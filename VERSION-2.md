@@ -1,11 +1,10 @@
-# VERSION 2 - CHECKPOINT
+# VERSION 2 DESIGN — FOCUS FIELD
 
-**Frozen on:** 2026-08-05
-**Checkpoint name:** `version2`
-**Website language:** English
-**Local route:** `/version2`
+**Branch:** `version2-design`  
+**Website language:** English  
+**Status:** Active design direction
 
-## What Version 2 explores
+## What this direction explores
 
 Version 2 turns the portfolio into an animated spatial field. It keeps the
 exploratory feeling of a game-like portfolio without asking the visitor to
@@ -21,7 +20,7 @@ whatever catches their attention. Curiosity becomes the navigation model.
 - The archery target becomes the visual and conceptual center of the field.
 - Five project and personality signals remain visible in one coherent space.
 - The visitor is welcomed as a guest and can explore in any order.
-- Motion supports discovery but respects reduced-motion preferences.
+- Motion supports discovery and respects reduced-motion preferences.
 
 ## Included interactions
 
@@ -34,14 +33,9 @@ whatever catches their attention. Curiosity becomes the navigation model.
 - Travel route recalculation with a Plan B.
 - Responsive layouts for desktop and mobile.
 
-## Relationship to Version 1
+## Development rule
 
-Version 1 remains available at `/version1` with its own files and stylesheet.
-Version 2 lives only in `app/version2/`, `public/styles/version2.css`, and
-`public/versions/version2/`. Shared framework files serve both routes but do not
-merge their designs.
+This is an evolving design branch, not a frozen release. Use commits to record
+each meaningful change. Version 1 is developed separately in the
+`version1-design` branch.
 
-## Preservation
-
-The exact source is preserved by the Git tag `version2` and by the ZIP snapshot
-in `checkpoints/`. Future directions should start as a separate version.
