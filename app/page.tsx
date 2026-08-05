@@ -56,6 +56,12 @@ export default function VersionTwo() {
         <a href="#top" className="v2-brand" aria-label="Back to top">
           ALINA.WU <span>/ FOCUS FIELD / V2</span>
         </a>
+        <nav className="v2-nav" aria-label="Portfolio sections">
+          <a href="/about">ABOUT</a>
+          <a href="/projects">PROJECTS</a>
+          <a href="/notes">NOTES</a>
+          <a href="/away">AWAY</a>
+        </nav>
         <div className="v2-status">
           <span><i /> FIELD ONLINE</span>
           <span>{discovered.length}/5 FOUND</span>
@@ -92,15 +98,16 @@ export default function VersionTwo() {
           <p>COMPUTER SCIENCE × HUMAN CURIOSITY</p>
           <h1>Follow<br />your <em>focus.</em></h1>
           <div className="v2-intro-copy">
-            <span>One field. Five signals.</span>
+            <span>HELLO, I AM ALINA.</span>
             <p>
-              Move to look around. Click anything that catches your attention.
-              No driving, no map to memorize, no correct order.
+              I build with code and study the human complexity it cannot fully
+              contain. Move to look around, or start with the person behind it.
             </p>
           </div>
-          <button onClick={() => setEntered(true)}>
-            ENTER THE FIELD <span>→</span>
-          </button>
+          <div className="v2-intro-actions">
+            <button onClick={() => setEntered(true)}>ENTER THE FIELD <span>→</span></button>
+            <a href="/about">MEET ALINA</a>
+          </div>
         </div>
 
         <button
@@ -229,6 +236,7 @@ export default function VersionTwo() {
                   </div>
                 </div>
                 <div className="v2-facts"><span>ROLE <b>Design + code</b></span><span>PRIORITY <b>Useful first</b></span><span>STATE <b>Iterating</b></span></div>
+                <a className="panel-link" href="/projects#web">CONTINUE INTO PROJECTS →</a>
               </div>
             )}
 
@@ -253,6 +261,7 @@ export default function VersionTwo() {
                     <button onClick={() => setAlgorithmRun((value) => !value)}>{algorithmRun ? "RESET" : "RUN PATH"}</button>
                   </div>
                 </div>
+                <a className="panel-link" href="/projects#algorithm">CONTINUE INTO THE CASE STUDY →</a>
               </div>
             )}
 
@@ -275,6 +284,7 @@ export default function VersionTwo() {
                     <button onClick={() => setDeviceOn((value) => !value)}>{deviceOn ? "POWER OFF" : "POWER ON"}</button>
                   </div>
                 </div>
+                <a className="panel-link" href="/projects#hardware">CONTINUE INTO THE CASE STUDY →</a>
               </div>
             )}
 
@@ -288,6 +298,7 @@ export default function VersionTwo() {
                   <article><span>LEARNING / NOW</span><p>How can interaction feel alive without turning a person into a data point?</p><small>No conclusion yet.</small></article>
                   <article><span>PERSONAL / TRACE</span><p>I used to practice laser shooting. Now I shoot arrows. The pause before release is part of the shot.</p><small>Maybe that belongs here.</small></article>
                 </div>
+                <a className="panel-link" href="/notes">OPEN ALL THOUGHT TRACES →</a>
               </div>
             )}
 
@@ -306,11 +317,29 @@ export default function VersionTwo() {
                   <button onClick={() => setRouteChanged((value) => !value)}>{routeChanged ? "RETURN TO PLAN A" : "RECALCULATE ROUTE"}</button>
                   <p>{routeChanged ? "PLAN B FOUND / LESS DIRECT / MORE INTERESTING" : "PLAN A READY / 38 MINUTES OF MARGIN"}</p>
                 </div>
+                <a className="panel-link" href="/away">FOLLOW THE ROUTE OFF SCREEN →</a>
               </div>
             )}
           </aside>
         </div>
       )}
+
+      <section className="field-afterword">
+        <div className="afterword-intro">
+          <span>THE FIELD WAS ONLY THE DOOR.</span>
+          <h2>A portfolio about<br />a person, not a stack.</h2>
+          <p>
+            The signals show what I make. The rooms beyond them show how I
+            think, what I notice, and who I am when the laptop closes.
+          </p>
+        </div>
+        <div className="afterword-grid">
+          <a href="/about"><span>01 / HUMAN SYSTEM</span><strong>Meet the person behind the work.</strong><i>ABOUT →</i></a>
+          <a href="/projects"><span>02 / WORK</span><strong>See how I approach different kinds of problems.</strong><i>PROJECTS →</i></a>
+          <a href="/notes"><span>03 / THOUGHT TRACES</span><strong>Read selected questions before they become conclusions.</strong><i>NOTES →</i></a>
+          <a href="/away"><span>04 / OFF SCREEN</span><strong>Follow the plans, detours, and ordinary life outside code.</strong><i>AWAY →</i></a>
+        </div>
+      </section>
     </main>
   );
 }

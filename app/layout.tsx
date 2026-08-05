@@ -13,17 +13,17 @@ const mono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alina — Focus Field",
-  description: "An animated spatial portfolio explored through focus rather than controls.",
+  title: "Alina — Code, People, and the Routes Between",
+  description: "Alina's interactive personal portfolio: computer science, psychology, projects, thought traces, and life beyond the screen.",
   openGraph: {
-    title: "ALINA.WU — Focus Field",
-    description: "An animated spatial portfolio explored through five signals and no controls to memorize.",
+    title: "ALINA.WU — Code, People, and the Routes Between",
+    description: "An interactive personal portfolio about computer science, human complexity, projects, thought traces, and life beyond the screen.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "Alina's Focus Field portfolio" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ALINA.WU — Focus Field",
-    description: "An animated spatial portfolio explored through five signals and no controls to memorize.",
+    title: "ALINA.WU — Code, People, and the Routes Between",
+    description: "An interactive personal portfolio about computer science, human complexity, projects, thought traces, and life beyond the screen.",
     images: ["/og.png"],
   },
 };

@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${pathname}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${pathname}`, { headers: { accept: "text/html" } }),
     {
       ASSETS: {
         fetch: async (request) => {
@@ -34,6 +34,10 @@ test("renders the Version 2 Focus Field at the root", async () => {
   const html = await response.text();
   assert.match(html, /Follow.*your.*focus/i);
   assert.match(html, /FOCUS FIELD/);
+  assert.match(html, /href="\/about"/);
+  assert.match(html, /href="\/projects"/);
+  assert.match(html, /href="\/notes"/);
+  assert.match(html, /href="\/away"/);
   assert.match(html, /href="\/site\.css"/);
   assert.doesNotMatch(html, /href="\/version1"|href="\/version2"/);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
@@ -48,5 +52,23 @@ test("keeps all five signals and lightweight demos", async () => {
   assert.match(page, /RUN PATH/);
   assert.match(page, /POWER ON/);
   assert.match(page, /RECALCULATE ROUTE/);
+});
+
+test("renders four deeper personal rooms", async () => {
+  const expectations = [
+    ["/about", /I build systems/i],
+    ["/projects", /Problems become/i],
+    ["/notes", /Thoughts with/i],
+    ["/away", /Plan the route/i],
+  ];
+
+  for (const [pathname, expected] of expectations) {
+    const response = await render(pathname);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, expected);
+    assert.match(html, /href="\/site\.css"/);
+    assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
+  }
 });
 
