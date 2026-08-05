@@ -1,70 +1,66 @@
-# Alina Portfolio — Version 1
+# Alina Portfolio - Versioned Workspace
 
-This folder contains the first checkpoint of Alina's interactive portfolio.
+This project keeps each portfolio direction as a separate, directly accessible
+version. A new version never silently overwrites an earlier one.
 
-**Current version:** `Version 1`  
-**Checkpoint date:** 2026-08-05  
-**Status:** Preserved and ready for future iteration
+## Start the website
 
-The website itself is entirely in English. This document includes Chinese
-instructions so the local preview is easy to use.
+1. Open the `alina-portfolio-demo` folder.
+2. Double-click **`START-WEBSITE.cmd`**.
+3. Keep the command window open while viewing the website.
+4. Press `Ctrl + C` in that window when finished, then close it.
 
-## 日常开启方式
+The launcher opens Version 1 by default. If the preview is already running,
+double-clicking the launcher simply opens it again.
 
-1. 打开 `alina-portfolio-demo` 文件夹。
-2. 双击根目录里的 **`START-WEBSITE.cmd`**。
-3. 保持弹出的命令窗口开启，浏览器会自动打开网站。
-4. 使用结束后，在命令窗口按 `Ctrl + C`，然后关闭窗口。
+## Open a specific version
 
-如果网站已经在运行，再次双击启动文件只会打开浏览器，不会重复启动。
+- Version index: <http://127.0.0.1:3000/>
+- Version 1: <http://127.0.0.1:3000/version1>
+- Version 2, when created: <http://127.0.0.1:3000/version2>
 
-默认地址：<http://127.0.0.1:3000/?v=version1>
+See [VERSIONS.md](VERSIONS.md) for the complete version architecture,
+development rules, and opening methods.
 
-## Version 1 checkpoint
+## Current checkpoints
 
-- The exact source is preserved in Git tag `version1`.
-- A portable source snapshot is stored in
+- The original Version 1 checkpoint is preserved in Git tag `version1`.
+- Its portable source snapshot is stored at
   `checkpoints/alina-portfolio-version1.zip`.
-- Design and content notes are recorded in [VERSION-1.md](VERSION-1.md).
+- Its design decisions are documented in [VERSION-1.md](VERSION-1.md).
 
-Do not edit the ZIP snapshot. Future work should continue in the main project
-files under `app/` and `public/`.
-
-## Folder map
+## Main folder map
 
 ```text
 alina-portfolio-demo/
-├── START-WEBSITE.cmd        Double-click launcher
-├── VERSION-1.md             V1 identity and checkpoint notes
+├── START-WEBSITE.cmd          Double-click launcher
+├── README.md                  Quick-start guide
+├── VERSIONS.md                Version architecture and rules
+├── VERSION-1.md               Version 1 design record
 ├── app/
-│   ├── page.tsx             Page content and interactions
-│   └── layout.tsx           Metadata, fonts, and document shell
+│   ├── layout.tsx             Shared document shell
+│   ├── page.tsx               Version index at /
+│   └── version1/
+│       ├── layout.tsx         Version 1 metadata and stylesheet
+│       └── page.tsx           Version 1 content and interactions
 ├── public/
-│   ├── site.css             Complete visual design
-│   └── og.png               Social sharing image
+│   ├── styles/
+│   │   ├── version-index.css  Version index styling
+│   │   └── version1.css       Version 1 styling
+│   └── og.png                 Version 1 social image
 ├── scripts/
-│   └── start-website.ps1    Local preview helper
-├── checkpoints/
-│   ├── README.md            Recovery notes
-│   └── alina-portfolio-version1.zip
-├── tests/                   Basic rendering checks
-└── build/, worker/, db/     Framework and hosting support
+│   └── start-website.ps1      Local preview helper
+├── checkpoints/               Read-only source snapshots
+├── tests/                     Rendering and version checks
+└── build/, worker/, db/       Framework and hosting support
 ```
 
 ## Editing guide
 
-- Change visible words and interactions in `app/page.tsx`.
-- Change colors, spacing, layout, and animation in `public/site.css`.
-- Change the browser title and sharing description in `app/layout.tsx`.
-- Keep new version decisions in a new version note instead of rewriting
-  `VERSION-1.md`.
-
-## Technical fallback
-
-If the launcher cannot be used, open PowerShell in this folder and run:
-
-```powershell
-$env:Path="$PWD\.runtime\node-v22.14.0-win-x64;$env:Path"
-npm run dev -- --hostname 127.0.0.1 --port 3000
-```
+- Edit Version 1 content in `app/version1/page.tsx`.
+- Edit Version 1 visuals in `public/styles/version1.css`.
+- Edit the version index in `app/page.tsx` and
+  `public/styles/version-index.css`.
+- Create a separate `app/version2/` folder and `version2.css` for Version 2.
+- Do not edit the Version 1 ZIP checkpoint.
 

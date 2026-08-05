@@ -3,6 +3,7 @@
 **Frozen on:** 2026-08-05  
 **Checkpoint name:** `version1`  
 **Website language:** English
+**Local route:** `/version1`
 
 ## What Version 1 establishes
 
@@ -39,6 +40,7 @@ That area is a strong candidate for Version 2 exploration.
 
 ## Preservation
 
-The exact source is preserved by the Git tag `version1` and by the ZIP snapshot
-in `checkpoints/`. Future versions should not modify this document.
-
+The exact original source is preserved by the Git tag `version1` and by the ZIP
+snapshot in `checkpoints/`. The active V1 route lives in `app/version1/` with
+its stylesheet in `public/styles/version1.css`. Future versions should not
+modify this document.

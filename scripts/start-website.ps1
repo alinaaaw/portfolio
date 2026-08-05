@@ -4,7 +4,7 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $nodeDirectory = Join-Path $projectRoot ".runtime\node-v22.14.0-win-x64"
 $npmCommand = Join-Path $nodeDirectory "npm.cmd"
 $devCommand = Join-Path $projectRoot "node_modules\.bin\vinext.cmd"
-$siteUrl = "http://127.0.0.1:3000/?v=version1"
+$siteUrl = "http://127.0.0.1:3000/version1?v=version1"
 
 try {
   $existingSite = Invoke-WebRequest -Uri $siteUrl -UseBasicParsing -TimeoutSec 2
