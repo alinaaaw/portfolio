@@ -1,44 +1,28 @@
-# VERSION 1 — CHECKPOINT
+# VERSION 1 DESIGN — PERSONAL WORKBENCH
 
-**Frozen on:** 2026-08-05  
-**Checkpoint name:** `version1`  
-**Website language:** English
+**Branch:** `version1-design`  
+**Website language:** English  
+**Status:** Active design direction
 
-## What Version 1 establishes
+## What this direction explores
 
-Version 1 is the first complete interaction and visual-direction study for the
-portfolio. It is intentionally a concept demo rather than a finished résumé.
-
-Its central idea is a professional personal workbench that reveals personality
+This direction is a professional personal workbench that reveals personality
 through exploration instead of explaining everything in a short biography.
 
 ## Design identity
 
-- Editorial and professional on first view.
-- Personal notes, questions, and dry humor appear through closer exploration.
-- Warm paper, charcoal, electric blue, acid lime, orange, and hardware yellow.
-- A target-like thought map connects to Alina's experience with laser shooting
-  and archery.
-- The visitor is treated as a guest, not a subject being observed.
-- Interaction is discoverable and lightweight, never a complicated game menu.
+- Editorial, warm, and structured without feeling like a résumé template.
+- First-person fragments, annotations, and clues create a sense of a real person.
+- Projects, notes, travel, and experiments coexist in one personal space.
+- The target / thought-map connects focus, decisions, shooting, and archery.
 
-## Included interactions
+## Open design question
 
-- Pointer-responsive workbench objects.
-- Five discoverable areas: web, algorithm, hardware, notes, and travel.
-- A runnable pathfinding study.
-- A hardware power and signal-state demonstration.
-- Expandable notes and a travel itinerary.
-- Responsive layouts for desktop and mobile.
+The target / thought-map area is visually meaningful but could make fuller use
+of its relationship to focus, goals, decision-making, and repeated practice.
 
-## Known next question
+## Development rule
 
-The target / thought-map area is visually meaningful but does not yet make full
-use of its connection to shooting, archery, focus, goals, and decision-making.
-That area is a strong candidate for Version 2 exploration.
-
-## Preservation
-
-The exact source is preserved by the Git tag `version1` and by the ZIP snapshot
-in `checkpoints/`. Future versions should not modify this document.
-
+This is an evolving design branch, not a frozen release. Use commits to record
+each meaningful change. Version 2 is developed separately in the
+`version2-design` branch.
