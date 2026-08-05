@@ -33,6 +33,7 @@ test("root renders the version index", async () => {
 
   assert.match(html, /Portfolio versions/i);
   assert.match(html, /href="\/version1"/);
+  assert.match(html, /href="\/version2"/);
   assert.match(html, /href="\/styles\/version-index\.css"/);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
 });
@@ -61,3 +62,26 @@ test("Version 1 source keeps all five interactive areas", async () => {
   assert.match(page, /POWER ON/);
 });
 
+test("Version 2 renders independently at its own route", async () => {
+  const response = await render("/version2");
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+
+  const html = await response.text();
+  assert.match(html, /Follow.*your.*focus/i);
+  assert.match(html, /FOCUS FIELD/);
+  assert.match(html, /href="\/styles\/version2\.css"/);
+  assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
+  assert.doesNotMatch(html, /codex-preview|SkeletonPreview/);
+});
+
+test("Version 2 source keeps all five signals and lightweight demos", async () => {
+  const page = await readFile(new URL("../app/version2/page.tsx", import.meta.url), "utf8");
+
+  for (const area of ["web", "algorithm", "hardware", "notes", "travel"]) {
+    assert.match(page, new RegExp(`openZone\\(\\"${area}\\"\\)`));
+  }
+  assert.match(page, /RUN PATH/);
+  assert.match(page, /POWER ON/);
+  assert.match(page, /RECALCULATE ROUTE/);
+});

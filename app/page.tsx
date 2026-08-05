@@ -29,23 +29,22 @@ export default function VersionIndex() {
             <strong>OPEN VERSION 1 →</strong>
           </a>
 
-          <article className="version-card version-card-planned" aria-label="Version 2 is not built yet">
+          <a className="version-card version-card-active version-card-v2" href="/version2">
             <span className="version-number">02</span>
             <div>
-              <p>NEXT STUDY</p>
-              <h2>Not defined yet</h2>
-              <span>A separate space will be created here without changing Version 1.</span>
+              <p>AVAILABLE NOW</p>
+              <h2>The Focus Field</h2>
+              <span>An animated spatial interface with five signals and no controls to memorize.</span>
             </div>
-            <strong>PLANNED</strong>
-          </article>
+            <strong>OPEN VERSION 2 →</strong>
+          </a>
         </section>
 
         <footer className="version-index-footer">
           <span>VERSIONED LOCALLY</span>
-          <a href="/version1">CURRENT: VERSION 1</a>
+          <a href="/version2">CURRENT: VERSION 2</a>
         </footer>
       </main>
     </>
   );
 }
-

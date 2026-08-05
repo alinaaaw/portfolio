@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ALINA.WU - Pixels, Algorithms & People / Version 1",
     description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Alina's interactive personal workbench" }],
+    images: [{ url: "/versions/version1/og.png", width: 1200, height: 630, alt: "Alina's interactive personal workbench" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ALINA.WU - Pixels, Algorithms & People / Version 1",
     description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-    images: ["/og.png"],
+    images: ["/versions/version1/og.png"],
   },
 };
 
@@ -24,4 +24,3 @@ export default function VersionOneLayout({ children }: Readonly<{ children: Reac
     </>
   );
 }
-

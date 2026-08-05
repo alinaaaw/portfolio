@@ -1,7 +1,7 @@
 # VERSION 1 — CHECKPOINT
 
-**Frozen on:** 2026-08-05  
-**Checkpoint name:** `version1`  
+**Frozen on:** 2026-08-05
+**Checkpoint name:** `version1`
 **Website language:** English
 **Local route:** `/version1`
 

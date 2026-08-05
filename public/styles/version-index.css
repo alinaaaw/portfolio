@@ -78,6 +78,8 @@
 
 .version-card-active { background: var(--ink); color: var(--paper) !important; }
 .version-card-active:hover { transform: translate(-5px, -5px); box-shadow: 10px 10px 0 var(--blue); }
+.version-card-v2 { background: #263e70; }
+.version-card-v2:hover { box-shadow: 10px 10px 0 #c9ff69; }
 .version-card-planned { border-style: dashed; color: #78746b; }
 .version-number { font: 52px var(--font-mono), monospace; }
 .version-card p { margin: 7px 0 22px; font: 9px var(--font-mono), monospace; letter-spacing: 0.12em; }
@@ -95,4 +97,3 @@
   .version-card { grid-template-columns: 65px 1fr; min-height: 260px; padding: 22px; }
   .version-number { font-size: 38px; }
 }
-
