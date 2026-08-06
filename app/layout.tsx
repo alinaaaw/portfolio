@@ -18,8 +18,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "Alina Wu — Case File 03: The Missing Researcher";
-  const description = "Enter an abandoned creative lab and reconstruct Alina through projects, notes, annotations, and five connected clues.";
+  const title = "Alina Wu — Lab 17 Interactive Portfolio";
+  const description = "Drive through Alina's late-night 3D laboratory and discover projects, research, field notes, and one unexpected bulletin.";
 
   return {
     title,
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      images: [{ url: `${origin}/og.png`, width: 1200, height: 630, alt: "Case File 03 evidence desk for The Missing Researcher" }],
+      images: [{ url: `${origin}/og.png`, width: 1200, height: 630, alt: "A late-night evidence desk inside Alina's interactive laboratory" }],
     },
     twitter: {
       card: "summary_large_image",

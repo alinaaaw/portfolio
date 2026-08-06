@@ -8,27 +8,27 @@
 
 ## Concept
 
-Version 3 presents the portfolio as a playful missing-person investigation.
-Alina has apparently disappeared, leaving an active laboratory filled with
-prototypes, annotations, route studies, and unfinished questions. The visitor
-reconstructs who she is by examining evidence rather than reading a biography.
+Version 3 presents the portfolio as a lightweight 3D exploration game. The
+visitor drives a small inspection rover through Alina's active laboratory and
+discovers factual project records, annotations, route studies, and unfinished
+questions. A possible disappearance is revealed gradually rather than announced.
 
 ## Investigation structure
 
-1. Accept Case File 03 and enter the laboratory.
-2. Inspect five objects in any order: terminal, route board, prototype, notebook,
-   and field bag.
-3. Read observations and form deductions about the subject.
-4. Connect the evidence on the case wall.
-5. Unlock the final theory: Alina was not missing; she followed the next question.
+1. Enter Lab 17 and launch the inspection rover.
+2. Drive with keyboard, touch controls, or click-to-navigate.
+3. Inspect five stations in any order: terminal, route table, device bench,
+   notebook, and field case.
+4. Discover the lab bulletin on the computer and follow later off-site traces.
+5. Recover Alina's final message after all five portfolio records are logged.
 
 ## Design identity
 
-- Late-night creative laboratory, not a police station or horror scene.
+- Realistic late-night creative laboratory rendered as a lightweight 3D scene.
 - Deep ink, warm paper, signal lime, evidence red, and muted cyan.
 - Editorial case files combined with tactile physical evidence.
 - Notes, corrections, crossed-out routes, and quiet humor reveal personality.
-- Projects are evidence of how the subject thinks and works.
+- Real projects and experiences are the primary evidence.
 - The mystery is inviting, intelligent, and safe rather than threatening.
 
 ## Development rule

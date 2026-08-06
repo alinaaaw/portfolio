@@ -1,6 +1,6 @@
 # Alina Portfolio — Version 3
 
-This branch contains the **Missing Researcher** portfolio direction.
+This branch contains the **Lab 17** interactive 3D portfolio direction.
 
 ## Open locally
 
@@ -10,14 +10,15 @@ the site, and press `Ctrl + C` when finished.
 ## Branch purpose
 
 - Branch: `version3-design`
-- Design: interactive laboratory investigation
+- Design: driveable 3D laboratory with a gradual mystery
 - Status: active and independently editable
 - Versions 1 and 2 are maintained separately.
 
 ## Main files
 
 ```text
-app/page.tsx              Investigation content and interactions
+app/page.tsx              Portfolio narrative and recovered project files
+app/_components/LabGame.tsx  Three.js laboratory and rover controls
 app/layout.tsx            Metadata and page shell
 public/site.css           Complete visual design and responsive behavior
 public/og.png             Social preview made for Case File 03
