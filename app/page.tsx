@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 type PanelId = "web" | "algorithm" | "hardware" | "notes" | "travel";
+type FocusId = "now" | "build" | "learn" | "explore";
+type Shot = { id: number; x: number; y: number; focus: FocusId };
 
 const panelNames: Record<PanelId, string> = {
   web: "WEB / SMALL SITES",
@@ -12,12 +14,64 @@ const panelNames: Record<PanelId, string> = {
   travel: "TRAVEL / OFF THE ROUTE",
 };
 
+const panelOrder: PanelId[] = ["web", "algorithm", "hardware", "notes", "travel"];
+
+const focusProfiles: Record<FocusId, {
+  index: string;
+  label: string;
+  title: string;
+  summary: string;
+  center: string;
+  detail: [string, string][];
+  panel: PanelId;
+}> = {
+  now: {
+    index: "00",
+    label: "CURRENT FOCUS",
+    title: "Ship the next useful thing.",
+    summary: "A stage becomes real when I can experience it, share it, and turn it into the next plan.",
+    center: "NOW",
+    detail: [["STAGE", "IN PROGRESS"], ["MODE", "BUILD / TEST"], ["BIAS", "KEEP MOVING"]],
+    panel: "algorithm",
+  },
+  build: {
+    index: "01",
+    label: "THINGS I BUILD",
+    title: "Code, then a real result.",
+    summary: "Small websites, algorithms, and hardware are different ways to move a problem from idea to use.",
+    center: "MAKE",
+    detail: [["FIELD", "WEB"], ["LOGIC", "ALGORITHM"], ["OUTPUT", "HARDWARE"]],
+    panel: "web",
+  },
+  learn: {
+    index: "02",
+    label: "THINGS I LEARN",
+    title: "Questions before conclusions.",
+    summary: "Computer science gives me structure. Psychology keeps the human parts complex, uncertain, and worth studying.",
+    center: "LEARN",
+    detail: [["METHOD", "RESEARCH"], ["STATE", "UNFINISHED"], ["RULE", "ASK NEXT"]],
+    panel: "notes",
+  },
+  explore: {
+    index: "03",
+    label: "THINGS I EXPLORE",
+    title: "A planned route into the unknown.",
+    summary: "I plan carefully, keep a backup, and still leave enough room to enter a life I have not experienced before.",
+    center: "GO",
+    detail: [["ROUTE", "PLANNED"], ["MARGIN", "PRESERVED"], ["NEXT", "UNKNOWN"]],
+    panel: "travel",
+  },
+};
+
 export default function Home() {
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [visited, setVisited] = useState<PanelId[]>([]);
   const [algorithmRunning, setAlgorithmRunning] = useState(false);
   const [hardwareOn, setHardwareOn] = useState(false);
+  const [focus, setFocus] = useState<FocusId>("now");
+  const [shots, setShots] = useState<Shot[]>([]);
   const deskRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<HTMLButtonElement>(null);
 
   const openPanel = (next: PanelId) => {
     setPanel(next);
@@ -45,6 +99,52 @@ export default function Home() {
     desk.style.setProperty("--nx", `${x * -12}px`);
     desk.style.setProperty("--ny", `${y * -12}px`);
   };
+
+  const lockFocus = (next: FocusId, x: number, y: number) => {
+    setFocus(next);
+    setShots((current) => [
+      ...current.slice(-5),
+      { id: Date.now(), x, y, focus: next },
+    ]);
+  };
+
+  const handleTargetPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const target = targetRef.current;
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    target.style.setProperty("--target-x", `${x}%`);
+    target.style.setProperty("--target-y", `${y}%`);
+  };
+
+  const handleTargetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (event.detail === 0) {
+      lockFocus("now", 50, 50);
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(3, Math.min(97, ((event.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(3, Math.min(97, ((event.clientY - rect.top) / rect.height) * 100));
+    const dx = event.clientX - (rect.left + rect.width / 2);
+    const dy = event.clientY - (rect.top + rect.height / 2);
+    const distance = Math.sqrt(dx * dx + dy * dy) / (Math.min(rect.width, rect.height) / 2);
+    const next: FocusId = distance <= 0.24 ? "now" : distance <= 0.48 ? "build" : distance <= 0.72 ? "learn" : "explore";
+    lockFocus(next, x, y);
+  };
+
+  const discoveryMessage = [
+    "Nothing opened yet. Start anywhere.",
+    "One trace found. The workbench is listening.",
+    "Two traces found. A pattern is beginning.",
+    "Three traces found. Projects and questions are connecting.",
+    "Four traces found. One part of the picture remains.",
+    "Surface complete. You have seen how the pieces connect.",
+  ][visited.length];
+
+  const activeFocus = focusProfiles[focus];
+  const nextPanel = panel ? panelOrder[(panelOrder.indexOf(panel) + 1) % panelOrder.length] : "web";
 
   return (
     <main>
@@ -78,21 +178,79 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="thought-map" aria-label="An animated map of plans and floating thoughts">
-          <div className="map-orbit orbit-one" />
-          <div className="map-orbit orbit-two" />
-          <div className="map-center">
-            <span>NOW</span>
-            <strong>building</strong>
-            <small>one step at a time</small>
+        <div className="focus-map-shell">
+          <div className="target-label-row">
+            <span>FOCUS MAP / LIVE</span>
+            <span>{shots.length === 0 ? "NO MARKS YET" : `${shots.length} MARK${shots.length === 1 ? "" : "S"}`}</span>
           </div>
+
+          <button
+            className={`focus-target focus-${focus}`}
+            ref={targetRef}
+            onPointerMove={handleTargetPointerMove}
+            onPointerLeave={() => {
+              targetRef.current?.style.setProperty("--target-x", "50%");
+              targetRef.current?.style.setProperty("--target-y", "50%");
+            }}
+            onClick={handleTargetClick}
+            aria-label="Aim at a ring and click to select a focus area"
+          >
+            <span className="target-axis axis-horizontal" aria-hidden="true" />
+            <span className="target-axis axis-vertical" aria-hidden="true" />
+            <span className="target-ring ring-explore"><i>EXPLORE</i></span>
+            <span className="target-ring ring-learn"><i>LEARN</i></span>
+            <span className="target-ring ring-build"><i>BUILD</i></span>
+            <span className="target-core">
+              <small>{activeFocus.index}</small>
+              <strong>{activeFocus.center}</strong>
+              <i>LOCKED</i>
+            </span>
+            {shots.map((shot) => (
+              <span
+                className={`target-shot shot-${shot.focus}`}
+                key={shot.id}
+                style={{ left: `${shot.x}%`, top: `${shot.y}%` }}
+                aria-hidden="true"
+              />
+            ))}
+            <span className="target-crosshair" aria-hidden="true"><i /><i /></span>
+            <span className="target-instruction">MOVE / AIM / CLICK</span>
+          </button>
+
           <span className="thought thought-a">travel route</span>
           <span className="thought thought-b">why would someone choose that?</span>
           <span className="thought thought-c">unverified</span>
           <span className="thought thought-d">next step →</span>
-          <span className="thought-dot dot-one" />
-          <span className="thought-dot dot-two" />
-          <p className="map-note">Some thoughts form a plan. Others are still floating.</p>
+
+          <div className="focus-readout" aria-live="polite">
+            <div className="focus-readout-heading">
+              <span>{activeFocus.index} / {activeFocus.label}</span>
+              <i>FOCUS LOCKED</i>
+            </div>
+            <h2>{activeFocus.title}</h2>
+            <p>{activeFocus.summary}</p>
+            <div className="focus-data">
+              {activeFocus.detail.map(([label, value]) => (
+                <span key={label}><small>{label}</small><b>{value}</b></span>
+              ))}
+            </div>
+            <button className="focus-follow" onClick={() => openPanel(activeFocus.panel)}>
+              FOLLOW THIS TRACE →
+            </button>
+          </div>
+
+          <div className="focus-legend" aria-label="Focus map controls">
+            {(Object.keys(focusProfiles) as FocusId[]).map((id) => (
+              <button
+                className={focus === id ? "active" : ""}
+                key={id}
+                onClick={() => setFocus(id)}
+              >
+                <span>{focusProfiles[id].index}</span>
+                {focusProfiles[id].label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -117,6 +275,7 @@ export default function Home() {
           <div className="bench-grid" aria-hidden="true" />
           <div className="bench-status">
             <span><i /> WORKSPACE ONLINE</span>
+            <span className="bench-guidance">{discoveryMessage}</span>
             <span>{visited.length}/5 DISCOVERED</span>
           </div>
 
@@ -193,8 +352,29 @@ export default function Home() {
           <span className="loose-note note-three">research first, ask people next</span>
         </div>
 
+        <div className={`discovery-ledger ${visited.length === 5 ? "complete" : ""}`}>
+          <div className="ledger-heading">
+            <span>VISITOR TRACE / {String(visited.length).padStart(2, "0")}</span>
+            <strong>{visited.length === 5 ? "SURFACE COMPLETE" : "STILL EXPLORING"}</strong>
+          </div>
+          <div className="ledger-items">
+            {panelOrder.map((id, index) => (
+              <button
+                className={visited.includes(id) ? "found" : ""}
+                key={id}
+                onClick={() => openPanel(id)}
+              >
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <b>{panelNames[id].split(" / ")[0]}</b>
+                <i>{visited.includes(id) ? "FOUND" : "OPEN"}</i>
+              </button>
+            ))}
+          </div>
+          <p>{discoveryMessage}</p>
+        </div>
+
         <p className="bench-caption">
-          An interaction study: the content is provisional, but the space already has a point of view.
+          The workbench remembers what you opened. There is no required order, only a route you leave behind.
         </p>
       </section>
 
@@ -337,6 +517,16 @@ export default function Home() {
                 <p className="panel-copy">Travel is more than an interest tag. It is another way of thinking: plan carefully, preserve some margin, then actually enter the unknown.</p>
               </div>
             )}
+
+            <div className="panel-route">
+              <div>
+                <span>NEXT TRACE</span>
+                <small>{visited.length}/5 AREAS DISCOVERED</small>
+              </div>
+              <button onClick={() => openPanel(nextPanel)}>
+                {panelNames[nextPanel]} →
+              </button>
+            </div>
           </aside>
         </div>
       )}

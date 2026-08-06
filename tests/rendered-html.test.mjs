@@ -34,6 +34,9 @@ test("server-renders the English Version 1 portfolio", async () => {
   assert.match(html, /Alina.*Pixels, Algorithms.*People/i);
   assert.match(html, /I solve problems with code/i);
   assert.match(html, /WORKBENCH/);
+  assert.match(html, /FOCUS MAP/);
+  assert.match(html, /MOVE \/ AIM \/ CLICK/);
+  assert.match(html, /VISITOR TRACE/);
   assert.match(html, /href="\/site\.css"/);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview/);
@@ -49,5 +52,19 @@ test("source keeps the five interactive portfolio areas", async () => {
   }
   assert.match(page, /RUN SEARCH/);
   assert.match(page, /POWER ON/);
+  assert.match(page, /handleTargetClick/);
+  assert.match(page, /focusProfiles/);
+  assert.match(page, /NEXT TRACE/);
+});
+
+test("Version 1 styles the focus and discovery interactions", async () => {
+  const css = await import("node:fs/promises").then(({ readFile }) =>
+    readFile(new URL("../public/site.css", import.meta.url), "utf8"),
+  );
+
+  assert.match(css, /\.focus-target/);
+  assert.match(css, /\.target-crosshair/);
+  assert.match(css, /\.discovery-ledger/);
+  assert.match(css, /\.panel-route/);
 });
 
