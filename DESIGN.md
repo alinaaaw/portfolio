@@ -1,32 +1,33 @@
-# VERSION 4 DESIGN — OBSERVATION ROOM
+# VERSION 4 DESIGN — WARM PERSONAL FIELD NOTES
 
 ## Experience statement
 
-The website is a short interactive artwork about uncertainty, attention, and
-control. It begins as a quiet room and unfolds through four decisions. The
-visitor gradually realizes that timing, hesitation, movement, and choice are
-part of the experience.
+Version 4 is unmistakably Alina's personal website. It introduces her before
+asking the visitor to interact, shows concrete project areas, and connects
+computer science with her curiosity about psychology and people.
 
-## Interaction rules
+## Hierarchy
 
-- Observe behavior without collecting identity, camera, microphone, or durable
-  data.
-- Describe the current session; never claim to diagnose personality.
-- Every choice must be understandable with mouse, touch, or keyboard.
-- Reveal interpretation after each action, then provide a complete trace.
-- State privacy and experimental limits before entry and again at the result.
-- Keep all behavioral state in page memory only.
+1. Alina's name, point of view, and current direction.
+2. Selected work in websites, algorithms, and hardware.
+3. The interests that shape how she notices: psychology, archery, and travel.
+4. A small optional experiment that adds depth without defining the website.
+5. A direct, friendly contact ending.
 
 ## Visual direction
 
-A dark behavioral lab with warm off-white typography, acid-green live signals,
-orange observation marks, fine grids, and precise monospaced metadata. Motion
-must communicate scanning, registering, or revealing—not decoration.
+Warm editorial field notes: cream paper, charcoal ink, coral, sage, dusty blue,
+and soft yellow. Paper layers, tape, notes, modest rotations, and crisp rules
+provide personality without making the layout messy.
 
-## Release checks
+The website must never feel like a dark laboratory, surveillance interface,
+medical application, generic résumé template, or personality-test funnel.
 
-- Full four-step path completes without dead ends.
-- Restart clears the previous trace.
-- Mobile stacks choices into a deliberate linear flow.
-- Reduced-motion users receive the same information.
-- The result is framed as an artwork, not a validated assessment.
+## Interaction rules
+
+- Essential personal information is visible without interaction.
+- Project tabs reveal meaningful differences between areas.
+- The experiment is short, optional, transparent, and non-diagnostic.
+- Interaction state remains in page memory only.
+- Pointer, touch, keyboard, mobile, and reduced-motion experiences must retain
+  equivalent content.

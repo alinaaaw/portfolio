@@ -19,43 +19,44 @@ async function render() {
   );
 }
 
-test("server renders the Observation Room entry", async () => {
+test("server renders an unmistakable personal portfolio", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /OBSERVATION ROOM/);
-  assert.match(html, /You are not here.*to answer questions/i);
-  assert.match(html, /No camera.*No identity.*No diagnosis/i);
-  assert.match(html, /ENTER THE ROOM/);
+  assert.match(html, /ALINA\.WU/);
+  assert.match(html, /Hi, I.*m Alina/i);
+  assert.match(html, /I build with.*code/i);
+  assert.match(html, /SELECTED WORK/);
+  assert.match(html, /AWAY FROM THE KEYBOARD/);
+  assert.match(html, /A SMALL EXPERIMENT/);
   assert.match(html, /href="\/site\.css"/);
-  assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
-  assert.doesNotMatch(html, /WORKBENCH|codex-preview|SkeletonPreview/);
+  assert.doesNotMatch(html, /OBSERVATION ROOM|PASSIVE SIGNALS|codex-preview/);
 });
 
-test("source keeps the complete four-stage experiment", async () => {
+test("source keeps projects and the optional experiment", async () => {
   const page = await import("node:fs/promises").then(({ readFile }) =>
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
   );
 
-  for (const stage of ["THRESHOLD", "INFORMATION", "PACE", "PROJECTION"]) {
-    assert.match(page, new RegExp(stage));
+  for (const area of ["WEB / PRODUCT THINKING", "ALGORITHMS / REASONING", "HARDWARE / PHYSICAL SYSTEMS"]) {
+    assert.match(page, new RegExp(area));
   }
-  assert.match(page, /PATH CHANGES/);
-  assert.match(page, /DATA TRANSMITTED/);
-  assert.match(page, /not a validated psychological assessment/i);
-  assert.match(page, /navigator\.clipboard/);
+  assert.match(page, /startExperiment/);
+  assert.match(page, /Nothing is saved/);
+  assert.match(page, /not a definition of you/i);
 });
 
-test("Version 4 styles responsive and reduced-motion states", async () => {
+test("Version 4 uses warm responsive styles", async () => {
   const css = await import("node:fs/promises").then(({ readFile }) =>
     readFile(new URL("../public/site.css", import.meta.url), "utf8"),
   );
 
-  assert.match(css, /\.observer-rail/);
-  assert.match(css, /\.choice-card/);
-  assert.match(css, /\.result-grid/);
+  assert.match(css, /--cream: #f7f1e6/);
+  assert.match(css, /\.portrait-board/);
+  assert.match(css, /\.project-workspace/);
+  assert.match(css, /\.experiment-card/);
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(css, /max-width: 680px/);
+  assert.match(css, /max-width: 640px/);
 });

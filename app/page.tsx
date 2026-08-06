@@ -1,350 +1,335 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-type Mode = "intro" | "trial" | "reflection" | "result";
-type RecordItem = { trial: number; choice: string; time: number };
-type ClickMark = { id: number; x: number; y: number };
+type ProjectId = "web" | "algorithm" | "hardware";
+type ExperimentStep = "intro" | "first" | "second" | "result";
 
-const trials = [
-  {
-    code: "THRESHOLD",
-    prompt: "Two entrances. One tells you exactly where it leads.",
-    context: "You can only open one.",
-    options: [
-      { id: "known", label: "THE LABELED DOOR", detail: "OBSERVATION ROOM →", mark: "A" },
-      { id: "unknown", label: "THE UNMARKED DOOR", detail: "NO DESTINATION GIVEN", mark: "?" },
-    ],
-    observations: {
-      known: "You chose definition before discovery. That may be caution—or simply efficient reading.",
-      unknown: "You chose discovery before definition. Curiosity moved before certainty arrived.",
-    },
+const projects: Record<ProjectId, {
+  number: string;
+  category: string;
+  title: string;
+  summary: string;
+  question: string;
+  role: string;
+  status: string;
+  className: string;
+}> = {
+  web: {
+    number: "01",
+    category: "WEB / PRODUCT THINKING",
+    title: "Small tools for real decisions.",
+    summary: "I like turning a fuzzy everyday problem into a clear, useful interface—then watching where people still hesitate.",
+    question: "How little interface is enough to help someone move?",
+    role: "DESIGN + DEVELOPMENT",
+    status: "ITERATING",
+    className: "project-coral",
   },
-  {
-    code: "INFORMATION",
-    prompt: "The next decision has missing context.",
-    context: "More information is available, but it may not make the choice easier.",
-    options: [
-      { id: "more", label: "READ THE FULL NOTE", detail: "ADD CONTEXT BEFORE CHOOSING", mark: "+" },
-      { id: "enough", label: "I HAVE ENOUGH", detail: "DECIDE WITH WHAT IS HERE", mark: "—" },
-    ],
-    observations: {
-      more: "You asked for context even after being warned it might not resolve the ambiguity.",
-      enough: "You accepted an incomplete picture and protected momentum.",
-    },
+  algorithm: {
+    number: "02",
+    category: "ALGORITHMS / REASONING",
+    title: "Finding a path without pretending it was obvious.",
+    summary: "Search becomes interesting when the first route fails. I build visual studies that make the reasoning, trade-offs, and recalculation visible.",
+    question: "What does the system do after its best guess is wrong?",
+    role: "RESEARCH + CODE",
+    status: "PROTOTYPE",
+    className: "project-blue",
   },
-  {
-    code: "PACE",
-    prompt: "A signal will appear. The interface does not say when.",
-    context: "Waiting may reveal something. Continuing is also a valid decision.",
-    options: [
-      { id: "wait", label: "WAIT FOR THE SIGNAL", detail: "LET THE MOMENT ARRIVE", mark: "…" },
-      { id: "continue", label: "CONTINUE NOW", detail: "DO NOT OUTSOURCE THE PACE", mark: ">" },
-    ],
-    observations: {
-      wait: "You allowed the interface to set the pace—at least this once.",
-      continue: "You reclaimed the pace instead of waiting for permission from the interface.",
-    },
+  hardware: {
+    number: "03",
+    category: "HARDWARE / PHYSICAL SYSTEMS",
+    title: "When code has to touch the real world.",
+    summary: "Sensors, boards, and physical feedback make assumptions impossible to hide. I enjoy the moment software becomes something you can hold.",
+    question: "Can a physical response make invisible data easier to understand?",
+    role: "BUILD + TEST",
+    status: "BENCH NOTES",
+    className: "project-yellow",
   },
-  {
-    code: "PROJECTION",
-    prompt: "Keep one object. None of them has a stated use.",
-    context: "The object will not appear again. The choice is still recorded.",
-    options: [
-      { id: "key", label: "THE KEY", detail: "POSSIBLE ACCESS", mark: "⌁" },
-      { id: "compass", label: "THE COMPASS", detail: "POSSIBLE DIRECTION", mark: "✣" },
-      { id: "card", label: "THE BLANK CARD", detail: "POSSIBLE MEANING", mark: "□" },
-    ],
-    observations: {
-      key: "You kept the possibility of access: a way through something not yet visible.",
-      compass: "You kept the possibility of direction: orientation before arrival.",
-      card: "You kept the possibility of authorship: meaning left deliberately unfinished.",
-    },
-  },
-] as const;
+};
+
+const firstChoices = {
+  map: { label: "A MAP", note: "You orient yourself through structure." },
+  people: { label: "THE PEOPLE", note: "You orient yourself through human signals." },
+  corner: { label: "A QUIET CORNER", note: "You orient yourself by finding space to observe." },
+} as const;
+
+const secondChoices = {
+  plan: { label: "MAKE A PLAN", note: "You prefer a shared frame before momentum." },
+  prototype: { label: "TRY SOMETHING SMALL", note: "You prefer evidence before a perfect frame." },
+} as const;
 
 export default function Home() {
-  const [mode, setMode] = useState<Mode>("intro");
-  const [trialIndex, setTrialIndex] = useState(0);
-  const [records, setRecords] = useState<RecordItem[]>([]);
-  const [elapsed, setElapsed] = useState(0);
-  const [switches, setSwitches] = useState(0);
-  const [movement, setMovement] = useState(0);
-  const [clicks, setClicks] = useState<ClickMark[]>([]);
-  const [copied, setCopied] = useState(false);
-  const trialStarted = useRef(0);
-  const lastHover = useRef<string | null>(null);
-  const lastPoint = useRef<{ x: number; y: number } | null>(null);
-  const movementTotal = useRef(0);
+  const [selectedProject, setSelectedProject] = useState<ProjectId>("web");
+  const [experimentStep, setExperimentStep] = useState<ExperimentStep>("intro");
+  const [firstChoice, setFirstChoice] = useState<keyof typeof firstChoices | null>(null);
+  const [secondChoice, setSecondChoice] = useState<keyof typeof secondChoices | null>(null);
+  const [decisionTime, setDecisionTime] = useState(0);
+  const experimentStarted = useRef(0);
+  const activeProject = projects[selectedProject];
 
-  useEffect(() => {
-    if (mode !== "trial") return;
-    const timer = window.setInterval(() => {
-      setElapsed(performance.now() - trialStarted.current);
-    }, 100);
-    return () => window.clearInterval(timer);
-  }, [mode, trialIndex]);
-
-  const begin = () => {
-    setMode("trial");
-    setTrialIndex(0);
-    setRecords([]);
-    setSwitches(0);
-    setMovement(0);
-    setClicks([]);
-    setCopied(false);
-    movementTotal.current = 0;
-    lastPoint.current = null;
-    lastHover.current = null;
-    trialStarted.current = performance.now();
+  const startExperiment = () => {
+    setFirstChoice(null);
+    setSecondChoice(null);
+    setDecisionTime(0);
+    experimentStarted.current = performance.now();
+    setExperimentStep("first");
   };
 
-  const choose = (choice: string) => {
-    const time = Math.max(100, performance.now() - trialStarted.current);
-    setRecords((current) => [...current, { trial: trialIndex, choice, time }]);
-    setElapsed(time);
-    setMode("reflection");
+  const chooseFirst = (choice: keyof typeof firstChoices) => {
+    setFirstChoice(choice);
+    setDecisionTime(performance.now() - experimentStarted.current);
+    setExperimentStep("second");
   };
 
-  const continueExperiment = () => {
-    if (trialIndex === trials.length - 1) {
-      setMode("result");
-      return;
-    }
-    setTrialIndex((current) => current + 1);
-    lastHover.current = null;
-    setElapsed(0);
-    trialStarted.current = performance.now();
-    setMode("trial");
-  };
-
-  const observeHover = (id: string) => {
-    if (lastHover.current && lastHover.current !== id) {
-      setSwitches((value) => value + 1);
-    }
-    lastHover.current = id;
-  };
-
-  const observePointer = (event: React.PointerEvent<HTMLElement>) => {
-    if (lastPoint.current) {
-      const dx = event.clientX - lastPoint.current.x;
-      const dy = event.clientY - lastPoint.current.y;
-      movementTotal.current += Math.sqrt(dx * dx + dy * dy);
-      const next = Math.floor(movementTotal.current / 500);
-      if (next !== movement) setMovement(next);
-    }
-    lastPoint.current = { x: event.clientX, y: event.clientY };
-  };
-
-  const markClick = (event: React.PointerEvent<HTMLElement>) => {
-    if (mode === "intro") return;
-    setClicks((current) => [
-      ...current.slice(-8),
-      {
-        id: Date.now(),
-        x: (event.clientX / window.innerWidth) * 100,
-        y: (event.clientY / window.innerHeight) * 100,
-      },
-    ]);
-  };
-
-  const currentTrial = trials[trialIndex];
-  const latestRecord = records[records.length - 1];
-  const latestObservation = latestRecord
-    ? currentTrial.observations[latestRecord.choice as keyof typeof currentTrial.observations]
-    : "";
-  const averageTime = records.length
-    ? records.reduce((sum, item) => sum + item.time, 0) / records.length
-    : 0;
-  const first = records[0]?.choice;
-  const information = records[1]?.choice;
-  const pace = records[2]?.choice;
-  const object = records[3]?.choice;
-  const movementLabel = movement < 4 ? "CONTAINED" : movement < 10 ? "SEARCHING" : "EXPANSIVE";
-  const summary =
-    "Observation 04: " +
-    (first === "unknown" ? "I entered through uncertainty" : "I entered through definition") +
-    ", " +
-    (information === "more" ? "asked for more context" : "accepted incomplete context") +
-    ", and " +
-    (pace === "wait" ? "waited for the interface" : "kept my own pace") +
-    ".";
-
-  const copySummary = async () => {
-    try {
-      await navigator.clipboard.writeText(summary);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
+  const chooseSecond = (choice: keyof typeof secondChoices) => {
+    setSecondChoice(choice);
+    setExperimentStep("result");
   };
 
   return (
-    <main
-      className={"experiment mode-" + mode + " reveal-" + records.length}
-      onPointerMove={observePointer}
-      onPointerDown={markClick}
-    >
-      <header className="lab-header">
-        <a href="#top" className="lab-mark" aria-label="Observation Room home">
-          <span className="pulse-dot" /> OBSERVATION ROOM
+    <main>
+      <header className="topbar">
+        <a className="wordmark" href="#top" aria-label="Back to the top">
+          ALINA.WU <span>/ PERSONAL FIELD NOTES</span>
         </a>
-        <div className="session-meta">
-          <span>SESSION 04</span>
-          <span>{mode === "intro" ? "DORMANT" : mode === "result" ? "ARCHIVED" : "SIGNAL LIVE"}</span>
-        </div>
+        <nav aria-label="Primary navigation">
+          <a href="#about">ABOUT</a>
+          <a href="#work">WORK</a>
+          <a href="#experiment">A SMALL EXPERIMENT</a>
+        </nav>
+        <a className="say-hi" href="mailto:hello@example.com">SAY HI ↗</a>
       </header>
 
-      <div className="room-grid" aria-hidden="true" />
-      <div className="scanline" aria-hidden="true" />
-      {clicks.map((click, index) => (
-        <span
-          className="click-mark"
-          key={click.id}
-          style={{
-            left: click.x + "%",
-            top: click.y + "%",
-            opacity: (index + 2) / (clicks.length + 2),
-          }}
-          aria-hidden="true"
-        />
-      ))}
-
-      <aside className="observer-rail" aria-label="Live observation status">
-        <span>PASSIVE SIGNALS</span>
-        <dl>
-          <div><dt>CHOICES</dt><dd>{String(records.length).padStart(2, "0")}</dd></div>
-          <div><dt>PATH CHANGES</dt><dd>{String(switches).padStart(2, "0")}</dd></div>
-          <div><dt>MOVEMENT</dt><dd>{movementLabel}</dd></div>
-          <div><dt>STORED</dt><dd>NO</dd></div>
-        </dl>
-      </aside>
-
-      <section className="room" id="top" aria-live="polite">
-        {mode === "intro" && (
-          <div className="intro-panel">
-            <p className="step-label">BEHAVIORAL STUDY / 04</p>
-            <h1>You are not here<br />to answer questions.</h1>
-            <p className="lead">
-              Make four small decisions. The room will pay attention to how you move between them—not who you are.
-            </p>
-            <div className="consent-note">
-              <span>BEFORE YOU ENTER</span>
-              <p>No camera. No identity. No diagnosis. Interaction signals live only in this page and disappear when you leave.</p>
-            </div>
-            <button className="primary-button" onClick={begin}>
-              ENTER THE ROOM <span>↗</span>
-            </button>
+      <section className="hero" id="top">
+        <div className="hero-copy">
+          <p className="eyebrow"><span /> COMPUTER SCIENCE · HUMAN CURIOSITY</p>
+          <h1>
+            Hi, I&apos;m Alina.
+            <br />
+            I build with <em>code</em>
+            <br />
+            and stay curious
+            <br />
+            about <i>people.</i>
+          </h1>
+          <p className="hero-intro">
+            I make small websites, study algorithms, and connect software to physical things.
+            Psychology keeps me asking what happens on the human side of every system.
+          </p>
+          <div className="hero-actions">
+            <a className="primary-action" href="#work">SEE WHAT I&apos;M MAKING <span>↓</span></a>
+            <a className="quiet-action" href="#about">A little more about me →</a>
           </div>
-        )}
+        </div>
 
-        {mode === "trial" && (
-          <div className="trial-panel" key={trialIndex}>
-            <div className="trial-head">
-              <p className="step-label">{String(trialIndex + 1).padStart(2, "0")} / {currentTrial.code}</p>
-              <span>{(elapsed / 1000).toFixed(1)} SEC</span>
-            </div>
-            <h2>{currentTrial.prompt}</h2>
-            <p className="trial-context">{currentTrial.context}</p>
-            <div className={"choice-field choice-count-" + currentTrial.options.length}>
-              {currentTrial.options.map((option) => (
-                <button
-                  className="choice-card"
-                  key={option.id}
-                  onPointerEnter={() => observeHover(option.id)}
-                  onFocus={() => observeHover(option.id)}
-                  onClick={() => choose(option.id)}
-                >
-                  <span className="choice-mark">{option.mark}</span>
-                  <span className="choice-copy"><strong>{option.label}</strong><small>{option.detail}</small></span>
-                  <span className="choice-arrow">↗</span>
-                </button>
-              ))}
-            </div>
-            <p className="micro-note">There is no correct choice. The pause is part of the choice.</p>
+        <div className="portrait-board" aria-label="A visual introduction to Alina">
+          <div className="paper-shadow paper-one" aria-hidden="true" />
+          <div className="paper-shadow paper-two" aria-hidden="true" />
+          <div className="hello-card">
+            <span className="tape" aria-hidden="true" />
+            <div className="sun-stamp" aria-hidden="true"><i /><i /><i /><i /></div>
+            <p>HELLO FROM MY DESK</p>
+            <strong>Thoughtful systems.<br />Unfinished questions.<br />A very detailed Plan B.</strong>
+            <small>SHANGHAI · CURRENTLY LEARNING</small>
           </div>
-        )}
-
-        {mode === "reflection" && latestRecord && (
-          <div className="reflection-panel">
-            <p className="step-label">OBSERVATION {String(trialIndex + 1).padStart(2, "0")} / REGISTERED</p>
-            <div className="observation-number">{(latestRecord.time / 1000).toFixed(1)}<small>SECONDS</small></div>
-            <h2>{latestObservation}</h2>
-            <p className="caution">One action cannot explain a person. It can only describe this moment.</p>
-            <button className="primary-button" onClick={continueExperiment}>
-              {trialIndex === trials.length - 1 ? "SEE THE TRACE" : "NEXT OBSERVATION"} <span>→</span>
-            </button>
+          <span className="orbit-tag tag-code">CODE</span>
+          <span className="orbit-tag tag-psych">PSYCHOLOGY</span>
+          <span className="orbit-tag tag-archery">ARCHERY</span>
+          <div className="question-card">
+            <span>TODAY&apos;S QUESTION</span>
+            <p>Can an interface feel warm without pretending to be human?</p>
           </div>
-        )}
-
-        {mode === "result" && (
-          <div className="result-panel">
-            <div className="result-heading">
-              <div>
-                <p className="step-label">SESSION 04 / BEHAVIORAL TRACE</p>
-                <h1>This is what happened.<br /><em>Not who you are.</em></h1>
-              </div>
-              <span className="archive-stamp">OBSERVED<br />NOT DIAGNOSED</span>
-            </div>
-
-            <div className="trace-line" aria-label="Sequence of recorded decisions">
-              {records.map((record, index) => (
-                <div key={record.trial + "-" + record.choice}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <i />
-                  <b>{record.choice.toUpperCase()}</b>
-                </div>
-              ))}
-            </div>
-
-            <div className="result-grid">
-              <article className="result-card featured">
-                <span>ENTRY</span>
-                <strong>{first === "unknown" ? "UNCERTAINTY FIRST" : "DEFINITION FIRST"}</strong>
-                <p>{first === "unknown" ? "You entered before the destination was explained." : "You used the available label to orient yourself."}</p>
-              </article>
-              <article className="result-card">
-                <span>CONTEXT</span>
-                <strong>{information === "more" ? "GATHER" : "PROCEED"}</strong>
-                <p>{information === "more" ? "More context felt worth the extra step." : "Incomplete information did not stop the decision."}</p>
-              </article>
-              <article className="result-card">
-                <span>PACE</span>
-                <strong>{pace === "wait" ? "RECEPTIVE" : "SELF-DIRECTED"}</strong>
-                <p>{pace === "wait" ? "You gave the signal time to arrive." : "You continued without waiting for a signal."}</p>
-              </article>
-              <article className="result-card">
-                <span>PROJECTION</span>
-                <strong>{object === "key" ? "ACCESS" : object === "compass" ? "DIRECTION" : "AUTHORSHIP"}</strong>
-                <p>You assigned possibility to an object whose purpose was never stated.</p>
-              </article>
-            </div>
-
-            <div className="result-stats">
-              <div><span>AVERAGE DECISION</span><b>{(averageTime / 1000).toFixed(1)}s</b></div>
-              <div><span>PATH CHANGES</span><b>{switches}</b></div>
-              <div><span>POINTER MOVEMENT</span><b>{movementLabel}</b></div>
-              <div><span>DATA TRANSMITTED</span><b>NONE</b></div>
-            </div>
-
-            <div className="result-actions">
-              <button className="primary-button" onClick={begin}>RUN AGAIN <span>↻</span></button>
-              <button className="text-button" onClick={copySummary}>{copied ? "TRACE COPIED ✓" : "COPY MY TRACE"}</button>
-            </div>
-            <p className="result-disclaimer">This experience is an interactive artwork, not a validated psychological assessment. Its interpretations are intentionally provisional.</p>
-          </div>
-        )}
+          <span className="scribble-note">still testing →</span>
+        </div>
       </section>
 
-      <div className="reveal-feed" aria-hidden="true">
-        <p>OBSERVATION DOES NOT BEGIN WHEN YOU CLICK.</p>
-        <p>HESITATION IS ALSO A SIGNAL.</p>
-        <p>THE INTERFACE CHANGES WHEN IT KNOWS YOU NOTICED.</p>
-      </div>
+      <section className="now-strip" aria-label="Current status">
+        <span>RIGHT NOW</span>
+        <p>Building useful little things · learning how attention works · planning the next trip</p>
+        <i>AVAILABLE FOR A GOOD CONVERSATION</i>
+      </section>
 
-      <footer className="lab-footer">
-        <span>AN EXPERIMENT ABOUT UNCERTAINTY, ATTENTION & CONTROL</span>
-        <span>LOCAL SESSION / NOTHING SAVED</span>
+      <section className="about-section" id="about">
+        <div className="section-index">01</div>
+        <div className="about-heading">
+          <p className="eyebrow">A WORKING PROFILE</p>
+          <h2>I like clear systems.<br />People are wonderfully<br /><em>less clear.</em></h2>
+        </div>
+        <div className="about-copy">
+          <p>
+            Computer science taught me to break a problem into parts. Psychology taught me
+            to be careful about assuming those parts explain the whole person.
+          </p>
+          <p>
+            That tension is where I like to work: between logic and lived experience,
+            between the plan and what actually happens.
+          </p>
+          <div className="about-margin-note">
+            <span>NOTE TO SELF</span>
+            Research first. Ask people next. Stay ready to be wrong.
+          </div>
+        </div>
+      </section>
+
+      <section className="work-section" id="work">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">02 / SELECTED WORK</p>
+            <h2>Things I make to<br />understand things better.</h2>
+          </div>
+          <p className="section-note">Choose a project card. The details will meet you on the right.</p>
+        </div>
+
+        <div className="project-workspace">
+          <div className="project-list" role="tablist" aria-label="Project areas">
+            {(Object.keys(projects) as ProjectId[]).map((id) => {
+              const project = projects[id];
+              return (
+                <button
+                  className={"project-tab " + project.className + (selectedProject === id ? " active" : "")}
+                  key={id}
+                  role="tab"
+                  aria-selected={selectedProject === id}
+                  onClick={() => setSelectedProject(id)}
+                >
+                  <span>{project.number}</span>
+                  <div><small>{project.category}</small><strong>{project.title}</strong></div>
+                  <i>{selectedProject === id ? "OPEN" : "VIEW"} ↗</i>
+                </button>
+              );
+            })}
+          </div>
+
+          <article className={"project-detail " + activeProject.className} aria-live="polite">
+            <div className="detail-top">
+              <span>{activeProject.number} / PROJECT NOTE</span>
+              <i>{activeProject.status}</i>
+            </div>
+            <h3>{activeProject.title}</h3>
+            <p>{activeProject.summary}</p>
+            <blockquote>
+              <span>THE QUESTION BEHIND IT</span>
+              {activeProject.question}
+            </blockquote>
+            <dl>
+              <div><dt>MY PART</dt><dd>{activeProject.role}</dd></div>
+              <div><dt>CURRENT STATE</dt><dd>{activeProject.status}</dd></div>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section className="life-section">
+        <div className="life-intro">
+          <p className="eyebrow">03 / AWAY FROM THE KEYBOARD</p>
+          <h2>The rest of the picture.</h2>
+          <p>Not everything needs to become a project. Some things simply change how I notice.</p>
+        </div>
+        <div className="life-cards">
+          <article className="life-card travel-card">
+            <span>TRAVEL / FIELD NOTES</span>
+            <strong>I plan the route carefully—then leave room for a different day to happen.</strong>
+            <small>BACKUP ROUTE: ALWAYS PRESENT</small>
+          </article>
+          <article className="life-card archery-card">
+            <div className="target-mark" aria-hidden="true"><i /><i /><i /></div>
+            <span>ARCHERY / PRACTICE</span>
+            <strong>Focus is less about holding still and more about returning.</strong>
+            <small>ONE ARROW · THEN ANOTHER</small>
+          </article>
+          <article className="life-card people-card">
+            <span>PSYCHOLOGY / CURIOSITY</span>
+            <strong>Why did that feel easy to one person and impossible to another?</strong>
+            <small>CONCLUSION: NOT YET</small>
+          </article>
+        </div>
+      </section>
+
+      <section className="experiment-section" id="experiment">
+        <div className="experiment-intro">
+          <p className="eyebrow">04 / A SMALL EXPERIMENT</p>
+          <h2>Let me learn one tiny thing about how you explore.</h2>
+          <p>
+            Two choices, about twenty seconds. This is a playful observation—not a test,
+            score, or diagnosis. Nothing is saved.
+          </p>
+        </div>
+
+        <div className={"experiment-card step-" + experimentStep} aria-live="polite">
+          {experimentStep === "intro" && (
+            <div className="experiment-welcome">
+              <span className="experiment-number">20<small>SEC</small></span>
+              <div>
+                <p>READY WHEN YOU ARE</p>
+                <h3>There is no correct way to begin.</h3>
+                <button onClick={startExperiment}>START THE SMALL EXPERIMENT <span>→</span></button>
+              </div>
+            </div>
+          )}
+
+          {experimentStep === "first" && (
+            <div className="question-step">
+              <div className="experiment-progress"><span>01 / 02</span><i><b /></i></div>
+              <h3>When you arrive somewhere new, what do you look for first?</h3>
+              <div className="warm-choices three">
+                {(Object.keys(firstChoices) as (keyof typeof firstChoices)[]).map((id) => (
+                  <button key={id} onClick={() => chooseFirst(id)}>
+                    <span>{id === "map" ? "⌖" : id === "people" ? "☺" : "◡"}</span>
+                    <strong>{firstChoices[id].label}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {experimentStep === "second" && firstChoice && (
+            <div className="question-step">
+              <div className="experiment-progress"><span>02 / 02</span><i><b /></i></div>
+              <p className="first-observation">{firstChoices[firstChoice].note}</p>
+              <h3>And when an idea is still unclear, how do you prefer to begin?</h3>
+              <div className="warm-choices">
+                {(Object.keys(secondChoices) as (keyof typeof secondChoices)[]).map((id) => (
+                  <button key={id} onClick={() => chooseSecond(id)}>
+                    <span>{id === "plan" ? "≡" : "✦"}</span>
+                    <strong>{secondChoices[id].label}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {experimentStep === "result" && firstChoice && secondChoice && (
+            <div className="experiment-result">
+              <div>
+                <p>YOUR LITTLE TRACE</p>
+                <h3>You entered through <em>{firstChoices[firstChoice].label.toLowerCase()}</em>, then chose to <em>{secondChoices[secondChoice].label.toLowerCase()}</em>.</h3>
+                <p className="result-copy">
+                  {firstChoices[firstChoice].note} {secondChoices[secondChoice].note}
+                  That is a description of two moments—not a definition of you.
+                </p>
+              </div>
+              <aside>
+                <span>FIRST DECISION</span>
+                <strong>{(decisionTime / 1000).toFixed(1)}s</strong>
+                <small>RECORDED HERE · SAVED NOWHERE</small>
+              </aside>
+              <button className="restart-button" onClick={startExperiment}>TRY A DIFFERENT PATH ↻</button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <footer id="contact">
+        <div>
+          <p className="eyebrow">ONE MORE THING</p>
+          <h2>If something here made you curious,<br /><em>come say hello.</em></h2>
+        </div>
+        <div className="footer-links">
+          <a href="mailto:hello@example.com">EMAIL ME <span>↗</span></a>
+          <a href="https://github.com/alinaaaw" target="_blank" rel="noreferrer">GITHUB <span>↗</span></a>
+          <a href="#top">BACK TO TOP <span>↑</span></a>
+        </div>
+        <p className="footer-note">BUILT WITH CODE, QUESTIONS, AND A FAIRLY DETAILED PLAN B.</p>
       </footer>
     </main>
   );

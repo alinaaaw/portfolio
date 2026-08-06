@@ -2,17 +2,17 @@
 
 **Branch:** version4-design
 
-**Status:** Demo complete
+**Status:** Warm personal-site redesign
 
-**Theme:** Psychological experiment / interactive observation
+**Theme:** Personal portfolio / warm field notes
 
-## Demo flow
+## Page flow
 
-1. Privacy and framing before entry.
-2. Four decisions about certainty, information, pace, and projection.
-3. Immediate, cautious observation after each choice.
-4. A final behavioral trace based on the session.
-5. Restart and copy-summary actions.
+1. Clear personal introduction.
+2. Interactive selected-work area.
+3. Psychology, travel, and archery as personal context.
+4. Optional two-choice exploration experiment.
+5. Warm contact ending.
 
-This demo deliberately avoids personality labels and does not transmit or save
-interaction data.
+The experiment deliberately avoids personality labels and does not transmit or
+save interaction data.

@@ -13,17 +13,17 @@ const mono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Observation Room — A Behavioral Experiment",
-  description: "Four small decisions. A live trace of uncertainty, attention, and control.",
+  title: "Alina Wu — Code, Curiosity & People",
+  description: "Alina's personal portfolio: thoughtful websites, algorithms, hardware, psychology, and small questions worth exploring.",
   openGraph: {
-    title: "Observation Room",
-    description: "You are not here to answer questions. You are here to be observed.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Observation Room behavioral experiment" }],
+    title: "Alina Wu — Code, Curiosity & People",
+    description: "A warm personal portfolio about building thoughtful systems and staying curious about people.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Alina Wu's personal portfolio" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Observation Room",
-    description: "Four small decisions. A behavioral trace—not a diagnosis.",
+    title: "Alina Wu — Code, Curiosity & People",
+    description: "Thoughtful systems, unfinished questions, and a fairly detailed Plan B.",
     images: ["/og.png"],
   },
 };
