@@ -1,36 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import V2Nav from "../_components/V2Nav";
 
 export default function AwayPage() {
   const [planB, setPlanB] = useState(false);
 
   return (
-    <main className="inner-shell away-shell">
-      <V2Nav active="away" label="AWAY / OPEN ROUTE" />
-      <section className="inner-hero away-hero">
-        <p className="inner-kicker">LIFE OUTSIDE THE SCREEN / TRAVEL</p>
-        <h1>Plan the route.<br />Keep a door open<br /><em>for surprise.</em></h1>
+    <main className="inner-shell routes-shell">
+      <V2Nav active="away" label="CLUBHOUSE EXIT / ROUTE BOARD" />
+
+      <section className="inner-hero routes-hero">
+        <p className="inner-kicker">OUTSIDE THE CLUBHOUSE / DEPARTURES</p>
+        <h1>The route is pinned.<br />The gate is<br /><em>still open.</em></h1>
         <div className="hero-aside">
-          <span>WHY I LEAVE</span>
+          <span>NEXT DEPARTURE / 08:10</span>
           <p>
-            Travel lets me enter an unfamiliar environment and experience a
-            different version of daily life. Going with friends is even better:
-            a new street, a shared plan, and usually a lot of laughter.
+            Plan A is clipped to the board. Plan B is already folded underneath.
+            A blank block in the afternoon has been protected from scheduling.
           </p>
         </div>
+        <div className="route-signpost" aria-hidden="true"><i /><span>RANGE</span><span>STATION</span></div>
       </section>
 
       <section className="route-lab content-section">
         <header className="section-heading">
-          <span>01 / A TYPICAL PLAN</span>
-          <h2>Detailed enough to move.<br />Flexible enough to survive.</h2>
+          <span>01 / PINNED BEFORE DEPARTURE</span>
+          <h2>Detailed enough to leave.<br />Loose enough to change.</h2>
         </header>
-        <div className={`route-board ${planB ? "is-plan-b" : ""}`}>
+        <div className={`route-board timber-route-board ${planB ? "is-plan-b" : ""}`}>
           <div className="route-board-head">
             <div><span>ROUTE MODE</span><strong>{planB ? "PLAN B / RECALCULATED" : "PLAN A / READY"}</strong></div>
-            <button onClick={() => setPlanB((value) => !value)}>{planB ? "RESTORE PLAN A" : "DISRUPT THE PLAN"}</button>
+            <button onClick={() => setPlanB((value) => !value)}>{planB ? "RESTORE PLAN A" : "WEATHER CHANGED"}</button>
           </div>
           <div className="route-map">
             <div className="route-city" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
@@ -40,37 +42,36 @@ export default function AwayPage() {
             <span className="route-point point-four"><b>OPEN</b>{planB ? "BETTER VIEW" : "MARGIN"}</span>
             <i className="route-drawn route-drawn-a" /><i className="route-drawn route-drawn-b" /><i className="route-drawn route-drawn-c" />
           </div>
-          <footer><span>{planB ? "NEW INFORMATION RECEIVED / ROUTE STILL GOOD" : "PRIMARY ROUTE / BACKUP OPTIONS SAVED"}</span><strong>{planB ? "+ 1 UNPLANNED STORY" : "38 MIN MARGIN"}</strong></footer>
+          <footer><span>{planB ? "NEW INFORMATION RECEIVED / ROUTE STILL GOOD" : "PRIMARY ROUTE / BACKUP FOLDED BEHIND"}</span><strong>{planB ? "+ 1 UNPLANNED STORY" : "38 MIN MARGIN"}</strong></footer>
         </div>
       </section>
 
-      <section className="travel-philosophy content-section">
-        <div className="travel-number">72<span>HRS</span></div>
-        <div>
-          <span>02 / SPECIAL-FORCES TOURISM, WITH MARGINS</span>
-          <h2>I can fit a lot into a trip.</h2>
-          <p>I plan closely, move quickly, and still protect enough time to rest or change direction. If something breaks, I immediately collect the new information and rebuild the best route from the present moment.</p>
-        </div>
-        <blockquote>“The plan is a tool for entering the unknown—not a reason to avoid it.”</blockquote>
-      </section>
-
-      <section className="ordinary-day content-section">
+      <section className="departure-shelf content-section">
         <header className="section-heading light-heading">
-          <span>03 / AN IDEAL ORDINARY DAY</span>
-          <h2>Not every good route<br />needs a destination.</h2>
+          <span>02 / PACKED BY THE DOOR</span>
+          <h2>The bag explains<br />the rest of the day.</h2>
         </header>
-        <div className="day-timeline">
-          <article><time>09:00</time><strong>MOVE</strong><span>Gym, energy, a clean beginning.</span></article>
-          <article><time>11:30</time><strong>READ</strong><span>A book and a thought worth keeping.</span></article>
-          <article><time>15:00</time><strong>PLAY</strong><span>A game with choices, clues, and another route to test.</span></article>
-          <article><time>19:20</time><strong>PAUSE</strong><span>A sofa, a film, and no optimization required.</span></article>
-          <article><time>21:10</time><strong>WANDER</strong><span>Go outside. See what the street is doing.</span></article>
+        <div className="packed-objects">
+          <article className="packed-shoes"><i aria-hidden="true" /><span>09:00 / MOVE</span><strong>Training shoes</strong><small>A clean beginning before the route gets crowded.</small></article>
+          <article className="packed-book"><i aria-hidden="true" /><span>11:30 / READ</span><strong>Book + pencil</strong><small>One sentence marked. Two questions added.</small></article>
+          <article className="packed-game"><i aria-hidden="true" /><span>15:00 / PLAY</span><strong>Five possible endings</strong><small>The obvious choice has already been crossed out.</small></article>
+          <article className="packed-blank"><i aria-hidden="true" /><span>19:20 / RESERVED</span><strong>Nothing scheduled</strong><small>Sofa, film, street, or a better suggestion.</small></article>
         </div>
       </section>
 
-      <footer className="inner-next">
-        <span>FIELD COMPLETE / FOR NOW</span>
-        <a href="/">Return to the Focus Field <b>↗</b></a>
+      <section className="return-board content-section">
+        <div className="return-stamp">72<span>HRS</span></div>
+        <div>
+          <span>RETURN LOG / FOUND IN A JACKET POCKET</span>
+          <h2>The plan came back<br />with pencil marks.</h2>
+          <p>One stop moved. Lunch was late. The blank block disappeared into an unfamiliar street. Plan B is now annotated and worth keeping.</p>
+        </div>
+        <blockquote>“The route worked. Just not for the reason written on the first page.”</blockquote>
+      </section>
+
+      <footer className="inner-next routes-next">
+        <span>RANGE OPEN / ANOTHER TARGET WAITING</span>
+        <Link href="/">Return to the outdoor range <b>↗</b></Link>
       </footer>
     </main>
   );

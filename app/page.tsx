@@ -26,12 +26,14 @@ export default function VersionTwo() {
   const [tension, setTension] = useState(0);
   const [unlocked, setUnlocked] = useState<ZoneId[]>([]);
   const [impactZone, setImpactZone] = useState<ZoneId | null>(null);
+  const [approachedZone, setApproachedZone] = useState<ZoneId | null>(null);
   const [shotCount, setShotCount] = useState(0);
   const [feedback, setFeedback] = useState("AIM · HOLD · PULL · RELEASE");
   const fieldRef = useRef<HTMLElement>(null);
   const drawRef = useRef<DrawState | null>(null);
   const tensionRef = useRef(0);
   const impactTimerRef = useRef<number | null>(null);
+  const focusTimerRef = useRef<number | null>(null);
 
   const handleImpact = useCallback((shot: LaunchSpec) => {
     setShotCount((count) => count + 1);
@@ -42,27 +44,44 @@ export default function VersionTwo() {
 
     setUnlocked((current) => current.includes(shot.zone!) ? current : [...current, shot.zone!]);
     setImpactZone(shot.zone);
-    setFeedback(`IMPACT · ${zoneLabels[shot.zone]} · SIGNAL UNLOCKED`);
+    setApproachedZone(shot.zone);
+    setFeedback(`IMPACT · CLOSING IN ON ${zoneLabels[shot.zone]}`);
     if (impactTimerRef.current) window.clearTimeout(impactTimerRef.current);
     impactTimerRef.current = window.setTimeout(() => setImpactZone(null), 900);
+    if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
+    focusTimerRef.current = window.setTimeout(() => {
+      setActiveZone(shot.zone);
+      setDiscovered((current) => current.includes(shot.zone!) ? current : [...current, shot.zone!]);
+    }, 520);
   }, []);
 
   const { canvasRef, launch, setActive, setAim, setDraw } = useArcheryEngine(handleImpact);
 
   const openZone = (zone: ZoneId) => {
     setEntered(true);
+    setApproachedZone(zone);
     setActiveZone(zone);
     setDiscovered((current) => current.includes(zone) ? current : [...current, zone]);
   };
 
+  const closeZone = () => {
+    setActiveZone(null);
+    setApproachedZone(null);
+    setFeedback("AIM · HOLD · PULL · RELEASE");
+  };
+
   useEffect(() => {
     const closeWithEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setActiveZone(null);
+      if (event.key === "Escape") {
+        setActiveZone(null);
+        setApproachedZone(null);
+      }
     };
     window.addEventListener("keydown", closeWithEscape);
     return () => {
       window.removeEventListener("keydown", closeWithEscape);
       if (impactTimerRef.current) window.clearTimeout(impactTimerRef.current);
+      if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
     };
   }, []);
 
@@ -166,10 +185,10 @@ export default function VersionTwo() {
           ALINA.WU <span>/ FOCUS FIELD / V2</span>
         </a>
         <nav className="v2-nav" aria-label="Portfolio sections">
-          <a href="/about">ABOUT</a>
-          <a href="/projects">PROJECTS</a>
-          <a href="/notes">NOTES</a>
-          <a href="/away">AWAY</a>
+          <a href="/about">LOCKER</a>
+          <a href="/projects">WORKSHOP</a>
+          <a href="/notes">ARCHIVE</a>
+          <a href="/away">ROUTES</a>
         </nav>
         <div className="v2-status">
           <span><i /> FIELD ONLINE</span>
@@ -178,7 +197,7 @@ export default function VersionTwo() {
       </header>
 
       <section
-        className={`focus-field ${drawing ? "is-drawing" : ""} ${impactZone ? `has-impact impact-${impactZone}` : ""}`}
+        className={`focus-field ${drawing ? "is-drawing" : ""} ${impactZone ? `has-impact impact-${impactZone}` : ""} ${approachedZone ? `is-focused focus-${approachedZone}` : ""}`}
         ref={fieldRef}
         onPointerMove={lookAround}
         onPointerDown={beginShot}
@@ -324,7 +343,7 @@ export default function VersionTwo() {
       </section>
 
       {activeZone && (
-        <div className="v2-overlay" onMouseDown={() => setActiveZone(null)}>
+        <div className={`v2-overlay range-clue-layer clue-${activeZone}`} onMouseDown={closeZone}>
           <aside
             className={`v2-panel panel-${activeZone}`}
             role="dialog"
@@ -337,7 +356,7 @@ export default function VersionTwo() {
                 <span>FIELD SIGNAL</span>
                 <strong>{zoneLabels[activeZone]}</strong>
               </div>
-              <button onClick={() => setActiveZone(null)} aria-label="Close field signal">CLOSE ×</button>
+              <button onClick={closeZone} aria-label="Close field signal">RETURN TO RANGE ×</button>
             </header>
 
             {activeZone === "web" && (
@@ -448,18 +467,18 @@ export default function VersionTwo() {
 
       <section className="field-afterword">
         <div className="afterword-intro">
-          <span>THE FIELD WAS ONLY THE DOOR.</span>
-          <h2>A portfolio about<br />a person, not a stack.</h2>
+          <span>THE CLUBHOUSE IS OPEN.</span>
+          <h2>The range was<br />only the entrance.</h2>
           <p>
             The signals show what I make. The rooms beyond them show how I
             think, what I notice, and who I am when the laptop closes.
           </p>
         </div>
         <div className="afterword-grid">
-          <a href="/about"><span>01 / HUMAN SYSTEM</span><strong>Meet the person behind the work.</strong><i>ABOUT →</i></a>
-          <a href="/projects"><span>02 / WORK</span><strong>See how I approach different kinds of problems.</strong><i>PROJECTS →</i></a>
-          <a href="/notes"><span>03 / THOUGHT TRACES</span><strong>Read selected questions before they become conclusions.</strong><i>NOTES →</i></a>
-          <a href="/away"><span>04 / OFF SCREEN</span><strong>Follow the plans, detours, and ordinary life outside code.</strong><i>AWAY →</i></a>
+          <a href="/about"><span>01 / LOCKER 17</span><strong>Open the objects that were left behind.</strong><i>LOCKER →</i></a>
+          <a href="/projects"><span>02 / REPAIR SHED</span><strong>Inspect three builds on the workbench.</strong><i>WORKSHOP →</i></a>
+          <a href="/notes"><span>03 / TARGET ARCHIVE</span><strong>Turn used targets over and read the pencil marks.</strong><i>ARCHIVE →</i></a>
+          <a href="/away"><span>04 / ROUTE BOARD</span><strong>Unfold Plan B and leave through the clubhouse gate.</strong><i>ROUTES →</i></a>
         </div>
       </section>
     </main>

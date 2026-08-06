@@ -1,29 +1,31 @@
+import Link from "next/link";
+
 type V2NavProps = {
   active?: "about" | "projects" | "notes" | "away";
   label: string;
 };
 
 const links = [
-  { href: "/about", id: "about", label: "ABOUT" },
-  { href: "/projects", id: "projects", label: "PROJECTS" },
-  { href: "/notes", id: "notes", label: "NOTES" },
-  { href: "/away", id: "away", label: "AWAY" },
+  { href: "/about", id: "about", label: "LOCKER" },
+  { href: "/projects", id: "projects", label: "WORKSHOP" },
+  { href: "/notes", id: "notes", label: "ARCHIVE" },
+  { href: "/away", id: "away", label: "ROUTES" },
 ] as const;
 
 export default function V2Nav({ active, label }: V2NavProps) {
   return (
     <header className="inner-header">
-      <a className="inner-brand" href="/" aria-label="Return to the Focus Field">
+      <Link className="inner-brand" href="/" aria-label="Return to the outdoor range">
         ALINA.WU <span>/ {label}</span>
-      </a>
+      </Link>
       <nav className="inner-nav" aria-label="Portfolio sections">
         {links.map((link) => (
-          <a key={link.id} className={active === link.id ? "is-active" : ""} href={link.href}>
+          <Link key={link.id} className={active === link.id ? "is-active" : ""} href={link.href}>
             {link.label}
-          </a>
+          </Link>
         ))}
       </nav>
-      <a className="field-return" href="/">FIELD ↗</a>
+      <Link className="field-return" href="/">RANGE ↗</Link>
     </header>
   );
 }

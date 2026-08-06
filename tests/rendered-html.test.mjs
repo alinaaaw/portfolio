@@ -66,10 +66,10 @@ test("keeps all five signals and lightweight demos", async () => {
 
 test("renders four deeper personal rooms", async () => {
   const expectations = [
-    ["/about", /I build systems/i],
-    ["/projects", /Problems become/i],
-    ["/notes", /Thoughts with/i],
-    ["/away", /Plan the route/i],
+    ["/about", /No biography/i],
+    ["/projects", /Nothing leaves/i],
+    ["/notes", /reverse side/i],
+    ["/away", /route is pinned/i],
   ];
 
   for (const [pathname, expected] of expectations) {

@@ -4,10 +4,15 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $nodeDirectory = Join-Path $projectRoot ".runtime\node-v22.14.0-win-x64"
+$workspaceRoot = Split-Path -Parent (Split-Path -Parent $projectRoot)
+$sharedNodeDirectory = Join-Path $workspaceRoot "alina-portfolio-demo\.runtime\node-v22.14.0-win-x64"
+if (-not (Test-Path -LiteralPath (Join-Path $nodeDirectory "npm.cmd"))) {
+  $nodeDirectory = $sharedNodeDirectory
+}
 $npmCommand = Join-Path $nodeDirectory "npm.cmd"
 $devCommand = Join-Path $projectRoot "node_modules\.bin\vinext.cmd"
 if (-not $Route.StartsWith("/")) { $Route = "/$Route" }
-$siteUrl = "http://127.0.0.1:3000$Route"
+$siteUrl = "http://127.0.0.1:3102$Route"
 
 try {
   $existingSite = Invoke-WebRequest -Uri $siteUrl -UseBasicParsing -TimeoutSec 2
@@ -49,4 +54,4 @@ Write-Host "Keep this window open while viewing the site."
 Write-Host "Press Ctrl+C when you are finished."
 Write-Host ""
 
-& $devCommand dev --hostname 127.0.0.1 --port 3000
+& $devCommand dev --hostname 127.0.0.1 --port 3102

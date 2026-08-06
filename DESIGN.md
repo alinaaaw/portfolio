@@ -6,6 +6,11 @@ An animated, illustrated digital world that feels professional at first glance
 and more playful through exploration. The style is crafted, alive, warm, and
 slightly unexpected without becoming childish or game-menu heavy.
 
+The shared world is an outdoor archery range at late afternoon with an adjacent
+timber clubhouse, repair shed, storage lockers, target archive, and route board.
+Outdoor views use open atmosphere and long depth; interior views use warm wood,
+paper evidence, practical objects, and light that feels connected to the range.
+
 Use low-poly or 2.5D environments, soft baked-looking light, restrained technical
 labels, and physical interaction. Archery contributes a visual language of rings,
 trajectories, tension, focus, impact, and release.
@@ -52,6 +57,7 @@ The layout is world-first rather than card-first.
 - Maintain clear foreground, middle ground, and background layers.
 - Keep permanent navigation minimal and visually quiet.
 - Reveal detail through focused layers and spatial transitions.
+- Treat route changes as camera movement between parts of one place.
 - Use an 8px spacing base and a 720px maximum width for long-form text.
 - Prefer asymmetry, open space, and one strong focal point.
 - Simplify composition on mobile instead of shrinking the desktop scene.

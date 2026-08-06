@@ -3,42 +3,48 @@
 import { useEffect, useState } from "react";
 import V2Nav from "../_components/V2Nav";
 
-const projects = {
+const workOrders = {
   web: {
-    index: "01—WEB",
-    title: "Small websites that remove a real annoyance.",
-    kind: "A COLLECTION OF WEB PROJECTS",
-    thought: "The interface is not decoration. It is the part where the solution meets another person.",
-    steps: ["Notice a repeated decision or friction", "Reduce it to the useful core", "Build a small working answer", "Watch where a person hesitates"],
-    color: "blue",
+    index: "01 / WEB",
+    tag: "SMALL SYSTEM / FIT CHECK",
+    title: "The handoff caught on one small edge.",
+    benchNote: "A repeated annoyance became a small website. The last adjustment was not visual; it removed the moment where a person had to guess what happened next.",
+    checks: ["Name the actual friction", "Remove everything that does not help", "Put a working version in someone’s hands", "Mark the hesitation and adjust"],
+    part: "grip",
+    status: "READY FOR FIELD TEST",
   },
   algorithm: {
-    index: "02—ALGORITHM",
-    title: "A path through incomplete information.",
-    kind: "ALGORITHM PROJECT / CASE STUDY",
-    thought: "I enjoy the search: gather evidence, test a route, learn from failure, and keep the reasoning visible.",
-    steps: ["Define what success actually means", "Map states and constraints", "Test more than one route", "Explain why the final route holds"],
-    color: "orange",
+    index: "02 / ALGORITHM",
+    tag: "ROUTE LOG / SIGHT ADJUSTMENT",
+    title: "Three paths failed before this one held.",
+    benchNote: "The discarded routes remain in the notebook. A final answer is more useful when the constraints, wrong turns, and reason for choosing it are still visible.",
+    checks: ["Define the finish line", "Map states and constraints", "Stress more than one route", "Leave the reasoning inspectable"],
+    part: "sight",
+    status: "GROUPING CONSISTENT",
   },
   hardware: {
-    index: "03—HARDWARE",
-    title: "Code that has to survive the physical world.",
-    kind: "HARDWARE PROJECT / PROTOTYPE",
-    thought: "Hardware makes an idea honest. Timing, signals, noise, and physical limits all get a vote.",
-    steps: ["Translate intent into signals", "Prototype the smallest loop", "Observe the real response", "Debug across code and hardware"],
-    color: "mint",
+    index: "03 / HARDWARE",
+    tag: "PHYSICAL SIGNAL / BENCH TEST",
+    title: "The code passed. The signal did not.",
+    benchNote: "Voltage, timing, noise, and a loose connection all entered the conversation. The prototype only became honest when the physical response matched the intended one.",
+    checks: ["Translate intent into a signal", "Build the smallest closed loop", "Measure the real response", "Debug across both sides of the wire"],
+    part: "sensor",
+    status: "SIGNAL RECEIVED",
   },
 } as const;
 
-type ProjectKey = keyof typeof projects;
+type ProjectKey = keyof typeof workOrders;
 
 export default function ProjectsPage() {
   const [active, setActive] = useState<ProjectKey>("web");
-  const project = projects[active];
+  const project = workOrders[active];
 
   useEffect(() => {
-    const requested = window.location.hash.slice(1) as ProjectKey;
-    if (requested in projects) setActive(requested);
+    const frame = window.requestAnimationFrame(() => {
+      const requested = window.location.hash.slice(1) as ProjectKey;
+      if (requested in workOrders) setActive(requested);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const selectProject = (key: ProjectKey) => {
@@ -47,68 +53,76 @@ export default function ProjectsPage() {
   };
 
   return (
-    <main className="inner-shell projects-shell">
-      <V2Nav active="projects" label="PROJECT OBSERVATORY" />
+    <main className="inner-shell workshop-shell">
+      <V2Nav active="projects" label="REPAIR SHED / WORK ORDERS" />
 
-      <section className="inner-hero projects-hero">
-        <p className="inner-kicker">WORK / THREE WAYS OF MAKING</p>
-        <h1>Problems become<br />interesting when<br /><em>they can move.</em></h1>
+      <section className="inner-hero workshop-hero">
+        <p className="inner-kicker">REPAIR SHED / LIGHT STILL ON</p>
+        <h1>Nothing leaves<br />the bench on<br /><em>confidence alone.</em></h1>
         <div className="hero-aside">
-          <span>MY WORK IS STILL GROWING.</span>
+          <span>THREE ITEMS WAITING</span>
           <p>
-            I have small website projects, an algorithm project, and a hardware
-            project. This space focuses on how I think through them—not inflated
-            claims or a wall of technology logos.
+            Each tag belongs to a different kind of build. Select one to see
+            what was checked, what resisted, and what remains unfinished.
           </p>
         </div>
+        <div className="shed-lamp" aria-hidden="true"><i /></div>
       </section>
 
-      <section className="project-observatory content-section" id={active}>
-        <div className="project-selector" role="tablist" aria-label="Project areas">
-          {(Object.keys(projects) as ProjectKey[]).map((key) => (
+      <section className="repair-floor content-section" id={active}>
+        <header className="section-heading">
+          <span>WORK ORDER RACK</span>
+          <h2>Choose what is<br />on the bench.</h2>
+        </header>
+
+        <div className="work-order-rack" role="tablist" aria-label="Project work orders">
+          {(Object.keys(workOrders) as ProjectKey[]).map((key) => (
             <button key={key} role="tab" aria-selected={active === key} className={active === key ? "is-active" : ""} onClick={() => selectProject(key)}>
-              <span>{projects[key].index}</span>
-              <strong>{key}</strong>
+              <span>{workOrders[key].index}</span>
+              <strong>{workOrders[key].tag}</strong>
+              <i>{workOrders[key].status}</i>
             </button>
           ))}
         </div>
 
-        <article className={`project-stage stage-${project.color}`} aria-live="polite">
-          <div className="project-radar" aria-hidden="true">
-            <i className="radar-ring radar-one" /><i className="radar-ring radar-two" /><i className="radar-ring radar-three" />
-            <span>{active === "web" ? "www" : active === "algorithm" ? "PATH" : "MCU"}</span>
+        <article className={`repair-bench bench-${project.part}`} aria-live="polite">
+          <div className="bench-object" aria-hidden="true">
+            <div className="bow-limb limb-top" /><div className="bow-limb limb-bottom" />
+            <div className="bench-string" /><div className="bench-arrow" />
+            <span className="part-marker marker-a">A</span><span className="part-marker marker-b">B</span><span className="part-marker marker-c">C</span>
+            <i className="measurement-line line-a" /><i className="measurement-line line-b" />
           </div>
-          <div className="project-story">
-            <span>{project.kind}</span>
+          <div className="work-order-copy">
+            <span>{project.tag}</span>
             <h2>{project.title}</h2>
-            <blockquote>{project.thought}</blockquote>
+            <p>{project.benchNote}</p>
+            <ol>
+              {project.checks.map((check, index) => <li key={check}><b>0{index + 1}</b><span>{check}</span></li>)}
+            </ol>
           </div>
-          <ol className="project-method">
-            {project.steps.map((step, index) => <li key={step}><span>0{index + 1}</span>{step}</li>)}
-          </ol>
-          <div className="project-honesty">
-            <span>DETAILS STATUS</span>
-            <p>Project names, screenshots, repositories, and outcomes will be added when each case study is ready. No invented metrics.</p>
-          </div>
+          <footer className="bench-status">
+            <div><span>STATUS</span><strong>{project.status}</strong></div>
+            <p>Names, repositories, images, and measured outcomes stay blank until the real case material is ready.</p>
+          </footer>
         </article>
       </section>
 
-      <section className="build-principles content-section">
+      <section className="repair-wall content-section">
         <header className="section-heading light-heading">
-          <span>04 / WHAT STAYS CONSTANT</span>
-          <h2>Useful. Explainable.<br />Open to revision.</h2>
+          <span>PINNED ABOVE THE BENCH</span>
+          <h2>Four notes that survived<br />more than one project.</h2>
         </header>
-        <div className="principle-grid">
-          <article><span>USEFUL</span><h3>Start with the friction.</h3><p>A clever solution is not enough if it does not help someone move forward.</p></article>
-          <article><span>EXPLAINABLE</span><h3>Show the reasoning.</h3><p>I trust a path more when its assumptions and tradeoffs can be inspected.</p></article>
-          <article><span>HUMAN</span><h3>Notice the person using it.</h3><p>Behavior, emotion, and context are part of the technical problem.</p></article>
-          <article><span>HONEST</span><h3>Confidence follows evidence.</h3><p>I would rather say “still testing” than pretend an unfinished answer is certain.</p></article>
+        <div className="repair-notes">
+          <article><span>01</span><p>Useful begins where the friction actually is.</p></article>
+          <article><span>02</span><p>If the reasoning cannot be inspected, the adjustment becomes guesswork.</p></article>
+          <article><span>03</span><p>A person pausing is also test output.</p></article>
+          <article><span>04</span><p>“Still testing” is a valid status.</p></article>
         </div>
       </section>
 
-      <footer className="inner-next">
-        <span>NEXT SIGNAL</span>
-        <a href="/notes">Read the thought traces <b>→</b></a>
+      <footer className="inner-next workshop-next">
+        <span>USED TARGETS / CABINET B</span>
+        <a href="/notes">Open the target archive <b>→</b></a>
       </footer>
     </main>
   );
