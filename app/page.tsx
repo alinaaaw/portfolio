@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 type PanelId = "web" | "algorithm" | "hardware" | "notes" | "travel";
-type FocusId = "now" | "build" | "learn" | "explore";
+type FocusId = "notice" | "research" | "decide" | "act";
 type Shot = { id: number; x: number; y: number; focus: FocusId };
 
 const panelNames: Record<PanelId, string> = {
@@ -16,50 +16,65 @@ const panelNames: Record<PanelId, string> = {
 
 const panelOrder: PanelId[] = ["web", "algorithm", "hardware", "notes", "travel"];
 
+const ringPositions: Record<FocusId, string> = {
+  notice: "OUTER ZONE",
+  research: "MIDDLE ZONE",
+  decide: "INNER ZONE",
+  act: "BULLSEYE",
+};
+
+const panelHints: Record<PanelId, string> = {
+  web: "WEB — small tools shaped around a real use.",
+  algorithm: "ALGORITHM — gather evidence, test a route, recalculate.",
+  hardware: "HARDWARE — code becomes a signal you can touch.",
+  notes: "NOTES — unfinished questions about people and interaction.",
+  travel: "TRAVEL — plan carefully, then enter someone else’s everyday.",
+};
+
 const focusProfiles: Record<FocusId, {
   index: string;
   label: string;
+  question: string;
   title: string;
   summary: string;
-  center: string;
-  detail: [string, string][];
-  panel: PanelId;
+  noteLabel: string;
+  note: string;
 }> = {
-  now: {
-    index: "00",
-    label: "CURRENT FOCUS",
-    title: "Ship the next useful thing.",
-    summary: "A stage becomes real when I can experience it, share it, and turn it into the next plan.",
-    center: "NOW",
-    detail: [["STAGE", "IN PROGRESS"], ["MODE", "BUILD / TEST"], ["BIAS", "KEEP MOVING"]],
-    panel: "algorithm",
+  notice: {
+    index: "04",
+    label: "NOTICE",
+    question: "What is actually happening?",
+    title: "Start with signals, not certainty.",
+    summary: "I look for context, behavior, and the part of a problem that has not been named yet.",
+    noteLabel: "STATUS I TRUST",
+    note: "Unverified is more useful than confidently wrong.",
   },
-  build: {
-    index: "01",
-    label: "THINGS I BUILD",
-    title: "Code, then a real result.",
-    summary: "Small websites, algorithms, and hardware are different ways to move a problem from idea to use.",
-    center: "MAKE",
-    detail: [["FIELD", "WEB"], ["LOGIC", "ALGORITHM"], ["OUTPUT", "HARDWARE"]],
-    panel: "web",
-  },
-  learn: {
-    index: "02",
-    label: "THINGS I LEARN",
-    title: "Questions before conclusions.",
-    summary: "Computer science gives me structure. Psychology keeps the human parts complex, uncertain, and worth studying.",
-    center: "LEARN",
-    detail: [["METHOD", "RESEARCH"], ["STATE", "UNFINISHED"], ["RULE", "ASK NEXT"]],
-    panel: "notes",
-  },
-  explore: {
+  research: {
     index: "03",
-    label: "THINGS I EXPLORE",
-    title: "A planned route into the unknown.",
-    summary: "I plan carefully, keep a backup, and still leave enough room to enter a life I have not experienced before.",
-    center: "GO",
-    detail: [["ROUTE", "PLANNED"], ["MARGIN", "PRESERVED"], ["NEXT", "UNKNOWN"]],
-    panel: "travel",
+    label: "RESEARCH",
+    question: "What do I know, and what am I assuming?",
+    title: "Collect evidence before asking for certainty.",
+    summary: "I search first, compare what I find, and then ask people when the human part needs a human answer.",
+    noteLabel: "DEFAULT MOVE",
+    note: "Search first. Ask people next.",
+  },
+  decide: {
+    index: "02",
+    label: "DECIDE",
+    question: "Which route is best with what I know now?",
+    title: "Choose a line without pretending it is perfect.",
+    summary: "I plan carefully, keep a backup, and preserve enough margin to respond when reality changes the route.",
+    noteLabel: "ROUTE RULE",
+    note: "Plan A. Backup B. Leave breathing room.",
+  },
+  act: {
+    index: "01",
+    label: "ACT",
+    question: "Can I make the next step real?",
+    title: "Build, test, experience, share.",
+    summary: "A stage is complete when I can use the result, show it to someone else, and see what the next step should be.",
+    noteLabel: "DONE MEANS",
+    note: "A real result, then a new question.",
   },
 };
 
@@ -68,8 +83,10 @@ export default function Home() {
   const [visited, setVisited] = useState<PanelId[]>([]);
   const [algorithmRunning, setAlgorithmRunning] = useState(false);
   const [hardwareOn, setHardwareOn] = useState(false);
-  const [focus, setFocus] = useState<FocusId>("now");
+  const [focus, setFocus] = useState<FocusId>("notice");
   const [shots, setShots] = useState<Shot[]>([]);
+  const [targetTouched, setTargetTouched] = useState(false);
+  const [activeObject, setActiveObject] = useState<PanelId | null>(null);
   const deskRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLButtonElement>(null);
 
@@ -102,10 +119,21 @@ export default function Home() {
 
   const lockFocus = (next: FocusId, x: number, y: number) => {
     setFocus(next);
+    setTargetTouched(true);
     setShots((current) => [
       ...current.slice(-5),
       { id: Date.now(), x, y, focus: next },
     ]);
+  };
+
+  const selectFocus = (next: FocusId) => {
+    const marks: Record<FocusId, [number, number]> = {
+      notice: [93, 50],
+      research: [80, 50],
+      decide: [67, 50],
+      act: [50, 50],
+    };
+    lockFocus(next, ...marks[next]);
   };
 
   const handleTargetPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -120,7 +148,7 @@ export default function Home() {
 
   const handleTargetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.detail === 0) {
-      lockFocus("now", 50, 50);
+      lockFocus("act", 50, 50);
       return;
     }
 
@@ -130,21 +158,45 @@ export default function Home() {
     const dx = event.clientX - (rect.left + rect.width / 2);
     const dy = event.clientY - (rect.top + rect.height / 2);
     const distance = Math.sqrt(dx * dx + dy * dy) / (Math.min(rect.width, rect.height) / 2);
-    const next: FocusId = distance <= 0.24 ? "now" : distance <= 0.48 ? "build" : distance <= 0.72 ? "learn" : "explore";
+    const next: FocusId = distance <= 0.22 ? "act" : distance <= 0.46 ? "decide" : distance <= 0.74 ? "research" : "notice";
     lockFocus(next, x, y);
   };
 
   const discoveryMessage = [
-    "Nothing opened yet. Start anywhere.",
-    "One trace found. The workbench is listening.",
-    "Two traces found. A pattern is beginning.",
-    "Three traces found. Projects and questions are connecting.",
-    "Four traces found. One part of the picture remains.",
-    "Surface complete. You have seen how the pieces connect.",
+    "Nothing opened yet. Start with the object that makes you curious.",
+    "One trace found. Open another object to look for a connection.",
+    "Two traces found. The workbench is beginning to explain itself.",
+    "Three traces found. Technical work and human questions are crossing.",
+    "Four traces found. One part of the working profile remains.",
+    "Surface complete. You have seen the technical and human sides together.",
   ][visited.length];
+
+  const traceInsight = visited.includes("web") && visited.includes("notes")
+    ? "Connection found: interface decisions lead back to questions about people."
+    : visited.includes("algorithm") && visited.includes("travel")
+      ? "Connection found: both routes begin with research, a choice, and a backup plan."
+      : visited.includes("hardware") && visited.includes("web")
+        ? "Connection found: the medium changes, but the goal stays useful and tangible."
+        : discoveryMessage;
 
   const activeFocus = focusProfiles[focus];
   const nextPanel = panel ? panelOrder[(panelOrder.indexOf(panel) + 1) % panelOrder.length] : "web";
+  const benchGuidance = activeObject
+    ? panelHints[activeObject]
+    : discoveryMessage;
+
+  const objectClass = (id: PanelId, base: string) => [
+    "object",
+    base,
+    visited.includes(id) ? "is-visited" : "",
+  ].filter(Boolean).join(" ");
+
+  const objectPreviewProps = (id: PanelId) => ({
+    onPointerEnter: () => setActiveObject(id),
+    onPointerLeave: () => setActiveObject(null),
+    onFocus: () => setActiveObject(id),
+    onBlur: () => setActiveObject(null),
+  });
 
   return (
     <main>
@@ -180,76 +232,75 @@ export default function Home() {
 
         <div className="focus-map-shell">
           <div className="target-label-row">
-            <span>FOCUS MAP / LIVE</span>
-            <span>{shots.length === 0 ? "NO MARKS YET" : `${shots.length} MARK${shots.length === 1 ? "" : "S"}`}</span>
+            <span>DECISION TARGET / FOUR ZONES</span>
+            <span>OUTSIDE → CENTER</span>
           </div>
 
-          <button
-            className={`focus-target focus-${focus}`}
-            ref={targetRef}
-            onPointerMove={handleTargetPointerMove}
-            onPointerLeave={() => {
-              targetRef.current?.style.setProperty("--target-x", "50%");
-              targetRef.current?.style.setProperty("--target-y", "50%");
-            }}
-            onClick={handleTargetClick}
-            aria-label="Aim at a ring and click to select a focus area"
-          >
-            <span className="target-axis axis-horizontal" aria-hidden="true" />
-            <span className="target-axis axis-vertical" aria-hidden="true" />
-            <span className="target-ring ring-explore"><i>EXPLORE</i></span>
-            <span className="target-ring ring-learn"><i>LEARN</i></span>
-            <span className="target-ring ring-build"><i>BUILD</i></span>
-            <span className="target-core">
-              <small>{activeFocus.index}</small>
-              <strong>{activeFocus.center}</strong>
-              <i>LOCKED</i>
-            </span>
-            {shots.map((shot) => (
-              <span
-                className={`target-shot shot-${shot.focus}`}
-                key={shot.id}
-                style={{ left: `${shot.x}%`, top: `${shot.y}%` }}
-                aria-hidden="true"
-              />
-            ))}
-            <span className="target-crosshair" aria-hidden="true"><i /><i /></span>
-            <span className="target-instruction">MOVE / AIM / CLICK</span>
-          </button>
+          <div className="target-explainer">
+            <strong>This is how I move from uncertainty to action.</strong>
+            <p>Begin at the edge: notice, research, decide, then act. Every zone is the full space between two boundary lines.</p>
+          </div>
 
-          <span className="thought thought-a">travel route</span>
-          <span className="thought thought-b">why would someone choose that?</span>
-          <span className="thought thought-c">unverified</span>
-          <span className="thought thought-d">next step →</span>
+          <div className="target-stage">
+            <button
+              className={`focus-target ${targetTouched ? `focus-${focus}` : "focus-idle"}`}
+              ref={targetRef}
+              onPointerMove={handleTargetPointerMove}
+              onPointerLeave={() => {
+                targetRef.current?.style.setProperty("--target-x", "50%");
+                targetRef.current?.style.setProperty("--target-y", "50%");
+              }}
+              onClick={handleTargetClick}
+              aria-label="Decision target with four zones: notice at the edge, then research, decide, and act at the bullseye"
+            >
+              <span className="target-axis axis-horizontal" aria-hidden="true" />
+              <span className="target-axis axis-vertical" aria-hidden="true" />
+              <span className="target-zone-label zone-notice">NOTICE</span>
+              <span className="target-zone-label zone-research">RESEARCH</span>
+              <span className="target-zone-label zone-decide">DECIDE</span>
+              <span className="target-core">
+                <small>BULLSEYE</small>
+                <strong>ACT</strong>
+              </span>
+              {shots.map((shot) => (
+                <span
+                  className={`target-shot shot-${shot.focus}`}
+                  key={shot.id}
+                  style={{ left: `${shot.x}%`, top: `${shot.y}%` }}
+                  aria-hidden="true"
+                />
+              ))}
+              <span className="target-crosshair" aria-hidden="true"><i /><i /></span>
+              <span className="target-instruction">AIM / CLICK A ZONE</span>
+            </button>
+
+            <div className="focus-legend" aria-label="Choose what to learn about Alina">
+              {(Object.keys(focusProfiles) as FocusId[]).map((id) => (
+                <button
+                  className={focus === id && targetTouched ? "active" : ""}
+                  key={id}
+                  onClick={() => selectFocus(id)}
+                  aria-pressed={focus === id && targetTouched}
+                >
+                  <span><b>{ringPositions[id]}</b>{focusProfiles[id].label}</span>
+                  <small>{focusProfiles[id].question}</small>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="focus-readout" aria-live="polite">
             <div className="focus-readout-heading">
-              <span>{activeFocus.index} / {activeFocus.label}</span>
-              <i>FOCUS LOCKED</i>
+              <span>{targetTouched ? "YOU HIT" : "START AT THE EDGE"}</span>
+              <i>{targetTouched ? `${ringPositions[focus]} / ${activeFocus.index}` : "NOTICE → RESEARCH → DECIDE → ACT"}</i>
             </div>
-            <h2>{activeFocus.title}</h2>
-            <p>{activeFocus.summary}</p>
-            <div className="focus-data">
-              {activeFocus.detail.map(([label, value]) => (
-                <span key={label}><small>{label}</small><b>{value}</b></span>
-              ))}
+            <strong className="focus-question">{activeFocus.label}</strong>
+            <h2>{activeFocus.question}</h2>
+            <p><b>{activeFocus.title}</b> {activeFocus.summary}</p>
+            <div className="aim-note">
+              <small>{activeFocus.noteLabel}</small>
+              <span>{activeFocus.note}</span>
             </div>
-            <button className="focus-follow" onClick={() => openPanel(activeFocus.panel)}>
-              FOLLOW THIS TRACE →
-            </button>
-          </div>
-
-          <div className="focus-legend" aria-label="Focus map controls">
-            {(Object.keys(focusProfiles) as FocusId[]).map((id) => (
-              <button
-                className={focus === id ? "active" : ""}
-                key={id}
-                onClick={() => setFocus(id)}
-              >
-                <span>{focusProfiles[id].index}</span>
-                {focusProfiles[id].label}
-              </button>
-            ))}
           </div>
         </div>
       </section>
@@ -275,16 +326,19 @@ export default function Home() {
           <div className="bench-grid" aria-hidden="true" />
           <div className="bench-status">
             <span><i /> WORKSPACE ONLINE</span>
-            <span className="bench-guidance">{discoveryMessage}</span>
+            <span className="bench-guidance" aria-live="polite">{benchGuidance}</span>
             <span>{visited.length}/5 DISCOVERED</span>
           </div>
 
           <button
-            className="object browser-object"
+            className={objectClass("web", "browser-object")}
             onClick={() => openPanel("web")}
             aria-label="Open the small website project"
+            {...objectPreviewProps("web")}
           >
             <span className="object-tag">PROJECT 01</span>
+            <span className="object-cue">OPEN CASE NOTE →</span>
+            {visited.includes("web") && <span className="visited-stamp">VISITED</span>}
             <span className="browser-chrome"><i /><i /><i /></span>
             <span className="browser-screen">
               <strong>small web things</strong>
@@ -294,11 +348,14 @@ export default function Home() {
           </button>
 
           <button
-            className="object algorithm-object"
+            className={objectClass("algorithm", "algorithm-object")}
             onClick={() => openPanel("algorithm")}
             aria-label="Open the algorithm project"
+            {...objectPreviewProps("algorithm")}
           >
             <span className="object-tag light">PROJECT 02</span>
+            <span className="object-cue light">OPEN CASE NOTE →</span>
+            {visited.includes("algorithm") && <span className="visited-stamp light">VISITED</span>}
             <span className="route route-a" />
             <span className="route route-b" />
             <span className="node node-a">A</span>
@@ -309,11 +366,14 @@ export default function Home() {
           </button>
 
           <button
-            className={`object hardware-object ${hardwareOn ? "is-on" : ""}`}
+            className={`${objectClass("hardware", "hardware-object")} ${hardwareOn ? "is-on" : ""}`}
             onClick={() => openPanel("hardware")}
             aria-label="Open the hardware project"
+            {...objectPreviewProps("hardware")}
           >
             <span className="object-tag">PROJECT 03</span>
+            <span className="object-cue">OPEN CASE NOTE →</span>
+            {visited.includes("hardware") && <span className="visited-stamp">VISITED</span>}
             <span className="board-chip">MCU</span>
             <span className="board-line line-one" />
             <span className="board-line line-two" />
@@ -325,11 +385,14 @@ export default function Home() {
           </button>
 
           <button
-            className="object notes-object"
+            className={objectClass("notes", "notes-object")}
             onClick={() => openPanel("notes")}
             aria-label="Open recent thoughts and learning notes"
+            {...objectPreviewProps("notes")}
           >
             <span className="paper-clip" />
+            <span className="object-cue">OPEN NOTE →</span>
+            {visited.includes("notes") && <span className="visited-stamp">VISITED</span>}
             <span className="hand-note">still learning</span>
             <strong>thinking lately</strong>
             <p>Does good interaction make people feel more human—or systems look more human?</p>
@@ -337,11 +400,14 @@ export default function Home() {
           </button>
 
           <button
-            className="object travel-object"
+            className={objectClass("travel", "travel-object")}
             onClick={() => openPanel("travel")}
             aria-label="Open the travel route"
+            {...objectPreviewProps("travel")}
           >
             <span className="ticket-edge">FIELD TRIP · 04</span>
+            <span className="object-cue">OPEN ROUTE →</span>
+            {visited.includes("travel") && <span className="visited-stamp">VISITED</span>}
             <strong>Next stop: someone else&apos;s everyday.</strong>
             <span className="travel-path"><i /><i /><i /></span>
             <small>A detailed plan, with room for the unexpected.</small>
@@ -355,7 +421,7 @@ export default function Home() {
         <div className={`discovery-ledger ${visited.length === 5 ? "complete" : ""}`}>
           <div className="ledger-heading">
             <span>VISITOR TRACE / {String(visited.length).padStart(2, "0")}</span>
-            <strong>{visited.length === 5 ? "SURFACE COMPLETE" : "STILL EXPLORING"}</strong>
+            <strong>{visited.length === 5 ? "SURFACE COMPLETE" : visited.length >= 2 ? "CONNECTION FOUND" : "STILL EXPLORING"}</strong>
           </div>
           <div className="ledger-items">
             {panelOrder.map((id, index) => (
@@ -370,7 +436,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <p>{discoveryMessage}</p>
+          <p>{traceInsight}</p>
         </div>
 
         <p className="bench-caption">
