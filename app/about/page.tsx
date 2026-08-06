@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import V2Nav from "../_components/V2Nav";
+import InteractiveModel from "../_components/three/InteractiveModel";
 
 const lockerItems = {
   route: {
@@ -42,6 +43,7 @@ const lockerItems = {
 } as const;
 
 type LockerKey = keyof typeof lockerItems;
+const lockerKeys = Object.keys(lockerItems) as LockerKey[];
 
 export default function AboutPage() {
   const [opened, setOpened] = useState<LockerKey>("route");
@@ -51,7 +53,7 @@ export default function AboutPage() {
     <main className="inner-shell clubhouse-shell">
       <V2Nav active="about" label="CLUBHOUSE / LOCKER 17" />
 
-      <section className="inner-hero clubhouse-hero">
+      <section className="inner-hero clubhouse-hero has-3d-hero">
         <p className="inner-kicker">CLUBHOUSE / SOMEONE LEFT THE LOCKER OPEN</p>
         <h1>No biography<br />on the door.<br /><em>Look closer.</em></h1>
         <div className="hero-aside">
@@ -61,30 +63,25 @@ export default function AboutPage() {
             your attention and decide what the evidence suggests.
           </p>
         </div>
-        <div className="cabin-window" aria-hidden="true"><i /><i /><span /></div>
+        <InteractiveModel kind="locker" className="hero-3d-model" activeIndex={lockerKeys.indexOf(opened)} onSelect={(index) => setOpened(lockerKeys[index])} title="LOCKER 17" hint="DRAG TO LOOK · CLICK A DOOR" />
       </section>
 
-      <section className="locker-room content-section">
+      <section className="locker-room content-section" id="locker">
         <header className="section-heading">
           <span>01 / PERSONAL STORAGE</span>
           <h2>Five objects.<br />No trait labels.</h2>
         </header>
 
         <div className="locker-explorer">
-          <div className="locker-cabinet" role="tablist" aria-label="Objects found in locker 17">
-            {(Object.keys(lockerItems) as LockerKey[]).map((key) => (
-              <button
-                key={key}
-                role="tab"
-                aria-selected={opened === key}
-                className={`locker-object object-${key} ${opened === key ? "is-open" : ""}`}
-                onClick={() => setOpened(key)}
-              >
-                <i aria-hidden="true" />
-                <span>{lockerItems[key].code}</span>
-                <strong>{lockerItems[key].label}</strong>
-              </button>
-            ))}
+          <div className="locker-model-panel" role="tablist" aria-label="Objects found in locker 17">
+            <InteractiveModel kind="locker" activeIndex={lockerKeys.indexOf(opened)} onSelect={(index) => setOpened(lockerKeys[index])} title="FULL LOCKER MODEL" hint="CLICK A DOOR TO OPEN IT" />
+            <div className="model-selector locker-model-selector">
+              {lockerKeys.map((key, index) => (
+                <button key={key} role="tab" aria-selected={opened === key} className={opened === key ? "is-active" : ""} onClick={() => setOpened(key)}>
+                  <b>0{index + 1}</b><span>{lockerItems[key].label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <article className="locker-evidence" aria-live="polite">

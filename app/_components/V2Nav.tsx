@@ -21,7 +21,8 @@ export default function V2Nav({ active, label }: V2NavProps) {
       <nav className="inner-nav" aria-label="Portfolio sections">
         {links.map((link) => (
           <Link key={link.id} className={active === link.id ? "is-active" : ""} href={link.href}>
-            {link.label}
+            <i className={`place-icon place-${link.id}`} aria-hidden="true"><b /><b /><b /></i>
+            <span>{link.label}</span>
           </Link>
         ))}
       </nav>

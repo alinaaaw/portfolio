@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import V2Nav from "../_components/V2Nav";
+import InteractiveModel from "../_components/three/InteractiveModel";
 
 export default function AwayPage() {
   const [planB, setPlanB] = useState(false);
@@ -11,7 +12,7 @@ export default function AwayPage() {
     <main className="inner-shell routes-shell">
       <V2Nav active="away" label="CLUBHOUSE EXIT / ROUTE BOARD" />
 
-      <section className="inner-hero routes-hero">
+      <section className="inner-hero routes-hero has-3d-hero">
         <p className="inner-kicker">OUTSIDE THE CLUBHOUSE / DEPARTURES</p>
         <h1>The route is pinned.<br />The gate is<br /><em>still open.</em></h1>
         <div className="hero-aside">
@@ -21,10 +22,10 @@ export default function AwayPage() {
             A blank block in the afternoon has been protected from scheduling.
           </p>
         </div>
-        <div className="route-signpost" aria-hidden="true"><i /><span>RANGE</span><span>STATION</span></div>
+        <InteractiveModel kind="routes" className="hero-3d-model" activeIndex={planB ? 3 : 0} onSelect={() => setPlanB((value) => !value)} title="DEPARTURE BOARD" hint="MOVE TO INSPECT · CLICK A PIN" />
       </section>
 
-      <section className="route-lab content-section">
+      <section className="route-lab content-section" id="route-board">
         <header className="section-heading">
           <span>01 / PINNED BEFORE DEPARTURE</span>
           <h2>Detailed enough to leave.<br />Loose enough to change.</h2>
@@ -34,7 +35,8 @@ export default function AwayPage() {
             <div><span>ROUTE MODE</span><strong>{planB ? "PLAN B / RECALCULATED" : "PLAN A / READY"}</strong></div>
             <button onClick={() => setPlanB((value) => !value)}>{planB ? "RESTORE PLAN A" : "WEATHER CHANGED"}</button>
           </div>
-          <div className="route-map">
+          <div className="route-map route-map-mixed">
+            <InteractiveModel kind="routes" className="route-3d-model" activeIndex={planB ? 3 : 0} onSelect={() => setPlanB((value) => !value)} />
             <div className="route-city" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
             <span className="route-point point-one"><b>08:10</b>DEPART</span>
             <span className="route-point point-two"><b>{planB ? "11:20" : "10:40"}</b>{planB ? "NEW STREET" : "FIRST STOP"}</span>

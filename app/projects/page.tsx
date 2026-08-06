@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import V2Nav from "../_components/V2Nav";
+import InteractiveModel from "../_components/three/InteractiveModel";
 
 const workOrders = {
   web: {
@@ -34,6 +35,7 @@ const workOrders = {
 } as const;
 
 type ProjectKey = keyof typeof workOrders;
+const projectKeys = Object.keys(workOrders) as ProjectKey[];
 
 export default function ProjectsPage() {
   const [active, setActive] = useState<ProjectKey>("web");
@@ -56,7 +58,7 @@ export default function ProjectsPage() {
     <main className="inner-shell workshop-shell">
       <V2Nav active="projects" label="REPAIR SHED / WORK ORDERS" />
 
-      <section className="inner-hero workshop-hero">
+      <section className="inner-hero workshop-hero has-3d-hero">
         <p className="inner-kicker">REPAIR SHED / LIGHT STILL ON</p>
         <h1>Nothing leaves<br />the bench on<br /><em>confidence alone.</em></h1>
         <div className="hero-aside">
@@ -66,17 +68,17 @@ export default function ProjectsPage() {
             what was checked, what resisted, and what remains unfinished.
           </p>
         </div>
-        <div className="shed-lamp" aria-hidden="true"><i /></div>
+        <InteractiveModel kind="workbench" className="hero-3d-model" activeIndex={projectKeys.indexOf(active)} onSelect={(index) => selectProject(projectKeys[index])} title="REPAIR BENCH" hint="MOVE TO INSPECT · CLICK A PART" />
       </section>
 
-      <section className="repair-floor content-section" id={active}>
+      <section className="repair-floor content-section" id="workbench">
         <header className="section-heading">
           <span>WORK ORDER RACK</span>
           <h2>Choose what is<br />on the bench.</h2>
         </header>
 
         <div className="work-order-rack" role="tablist" aria-label="Project work orders">
-          {(Object.keys(workOrders) as ProjectKey[]).map((key) => (
+          {projectKeys.map((key) => (
             <button key={key} role="tab" aria-selected={active === key} className={active === key ? "is-active" : ""} onClick={() => selectProject(key)}>
               <span>{workOrders[key].index}</span>
               <strong>{workOrders[key].tag}</strong>
@@ -86,12 +88,7 @@ export default function ProjectsPage() {
         </div>
 
         <article className={`repair-bench bench-${project.part}`} aria-live="polite">
-          <div className="bench-object" aria-hidden="true">
-            <div className="bow-limb limb-top" /><div className="bow-limb limb-bottom" />
-            <div className="bench-string" /><div className="bench-arrow" />
-            <span className="part-marker marker-a">A</span><span className="part-marker marker-b">B</span><span className="part-marker marker-c">C</span>
-            <i className="measurement-line line-a" /><i className="measurement-line line-b" />
-          </div>
+          <InteractiveModel kind="workbench" className="bench-3d-model" activeIndex={projectKeys.indexOf(active)} onSelect={(index) => selectProject(projectKeys[index])} title="LIVE BENCH" hint="SELECT A PART OR WORK ORDER" />
           <div className="work-order-copy">
             <span>{project.tag}</span>
             <h2>{project.title}</h2>

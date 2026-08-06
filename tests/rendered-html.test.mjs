@@ -54,11 +54,13 @@ test("keeps all five signals and lightweight demos", async () => {
   assert.match(page, /RUN PATH/);
   assert.match(page, /POWER ON/);
   assert.match(page, /RECALCULATE ROUTE/);
-  assert.match(page, /AIM · HOLD · PULL · RELEASE/);
+  assert.match(page, /MOVE TO AIM · HOLD TO DRAW · RELEASE/);
   assert.match(page, /setPointerCapture/);
   assert.match(page, /data-zone="notes"/);
-  assert.match(page, /PULL FARTHER/);
+  assert.match(page, /HOLD A LITTLE LONGER/);
   assert.match(page, /SIGNAL UNLOCKED/);
+  assert.match(page, /kind="range"/);
+  assert.doesNotMatch(page, /range-landmark landmark-locker/);
   assert.match(engine, /requestAnimationFrame/);
   assert.match(engine, /ResizeObserver/);
   assert.match(physics, /velocityY.*gravity/);

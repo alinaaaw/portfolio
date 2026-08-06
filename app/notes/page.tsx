@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import V2Nav from "../_components/V2Nav";
+import InteractiveModel from "../_components/three/InteractiveModel";
 
 const targets = [
   { id: "confidence", drawer: "A-01", type: "OBSERVATION", title: "Confidence should arrive after understanding.", body: "I particularly dislike certainty that has not earned itself. My instinct is to research first, collect enough context, and only then ask or decide. I am learning that carefulness can be useful without turning into endless hesitation.", annotation: "Do not confuse a clean grouping with complete information.", hit: [44, 38] },
@@ -24,7 +25,7 @@ export default function NotesPage() {
     <main className="inner-shell archive-shell">
       <V2Nav active="notes" label="TARGET ARCHIVE / CABINET B" />
 
-      <section className="inner-hero archive-hero">
+      <section className="inner-hero archive-hero has-3d-hero">
         <p className="inner-kicker">TARGET ARCHIVE / USED PAPER KEPT</p>
         <h1>The reverse side<br />usually says<br /><em>more.</em></h1>
         <div className="hero-aside">
@@ -34,24 +35,27 @@ export default function NotesPage() {
             and questions that have not earned a conclusion yet.
           </p>
         </div>
-        <div className="archive-drawers" aria-hidden="true"><i /><i /><i /><i /></div>
+        <InteractiveModel kind="archive" className="hero-3d-model" activeIndex={active} onSelect={selectTarget} title="CABINET B" hint="MOVE TO INSPECT · CLICK A DRAWER" />
       </section>
 
-      <section className="target-cabinet content-section">
+      <section className="target-cabinet content-section" id="cabinet">
         <header className="section-heading">
           <span>CABINET B / FOUR TARGETS</span>
           <h2>Select a sheet.<br />Turn it over.</h2>
         </header>
 
         <div className="target-archive">
-          <div className="target-drawers" role="tablist" aria-label="Archived thought targets">
-            {targets.map((item, index) => (
-              <button key={item.id} role="tab" aria-selected={active === index} className={active === index ? "is-active" : ""} onClick={() => selectTarget(index)}>
-                <span className="drawer-target" style={{ "--hit-x": `${item.hit[0]}%`, "--hit-y": `${item.hit[1]}%` } as CSSProperties}><i /></span>
-                <b>{item.drawer}</b>
-                <strong>{item.type}</strong>
-              </button>
-            ))}
+          <div className="archive-model-panel">
+            <InteractiveModel kind="archive" activeIndex={active} onSelect={selectTarget} title="TARGET DRAWERS" hint="THE SELECTED DRAWER PULLS FORWARD" />
+            <div className="target-drawers" role="tablist" aria-label="Archived thought targets">
+              {targets.map((item, index) => (
+                <button key={item.id} role="tab" aria-selected={active === index} className={active === index ? "is-active" : ""} onClick={() => selectTarget(index)}>
+                  <span className="drawer-target" style={{ "--hit-x": `${item.hit[0]}%`, "--hit-y": `${item.hit[1]}%` } as CSSProperties}><i /></span>
+                  <b>{item.drawer}</b>
+                  <strong>{item.type}</strong>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className={`archived-target ${flipped ? "is-flipped" : ""}`}>
