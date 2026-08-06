@@ -31,7 +31,7 @@ test("server-renders the English Version 1 portfolio", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /Alina.*Pixels, Algorithms.*People/i);
+  assert.match(html, /Wenrui \(Alina\) Wu/i);
   assert.match(html, /I solve problems with code/i);
   assert.match(html, /WORKBENCH/);
   assert.match(html, /DECISION TARGET \/ FOUR ZONES/);
@@ -48,15 +48,21 @@ test("source keeps the five interactive portfolio areas", async () => {
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
   );
 
-  for (const area of ["web", "algorithm", "hardware", "notes", "travel"]) {
+  for (const area of ["web", "algorithm", "hardware", "internship", "research"]) {
     assert.match(page, new RegExp(`openPanel\\(\\"${area}\\"\\)`));
   }
-  assert.match(page, /RUN SEARCH/);
+  assert.match(page, /RUN ALLOCATION/);
   assert.match(page, /POWER ON/);
   assert.match(page, /handleTargetClick/);
   assert.match(page, /focusProfiles/);
   assert.match(page, /CONNECTION FOUND/);
   assert.match(page, /NEXT TRACE/);
+  assert.match(page, /Quality of Life in Shanghai/);
+  assert.match(page, /Automatic and Satisfactory Course Assignment/);
+  assert.match(page, /Monitoring Device for Muscle Usage & Behavior/);
+  assert.match(page, /Thermo Fisher Scientific/);
+  assert.match(page, /Social Futures Lab/);
+  assert.doesNotMatch(page, /hello@example\.com|A SMALL WEBSITE PROJECT|The final version can/);
 });
 
 test("Version 1 styles the focus and discovery interactions", async () => {
@@ -72,6 +78,10 @@ test("Version 1 styles the focus and discovery interactions", async () => {
   assert.match(css, /\.visited-stamp/);
   assert.match(css, /\.discovery-ledger/);
   assert.match(css, /\.panel-route/);
+  assert.match(css, /\.map-demo/);
+  assert.match(css, /\.allocation-demo/);
+  assert.match(css, /\.experience-log/);
+  assert.match(css, /\.research-flow/);
 });
 
 test("the target uses matching visual and click boundaries", async () => {

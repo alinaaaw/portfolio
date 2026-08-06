@@ -2,19 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type PanelId = "web" | "algorithm" | "hardware" | "notes" | "travel";
+type PanelId = "web" | "algorithm" | "hardware" | "internship" | "research";
 type FocusId = "notice" | "research" | "decide" | "act";
 type Shot = { id: number; x: number; y: number; focus: FocusId };
 
 const panelNames: Record<PanelId, string> = {
-  web: "WEB / SMALL SITES",
-  algorithm: "ALGORITHM / SEARCH & REASON",
-  hardware: "HARDWARE / PHYSICAL SYSTEMS",
-  notes: "NOTES / THOUGHT FRAGMENTS",
-  travel: "TRAVEL / OFF THE ROUTE",
+  web: "PROJECT / QUALITY OF LIFE IN SHANGHAI",
+  algorithm: "PROJECT / COURSE ASSIGNMENT",
+  hardware: "PROJECT / MUSCLE USAGE MONITOR",
+  internship: "EXPERIENCE / SOFTWARE ENGINEERING",
+  research: "RESEARCH / SOCIAL FUTURES LAB",
 };
 
-const panelOrder: PanelId[] = ["web", "algorithm", "hardware", "notes", "travel"];
+const panelShortNames: Record<PanelId, string> = {
+  web: "WEB MAP",
+  algorithm: "ALLOCATION",
+  hardware: "EMG DEVICE",
+  internship: "INTERNSHIP",
+  research: "RESEARCH",
+};
+
+const panelOrder: PanelId[] = ["web", "algorithm", "hardware", "internship", "research"];
 
 const ringPositions: Record<FocusId, string> = {
   notice: "OUTER ZONE",
@@ -24,11 +32,11 @@ const ringPositions: Record<FocusId, string> = {
 };
 
 const panelHints: Record<PanelId, string> = {
-  web: "WEB — small tools shaped around a real use.",
-  algorithm: "ALGORITHM — gather evidence, test a route, recalculate.",
-  hardware: "HARDWARE — code becomes a signal you can touch.",
-  notes: "NOTES — unfinished questions about people and interaction.",
-  travel: "TRAVEL — plan carefully, then enter someone else’s everyday.",
+  web: "WEB — an interactive Shanghai neighborhood map built from community research.",
+  algorithm: "ALGORITHM — allocation methods optimized for satisfaction and efficiency.",
+  hardware: "HARDWARE — EMG signals, ESP32 classification, and mobile visualization.",
+  internship: "INTERNSHIP — machine vision, software testing, and workflow analysis.",
+  research: "RESEARCH — how shared principles change perceived relevance between cases.",
 };
 
 const focusProfiles: Record<FocusId, {
@@ -83,6 +91,7 @@ export default function Home() {
   const [visited, setVisited] = useState<PanelId[]>([]);
   const [algorithmRunning, setAlgorithmRunning] = useState(false);
   const [hardwareOn, setHardwareOn] = useState(false);
+  const [mapRadius, setMapRadius] = useState(10);
   const [focus, setFocus] = useState<FocusId>("notice");
   const [shots, setShots] = useState<Shot[]>([]);
   const [targetTouched, setTargetTouched] = useState(false);
@@ -171,12 +180,12 @@ export default function Home() {
     "Surface complete. You have seen the technical and human sides together.",
   ][visited.length];
 
-  const traceInsight = visited.includes("web") && visited.includes("notes")
-    ? "Connection found: interface decisions lead back to questions about people."
-    : visited.includes("algorithm") && visited.includes("travel")
-      ? "Connection found: both routes begin with research, a choice, and a backup plan."
+  const traceInsight = visited.includes("web") && visited.includes("research")
+    ? "Connection found: community data becomes useful when analysis turns into an interface."
+    : visited.includes("algorithm") && visited.includes("research")
+      ? "Connection found: both projects ask how people judge a choice as fair or relevant."
       : visited.includes("hardware") && visited.includes("web")
-        ? "Connection found: the medium changes, but the goal stays useful and tangible."
+        ? "Connection found: physical signals and neighborhood data both need a readable human output."
         : discoveryMessage;
 
   const activeFocus = focusProfiles[focus];
@@ -202,7 +211,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <a className="wordmark" href="#top" aria-label="Back to the top">
-          ALINA.WU <span>/ FIELD NOTES</span>
+          WENRUI (ALINA) WU <span>/ FIELD NOTES</span>
         </a>
         <nav aria-label="Primary navigation">
           <a href="#workbench">WORKBENCH</a>
@@ -213,7 +222,7 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">COMPUTER SCIENCE × HUMAN CURIOSITY</p>
+          <p className="eyebrow">UW COMPUTER SCIENCE × HUMAN CURIOSITY</p>
           <h1>
             I solve problems with code,
             <br />
@@ -221,9 +230,10 @@ export default function Home() {
             <span className="circled">people</span>{" "}beyond it.
           </h1>
           <p className="intro">
-            I build small sites, study algorithms, and connect ideas to physical
-            hardware. This is not a résumé compressed into a few lines. It is a
-            workbench that stays in motion.
+            I am a computer science student at the University of Washington,
+            a software engineering intern at Thermo Fisher Scientific, and an
+            undergraduate researcher studying how people judge relevance and
+            shared principles.
           </p>
           <a className="primary-action" href="#workbench">
             COME IN <span aria-hidden="true">↓</span>
@@ -333,7 +343,7 @@ export default function Home() {
           <button
             className={objectClass("web", "browser-object")}
             onClick={() => openPanel("web")}
-            aria-label="Open the small website project"
+            aria-label="Open the Quality of Life in Shanghai web project"
             {...objectPreviewProps("web")}
           >
             <span className="object-tag">PROJECT 01</span>
@@ -341,9 +351,9 @@ export default function Home() {
             {visited.includes("web") && <span className="visited-stamp">VISITED</span>}
             <span className="browser-chrome"><i /><i /><i /></span>
             <span className="browser-screen">
-              <strong>small web things</strong>
+              <strong>Quality of Life in Shanghai</strong>
               <span className="mini-layout"><i /><i /><i /></span>
-              <small>open preview ↗</small>
+              <small>HTML/CSS · JavaScript · community research</small>
             </span>
           </button>
 
@@ -361,8 +371,8 @@ export default function Home() {
             <span className="node node-a">A</span>
             <span className="node node-b">?</span>
             <span className="node node-c">B</span>
-            <strong>find a path</strong>
-            <small>reason · test · recalculate</small>
+            <strong>course assignment</strong>
+            <small>Python · NumPy · satisfaction</small>
           </button>
 
           <button
@@ -380,42 +390,42 @@ export default function Home() {
             <span className="board-port port-one" />
             <span className="board-port port-two" />
             <span className="board-led" />
-            <strong>physical computing</strong>
-            <small>tap to inspect</small>
+            <strong>muscle usage monitor</strong>
+            <small>EMG · ESP32 · mobile visualization</small>
           </button>
 
           <button
-            className={objectClass("notes", "notes-object")}
-            onClick={() => openPanel("notes")}
-            aria-label="Open recent thoughts and learning notes"
-            {...objectPreviewProps("notes")}
+            className={objectClass("internship", "notes-object experience-object")}
+            onClick={() => openPanel("internship")}
+            aria-label="Open the software engineering internship"
+            {...objectPreviewProps("internship")}
           >
             <span className="paper-clip" />
-            <span className="object-cue">OPEN NOTE →</span>
-            {visited.includes("notes") && <span className="visited-stamp">VISITED</span>}
-            <span className="hand-note">still learning</span>
-            <strong>thinking lately</strong>
-            <p>Does good interaction make people feel more human—or systems look more human?</p>
-            <small>conclusion: not yet.</small>
+            <span className="object-cue">OPEN FIELD LOG →</span>
+            {visited.includes("internship") && <span className="visited-stamp">VISITED</span>}
+            <span className="hand-note">JUN 2026 — PRESENT</span>
+            <strong>software engineering</strong>
+            <p>Machine vision, localization testing, and workflow analysis.</p>
+            <small>Thermo Fisher Scientific / Shanghai</small>
           </button>
 
           <button
-            className={objectClass("travel", "travel-object")}
-            onClick={() => openPanel("travel")}
-            aria-label="Open the travel route"
-            {...objectPreviewProps("travel")}
+            className={objectClass("research", "travel-object research-object")}
+            onClick={() => openPanel("research")}
+            aria-label="Open the undergraduate research experience"
+            {...objectPreviewProps("research")}
           >
-            <span className="ticket-edge">FIELD TRIP · 04</span>
-            <span className="object-cue">OPEN ROUTE →</span>
-            {visited.includes("travel") && <span className="visited-stamp">VISITED</span>}
-            <strong>Next stop: someone else&apos;s everyday.</strong>
+            <span className="ticket-edge">RESEARCH FILE · 05</span>
+            <span className="object-cue">OPEN STUDY →</span>
+            {visited.includes("research") && <span className="visited-stamp">VISITED</span>}
+            <strong>How do shared principles change perceived relevance?</strong>
             <span className="travel-path"><i /><i /><i /></span>
-            <small>A detailed plan, with room for the unexpected.</small>
+            <small>Social Futures Lab / University of Washington</small>
           </button>
 
-          <span className="loose-note note-one">TODO: overthink less</span>
-          <span className="loose-note note-two">backup route B</span>
-          <span className="loose-note note-three">research first, ask people next</span>
+          <span className="loose-note note-one">black-box test: observe before assuming</span>
+          <span className="loose-note note-two">30+ rounds of feedback</span>
+          <span className="loose-note note-three">principles → perceived relevance</span>
         </div>
 
         <div className={`discovery-ledger ${visited.length === 5 ? "complete" : ""}`}>
@@ -431,7 +441,7 @@ export default function Home() {
                 onClick={() => openPanel(id)}
               >
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <b>{panelNames[id].split(" / ")[0]}</b>
+                <b>{panelShortNames[id]}</b>
                 <i>{visited.includes(id) ? "FOUND" : "OPEN"}</i>
               </button>
             ))}
@@ -447,16 +457,33 @@ export default function Home() {
       <section className="about-section" id="about">
         <div className="about-index">02</div>
         <div className="about-copy">
-          <p className="eyebrow">A WORKING PROFILE</p>
-          <h2>I believe answers are worth looking for,<br />not pretending to have.</h2>
+          <p className="eyebrow">EDUCATION / A WORKING PROFILE</p>
+          <h2>I study systems,<br />then ask what the system means for people.</h2>
         </div>
         <div className="about-notes">
-          <p>
-            I gather information before choosing a route. Computer science
-            teaches me how to break down problems; psychology reminds me that
-            people are not systems waiting to be reduced.
-          </p>
-          <p className="margin-note">I may be less serious once you know me.</p>
+          <div className="education-note">
+            <span>UNIVERSITY OF WASHINGTON</span>
+            <strong>B.S. in Computer Science</strong>
+            <small>Paul G. Allen School · Expected June 2028 · GPA 4.0</small>
+          </div>
+          <div className="education-note">
+            <span>HARVARD SUMMER SCHOOL / 2024</span>
+            <strong>AI with Python & Multivariable Calculus</strong>
+            <small>Boston, Massachusetts</small>
+          </div>
+          <p className="margin-note">Computer science gives me structure. Human behavior keeps the questions complicated.</p>
+        </div>
+      </section>
+
+      <section className="skills-section" aria-labelledby="skills-title">
+        <div className="skills-heading">
+          <p className="eyebrow">03 / TECHNICAL TOOLKIT</p>
+          <h2 id="skills-title">Tools I have actually used.</h2>
+        </div>
+        <div className="skills-grid">
+          <div><span>LANGUAGES</span><p>Python, Java, JavaScript, HTML/CSS, SQLite, C/C++</p></div>
+          <div><span>TOOLS</span><p>GitHub, VS Code, Fusion, AutoCAD, Arduino IDE, LaTeX, PyCharm, IntelliJ, Docker</p></div>
+          <div><span>LIBRARIES</span><p>pandas, NumPy, Matplotlib, LangGraph, LangChain, Ultralytics YOLO</p></div>
         </div>
       </section>
 
@@ -466,8 +493,9 @@ export default function Home() {
           <h2>If an idea made you pause,<br />let&apos;s talk.</h2>
         </div>
         <div className="footer-links">
-          <a href="mailto:hello@example.com">EMAIL ↗</a>
-          <a href="#top">GITHUB ↗</a>
+          <a href="mailto:awu78@uw.edu">AWU78@UW.EDU ↗</a>
+          <a href="https://www.linkedin.com/in/wenrui-wu/" target="_blank" rel="noreferrer">LINKEDIN ↗</a>
+          <a href="https://github.com/alina" target="_blank" rel="noreferrer">GITHUB ↗</a>
           <a href="#top">BACK TO TOP ↑</a>
         </div>
       </footer>
@@ -488,99 +516,111 @@ export default function Home() {
 
             {panel === "web" && (
               <div className="panel-body">
-                <p className="panel-kicker">SELECTED WEB EXPERIMENT</p>
-                <h3 id="panel-title">Turn a real problem into something people can use.</h3>
+                <p className="panel-kicker">PROJECT / SEP 2023 — MAY 2024</p>
+                <h3 id="panel-title">Quality of Life in Shanghai</h3>
                 <div className="live-browser">
-                  <div className="live-browser-bar">localhost / small-website</div>
-                  <div className="live-site">
-                    <span>A SMALL WEBSITE PROJECT</span>
-                    <strong>Not just a screenshot.<br />Try it here.</strong>
-                    <button>TRY THE DEMO →</button>
+                  <div className="live-browser-bar">neighborhood-map / walking radius</div>
+                  <div className="map-demo">
+                    <span className="map-road road-one" /><span className="map-road road-two" />
+                    <i className="map-home">YOU</i>
+                    <i className="map-place place-one">FOOD</i>
+                    <i className="map-place place-two">CARE</i>
+                    <i className="map-place place-three">PARK</i>
+                    <span className={`map-radius radius-${mapRadius}`} />
+                    <button onClick={() => setMapRadius((value) => value === 30 ? 10 : value + 10)}>
+                      RADIUS / {mapRadius} MIN →
+                    </button>
                   </div>
                 </div>
                 <div className="project-meta">
-                  <span>ROLE<br /><b>Design & development</b></span>
-                  <span>STATUS<br /><b>Still iterating</b></span>
-                  <span>LESSON<br /><b>Make it useful first</b></span>
+                  <span>ROLE<br /><b>Team lead · 8 students</b></span>
+                  <span>RESEARCH<br /><b>20+ questionnaires & interviews</b></span>
+                  <span>STACK<br /><b>HTML/CSS · JavaScript</b></span>
                 </div>
+                <p className="panel-copy">I led a mixed-methods study, turned community findings into an interactive map for locating nearby facilities, and helped organize food-safety and anti-fraud campaigns.</p>
               </div>
             )}
 
             {panel === "algorithm" && (
               <div className="panel-body">
-                <p className="panel-kicker">INTERACTIVE ALGORITHM NOTE</p>
-                <h3 id="panel-title">A route will not reveal itself. Try one.</h3>
-                <div className={`algo-demo ${algorithmRunning ? "running" : ""}`}>
-                  <div className="algo-grid">
-                    {Array.from({ length: 24 }, (_, index) => (
-                      <i key={index} className={[2, 8, 9, 15, 21].includes(index) ? "wall" : ""} />
-                    ))}
-                    <span className="algo-start">S</span>
-                    <span className="algo-end">E</span>
+                <p className="panel-kicker">PROJECT / JAN 2024 — MAR 2025</p>
+                <h3 id="panel-title">Automatic and Satisfactory Course Assignment</h3>
+                <div className={`allocation-demo ${algorithmRunning ? "running" : ""}`}>
+                  <div className="allocation-table">
+                    <span>STUDENT A</span><b>{algorithmRunning ? "COURSE 2 / 1ST CHOICE" : "WAITING"}</b>
+                    <span>STUDENT B</span><b>{algorithmRunning ? "COURSE 1 / 2ND CHOICE" : "WAITING"}</b>
+                    <span>STUDENT C</span><b>{algorithmRunning ? "COURSE 3 / 1ST CHOICE" : "WAITING"}</b>
                   </div>
                   <div className="algo-control">
-                    <span>{algorithmRunning ? "PATH FOUND · 17 STEPS" : "READY TO SEARCH"}</span>
+                    <span>{algorithmRunning ? "SATISFACTION / OPTIMIZED" : "ALLOCATION / READY"}</span>
                     <button onClick={() => setAlgorithmRunning((value) => !value)}>
-                      {algorithmRunning ? "RESET" : "RUN SEARCH"}
+                      {algorithmRunning ? "RESET" : "RUN ALLOCATION"}
                     </button>
                   </div>
                 </div>
-                <p className="panel-copy">The finished project page can run the real algorithm here, letting visitors change the input, step through execution, and see how you approach the problem.</p>
+                <div className="project-meta">
+                  <span>METHODS<br /><b>Simultaneous Eating</b></span>
+                  <span>DECOMPOSITION<br /><b>Birkhoff</b></span>
+                  <span>FEEDBACK<br /><b>30+ professors & peers</b></span>
+                </div>
+                <p className="panel-copy">I researched allocation efficiency, implemented the methods in Python and NumPy, improved runtime by 200+% through feedback, and extended the work into a parent-teacher meeting scheduler.</p>
               </div>
             )}
 
             {panel === "hardware" && (
               <div className="panel-body">
-                <p className="panel-kicker">HARDWARE PROTOTYPE / BENCH TEST</p>
-                <h3 id="panel-title">When code leaves the screen.</h3>
+                <p className="panel-kicker">PROJECT / JUL 2025 — PRESENT</p>
+                <h3 id="panel-title">Monitoring Device for Muscle Usage & Behavior</h3>
                 <div className={`device-demo ${hardwareOn ? "powered" : ""}`}>
                   <div className="device-board">
-                    <span className="device-core">CORE</span>
-                    <span className="device-sensor">SENSOR</span>
-                    <span className="device-output">OUT</span>
+                    <span className="device-core">ESP32</span>
+                    <span className="device-sensor">EMG</span>
+                    <span className="device-output">APP</span>
                     <i className="signal signal-one" />
                     <i className="signal signal-two" />
                   </div>
                   <div className="device-console">
-                    <p>&gt; device.status</p>
-                    <p>{hardwareOn ? "signal received" : "waiting for input..."}</p>
+                    <p>&gt; emg.stream</p>
+                    <p>{hardwareOn ? "bluetooth signals classified" : "waiting for muscle input..."}</p>
                     <button onClick={() => setHardwareOn((value) => !value)}>
                       {hardwareOn ? "POWER OFF" : "POWER ON"}
                     </button>
                   </div>
                 </div>
-                <p className="panel-copy">The final version can use real photographs, signal flow, debugging notes, and a live sample of device data.</p>
+                <div className="project-meta">
+                  <span>DESIGN<br /><b>Fusion · AutoCAD</b></span>
+                  <span>FIRMWARE<br /><b>Arduino · C/C++</b></span>
+                  <span>SIGNAL<br /><b>EMG · Bluetooth</b></span>
+                </div>
+                <p className="panel-copy">I designed and modeled the hardware, processed EMG signals from multiple Bluetooth devices, built ESP32 classification pipelines, and connected the results to a mobile visualization after exercise.</p>
               </div>
             )}
 
-            {panel === "notes" && (
-              <div className="panel-body notes-panel">
-                <p className="panel-kicker">THOUGHTS IN PROGRESS</p>
-                <h3 id="panel-title">Not a wall of opinions. Traces of thinking.</h3>
-                <blockquote>
-                  “Sounding certain without understanding” may be the state I distrust most.
-                  <span>NOTE: “I do not know yet” is allowed here.</span>
-                </blockquote>
-                <div className="learning-list">
-                  <span>LEARNING NOW</span>
-                  <p>How to make interaction interesting without letting it steal attention from the content.</p>
-                  <span>RECENT QUESTION</span>
-                  <p>Code can solve problems—but what counts as a human problem?</p>
+            {panel === "internship" && (
+              <div className="panel-body experience-panel">
+                <p className="panel-kicker">SOFTWARE ENGINEER INTERN / JUN 2026 — PRESENT</p>
+                <h3 id="panel-title">Thermo Fisher Scientific, Shanghai</h3>
+                <div className="experience-log">
+                  <div><b>01 / MACHINE VISION</b><p>Integrated YOLO26 object detection with ROS2 robot-arm motion control for repetitive laboratory sample handling.</p></div>
+                  <div><b>02 / SOFTWARE TESTING</b><p>Performed black-box workflow testing for Chinese localization of 3500Dx DNA-sequencing software.</p></div>
+                  <div><b>03 / WORKFLOW ANALYSIS</b><p>Reverse-engineered Qantis EDXRF workflows to clarify page transitions and structures for UI designers.</p></div>
+                  <div><b>04 / ONBOARDING</b><p>Trained a new intern, configured a virtual machine, and troubleshot the path toward independent testing.</p></div>
                 </div>
               </div>
             )}
 
-            {panel === "travel" && (
-              <div className="panel-body">
-                <p className="panel-kicker">A WELL-PLANNED ESCAPE</p>
-                <h3 id="panel-title">Enter an unfamiliar place. Try another everyday.</h3>
-                <div className="itinerary">
-                  <div><b>08:10</b><span>Departure</span><small>main route</small></div>
-                  <div><b>11:40</b><span>Wander</span><small>deliberately left open</small></div>
-                  <div><b>16:20</b><span>Plan B</span><small>in case it rains</small></div>
-                  <div><b>?</b><span>Laughing in the street with friends</span><small>impossible to schedule, worth expecting</small></div>
+            {panel === "research" && (
+              <div className="panel-body research-panel">
+                <p className="panel-kicker">UNDERGRADUATE RESEARCH ASSISTANT / APR 2026 — PRESENT</p>
+                <h3 id="panel-title">Social Futures Lab, University of Washington</h3>
+                <div className="research-flow">
+                  <div><b>01</b><span>PARTICIPANT SURVEYS</span><small>case similarity · relevance · principle agreement</small></div>
+                  <i>→</i>
+                  <div><b>02</b><span>NORMALIZED VECTORS</span><small>CSV processing · pandas · case analysis</small></div>
+                  <i>→</i>
+                  <div><b>03</b><span>RESEARCH QUESTION</span><small>how shared principles affect perceived relevance</small></div>
                 </div>
-                <p className="panel-copy">Travel is more than an interest tag. It is another way of thinking: plan carefully, preserve some margin, then actually enter the unknown.</p>
+                <p className="panel-copy">I analyze survey data and construct normalized principle vectors while investigating how agreement on principles changes the way people perceive relevance between cases.</p>
               </div>
             )}
 

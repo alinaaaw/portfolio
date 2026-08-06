@@ -12,17 +12,17 @@ const mono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alina — Pixels, Algorithms & People",
-  description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
+  title: "Wenrui (Alina) Wu — Software, Research & Physical Computing",
+  description: "University of Washington computer science student building software, allocation algorithms, hardware systems, and human-centered research.",
   openGraph: {
-    title: "ALINA.WU — Pixels, Algorithms & People",
-    description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Alina's interactive personal workbench" }],
+    title: "WENRUI (ALINA) WU — Personal Workbench",
+    description: "Software engineering, allocation algorithms, physical computing, and research about how people judge relevance.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Wenrui Alina Wu's interactive personal workbench" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ALINA.WU — Pixels, Algorithms & People",
-    description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
+    title: "WENRUI (ALINA) WU — Personal Workbench",
+    description: "Software engineering, allocation algorithms, physical computing, and human-centered research.",
     images: ["/og.png"],
   },
 };
