@@ -44,6 +44,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /The signal holds outside the lab/);
   assert.match(page, /EMG classifier is separating intentional contraction from drift/);
   assert.match(page, /bringing the hardware and full logs back to Lab 17/);
+  assert.match(page, /mailto:awu78@uw\.edu/);
   assert.match(page, /INCOMING FAX/);
   assert.match(page, /CLICK THE HIGHLIGHTED PRINTER/);
   assert.match(page, /onDoubleClick/);
