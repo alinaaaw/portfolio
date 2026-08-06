@@ -21,7 +21,8 @@ absence is revealed gradually rather than announced.
 3. Inspect six objects in any order: computer, drawer, notebook, books, note
    board, and field case.
 4. Discover the lab bulletin inside the computer and follow later physical clues.
-5. Activate the printer and receive Alina's fax after all six traces are logged.
+5. Activate the printer and receive Alina's off-site field report after all six
+   traces are logged.
 
 ## Design identity
 

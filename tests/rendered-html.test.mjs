@@ -38,7 +38,10 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /Social Futures Lab/i);
   assert.match(page, /Thermo Fisher Scientific/i);
   assert.match(page, /offline for four days/);
-  assert.match(page, /I am not missing/);
+  assert.doesNotMatch(page, /I am not missing/);
+  assert.match(page, /The signal holds outside the lab/);
+  assert.match(page, /EMG classifier is separating intentional contraction from drift/);
+  assert.match(page, /bringing the hardware and full logs back to Lab 17/);
   assert.match(page, /PRINTER ACTIVE/);
 });
 
@@ -51,6 +54,9 @@ test("3D room supports object hitboxes, camera moves, and fax state", async () =
   assert.match(game, /pointermove/);
   assert.match(game, /onInspect/);
   assert.match(game, /faxReady/);
+  assert.match(game, /CatmullRomCurve3/);
+  assert.match(game, /MeshPhysicalMaterial/);
+  assert.match(game, /buildBooks/);
   assert.doesNotMatch(game, /rover/i);
   for (const selector of ["lab-game", "computer-view", "os-screen", "drawer-closeup", "notebook-closeup", "board-closeup", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));

@@ -17,7 +17,8 @@ suggests an off-site route, and the final recovered message resolves the story.
 2. Drag to change the view, then click one of six visible object signals.
 3. Let the camera move into a close-up and interact with the object itself.
 4. Use the direct Room Index when spatial exploration is not desired.
-5. Connect all six traces to activate the printer and receive Alina's fax.
+5. Connect all six traces to activate the printer and receive Alina's off-site
+   research progress report.
 
 ## Portfolio stations
 
@@ -34,6 +35,9 @@ suggests an off-site route, and the final recovered message resolves the story.
 - Match the social cover's realistic, cinematic late-night laboratory mood.
 - Use procedural 3D geometry, physical materials, practical task lighting,
   atmospheric fog, shadows, and a restrained film-grain overlay.
+- Compose the room as a dense, used workspace: computer, instruments, circuits,
+  cables, notebooks, papers, glassware, lamps, and personal objects should share
+  surfaces instead of reading as isolated exhibits.
 - Deep green-black surfaces frame warm wood and paper evidence.
 - Signal lime means navigable; cyan means recovered; coral means anomaly.
 - Keep the interface sparse, editorial, and readable over the 3D world.
@@ -54,4 +58,5 @@ suggests an off-site route, and the final recovered message resolves the story.
 The site is a real portfolio before it is a mystery. Use factual project titles,
 roles, tools, teams, and dates. Narrative copy should be observant, dry, and
 slightly playful. The mystery may create curiosity but must never obscure the
-work or make the subject appear endangered.
+work or make the subject appear endangered. The final fax resolves the absence
+indirectly through a credible field-research update, not a literal denial.

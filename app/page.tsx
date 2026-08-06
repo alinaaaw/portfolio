@@ -72,7 +72,7 @@ export default function VersionThree() {
     "THREE TRACES CONNECT",
     "OFF-SITE PATTERN FORMING",
     "PRINTER RECEIVING DATA",
-    "FAX READY / SOURCE UNKNOWN",
+    "FIELD REPORT READY / SOURCE AW",
   ][discovered.length];
 
   return (
@@ -114,7 +114,7 @@ export default function VersionThree() {
             <div className="explore-dock">
               {zoneOrder.map((zone) => <button className={discovered.includes(zone)?"found":""} key={zone} onClick={() => inspect(zone)}><span>{zoneInfo[zone].index}</span><i>{zoneInfo[zone].label}</i></button>)}
             </div>
-            {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> PRINTER ACTIVE <strong>OPEN INCOMING FAX →</strong></button>}
+            {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> PRINTER ACTIVE <strong>OPEN FIELD REPORT →</strong></button>}
           </>
         )}
       </section>
@@ -173,7 +173,7 @@ export default function VersionThree() {
 
             {active==="notebook"&&<button className={`notebook-closeup ${noteTurned?"turned":""}`} onClick={() => setNoteTurned((value) => !value)}><small>{noteTurned?"REVERSE / PERSONAL MARGIN":"UW SOCIAL FUTURES LAB / PAGE 17"}</small><h2>{noteTurned?"Sounding certain is not the same as understanding.":"How do principles shape perceived relevance?"}</h2><p>{noteTurned?"Research first. Ask people next. Leave room for the answer to stay complicated.":"Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation."}</p><span>{noteTurned?"TURN BACK ↺":"TURN THE PAGE ↻"}</span></button>}
 
-            {active==="books"&&<div className="books-closeup"><aside><button className={activeBook==="algorithm"?"selected":""} onClick={() => setActiveBook("algorithm")}>ALGORITHMS</button><button className={activeBook==="human"?"selected":""} onClick={() => setActiveBook("human")}>HUMAN SYSTEMS</button><button className={activeBook==="travel"?"selected":""} onClick={() => setActiveBook("travel")}>FIELD ROUTES</button></aside><article>{activeBook==="algorithm"&&<><small>BOOKMARK / COURSE PROJECT</small><h2>Automatic and Satisfactory Course Assignment</h2><p>Python and NumPy implementation using Simultaneous Eating and Birkhoff Decomposition to produce efficient allocations shaped by student preferences.</p></>}{activeBook==="human"&&<><small>MARGIN / CHAPTER UNFINISHED</small><h2>People are not systems waiting to be reduced.</h2><p>Computer science supplies structure. Psychology supplies the warning label: a model can be useful without being the whole person.</p></>}{activeBook==="travel"&&<><small>FOLDED MAP / PLAN B INCLUDED</small><h2>A route is a hypothesis.</h2><p>Plan carefully enough to begin, then update the route when the world supplies new information.</p></>}</article></div>}
+            {active==="books"&&<div className="books-closeup"><aside className="book-shelf"><button className={activeBook==="algorithm"?"selected":""} onClick={() => setActiveBook("algorithm")}><span>01</span><strong>ALGORITHMS</strong><small>PYTHON / ALLOCATION</small></button><button className={activeBook==="human"?"selected":""} onClick={() => setActiveBook("human")}><span>02</span><strong>HUMAN SYSTEMS</strong><small>CS / PSYCHOLOGY</small></button><button className={activeBook==="travel"?"selected":""} onClick={() => setActiveBook("travel")}><span>03</span><strong>FIELD ROUTES</strong><small>MAPS / PLAN B</small></button></aside><article>{activeBook==="algorithm"&&<><small>BOOKMARK / COURSE PROJECT</small><h2>Automatic and Satisfactory Course Assignment</h2><p>Python and NumPy implementation using Simultaneous Eating and Birkhoff Decomposition to produce efficient allocations shaped by student preferences.</p></>}{activeBook==="human"&&<><small>MARGIN / CHAPTER UNFINISHED</small><h2>People are not systems waiting to be reduced.</h2><p>Computer science supplies structure. Psychology supplies the warning label: a model can be useful without being the whole person.</p></>}{activeBook==="travel"&&<><small>FOLDED MAP / PLAN B INCLUDED</small><h2>A route is a hypothesis.</h2><p>Plan carefully enough to begin, then update the route when the world supplies new information.</p></>}</article></div>}
 
             {active==="board"&&<div className="board-closeup"><div className="board-notes">{["research first, ask people next","TODO: overthink less","backup route B","I do not know yet","make it useful before impressive"].map((note,index) => <button className={activeNote===index?"selected":""} onClick={() => setActiveNote(index)} key={note}>{note}</button>)}</div><article><small>SELECTED MARGIN / {String(activeNote+1).padStart(2,"0")}</small><h2>{["Questions before conclusions.","Momentum is also evidence.","Preparation creates freedom.","Uncertainty is a valid state.","Usefulness before spectacle."][activeNote]}</h2><p>{["Collect context, then talk to the people inside the problem.","Thinking carefully matters. So does eventually testing the thought.","A Plan B is not pessimism; it is permission to continue.","Not every question needs to be converted into a confident answer.","The interface should help a person do something—not only prove it was difficult to build."][activeNote]}</p></article></div>}
 
@@ -189,7 +189,7 @@ export default function VersionThree() {
           <section className="fax-machine" role="dialog" aria-modal="true" aria-labelledby="fax-title" onMouseDown={(event) => event.stopPropagation()}>
             <header><span>LAB 17 PRINTER / INCOMING</span><button onClick={() => setFaxOpen(false)}>×</button></header>
             <div className="fax-slot"><i /></div>
-            <article className="fax-paper"><small>FAX / SOURCE: AW / AFTER 06 CONNECTED TRACES</small><h2 id="fax-title">I am not missing.</h2><p>I followed a question farther than expected, took the field case, and forgot that “back soon” is not a useful status update.</p><p>The projects are real. The bulletin is technically accurate. The detailed Plan B is in the side pocket.</p><strong>— Alina</strong><footer><span>STATUS / SOMEWHERE INTERESTING</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer></article>
+            <article className="fax-paper"><small>FIELD REPORT / SOURCE: AW / PHASE 02</small><h2 id="fax-title">The signal holds outside the lab.</h2><p>Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.</p><p>I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17.</p><strong>More when I return. — Alina</strong><footer><span>STATUS / PHASE 02 COMPLETE</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer></article>
           </section>
         </div>
       )}
