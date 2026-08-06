@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import type { ZoneId } from "./_components/LabGame";
 
 const LabGame = dynamic(() => import("./_components/LabGame"), {
@@ -28,6 +28,78 @@ const projectFiles = [
   { id:"emg" as const,name:"emg-monitor.device",meta:"ARDUINO · C/C++ · FUSION",title:"Muscle Usage & Behavior Monitor",copy:"A multi-device system that collects EMG signals over Bluetooth, classifies them on ESP32 microcontrollers, and sends exercise data to a mobile interface.",facts:["ESP32","EMG + BLUETOOTH","MOBILE INTERFACE"] },
 ];
 
+const shelfBooks = [
+  { id:"algorithms",index:"01",title:"Fair Allocation",meta:"ALGORITHMS / BOOKMARK 42",heading:"Automatic and Satisfactory Course Assignment",copy:"Simultaneous Eating and Birkhoff Decomposition, annotated with the points where efficiency and student preference stop agreeing cleanly.",note:"Re-run with the preference ties preserved." },
+  { id:"city",index:"02",title:"Walking Distance",meta:"FIELD MAP / SHANGHAI",heading:"Quality of Life in Shanghai",copy:"Interview notes, questionnaire patterns, and an early neighborhood map folded together before they became an interactive website.",note:"A useful map begins with somebody's ordinary Tuesday." },
+  { id:"signals",index:"03",title:"Signals in Motion",meta:"HARDWARE / EMG",heading:"Muscle Usage & Behavior Monitor",copy:"Signal sketches for the ESP32 system, including the noisy readings that were more useful than the clean demonstrations.",note:"Test outside the clean bench." },
+  { id:"human",index:"04",title:"Human Systems",meta:"PSYCHOLOGY / MARGIN",heading:"People are not systems waiting to be reduced.",copy:"Computer science supplies structure. Psychology supplies the warning label: a model can be useful without becoming the whole person.",note:"Ask what the model leaves out." },
+  { id:"research",index:"05",title:"Relevance",meta:"UW SOCIAL FUTURES LAB",heading:"How do principles shape perceived relevance?",copy:"Survey questions, normalized case data, and a working set of principle vectors. Several conclusions remain deliberately unfinished.",note:"Sounding certain is not the same as understanding." },
+  { id:"routes",index:"06",title:"Field Routes",meta:"MAPS / PLAN B",heading:"A route is a hypothesis.",copy:"Careful itineraries, alternative paths, and the reminder that preparation is permission to adapt rather than proof that nothing will change.",note:"Leave the return line open." },
+] as const;
+
+type ShelfBook = (typeof shelfBooks)[number];
+type DrawerFile = "folder" | "notebook" | "components" | "envelope";
+
+function BookshelfScene({ onClose }:{ onClose:()=>void }) {
+  const [selected,setSelected] = useState<ShelfBook|null>(null);
+  const [reverse,setReverse] = useState(false);
+  const positions = [13,26,39.5,52.5,66,79.5];
+  return <div className="modal-layer tactile-layer bookshelf-layer" onMouseDown={onClose}>
+    <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Bookshelf close-up" onMouseDown={(event) => event.stopPropagation()}>
+      <header><div><span>04</span><strong>BOOKSHELF / SELECT A BOOK</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+      <div className="bookshelf-photo-stage">
+        <img src="/lab-bookshelf-closeup.png" alt="Six worn books with bookmarks on a dark wooden shelf" />
+        <p>CLICK A BOOK TO PULL IT FROM THE SHELF</p>
+        {shelfBooks.map((book,index) => <button key={book.id} className="photo-book-hit" style={{left:`${positions[index]}%`}} onClick={() => { setSelected(book); setReverse(false); }} aria-label={`Open ${book.title}`}><span>{book.index}</span><b>{book.title}</b></button>)}
+      </div>
+      {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
+        <div className={`physical-book ${reverse?"reverse":""}`} onMouseDown={(event) => event.stopPropagation()}>
+          <div className="book-pages">
+            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{reverse?selected.note:selected.heading}</h2><p>{reverse?"A note in the back margin, written after the rest of the page.":selected.copy}</p><i className="page-lines" /></article>
+            <button className="book-page book-page-right" onClick={() => setReverse((value) => !value)} aria-label="Turn book page"><span className="sticky-tab">FIELD NOTE</span><small>{reverse?"RETURN / PAGE 42":"ANNOTATION / PAGE 41"}</small><blockquote>{reverse?selected.copy:selected.note}</blockquote><b>{reverse?"TURN BACK ↶":"TURN PAGE ↷"}</b></button>
+            <div className="book-spine" />
+          </div>
+          <button className="close-book" onClick={() => setSelected(null)}>RETURN BOOK TO SHELF ×</button>
+        </div>
+      </div>}
+    </section>
+  </div>;
+}
+
+function DrawerScene({ onClose }:{ onClose:()=>void }) {
+  const [open,setOpen] = useState(false);
+  const [selected,setSelected] = useState<DrawerFile|null>(null);
+  const startY = useRef<number|null>(null);
+  const fileCopy: Record<DrawerFile,{meta:string;title:string;copy:string;note:string}> = {
+    folder:{meta:"PROJECT FOLDER / 2023—2024",title:"Shanghai, at walking distance.",copy:"Questionnaires, interview summaries, and printed facility maps from the eight-person Quality of Life in Shanghai project.",note:"Ask residents before drawing the route."},
+    notebook:{meta:"FIELD LOG / SOCIAL FUTURES LAB",title:"Cases, principles, relevance.",copy:"Small observations recorded before the survey responses were normalized and moved into the Pandas pipeline.",note:"Do not smooth away disagreement."},
+    components:{meta:"HARDWARE POUCH / REV. 04",title:"The prototype left the clean bench.",copy:"ESP32 board, EMG sensor leads, spare headers, and the component set used for the current outdoor movement tests.",note:"Noise after fatigue may be useful."},
+    envelope:{meta:"SEALED NOTE / RETURN CHANNEL",title:"For the printer, after six traces.",copy:"A routing envelope with the Lab 17 printer address and a field-transmission schedule written inside the flap.",note:"Next report: after Phase 02."},
+  };
+  const item = selected ? fileCopy[selected] : null;
+  const pullEnd = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (startY.current!==null && event.clientY-startY.current>18) setOpen(true);
+    startY.current = null;
+  };
+  return <div className="modal-layer tactile-layer drawer-layer" onMouseDown={onClose}>
+    <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Desk drawer close-up" onMouseDown={(event) => event.stopPropagation()}>
+      <header><div><span>02</span><strong>DESK DRAWER / PULL TO OPEN</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+      <div className={`drawer-photo-stage ${open?"drawer-open":""}`}>
+        <img src="/lab-drawer-open.png" alt="An open wooden drawer containing a folder, notebook, electronics pouch, and envelope" />
+        <div className="drawer-dark" />
+        <button className="drawer-front" onClick={() => setOpen(true)} onPointerDown={(event) => { startY.current=event.clientY; event.currentTarget.setPointerCapture(event.pointerId); }} onPointerUp={pullEnd}><i /><span>{open?"DRAWER OPEN":"GRAB HANDLE AND PULL DOWN"}</span></button>
+        {open&&<div className="drawer-hotspots">
+          <button className="drawer-hit hit-folder" onClick={() => setSelected("folder")}><span>PROJECT FOLDER</span></button>
+          <button className="drawer-hit hit-notebook" onClick={() => setSelected("notebook")}><span>FIELD NOTEBOOK</span></button>
+          <button className="drawer-hit hit-components" onClick={() => setSelected("components")}><span>COMPONENT POUCH</span></button>
+          <button className="drawer-hit hit-envelope" onClick={() => setSelected("envelope")}><span>SEALED ENVELOPE</span></button>
+        </div>}
+      </div>
+      {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><article onMouseDown={(event) => event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p><blockquote>{item.note}</blockquote><button onClick={() => setSelected(null)}>PUT IT BACK ×</button></article></div>}
+    </section>
+  </div>;
+}
+
 export default function VersionThree() {
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
@@ -35,10 +107,9 @@ export default function VersionThree() {
   const [discovered,setDiscovered] = useState<ZoneId[]>([]);
   const [indexOpen,setIndexOpen] = useState(false);
   const [computerFile,setComputerFile] = useState<ComputerFile>("desktop");
+  const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
   const [bulletin,setBulletin] = useState(false);
-  const [drawerItem,setDrawerItem] = useState<"device"|"components"|"label">("device");
   const [noteTurned,setNoteTurned] = useState(false);
-  const [activeBook,setActiveBook] = useState<"algorithm"|"human"|"travel">("algorithm");
   const [activeNote,setActiveNote] = useState(0);
   const [fieldItem,setFieldItem] = useState<"internship"|"target"|"ticket">("internship");
   const [faxOpen,setFaxOpen] = useState(false);
@@ -62,6 +133,11 @@ export default function VersionThree() {
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
   },[]);
+
+  const openComputerFile = (file: ComputerFile) => {
+    setComputerFile(file);
+    setSelectedComputerFile(null);
+  };
 
   const solved = discovered.length===zoneOrder.length;
   const desktopFile = projectFiles.find((file) => file.id===computerFile);
@@ -134,23 +210,24 @@ export default function VersionThree() {
           <div className="monitor-bezel">
             <header className="os-bar"><span>ALINA.OS / LAB-17</span><div><b>SYNC ACTIVE</b><i />02:17</div><button onClick={() => setActive(null)}>LEAVE COMPUTER ×</button></header>
             <div className="os-screen">
-              <aside className="os-sidebar"><strong>AW</strong><button onClick={() => setComputerFile("desktop")}>DESKTOP</button><button onClick={() => setComputerFile("projects")}>PROJECTS</button><button onClick={() => setComputerFile("experience")}>EXPERIENCE</button><button onClick={() => setComputerFile("about")}>ABOUT.TXT</button><span>LAB-17 / LOCAL</span></aside>
+              <aside className="os-sidebar"><strong>AW</strong><button onClick={() => openComputerFile("desktop")}>DESKTOP</button><button onClick={() => openComputerFile("projects")}>PROJECTS</button><button onClick={() => openComputerFile("experience")}>EXPERIENCE</button><button onClick={() => openComputerFile("about")}>ABOUT.TXT</button><span>LAB-17 / LOCAL</span></aside>
               <main className="os-workspace">
                 {computerFile==="desktop"&&<div className="desktop-icons">
-                  <button onClick={() => setComputerFile("about")}><i className="file-icon" /><span>ABOUT.txt</span></button>
-                  <button onClick={() => setComputerFile("projects")}><i className="folder-icon" /><span>PROJECTS</span></button>
-                  <button onClick={() => setComputerFile("experience")}><i className="folder-icon" /><span>EXPERIENCE</span></button>
-                  <button onClick={() => setComputerFile("research")}><i className="file-icon" /><span>FIELD_NOTES.md</span></button>
+                  <button className={selectedComputerFile==="about"?"selected":""} onClick={() => setSelectedComputerFile("about")} onDoubleClick={() => openComputerFile("about")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("about"); }}><i className="file-icon" /><span>ABOUT.txt</span></button>
+                  <button className={selectedComputerFile==="projects"?"selected":""} onClick={() => setSelectedComputerFile("projects")} onDoubleClick={() => openComputerFile("projects")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("projects"); }}><i className="folder-icon" /><span>PROJECTS</span></button>
+                  <button className={selectedComputerFile==="experience"?"selected":""} onClick={() => setSelectedComputerFile("experience")} onDoubleClick={() => openComputerFile("experience")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("experience"); }}><i className="folder-icon" /><span>EXPERIENCE</span></button>
+                  <button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("research"); }}><i className="file-icon" /><span>FIELD_NOTES.md</span></button>
+                  <p className="desktop-hint">SINGLE CLICK TO SELECT / DOUBLE CLICK TO OPEN</p>
                   <div className="desktop-welcome"><small>WELCOME / GUEST</small><h2>Wenrui<br />(Alina) Wu</h2><p>Computer Science at the University of Washington. Code, physical systems, and questions about the people around them.</p></div>
                 </div>}
 
                 {computerFile==="about"&&<article className="os-window text-file"><header><span>ABOUT.txt</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>PROFILE / LAST SAVED RECENTLY</small><h2>I build with code,<br />then look closely at<br />what it meets.</h2><p>Computer science gives me a way to break problems apart. Psychology keeps the human parts from becoming too simple. I collect information before choosing a route, but I try not to confuse preparation with certainty.</p><blockquote>“I do not know yet” is allowed here.</blockquote></div></article>}
 
-                {computerFile==="projects"&&<article className="os-window folder-window"><header><span>PROJECTS / 3 ITEMS</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div className="file-list">{projectFiles.map((file) => <button key={file.id} onClick={() => setComputerFile(file.id)}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span><b>OPEN →</b></button>)}</div></article>}
+                {computerFile==="projects"&&<article className="os-window folder-window"><header><span>PROJECTS / 3 ITEMS · DOUBLE CLICK TO OPEN</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div className="file-list">{projectFiles.map((file) => <button className={selectedComputerFile===file.id?"selected":""} key={file.id} onClick={() => setSelectedComputerFile(file.id)} onDoubleClick={() => openComputerFile(file.id)} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile(file.id); }}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span><b>DOUBLE CLICK</b></button>)}</div></article>}
 
                 {desktopFile&&<article className="os-window project-window"><header><button onClick={() => setComputerFile("projects")}>← PROJECTS</button><span>{desktopFile.name}</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>{desktopFile.meta}</small><h2>{desktopFile.title}</h2><p>{desktopFile.copy}</p><div>{desktopFile.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><button className="run-file">CASE FILE / VERIFIED</button></div></article>}
 
-                {computerFile==="experience"&&<article className="os-window experience-window"><header><span>EXPERIENCE / 2 ITEMS</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><button onClick={() => setComputerFile("research")}><span>01 / RESEARCH</span><strong>UW Social Futures Lab</strong><small>APR 2026 — PRESENT</small></button><button onClick={() => setComputerFile("internship")}><span>02 / INTERNSHIP</span><strong>Thermo Fisher Scientific</strong><small>JUN 2026 — PRESENT</small></button></div></article>}
+                {computerFile==="experience"&&<article className="os-window experience-window"><header><span>EXPERIENCE / 2 ITEMS · DOUBLE CLICK TO OPEN</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")}><span>01 / RESEARCH</span><strong>UW Social Futures Lab</strong><small>APR 2026 — PRESENT</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")}><span>02 / INTERNSHIP</span><strong>Thermo Fisher Scientific</strong><small>JUN 2026 — PRESENT</small></button></div></article>}
 
                 {computerFile==="research"&&<article className="os-window text-file"><header><button onClick={() => setComputerFile("experience")}>← EXPERIENCE</button><span>SOCIAL_FUTURES_LAB.md</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>UNDERGRADUATE RESEARCH / UW</small><h2>How do principles shape perceived relevance?</h2><p>Analyzing how agreement on principles affects perceived relevance between cases through surveys, normalized data, and Pandas-based CSV pipelines.</p><blockquote>STATUS: the relationship is still under investigation.</blockquote></div></article>}
 
@@ -164,16 +241,15 @@ export default function VersionThree() {
         </div>
       )}
 
-      {active&&active!=="computer"&&(
+      {active==="drawer"&&<DrawerScene onClose={() => setActive(null)} />}
+      {active==="books"&&<BookshelfScene onClose={() => setActive(null)} />}
+
+      {active&&active!=="computer"&&active!=="drawer"&&active!=="books"&&(
         <div className={`modal-layer object-layer object-${active}`} onMouseDown={() => setActive(null)}>
           <section className="object-view" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => event.stopPropagation()}>
             <header><div><span>{zoneInfo[active].index}</span><strong id="object-title">{zoneInfo[active].label}</strong></div><button onClick={() => setActive(null)}>RETURN TO ROOM ×</button></header>
 
-            {active==="drawer"&&<div className="drawer-closeup"><div className="drawer-tray"><button className={drawerItem==="device"?"selected":""} onClick={() => setDrawerItem("device")}><i className="mini-board" /><span>EMG PROTOTYPE</span></button><button className={drawerItem==="components"?"selected":""} onClick={() => setDrawerItem("components")}><i className="component-bag" /><span>SPARE PARTS</span></button><button className={drawerItem==="label"?"selected":""} onClick={() => setDrawerItem("label")}><i className="paper-label" /><span>HANDWRITTEN LABEL</span></button></div><article>{drawerItem==="device"&&<><small>PROJECT / ARDUINO · C/C++ · FUSION</small><h2>Muscle Usage &amp;<br />Behavior Monitor</h2><p>A multi-device system that collects EMG signals over Bluetooth, classifies them on ESP32 microcontrollers, and sends exercise data to a mobile interface.</p><div className="object-tags"><span>ESP32</span><span>EMG</span><span>BLUETOOTH</span></div></>}{drawerItem==="components"&&<><small>COMPONENT BAG / REV. 04</small><h2>Ideas eventually<br />need a body.</h2><p>Sensors, spare pins, and three abandoned enclosure ideas. The prototype changed shape before the signal path stopped changing.</p></>}{drawerItem==="label"&&<><small>PENCIL / BEFORE ASSEMBLY</small><h2>“If it cannot respond,<br />it is still a diagram.”</h2><p>The sentence appears again in two notebooks and once on the computer.</p></>}</article></div>}
-
             {active==="notebook"&&<button className={`notebook-closeup ${noteTurned?"turned":""}`} onClick={() => setNoteTurned((value) => !value)}><small>{noteTurned?"REVERSE / PERSONAL MARGIN":"UW SOCIAL FUTURES LAB / PAGE 17"}</small><h2>{noteTurned?"Sounding certain is not the same as understanding.":"How do principles shape perceived relevance?"}</h2><p>{noteTurned?"Research first. Ask people next. Leave room for the answer to stay complicated.":"Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation."}</p><span>{noteTurned?"TURN BACK ↺":"TURN THE PAGE ↻"}</span></button>}
-
-            {active==="books"&&<div className="books-closeup"><aside className="book-shelf"><button className={activeBook==="algorithm"?"selected":""} onClick={() => setActiveBook("algorithm")}><span>01</span><strong>ALGORITHMS</strong><small>PYTHON / ALLOCATION</small></button><button className={activeBook==="human"?"selected":""} onClick={() => setActiveBook("human")}><span>02</span><strong>HUMAN SYSTEMS</strong><small>CS / PSYCHOLOGY</small></button><button className={activeBook==="travel"?"selected":""} onClick={() => setActiveBook("travel")}><span>03</span><strong>FIELD ROUTES</strong><small>MAPS / PLAN B</small></button></aside><article>{activeBook==="algorithm"&&<><small>BOOKMARK / COURSE PROJECT</small><h2>Automatic and Satisfactory Course Assignment</h2><p>Python and NumPy implementation using Simultaneous Eating and Birkhoff Decomposition to produce efficient allocations shaped by student preferences.</p></>}{activeBook==="human"&&<><small>MARGIN / CHAPTER UNFINISHED</small><h2>People are not systems waiting to be reduced.</h2><p>Computer science supplies structure. Psychology supplies the warning label: a model can be useful without being the whole person.</p></>}{activeBook==="travel"&&<><small>FOLDED MAP / PLAN B INCLUDED</small><h2>A route is a hypothesis.</h2><p>Plan carefully enough to begin, then update the route when the world supplies new information.</p></>}</article></div>}
 
             {active==="board"&&<div className="board-closeup"><div className="board-notes">{["research first, ask people next","TODO: overthink less","backup route B","I do not know yet","make it useful before impressive"].map((note,index) => <button className={activeNote===index?"selected":""} onClick={() => setActiveNote(index)} key={note}>{note}</button>)}</div><article><small>SELECTED MARGIN / {String(activeNote+1).padStart(2,"0")}</small><h2>{["Questions before conclusions.","Momentum is also evidence.","Preparation creates freedom.","Uncertainty is a valid state.","Usefulness before spectacle."][activeNote]}</h2><p>{["Collect context, then talk to the people inside the problem.","Thinking carefully matters. So does eventually testing the thought.","A Plan B is not pessimism; it is permission to continue.","Not every question needs to be converted into a confident answer.","The interface should help a person do something—not only prove it was difficult to build."][activeNote]}</p></article></div>}
 
@@ -189,7 +265,7 @@ export default function VersionThree() {
           <section className="fax-machine" role="dialog" aria-modal="true" aria-labelledby="fax-title" onMouseDown={(event) => event.stopPropagation()}>
             <header><span>LAB 17 PRINTER / INCOMING</span><button onClick={() => setFaxOpen(false)}>×</button></header>
             <div className="fax-slot"><i /></div>
-            <article className="fax-paper"><small>FIELD REPORT / SOURCE: AW / PHASE 02</small><h2 id="fax-title">The signal holds outside the lab.</h2><p>Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.</p><p>I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17.</p><strong>More when I return. — Alina</strong><footer><span>STATUS / PHASE 02 COMPLETE</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer></article>
+            <div className="fax-output"><article className="fax-paper"><small>FIELD REPORT / SOURCE: AW / PHASE 02</small><h2 id="fax-title">The signal holds outside the lab.</h2><p>Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.</p><p>I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17.</p><strong>More when I return. — Alina</strong><footer><span>STATUS / PHASE 02 COMPLETE</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer></article></div>
           </section>
         </div>
       )}

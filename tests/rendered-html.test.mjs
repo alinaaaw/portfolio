@@ -43,24 +43,37 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /EMG classifier is separating intentional contraction from drift/);
   assert.match(page, /bringing the hardware and full logs back to Lab 17/);
   assert.match(page, /PRINTER ACTIVE/);
+  assert.match(page, /onDoubleClick/);
+  assert.match(page, /SINGLE CLICK TO SELECT \/ DOUBLE CLICK TO OPEN/);
+  assert.match(page, /lab-bookshelf-closeup\.png/);
+  assert.match(page, /lab-drawer-open\.png/);
+  assert.match(page, /GRAB HANDLE AND PULL DOWN/);
+  assert.match(page, /TURN PAGE/);
+  assert.match(page, /fax-output/);
 });
 
-test("3D room supports object hitboxes, camera moves, and fax state", async () => {
+test("photoreal room supports precise hotspots, parallax, and layered object exploration", async () => {
   const game = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/_components/LabGame.tsx", import.meta.url), "utf8"));
   const css = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../public/site.css", import.meta.url), "utf8"));
-  assert.match(game, /WebGLRenderer/);
-  assert.match(game, /cameraPoses/);
-  assert.match(game, /Raycaster/);
-  assert.match(game, /pointermove/);
+  assert.match(game, /lab-workspace-v2\.png/);
+  assert.match(game, /photo-stage/);
+  assert.match(game, /zone-hotspot/);
+  assert.match(game, /pointerMove/);
+  assert.match(game, /focus-\$\{requested\}/);
   assert.match(game, /onInspect/);
   assert.match(game, /faxReady/);
-  assert.match(game, /CatmullRomCurve3/);
-  assert.match(game, /MeshPhysicalMaterial/);
-  assert.match(game, /buildBooks/);
   assert.doesNotMatch(game, /rover/i);
-  for (const selector of ["lab-game", "computer-view", "os-screen", "drawer-closeup", "notebook-closeup", "board-closeup", "fax-paper"]) {
+  for (const selector of ["photo-lab", "zone-hotspot", "computer-view", "os-screen", "drawer-photo-stage", "bookshelf-photo-stage", "physical-book", "fax-output", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
   assert.match(css, /@media \(max-width: 620px\)/);
   assert.match(css, /prefers-reduced-motion/);
+});
+
+test("photographic room and object close-up assets are present", async () => {
+  const { stat } = await import("node:fs/promises");
+  for (const asset of ["lab-workspace-v2.png", "lab-bookshelf-closeup.png", "lab-drawer-open.png"]) {
+    const info = await stat(new URL(`../public/${asset}`, import.meta.url));
+    assert.ok(info.size > 1_000_000, `${asset} should be a high-resolution photographic asset`);
+  }
 });

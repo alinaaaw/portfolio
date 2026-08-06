@@ -8,7 +8,7 @@
 
 ## Concept
 
-Version 3 presents the portfolio as a lightweight 3D room exploration. The
+Version 3 presents the portfolio as a photoreal 2.5D room exploration. The
 visitor looks around Alina's active laboratory and clicks the computer, drawer,
 notebook, books, note board, and field case. Each object becomes a dedicated
 close-up interface containing factual work and more personal traces. A possible
@@ -16,7 +16,7 @@ absence is revealed gradually rather than announced.
 
 ## Investigation structure
 
-1. Enter Lab 17 and look around the single 3D room.
+1. Enter Lab 17 and look around the single photographic room.
 2. Drag the view and click highlighted objects to move closer.
 3. Inspect six objects in any order: computer, drawer, notebook, books, note
    board, and field case.
@@ -26,7 +26,8 @@ absence is revealed gradually rather than announced.
 
 ## Design identity
 
-- Realistic late-night creative laboratory rendered as a lightweight 3D scene.
+- Realistic late-night creative laboratory presented as a lightweight
+  photographic 2.5D scene.
 - Deep ink, warm paper, signal lime, evidence red, and muted cyan.
 - Editorial case files combined with tactile physical evidence.
 - Notes, corrections, crossed-out routes, and quiet humor reveal personality.
