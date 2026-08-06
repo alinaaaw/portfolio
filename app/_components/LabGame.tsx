@@ -3,356 +3,386 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-export type StationId = "terminal" | "route" | "hardware" | "notebook" | "fieldcase";
+export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 
 type LabGameProps = {
   active: boolean;
-  discovered: StationId[];
-  onNearChange: (station: StationId | null) => void;
-  onInspect: (station: StationId) => void;
+  viewing: ZoneId | null;
+  discovered: ZoneId[];
+  faxReady: boolean;
+  onHover: (zone: ZoneId | null) => void;
+  onInspect: (zone: ZoneId) => void;
 };
 
-type StationTarget = THREE.Object3D & { userData: { station?: StationId } };
-
-const stationPositions: Record<StationId, [number, number]> = {
-  terminal: [-7.2, -5.7],
-  route: [-1.9, -6.6],
-  hardware: [5.4, -5.5],
-  notebook: [6.6, 2.8],
-  fieldcase: [-6.3, 3.5],
-};
+type ZoneTarget = THREE.Object3D & { userData: { zone?: ZoneId } };
 
 const palette = {
-  ink: 0x0b1211,
+  void: 0x07100f,
+  ink: 0x101817,
   metal: 0x293432,
-  metalLight: 0x68736e,
-  wood: 0x5d4737,
-  woodLight: 0x8b6a4e,
-  paper: 0xd9cfb7,
-  cyan: 0x65c7c0,
+  steel: 0x707a75,
+  wood: 0x604938,
+  woodLight: 0x8c694b,
+  paper: 0xdfd3b8,
+  cyan: 0x70c9c0,
   signal: 0xd1f45c,
   red: 0xe45a43,
-  green: 0x31463e,
+  green: 0x294139,
 };
 
-function mat(color: number, roughness = .82, metalness = .04, emissive = 0x000000, emissiveIntensity = 0) {
+const zoneLabels: Record<ZoneId, string> = {
+  computer: "COMPUTER / FILE SYSTEM",
+  drawer: "DRAWER / PROTOTYPE",
+  notebook: "NOTEBOOK / RESEARCH",
+  books: "BOOKS / ALGORITHMS",
+  board: "BOARD / MARGIN NOTES",
+  fieldcase: "FIELD CASE / EXPERIENCE",
+};
+
+const zonePositions: Record<ZoneId, [number, number, number]> = {
+  computer: [-5.9, 2.25, -6.05],
+  drawer: [-3.4, 1.05, -5.75],
+  notebook: [4.9, 1.72, 2.2],
+  books: [8.2, 2.55, -5.95],
+  board: [1.1, 3.15, -8.55],
+  fieldcase: [-7.1, .85, 3.45],
+};
+
+const cameraPoses: Record<ZoneId, { position: [number,number,number]; target: [number,number,number] }> = {
+  computer: { position: [-5.9,2.8,-2.75], target: [-5.9,2.25,-6.05] },
+  drawer: { position: [-3.4,2.35,-2.7], target: [-3.4,1.05,-5.75] },
+  notebook: { position: [4.9,4.25,5.65], target: [4.9,1.58,2.2] },
+  books: { position: [8.1,3.1,-2.2], target: [8.2,2.5,-5.95] },
+  board: { position: [1.1,3.35,-4.7], target: [1.1,3.1,-8.5] },
+  fieldcase: { position: [-7.05,3.1,6.3], target: [-7.05,.85,3.45] },
+};
+
+function material(color: number, roughness = .8, metalness = .05, emissive = 0x000000, emissiveIntensity = 0) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness, emissive, emissiveIntensity });
 }
 
-function box(w: number, h: number, d: number, color: number, roughness?: number, metalness?: number) {
-  return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color, roughness, metalness));
+function box(width: number, height: number, depth: number, color: number, roughness?: number, metalness?: number) {
+  return new THREE.Mesh(new THREE.BoxGeometry(width,height,depth),material(color,roughness,metalness));
 }
 
 function cylinder(radius: number, height: number, color: number, segments = 24) {
-  return new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, segments), mat(color));
+  return new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,segments),material(color));
 }
 
-function labelSprite(text: string, accent: string) {
+function makeLabel(text: string) {
   const canvas = document.createElement("canvas");
-  canvas.width = 512;
+  canvas.width = 640;
   canvas.height = 128;
   const context = canvas.getContext("2d");
   if (context) {
-    context.fillStyle = "rgba(7,14,13,.9)";
-    context.fillRect(0, 0, 512, 128);
-    context.strokeStyle = accent;
+    context.fillStyle = "rgba(5,12,11,.9)";
+    context.fillRect(0,0,640,128);
+    context.strokeStyle = "#d1f45c";
     context.lineWidth = 4;
-    context.strokeRect(4, 4, 504, 120);
-    context.fillStyle = accent;
-    context.font = "700 35px monospace";
+    context.strokeRect(5,5,630,118);
+    context.fillStyle = "#d1f45c";
+    context.font = "700 34px monospace";
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillText(text, 256, 65);
+    context.fillText(text,320,65);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
-  const sprite = new THREE.Sprite(material);
-  sprite.scale.set(3.5, .875, 1);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:texture,transparent:true,depthWrite:false }));
+  sprite.scale.set(4.1,.82,1);
   return sprite;
 }
 
-function addBench(scene: THREE.Scene, x: number, z: number, width = 4.2, depth = 2.2) {
+function addZone(scene: THREE.Scene, zone: ZoneId, targets: ZoneTarget[]) {
+  const [x,y,z] = zonePositions[zone];
   const group = new THREE.Group();
-  const top = box(width, .26, depth, palette.woodLight);
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(.38,.028,10,44),
+    material(palette.signal,.28,.2,palette.signal,1.5),
+  );
+  ring.rotation.x = Math.PI/2;
+  group.add(ring);
+  const hit = new THREE.Mesh(
+    new THREE.SphereGeometry(.68,16,12),
+    new THREE.MeshBasicMaterial({ transparent:true,opacity:0,depthWrite:false }),
+  ) as ZoneTarget;
+  hit.userData.zone = zone;
+  group.add(hit);
+  const label = makeLabel(zoneLabels[zone]);
+  label.position.y = .92;
+  group.add(label);
+  group.position.set(x,y,z);
+  scene.add(group);
+  targets.push(hit);
+  return group;
+}
+
+function addDesk(scene: THREE.Scene, x: number, z: number, width: number, depth: number) {
+  const group = new THREE.Group();
+  const top = box(width,.25,depth,palette.woodLight);
   top.position.y = 1.48;
   group.add(top);
-  for (const px of [-width / 2 + .28, width / 2 - .28]) {
-    for (const pz of [-depth / 2 + .25, depth / 2 - .25]) {
-      const leg = box(.26, 1.45, .26, palette.metal, .45, .65);
-      leg.position.set(px, .72, pz);
+  for (const px of [-width/2+.26,width/2-.26]) {
+    for (const pz of [-depth/2+.24,depth/2-.24]) {
+      const leg = box(.22,1.45,.22,palette.metal,.38,.7);
+      leg.position.set(px,.72,pz);
       group.add(leg);
     }
   }
-  group.position.set(x, 0, z);
+  group.position.set(x,0,z);
   scene.add(group);
   return group;
 }
 
-function addBeacon(scene: THREE.Scene, id: StationId, x: number, z: number, label: string, targets: StationTarget[]) {
-  const beacon = new THREE.Group();
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(.52, .035, 10, 48),
-    mat(palette.signal, .35, .25, palette.signal, 1.4),
-  );
-  ring.rotation.x = Math.PI / 2;
-  beacon.add(ring);
-  const hit = new THREE.Mesh(
-    new THREE.SphereGeometry(.75, 20, 14),
-    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
-  ) as StationTarget;
-  hit.userData.station = id;
-  beacon.add(hit);
-  const sprite = labelSprite(label, "#d1f45c");
-  sprite.position.y = 1.25;
-  beacon.add(sprite);
-  beacon.position.set(x, .13, z);
-  scene.add(beacon);
-  targets.push(hit);
-  return beacon;
-}
-
-function buildTerminal(scene: THREE.Scene) {
-  const bench = addBench(scene, -7.2, -6.25, 4.5, 2.1);
-  const monitor = box(2.65, 1.55, .18, palette.metal, .35, .65);
-  monitor.position.set(0, 2.45, 0);
-  bench.add(monitor);
-  const screen = box(2.35, 1.25, .04, 0x183f3d);
-  screen.position.set(0, 2.45, .115);
-  (screen.material as THREE.MeshStandardMaterial).emissive.setHex(palette.cyan);
-  (screen.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.25;
-  bench.add(screen);
-  const stand = box(.22, .85, .22, palette.metal, .35, .7);
-  stand.position.set(0, 1.85, -.05);
-  bench.add(stand);
-  const keyboard = box(2.2, .1, .72, 0x202927, .55, .4);
-  keyboard.position.set(0, 1.68, .58);
-  keyboard.rotation.x = -.08;
-  bench.add(keyboard);
-  for (let row = 0; row < 4; row += 1) {
-    for (let col = 0; col < 10; col += 1) {
-      const key = box(.15, .035, .1, 0x70766e);
-      key.position.set(-.76 + col * .17, 1.75, .38 + row * .13);
-      bench.add(key);
+function buildComputer(scene: THREE.Scene) {
+  const desk = addDesk(scene,-4.7,-6.3,6.8,2.35);
+  const monitor = box(3.25,2,.2,palette.metal,.35,.65);
+  monitor.position.set(-1.2,2.6,.02);
+  desk.add(monitor);
+  const screen = box(2.9,1.65,.04,0x163d39);
+  screen.position.set(-1.2,2.6,.14);
+  const screenMat = screen.material as THREE.MeshStandardMaterial;
+  screenMat.emissive.setHex(palette.cyan);
+  screenMat.emissiveIntensity = 1.25;
+  desk.add(screen);
+  const stand = box(.2,.9,.24,palette.metal,.35,.7);
+  stand.position.set(-1.2,1.87,0);
+  desk.add(stand);
+  const keyboard = box(2.55,.1,.8,0x202927,.5,.42);
+  keyboard.position.set(-1.2,1.67,.67);
+  desk.add(keyboard);
+  for (let row=0; row<4; row+=1) {
+    for (let column=0; column<11; column+=1) {
+      const key = box(.15,.025,.1,0x778078);
+      key.position.set(-2.02+column*.17,1.74,.44+row*.13);
+      desk.add(key);
     }
+  }
+  const printer = box(1.7,.9,1.25,0xd0c6ad);
+  printer.position.set(2,1.98,.05);
+  desk.add(printer);
+  const printerSlot = box(1.2,.08,.07,0x28302e);
+  printerSlot.position.set(2,2.18,.69);
+  desk.add(printerSlot);
+  const printerLight = cylinder(.055,.055,0x635f4e,12);
+  printerLight.rotation.x = Math.PI/2;
+  printerLight.position.set(2.58,2.36,.67);
+  printerLight.userData.faxLight = true;
+  desk.add(printerLight);
+  const paper = box(1.15,.025,1.35,palette.paper);
+  paper.position.set(2,2.25,.1);
+  paper.rotation.x = -.6;
+  paper.userData.faxPaper = true;
+  paper.visible = false;
+  desk.add(paper);
+
+  const drawerUnit = box(2.3,1.3,1.7,palette.wood);
+  drawerUnit.position.set(.65,.75,0);
+  desk.add(drawerUnit);
+  for (let index=0; index<3; index+=1) {
+    const face = box(2.05,.32,.08,palette.woodLight);
+    face.position.set(.65,.45+index*.4,.89);
+    desk.add(face);
+    const handle = box(.42,.06,.08,palette.steel,.3,.75);
+    handle.position.set(.65,.45+index*.4,.96);
+    desk.add(handle);
   }
 }
 
-function buildRouteTable(scene: THREE.Scene) {
-  const bench = addBench(scene, -1.9, -7, 4, 2);
-  const paper = box(2.8, .045, 1.45, palette.paper);
-  paper.position.set(0, 1.64, .05);
-  bench.add(paper);
-  const nodes: [number, number][] = [[-.95,-.35],[-.4,.35],[.25,-.1],[.92,.38]];
-  nodes.forEach(([x,z], index) => {
-    const node = cylinder(.09, .08, index === 3 ? palette.red : palette.cyan, 16);
-    node.position.set(x, 1.71, z);
-    bench.add(node);
-    if (index > 0) {
-      const [px,pz] = nodes[index - 1];
-      const dx = x - px;
-      const dz = z - pz;
-      const line = box(Math.hypot(dx,dz), .025, .035, palette.red);
-      line.position.set((x+px)/2,1.7,(z+pz)/2);
-      line.rotation.y = -Math.atan2(dz,dx);
-      bench.add(line);
-    }
-  });
-  const lamp = new THREE.SpotLight(0xffc682, 18, 8, .65, .55, 1.6);
-  lamp.position.set(-1.9, 5, -5.9);
-  lamp.target.position.set(-1.9, 0, -7);
-  scene.add(lamp, lamp.target);
-}
-
-function buildHardware(scene: THREE.Scene) {
-  const bench = addBench(scene, 5.4, -6.1, 4.4, 2.2);
-  const board = box(2.9, .12, 1.5, 0x314f46);
-  board.position.set(0, 1.66, 0);
-  bench.add(board);
-  const core = box(.82, .24, .7, 0x171d1c, .35, .6);
-  core.position.set(0, 1.84, 0);
-  bench.add(core);
-  for (let index = 0; index < 8; index += 1) {
-    const pin = box(.08, .12, .08, palette.metalLight, .3, .8);
-    pin.position.set(-1.15 + index * .33, 1.81, index % 2 ? .55 : -.55);
-    bench.add(pin);
-  }
-  const sensor = cylinder(.27, .3, palette.paper);
-  sensor.position.set(-1, 1.88, 0);
-  bench.add(sensor);
-  const led = cylinder(.08, .18, palette.signal, 16);
-  led.position.set(1.1, 1.92, 0);
-  (led.material as THREE.MeshStandardMaterial).emissive.setHex(palette.signal);
-  (led.material as THREE.MeshStandardMaterial).emissiveIntensity = 2.5;
-  bench.add(led);
-}
-
-function buildNotebook(scene: THREE.Scene) {
-  const bench = addBench(scene, 7.2, 3.15, 3.4, 2.2);
-  const left = box(1.35, .06, 1.6, palette.paper);
-  left.position.set(-.69, 1.67, 0);
-  left.rotation.y = -.06;
+function buildNotebookTable(scene: THREE.Scene) {
+  const desk = addDesk(scene,4.9,2.2,4.1,2.6);
+  const left = box(1.55,.05,1.8,palette.paper);
+  left.position.set(-.78,1.67,0);
+  left.rotation.y = -.05;
   const right = left.clone();
-  right.position.x = .69;
-  right.rotation.y = .06;
-  bench.add(left, right);
-  for (let index = 0; index < 6; index += 1) {
-    const lineL = box(1.08, .012, .018, 0x66827a);
-    lineL.position.set(-.69, 1.705, -.55 + index * .2);
-    const lineR = lineL.clone();
-    lineR.position.x = .69;
-    bench.add(lineL, lineR);
+  right.position.x = .78;
+  right.rotation.y = .05;
+  desk.add(left,right);
+  for (let line=0; line<7; line+=1) {
+    const leftLine = box(1.22,.01,.017,0x63817a);
+    leftLine.position.set(-.78,1.7,-.65+line*.21);
+    const rightLine = leftLine.clone();
+    rightLine.position.x = .78;
+    desk.add(leftLine,rightLine);
   }
-  const mug = cylinder(.32, .55, 0x334a45, 24);
-  mug.position.set(1.35, 1.82, -.55);
-  bench.add(mug);
+  const pen = cylinder(.035,1.35,palette.red,10);
+  pen.rotation.z = Math.PI/2;
+  pen.position.set(.8,1.79,.7);
+  desk.add(pen);
+  const mug = cylinder(.32,.55,0x304b45,24);
+  mug.position.set(1.65,1.8,-.55);
+  desk.add(mug);
+}
+
+function buildBooks(scene: THREE.Scene) {
+  const shelf = new THREE.Group();
+  const back = box(3.1,5.8,.45,palette.wood);
+  back.position.z = -.2;
+  shelf.add(back);
+  for (let level=0; level<4; level+=1) {
+    const board = box(3.4,.18,1.25,palette.woodLight);
+    board.position.set(0,.25+level*1.4,.15);
+    shelf.add(board);
+    for (let index=0; index<5; index+=1) {
+      const colors = [0x8e4d3e,0x405c57,0xc2a866,0x6c5648,0x4b6671];
+      const book = box(.38,.92+(index%2)*.16,.75,colors[(index+level)%colors.length]);
+      book.position.set(-1.05+index*.5,.82+level*1.4,.15);
+      book.rotation.z = index===4 ? -.08 : 0;
+      shelf.add(book);
+    }
+  }
+  shelf.position.set(8.25,0,-6.2);
+  scene.add(shelf);
+}
+
+function buildBoard(scene: THREE.Scene) {
+  const board = box(6.8,3.25,.16,0x5b4838);
+  board.position.set(1.1,3.45,-8.68);
+  scene.add(board);
+  const papers = [
+    [-2.1,.55,.85,1.08,0xd8cda9,-.05],
+    [-.65,.5,1.55,1.15,0xe1d7bd,.03],
+    [1.2,.6,1.2,1.35,0xc7bd91,-.08],
+    [2.35,-.65,1.25,.82,0xdfc4a0,.06],
+    [-1.7,-.75,1.35,.8,0xd8d0bd,.08],
+    [.2,-.82,1.55,.78,0xe1d9c6,-.03],
+  ] as const;
+  papers.forEach(([x,y,w,h,color,rotation],index) => {
+    const paper = box(w,h,.025,color);
+    paper.position.set(1.1+x,3.45+y,-8.56);
+    paper.rotation.z = rotation;
+    scene.add(paper);
+    const pin = cylinder(.055,.08,index===2?palette.red:palette.signal,12);
+    pin.rotation.x = Math.PI/2;
+    pin.position.set(1.1+x,3.45+y+h/2-.12,-8.48);
+    scene.add(pin);
+  });
+  for (const [x,y,rotation] of [[-.2,.1,.15],[-.4,-.4,-.12],[.35,.1,-.2]] as const) {
+    const thread = box(2.6,.025,.02,palette.red);
+    thread.position.set(1.1+x,3.45+y,-8.47);
+    thread.rotation.z = rotation;
+    scene.add(thread);
+  }
 }
 
 function buildFieldCase(scene: THREE.Scene) {
-  const caseGroup = new THREE.Group();
-  const base = box(3.3, .75, 2.1, 0x4e412f, .65, .15);
-  base.position.y = .48;
-  caseGroup.add(base);
-  const lid = box(3.3, .18, 2.1, 0x6e573c);
-  lid.position.set(0, 1.5, -.9);
+  const group = new THREE.Group();
+  const base = box(3.4,.72,2.15,0x4e402f,.68,.12);
+  base.position.y = .46;
+  const lid = box(3.4,.17,2.15,0x71583d);
+  lid.position.set(0,1.52,-.9);
   lid.rotation.x = -1.08;
-  caseGroup.add(lid);
-  const target = new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,.07,48), mat(palette.paper));
-  target.rotation.x = Math.PI / 2;
-  target.position.set(-.85, 1.05, 0);
-  caseGroup.add(target);
-  [.52,.34,.16].forEach((radius,index) => {
-    const color = [0x4e7c7a,0xc8b65d,palette.red][index];
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,.075,40),mat(color));
-    ring.rotation.x = Math.PI / 2;
-    ring.position.set(-.85,1.05,.045 + index * .008);
-    caseGroup.add(ring);
+  group.add(base,lid);
+  const target = new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,.06,48),material(palette.paper));
+  target.rotation.x = Math.PI/2;
+  target.position.set(-.85,1.02,.05);
+  group.add(target);
+  [.53,.35,.17].forEach((radius,index) => {
+    const colors = [0x507b78,0xcab65b,palette.red];
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,.065,40),material(colors[index]));
+    ring.rotation.x = Math.PI/2;
+    ring.position.set(-.85,1.02,.09+index*.01);
+    group.add(ring);
   });
-  const ticket = box(1.1,.05,.55,0xc9b982);
-  ticket.position.set(.9,1.05,.1);
-  ticket.rotation.y = -.18;
-  caseGroup.add(ticket);
-  caseGroup.position.set(-6.3,0,3.5);
-  scene.add(caseGroup);
+  const ticket = box(1.15,.035,.58,0xcbbb82);
+  ticket.position.set(.9,1.02,.1);
+  ticket.rotation.y = -.16;
+  group.add(ticket);
+  const card = box(1.15,.035,.72,0xd8d0b9);
+  card.position.set(.82,1.05,-.58);
+  card.rotation.y = .12;
+  group.add(card);
+  group.position.set(-7.1,0,3.45);
+  scene.add(group);
 }
 
-function buildRoom(scene: THREE.Scene, targets: StationTarget[]) {
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(26, 18), mat(0x18221f, .96));
-  floor.rotation.x = -Math.PI / 2;
+function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(26,18),material(0x17211f,.97));
+  floor.rotation.x = -Math.PI/2;
   floor.receiveShadow = true;
-  floor.userData.floor = true;
   scene.add(floor);
-
-  const backWall = box(26, 7.5, .35, 0x101816);
-  backWall.position.set(0,3.75,-9);
-  const sideWall = box(.35,7.5,18,0x131d1a);
-  sideWall.position.set(-13,3.75,0);
-  scene.add(backWall,sideWall);
-  for (let index = 0; index < 7; index += 1) {
-    const beam = box(.18,7.2,.12,0x2e3a36,.42,.65);
-    beam.position.set(-11.5 + index * 3.7,3.6,-8.72);
+  const back = box(26,7.8,.34,0x101816);
+  back.position.set(0,3.9,-9);
+  const side = box(.34,7.8,18,0x121c19);
+  side.position.set(-13,3.9,0);
+  scene.add(back,side);
+  for (let index=0; index<7; index+=1) {
+    const beam = box(.17,7.3,.12,0x2c3834,.4,.72);
+    beam.position.set(-11.4+index*3.7,3.65,-8.75);
     scene.add(beam);
   }
-  const windowFrame = box(5.6,3.25,.12,0x25312e,.4,.7);
-  windowFrame.position.set(7.9,4.65,-8.7);
-  const windowGlow = box(5.15,2.8,.06,0x335c59);
-  windowGlow.position.set(7.9,4.65,-8.61);
-  (windowGlow.material as THREE.MeshStandardMaterial).emissive.setHex(0x3d7773);
-  (windowGlow.material as THREE.MeshStandardMaterial).emissiveIntensity = .6;
+  const windowFrame = box(5.4,3.1,.12,0x26322f,.35,.72);
+  windowFrame.position.set(-8.7,4.65,-8.7);
+  const windowGlow = box(5,2.7,.05,0x2b5552);
+  windowGlow.position.set(-8.7,4.65,-8.61);
+  const glowMaterial = windowGlow.material as THREE.MeshStandardMaterial;
+  glowMaterial.emissive.setHex(0x376b67);
+  glowMaterial.emissiveIntensity = .65;
   scene.add(windowFrame,windowGlow);
 
-  buildTerminal(scene);
-  buildRouteTable(scene);
-  buildHardware(scene);
-  buildNotebook(scene);
+  buildComputer(scene);
+  buildNotebookTable(scene);
+  buildBooks(scene);
+  buildBoard(scene);
   buildFieldCase(scene);
 
-  addBeacon(scene,"terminal",...stationPositions.terminal,"01 / TERMINAL",targets);
-  addBeacon(scene,"route",...stationPositions.route,"02 / ROUTE",targets);
-  addBeacon(scene,"hardware",...stationPositions.hardware,"03 / DEVICE",targets);
-  addBeacon(scene,"notebook",...stationPositions.notebook,"04 / NOTES",targets);
-  addBeacon(scene,"fieldcase",...stationPositions.fieldcase,"05 / FIELD CASE",targets);
-
-  const shelf = box(2.6,5.4,.55,palette.metal,.45,.7);
-  shelf.position.set(-11.9,2.7,3.8);
-  scene.add(shelf);
-  for (let index = 0; index < 4; index += 1) {
-    const shelfBoard = box(2.6,.12,2,palette.metal,.42,.65);
-    shelfBoard.position.set(-11.9,.8 + index * 1.35,3.8);
-    scene.add(shelfBoard);
+  const rollingChair = new THREE.Group();
+  const seat = box(1.25,.2,1.2,0x27312f,.48,.5);
+  seat.position.y = 1.1;
+  const chairBack = box(1.25,1.45,.18,0x27312f,.48,.5);
+  chairBack.position.set(0,1.75,.5);
+  rollingChair.add(seat,chairBack);
+  for (let index=0; index<5; index+=1) {
+    const spoke = box(1.1,.08,.08,palette.steel,.35,.75);
+    spoke.position.y = .35;
+    spoke.rotation.y = index*Math.PI*.4;
+    rollingChair.add(spoke);
   }
+  rollingChair.position.set(-5.5,0,-3.9);
+  rollingChair.rotation.y = -.25;
+  scene.add(rollingChair);
+
+  (Object.keys(zonePositions) as ZoneId[]).forEach((zone) => addZone(scene,zone,targets));
 }
 
-function buildRover(scene: THREE.Scene) {
-  const rover = new THREE.Group();
-  const body = box(1.1,.35,1.55,0x313b38,.3,.72);
-  body.position.y = .5;
-  rover.add(body);
-  const top = box(.78,.28,.82,0xd1f45c,.45,.35);
-  top.position.set(0,.78,-.08);
-  rover.add(top);
-  const mast = cylinder(.055,.65,palette.metalLight,12);
-  mast.position.set(0,1.18,-.1);
-  rover.add(mast);
-  const camera = box(.35,.25,.3,0x101817,.25,.75);
-  camera.position.set(0,1.52,-.1);
-  rover.add(camera);
-  for (const x of [-.63,.63]) {
-    for (const z of [-.5,.5]) {
-      const wheel = new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.18,20),mat(0x0a0d0c,.5,.35));
-      wheel.rotation.z = Math.PI / 2;
-      wheel.position.set(x,.31,z);
-      rover.add(wheel);
-    }
-  }
-  for (const x of [-.3,.3]) {
-    const lamp = cylinder(.09,.08,0xffe0a3,16);
-    lamp.rotation.x = Math.PI / 2;
-    lamp.position.set(x,.56,-.8);
-    (lamp.material as THREE.MeshStandardMaterial).emissive.setHex(0xffd28a);
-    (lamp.material as THREE.MeshStandardMaterial).emissiveIntensity = 3;
-    rover.add(lamp);
-  }
-  rover.position.set(0,0,6.2);
-  rover.rotation.y = Math.PI;
-  scene.add(rover);
-  return rover;
-}
-
-export default function LabGame({ active, discovered, onNearChange, onInspect }: LabGameProps) {
+export default function LabGame({ active, viewing, discovered, faxReady, onHover, onInspect }: LabGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const keyRef = useRef(new Set<string>());
-  const inspectRef = useRef(onInspect);
   const activeRef = useRef(active);
-  const nearRef = useRef<StationId | null>(null);
+  const viewingRef = useRef(viewing);
   const discoveredRef = useRef(discovered);
+  const faxReadyRef = useRef(faxReady);
+  const inspectRef = useRef(onInspect);
 
-  useEffect(() => { inspectRef.current = onInspect; }, [onInspect]);
-  useEffect(() => { activeRef.current = active; }, [active]);
-  useEffect(() => { discoveredRef.current = discovered; }, [discovered]);
+  useEffect(() => { activeRef.current = active; },[active]);
+  useEffect(() => { viewingRef.current = viewing; },[viewing]);
+  useEffect(() => { discoveredRef.current = discovered; },[discovered]);
+  useEffect(() => { faxReadyRef.current = faxReady; },[faxReady]);
+  useEffect(() => { inspectRef.current = onInspect; },[onInspect]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+    const renderer = new THREE.WebGLRenderer({ canvas,antialias:true,powerPreference:"high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.65));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.08;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x08100f);
-    scene.fog = new THREE.FogExp2(0x08100f,.027);
-    const camera = new THREE.PerspectiveCamera(47,1,.1,80);
-    const targets: StationTarget[] = [];
+    scene.background = new THREE.Color(palette.void);
+    scene.fog = new THREE.FogExp2(palette.void,.026);
+    const camera = new THREE.PerspectiveCamera(45,1,.1,80);
+    const defaultPosition = new THREE.Vector3(0,5.4,13.3);
+    const defaultTarget = new THREE.Vector3(0,1.65,-1.5);
+    camera.position.copy(defaultPosition);
+    const currentTarget = defaultTarget.clone();
+    const targets: ZoneTarget[] = [];
     buildRoom(scene,targets);
-    const rover = buildRover(scene);
 
-    scene.add(new THREE.HemisphereLight(0x7fa39d,0x0b0e0d,1.3));
-    const key = new THREE.DirectionalLight(0xffd19a,3.5);
-    key.position.set(-5,10,7);
+    scene.add(new THREE.HemisphereLight(0x83a8a1,0x080c0b,1.25));
+    const key = new THREE.DirectionalLight(0xffd29c,3.6);
+    key.position.set(-5,11,7);
     key.castShadow = true;
     key.shadow.mapSize.set(2048,2048);
     key.shadow.camera.left = -16;
@@ -360,162 +390,134 @@ export default function LabGame({ active, discovered, onNearChange, onInspect }:
     key.shadow.camera.top = 13;
     key.shadow.camera.bottom = -12;
     scene.add(key);
-    const cyan = new THREE.PointLight(palette.cyan,15,18,1.7);
-    cyan.position.set(-7,4,-5);
-    const warm = new THREE.PointLight(0xffb46a,20,20,1.8);
-    warm.position.set(4,5,-2);
-    scene.add(cyan,warm);
+    const cyan = new THREE.PointLight(palette.cyan,16,18,1.8);
+    cyan.position.set(-5.8,4.1,-5.2);
+    const warm = new THREE.PointLight(0xffb46a,21,20,1.7);
+    warm.position.set(4.5,5,-1);
+    const boardLight = new THREE.SpotLight(0xffcd92,18,10,.75,.45,1.5);
+    boardLight.position.set(1.1,6,-4.8);
+    boardLight.target.position.set(1.1,3,-8.5);
+    scene.add(cyan,warm,boardLight,boardLight.target);
     scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
-      }
+      if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
     });
 
     const pointer = new THREE.Vector2(5,5);
     const raycaster = new THREE.Raycaster();
-    let destination: THREE.Vector3 | null = null;
-    let destinationStation: StationId | null = null;
-    let speed = 0;
-    let previous = performance.now();
+    let pointerX = 0;
+    let pointerY = 0;
+    let hovered: ZoneId | null = null;
+    let requested: ZoneId | null = null;
+    let requestStarted = 0;
+    let requestDelivered = false;
+    let dragging = false;
+    let dragStartX = 0;
+    let dragOrbit = 0;
+    let orbit = 0;
     let frame = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
-      camera.aspect = Math.max(1,rect.width) / Math.max(1,rect.height);
+      camera.aspect = Math.max(1,rect.width)/Math.max(1,rect.height);
       camera.updateProjectionMatrix();
     };
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
     resize();
 
-    const updatePointer = (event: PointerEvent) => {
+    const readPointer = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       pointer.x = ((event.clientX-rect.left)/rect.width)*2-1;
       pointer.y = -((event.clientY-rect.top)/rect.height)*2+1;
+      pointerX = pointer.x;
+      pointerY = pointer.y;
       raycaster.setFromCamera(pointer,camera);
+      const hit = raycaster.intersectObjects(targets,false)[0]?.object as ZoneTarget | undefined;
+      return hit?.userData.zone ?? null;
     };
     const pointerMove = (event: PointerEvent) => {
-      updatePointer(event);
-      const stationHit = raycaster.intersectObjects(targets,false)[0]?.object as StationTarget | undefined;
-      canvas.style.cursor = stationHit?.userData.station ? "pointer" : "crosshair";
+      const zone = readPointer(event);
+      if (zone !== hovered) { hovered = zone; onHover(zone); }
+      if (dragging) orbit = THREE.MathUtils.clamp(dragOrbit+(event.clientX-dragStartX)*.0025,-.42,.42);
+      canvas.style.cursor = zone ? "pointer" : dragging ? "grabbing" : "grab";
     };
     const pointerDown = (event: PointerEvent) => {
-      updatePointer(event);
-      const stationHit = raycaster.intersectObjects(targets,false)[0]?.object as StationTarget | undefined;
-      const station = stationHit?.userData.station;
-      if (station) {
-        const [x,z] = stationPositions[station];
-        destination = new THREE.Vector3(x,0,z+1.55);
-        destinationStation = station;
-        return;
+      const zone = readPointer(event);
+      if (zone && activeRef.current) {
+        requested = zone;
+        requestStarted = performance.now();
+        requestDelivered = false;
+      } else {
+        dragging = true;
+        dragStartX = event.clientX;
+        dragOrbit = orbit;
+        canvas.setPointerCapture(event.pointerId);
       }
-      const floor = scene.children.find((child) => child.userData.floor);
-      if (!floor) return;
-      const hit = raycaster.intersectObject(floor,false)[0];
-      if (hit) {
-        destination = hit.point.clone();
-        destination.x = THREE.MathUtils.clamp(destination.x,-11.5,11.5);
-        destination.z = THREE.MathUtils.clamp(destination.z,-7.6,7.6);
-        destinationStation = null;
-      }
+    };
+    const pointerUp = (event: PointerEvent) => {
+      dragging = false;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     };
     canvas.addEventListener("pointermove",pointerMove);
     canvas.addEventListener("pointerdown",pointerDown);
-
-    const keyDown = (event: KeyboardEvent) => {
-      const keyName = event.key.toLowerCase();
-      if (["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d","e"].includes(keyName)) event.preventDefault();
-      keyRef.current.add(keyName);
-      if (keyName === "e" && nearRef.current) inspectRef.current(nearRef.current);
-      if (["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(keyName)) destination = null;
-    };
-    const keyUp = (event: KeyboardEvent) => keyRef.current.delete(event.key.toLowerCase());
-    window.addEventListener("keydown",keyDown);
-    window.addEventListener("keyup",keyUp);
+    canvas.addEventListener("pointerup",pointerUp);
+    canvas.addEventListener("pointercancel",pointerUp);
+    canvas.addEventListener("pointerleave",pointerUp);
 
     const tick = (now: number) => {
-      const delta = Math.min(.04,(now-previous)/1000);
-      previous = now;
-      const keys = keyRef.current;
-      const forward = keys.has("w") || keys.has("arrowup");
-      const reverse = keys.has("s") || keys.has("arrowdown");
-      const left = keys.has("a") || keys.has("arrowleft");
-      const right = keys.has("d") || keys.has("arrowright");
-
-      if (activeRef.current) {
-        if (forward || reverse) {
-          const targetSpeed = forward ? 3.8 : -2.3;
-          speed = THREE.MathUtils.lerp(speed,targetSpeed,.08);
-          const steer = (left ? 1 : 0) - (right ? 1 : 0);
-          rover.rotation.y += steer * delta * (forward ? 1.75 : -1.35);
-        } else if (destination) {
-          const dx = destination.x-rover.position.x;
-          const dz = destination.z-rover.position.z;
-          const distance = Math.hypot(dx,dz);
-          if (distance < .35) {
-            speed = THREE.MathUtils.lerp(speed,0,.25);
-            destination = null;
-            if (destinationStation) inspectRef.current(destinationStation);
-            destinationStation = null;
-          } else {
-            const desired = Math.atan2(dx,dz);
-            let angle = desired-rover.rotation.y;
-            angle = Math.atan2(Math.sin(angle),Math.cos(angle));
-            rover.rotation.y += THREE.MathUtils.clamp(angle,-delta*2.2,delta*2.2);
-            speed = THREE.MathUtils.lerp(speed,Math.min(3.4,distance*1.5),.07);
-          }
-        } else {
-          speed = THREE.MathUtils.lerp(speed,0,.12);
-          if (left || right) rover.rotation.y += ((left ? 1 : 0)-(right ? 1 : 0))*delta*1.25;
+      if (viewingRef.current === null && !requested) {
+        const desiredPosition = defaultPosition.clone();
+        desiredPosition.x = Math.sin(orbit)*13.3 + pointerX*.22;
+        desiredPosition.z = Math.cos(orbit)*13.3;
+        desiredPosition.y += -pointerY*.15;
+        camera.position.lerp(desiredPosition,.035);
+        currentTarget.lerp(defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,-pointerY*.08,0)),.04);
+      }
+      if (requested) {
+        const pose = cameraPoses[requested];
+        const desiredPosition = new THREE.Vector3(...pose.position);
+        const desiredTarget = new THREE.Vector3(...pose.target);
+        camera.position.lerp(desiredPosition,.075);
+        currentTarget.lerp(desiredTarget,.075);
+        if (!requestDelivered && now-requestStarted>720) {
+          requestDelivered = true;
+          inspectRef.current(requested);
         }
-
-        rover.position.x += Math.sin(rover.rotation.y)*speed*delta;
-        rover.position.z += Math.cos(rover.rotation.y)*speed*delta;
-        rover.position.x = THREE.MathUtils.clamp(rover.position.x,-11.5,11.5);
-        rover.position.z = THREE.MathUtils.clamp(rover.position.z,-7.65,7.65);
+      }
+      if (viewingRef.current === null && requestDelivered) {
+        requested = null;
+        requestDelivered = false;
       }
 
-      let nearest: StationId | null = null;
-      let nearestDistance = 2.35;
-      (Object.entries(stationPositions) as [StationId,[number,number]][]).forEach(([id,[x,z]]) => {
-        const distance = Math.hypot(rover.position.x-x,rover.position.z-z);
-        if (distance < nearestDistance) { nearest = id; nearestDistance = distance; }
-      });
-      if (nearest !== nearRef.current) {
-        nearRef.current = nearest;
-        onNearChange(nearest);
-      }
-
+      camera.lookAt(currentTarget);
       targets.forEach((target) => {
-        const id = target.userData.station;
-        if (!id) return;
-        const beacon = target.parent;
-        if (!beacon) return;
-        const found = discoveredRef.current.includes(id);
-        const ring = beacon.children[0] as THREE.Mesh;
-        ring.rotation.z += delta*(found ? .35 : 1.2);
-        const scale = 1 + Math.sin(now*.002 + beacon.position.x)*.08;
-        ring.scale.setScalar(scale);
-        const material = ring.material as THREE.MeshStandardMaterial;
-        material.color.setHex(found ? palette.cyan : palette.signal);
-        material.emissive.setHex(found ? palette.cyan : palette.signal);
+        const zone = target.userData.zone;
+        const group = target.parent;
+        if (!zone || !group) return;
+        const ring = group.children[0] as THREE.Mesh;
+        ring.rotation.z += .012;
+        ring.scale.setScalar(1+Math.sin(now*.002+group.position.x)*.09);
+        const found = discoveredRef.current.includes(zone);
+        const ringMaterial = ring.material as THREE.MeshStandardMaterial;
+        ringMaterial.color.setHex(found?palette.cyan:palette.signal);
+        ringMaterial.emissive.setHex(found?palette.cyan:palette.signal);
       });
-
-      rover.children.forEach((child) => {
-        if (child instanceof THREE.Mesh && child.geometry instanceof THREE.CylinderGeometry && child.position.y < .5) child.rotation.x -= speed*delta*2.2;
+      scene.traverse((object) => {
+        if (object.userData.faxLight && object instanceof THREE.Mesh) {
+          const faxMaterial = object.material as THREE.MeshStandardMaterial;
+          faxMaterial.color.setHex(faxReadyRef.current?palette.signal:0x635f4e);
+          faxMaterial.emissive.setHex(faxReadyRef.current?palette.signal:0x000000);
+          faxMaterial.emissiveIntensity = faxReadyRef.current ? 2+Math.sin(now*.008) : 0;
+        }
+        if (object.userData.faxPaper && object instanceof THREE.Mesh) {
+          object.visible = faxReadyRef.current;
+          if (faxReadyRef.current) object.position.z = .1+Math.sin(now*.0015)*.05;
+        }
       });
-
-      const behind = new THREE.Vector3(-Math.sin(rover.rotation.y)*6.4,5.5,-Math.cos(rover.rotation.y)*6.4);
-      const cameraTarget = rover.position.clone().add(behind);
-      camera.position.lerp(cameraTarget,.055);
-      const lookAt = rover.position.clone().add(new THREE.Vector3(0,.65,0));
-      camera.lookAt(lookAt);
       renderer.render(scene,camera);
       frame = requestAnimationFrame(tick);
     };
-    camera.position.set(0,6,12);
     frame = requestAnimationFrame(tick);
 
     return () => {
@@ -523,34 +525,20 @@ export default function LabGame({ active, discovered, onNearChange, onInspect }:
       cancelAnimationFrame(frame);
       canvas.removeEventListener("pointermove",pointerMove);
       canvas.removeEventListener("pointerdown",pointerDown);
-      window.removeEventListener("keydown",keyDown);
-      window.removeEventListener("keyup",keyUp);
+      canvas.removeEventListener("pointerup",pointerUp);
+      canvas.removeEventListener("pointercancel",pointerUp);
+      canvas.removeEventListener("pointerleave",pointerUp);
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh) {
           object.geometry.dispose();
-          const materials = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach((material) => material.dispose());
+          const materials = Array.isArray(object.material)?object.material:[object.material];
+          materials.forEach((item) => item.dispose());
         }
         if (object instanceof THREE.Sprite) object.material.map?.dispose();
       });
       renderer.dispose();
     };
-  }, [onNearChange]);
+  },[onHover]);
 
-  const press = (key: string, down: boolean) => {
-    if (down) keyRef.current.add(key);
-    else keyRef.current.delete(key);
-  };
-
-  return (
-    <div className="lab-game">
-      <canvas ref={canvasRef} aria-label="Driveable 3D model of Alina's laboratory" />
-      <div className="mobile-drive" aria-label="Drive controls">
-        <button onPointerDown={() => press("w",true)} onPointerUp={() => press("w",false)} onPointerCancel={() => press("w",false)} aria-label="Drive forward">↑</button>
-        <button onPointerDown={() => press("a",true)} onPointerUp={() => press("a",false)} onPointerCancel={() => press("a",false)} aria-label="Turn left">←</button>
-        <button onPointerDown={() => press("s",true)} onPointerUp={() => press("s",false)} onPointerCancel={() => press("s",false)} aria-label="Drive backward">↓</button>
-        <button onPointerDown={() => press("d",true)} onPointerUp={() => press("d",false)} onPointerCancel={() => press("d",false)} aria-label="Turn right">→</button>
-      </div>
-    </div>
-  );
+  return <div className="lab-game"><canvas ref={canvasRef} aria-label="Interactive 3D laboratory with six explorable objects" /></div>;
 }

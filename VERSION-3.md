@@ -8,19 +8,20 @@
 
 ## Concept
 
-Version 3 presents the portfolio as a lightweight 3D exploration game. The
-visitor drives a small inspection rover through Alina's active laboratory and
-discovers factual project records, annotations, route studies, and unfinished
-questions. A possible disappearance is revealed gradually rather than announced.
+Version 3 presents the portfolio as a lightweight 3D room exploration. The
+visitor looks around Alina's active laboratory and clicks the computer, drawer,
+notebook, books, note board, and field case. Each object becomes a dedicated
+close-up interface containing factual work and more personal traces. A possible
+absence is revealed gradually rather than announced.
 
 ## Investigation structure
 
-1. Enter Lab 17 and launch the inspection rover.
-2. Drive with keyboard, touch controls, or click-to-navigate.
-3. Inspect five stations in any order: terminal, route table, device bench,
-   notebook, and field case.
-4. Discover the lab bulletin on the computer and follow later off-site traces.
-5. Recover Alina's final message after all five portfolio records are logged.
+1. Enter Lab 17 and look around the single 3D room.
+2. Drag the view and click highlighted objects to move closer.
+3. Inspect six objects in any order: computer, drawer, notebook, books, note
+   board, and field case.
+4. Discover the lab bulletin inside the computer and follow later physical clues.
+5. Activate the printer and receive Alina's fax after all six traces are logged.
 
 ## Design identity
 

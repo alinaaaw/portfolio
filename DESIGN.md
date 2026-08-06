@@ -2,9 +2,9 @@
 
 ## Product idea
 
-Version 3 is a lightweight third-person 3D portfolio game set inside Alina's
-late-night creative laboratory. Visitors drive a small inspection rover between
-five stations and recover real project and experience records.
+Version 3 is a lightweight 3D portfolio set inside Alina's late-night creative
+laboratory. Visitors remain inside one coherent room, look around by dragging,
+and click physical objects to move closer and open dedicated interfaces.
 
 The mystery emerges gradually. The opening presents a personal workspace, not
 a missing-person case. Only after opening the computer does an unexpected lab
@@ -13,20 +13,21 @@ suggests an off-site route, and the final recovered message resolves the story.
 
 ## Experience hierarchy
 
-1. Enter Lab 17 as a guest and learn the rover controls.
-2. Drive with WASD or arrow keys, or click the floor to auto-navigate.
-3. Approach five visible signals and inspect the related portfolio records.
-4. Use the direct Project Index when game navigation is not desired.
-5. Connect all five traces to receive Alina's final message.
+1. Enter Lab 17 as a guest and learn to look around the room.
+2. Drag to change the view, then click one of six visible object signals.
+3. Let the camera move into a close-up and interact with the object itself.
+4. Use the direct Room Index when spatial exploration is not desired.
+5. Connect all six traces to activate the printer and receive Alina's fax.
 
 ## Portfolio stations
 
-- Terminal: Quality of Life in Shanghai interactive map and the first bulletin.
-- Route table: course-assignment algorithm using Simultaneous Eating and
-  Birkhoff Decomposition.
-- Device bench: ESP32 and EMG muscle-usage monitoring system.
-- Notebook: undergraduate research at UW's Social Futures Lab.
-- Field case: Thermo Fisher Scientific software engineering experience.
+- Computer: a full-screen desktop with About, Projects, Experience, and the
+  first unexplained lab bulletin.
+- Desk drawer: ESP32 and EMG muscle-usage prototype, components, and labels.
+- Research notebook: undergraduate work at UW's Social Futures Lab.
+- Bookshelf: course-allocation algorithms, psychology, and field routes.
+- Note board: work habits, questions, corrections, and personal margins.
+- Field case: Thermo Fisher Scientific experience, archery, and a return ticket.
 
 ## Visual language
 
@@ -40,10 +41,11 @@ suggests an off-site route, and the final recovered message resolves the story.
 
 ## Interaction and accessibility
 
-- Desktop supports WASD, arrow keys, E to inspect, and click-to-drive.
-- Clicking a station triggers automatic navigation and inspection.
-- Touch layouts provide directional controls and a large proximity action.
-- A direct portfolio index exposes every project without requiring game controls.
+- Desktop supports drag-to-look, hover feedback, and click-to-inspect.
+- Clicking an object triggers a smooth, temporarily locked camera transition.
+- The computer becomes a full-screen operating system; other objects become
+  tactile close-ups with their own small interactions.
+- A direct room index exposes every section without requiring 3D navigation.
 - Dialogs close with Escape, a visible close button, or the backdrop.
 - Respect reduced-motion preferences and cap renderer pixel density.
 

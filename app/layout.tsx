@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
   const origin = `${protocol}://${host}`;
   const title = "Alina Wu — Lab 17 Interactive Portfolio";
-  const description = "Drive through Alina's late-night 3D laboratory and discover projects, research, field notes, and one unexpected bulletin.";
+  const description = "Explore Alina's late-night 3D laboratory, open the computer, inspect projects and field notes, and uncover one unexpected message.";
 
   return {
     title,
