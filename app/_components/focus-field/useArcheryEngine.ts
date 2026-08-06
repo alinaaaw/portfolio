@@ -118,9 +118,6 @@ function drawBow(context: CanvasRenderingContext2D, world: World, now: number) {
   context.lineTo(0, 86);
   context.stroke();
 
-  context.fillStyle = "#101827";
-  context.fillRect(25, -10, 19, 20);
-
   if (showNockedArrow) {
     context.strokeStyle = "#f7f4ea";
     context.lineWidth = 3;
