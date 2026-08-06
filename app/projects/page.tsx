@@ -6,31 +6,40 @@ import InteractiveModel from "../_components/three/InteractiveModel";
 
 const workOrders = {
   web: {
-    index: "01 / WEB",
-    tag: "SMALL SYSTEM / FIT CHECK",
-    title: "The handoff caught on one small edge.",
-    benchNote: "A repeated annoyance became a small website. The last adjustment was not visual; it removed the moment where a person had to guess what happened next.",
-    checks: ["Name the actual friction", "Remove everything that does not help", "Put a working version in someone’s hands", "Mark the hesitation and adjust"],
+    index: "01 / WEB + FIELD STUDY",
+    tag: "QUALITY OF LIFE IN SHANGHAI",
+    title: "A neighborhood map built from what residents said they needed.",
+    benchNote: "I led a team of eight through questionnaires, interviews, analysis, and implementation. The resulting website lets residents locate nearby facilities inside a walking-distance radius they choose.",
+    checks: ["Collected and analyzed 20+ questionnaires and interviews", "Translated community findings into map requirements", "Built the interactive map with HTML, CSS, and JavaScript", "Organized food-safety and anti-fraud publicity campaigns"],
     part: "grip",
-    status: "READY FOR FIELD TEST",
+    status: "DELIVERED / MAY 2024",
+    period: "SEP 2023 - MAY 2024",
+    stack: "HTML/CSS · JAVASCRIPT",
+    evidence: "Team of 8 · 20+ questionnaires and interviews · custom walking-radius search",
   },
   algorithm: {
-    index: "02 / ALGORITHM",
-    tag: "ROUTE LOG / SIGHT ADJUSTMENT",
-    title: "Three paths failed before this one held.",
-    benchNote: "The discarded routes remain in the notebook. A final answer is more useful when the constraints, wrong turns, and reason for choosing it are still visible.",
-    checks: ["Define the finish line", "Map states and constraints", "Stress more than one route", "Leave the reasoning inspectable"],
+    index: "02 / ALLOCATION ALGORITHM",
+    tag: "AUTOMATIC AND SATISFACTORY COURSE ASSIGNMENT",
+    title: "Satisfaction became an optimization problem with inspectable choices.",
+    benchNote: "I researched assignment methods, implemented Simultaneous Eating and Birkhoff Decomposition, then extended the system into a parent-teacher meeting scheduler.",
+    checks: ["Evaluated algorithms for satisfaction and allocation efficiency", "Implemented allocation methods in Python and NumPy", "Collected feedback from 30+ professors and peers", "Improved runtime by more than 200%"],
     part: "sight",
-    status: "GROUPING CONSISTENT",
+    status: "EXTENDED / MAR 2025",
+    period: "JAN 2024 - MAR 2025",
+    stack: "PYTHON · NUMPY",
+    evidence: "30+ reviewers · 200+% runtime improvement · scheduler extension",
   },
   hardware: {
-    index: "03 / HARDWARE",
-    tag: "PHYSICAL SIGNAL / BENCH TEST",
-    title: "The code passed. The signal did not.",
-    benchNote: "Voltage, timing, noise, and a loose connection all entered the conversation. The prototype only became honest when the physical response matched the intended one.",
-    checks: ["Translate intent into a signal", "Build the smallest closed loop", "Measure the real response", "Debug across both sides of the wire"],
+    index: "03 / HARDWARE + SIGNALS",
+    tag: "MONITORING DEVICE FOR MUSCLE USAGE & BEHAVIOR",
+    title: "Muscle activity moves from the body to an interface.",
+    benchNote: "The system combines a designed physical enclosure, multiple Bluetooth-connected EMG devices, ESP32 signal classification, and a mobile interface for post-exercise visualization.",
+    checks: ["Designed hardware structures and prototyped 3D models", "Collected and processed multi-device EMG signals", "Built ESP32 classification pipelines with Arduino", "Refined the mobile interface for usability and accessibility"],
     part: "sensor",
-    status: "SIGNAL RECEIVED",
+    status: "IN DEVELOPMENT",
+    period: "JUL 2025 - PRESENT",
+    stack: "FUSION · AUTOCAD · ARDUINO · C/C++",
+    evidence: "Bluetooth EMG collection · ESP32 classification · mobile visualization",
   },
 } as const;
 
@@ -62,10 +71,10 @@ export default function ProjectsPage() {
         <p className="inner-kicker">REPAIR SHED / LIGHT STILL ON</p>
         <h1>Nothing leaves<br />the bench on<br /><em>confidence alone.</em></h1>
         <div className="hero-aside">
-          <span>THREE ITEMS WAITING</span>
+          <span>THREE PROJECT RECORDS</span>
           <p>
             Each tag belongs to a different kind of build. Select one to see
-            what was checked, what resisted, and what remains unfinished.
+            what was built, what changed, and what was measured.
           </p>
         </div>
         <InteractiveModel kind="workbench" className="hero-3d-model" activeIndex={projectKeys.indexOf(active)} onSelect={(index) => selectProject(projectKeys[index])} title="REPAIR BENCH" hint="MOVE TO INSPECT · CLICK A PART" />
@@ -98,8 +107,9 @@ export default function ProjectsPage() {
             </ol>
           </div>
           <footer className="bench-status">
-            <div><span>STATUS</span><strong>{project.status}</strong></div>
-            <p>Names, repositories, images, and measured outcomes stay blank until the real case material is ready.</p>
+            <div><span>PERIOD</span><strong>{project.period}</strong></div>
+            <div><span>TOOLS</span><strong>{project.stack}</strong></div>
+            <p>{project.evidence}</p>
           </footer>
         </article>
       </section>
@@ -107,13 +117,13 @@ export default function ProjectsPage() {
       <section className="repair-wall content-section">
         <header className="section-heading light-heading">
           <span>PINNED ABOVE THE BENCH</span>
-          <h2>Four notes that survived<br />more than one project.</h2>
+          <h2>Evidence pinned above<br />the workbench.</h2>
         </header>
         <div className="repair-notes">
-          <article><span>01</span><p>Useful begins where the friction actually is.</p></article>
-          <article><span>02</span><p>If the reasoning cannot be inspected, the adjustment becomes guesswork.</p></article>
-          <article><span>03</span><p>A person pausing is also test output.</p></article>
-          <article><span>04</span><p>“Still testing” is a valid status.</p></article>
+          <article><span>01 / COMMUNITY</span><p>20+ questionnaires and interviews shaped the Shanghai map.</p></article>
+          <article><span>02 / FEEDBACK</span><p>30+ professors and peers helped refine the allocation algorithm.</p></article>
+          <article><span>03 / PERFORMANCE</span><p>Algorithm revisions improved runtime by more than 200%.</p></article>
+          <article><span>04 / PHYSICAL LOOP</span><p>EMG signals travel through Bluetooth devices, ESP32 classification, and a mobile app.</p></article>
         </div>
       </section>
 

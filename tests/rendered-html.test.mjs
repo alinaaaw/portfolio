@@ -51,9 +51,11 @@ test("keeps all five signals and lightweight demos", async () => {
   for (const area of ["web", "algorithm", "hardware", "notes", "travel"]) {
     assert.match(page, new RegExp(`openZone\\(\\"${area}\\"\\)`));
   }
-  assert.match(page, /RUN PATH/);
-  assert.match(page, /POWER ON/);
-  assert.match(page, /RECALCULATE ROUTE/);
+  assert.match(page, /RUN ALLOCATION/);
+  assert.match(page, /START STREAM/);
+  assert.match(page, /TRACE THE WORKFLOW/);
+  assert.match(page, /Quality of Life in Shanghai/);
+  assert.match(page, /Social Futures Lab/);
   assert.match(page, /MOVE TO AIM · HOLD TO DRAW · RELEASE/);
   assert.match(page, /setPointerCapture/);
   assert.match(page, /data-zone="notes"/);

@@ -95,28 +95,30 @@ export default function AboutPage() {
 
       <section className="clubhouse-worktable content-section">
         <header className="section-heading light-heading">
-          <span>02 / LEFT ON THE TABLE</span>
-          <h2>The work leaves<br />its own explanation.</h2>
+          <span>02 / BESIDE THE LAPTOP</span>
+          <h2>A transcript, a summer,<br />and the tools in use.</h2>
         </header>
         <div className="table-evidence">
           <article className="debug-sheet">
-            <span>TEST LOG / 14:06</span>
+            <span>UNIVERSITY OF WASHINGTON / SEATTLE</span>
             <ol>
-              <li><b>PASS</b> The function returns the expected result.</li>
-              <li><b>PAUSE</b> The first person to try it hesitates.</li>
-              <li><b>NOTE</b> The specification explained the system, not the moment.</li>
-              <li><b>REVISE</b> Change the handoff. Test again.</li>
+              <li><b>DEGREE</b> B.S. in Computer Science</li>
+              <li><b>DATE</b> Expected June 2028</li>
+              <li><b>GPA</b> 4.0 cumulative</li>
+              <li><b>SCHOOL</b> Paul G. Allen School</li>
             </ol>
           </article>
           <article className="split-notebook">
-            <div><span>CODE CAN</span><p>Make the route executable.</p></div>
-            <div><span>CODE MISSED</span><p>Why someone did not want that route.</p></div>
-            <small>Both pages remain open.</small>
+            <div><span>UW COURSEWORK</span><p>Databases, linear algebra, foundations of computing, and software design.</p></div>
+            <div><span>HARVARD SUMMER 2024</span><p>Artificial Intelligence with Python and multivariable calculus.</p></div>
+            <small>The technical route is still widening.</small>
           </article>
           <article className="completion-slip">
-            <span>CHECKPOINT / COMPLETE</span>
-            <p>Try it.</p><p>Share it.</p><p>Write down what changed.</p>
-            <strong>NEXT →</strong>
+            <span>TOOLS / CURRENT KIT</span>
+            <p>Python · Java · JavaScript · C/C++</p>
+            <p>pandas · NumPy · Matplotlib · YOLO</p>
+            <p>Docker · Arduino · Fusion · AutoCAD</p>
+            <strong>BUILD → TEST → REVISE</strong>
           </article>
         </div>
       </section>

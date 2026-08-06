@@ -8,11 +8,11 @@ import InteractiveModel from "./_components/three/InteractiveModel";
 type AimState = { x: number; y: number; clientX: number; clientY: number; zone: ZoneId | null };
 
 const zoneLabels: Record<ZoneId, string> = {
-  web: "PROJECT / SMALL WEB SYSTEMS",
-  algorithm: "PROJECT / ALGORITHM STUDY",
-  hardware: "PROJECT / HARDWARE SIGNAL",
-  notes: "EXPERIENCE / ARCHERY PRACTICE",
-  travel: "EXPERIENCE / TRAVEL ROUTE",
+  web: "PROJECT / QUALITY OF LIFE IN SHANGHAI",
+  algorithm: "PROJECT / COURSE ASSIGNMENT",
+  hardware: "PROJECT / MUSCLE MONITOR",
+  notes: "EXPERIENCE / SOCIAL FUTURES LAB",
+  travel: "EXPERIENCE / THERMO FISHER SCIENTIFIC",
 };
 
 export default function VersionTwo() {
@@ -251,10 +251,10 @@ export default function VersionTwo() {
           <p>COMPUTER SCIENCE × HUMAN CURIOSITY</p>
           <h1>Follow<br />your <em>focus.</em></h1>
           <div className="v2-intro-copy">
-            <span>HELLO, I AM ALINA.</span>
+            <span>WENRUI (ALINA) WU</span>
             <p>
-              I build with code and study the human complexity it cannot fully
-              contain. Move to look around, or start with the person behind it.
+              Computer Science at the University of Washington. I build with
+              code, then look closely at the people and systems it meets.
             </p>
           </div>
           <div className="v2-intro-actions">
@@ -275,8 +275,8 @@ export default function VersionTwo() {
             <i /><i /><i />
             <b>www</b>
           </span>
-          <strong>WEB PROJECT</strong>
-          <small>small systems made usable</small>
+          <strong>SHANGHAI MAP</strong>
+          <small>web project · team of 8</small>
         </button>
 
         <button data-zone="algorithm"
@@ -290,8 +290,8 @@ export default function VersionTwo() {
           <span className="algorithm-beacon">
             <i /><i /><i /><i />
           </span>
-          <strong>ALGORITHM</strong>
-          <small>a path tested and recalculated</small>
+          <strong>ASSIGNMENT</strong>
+          <small>algorithm project · Python</small>
         </button>
 
         <button data-zone="hardware"
@@ -308,8 +308,8 @@ export default function VersionTwo() {
             <i className="hardware-pin pin-b" />
             <i className="hardware-led" />
           </span>
-          <strong>HARDWARE</strong>
-          <small>a signal beyond the screen</small>
+          <strong>EMG MONITOR</strong>
+          <small>hardware project · ESP32</small>
         </button>
 
         <button data-zone="notes"
@@ -317,7 +317,7 @@ export default function VersionTwo() {
           onClick={(event) => { if (event.detail === 0 || unlocked.includes("notes")) openZone("notes"); }}
           onPointerEnter={() => setHovered("notes")}
           onPointerLeave={() => setHovered(null)}
-          aria-label="Explore personal field notes"
+          aria-label="Explore undergraduate research experience"
         >
           <span className="marker-index">04</span>
           <span className="target-beacon" aria-hidden="true">
@@ -327,8 +327,8 @@ export default function VersionTwo() {
             <i className="target-center" />
             <i className="target-arrow" />
           </span>
-          <strong>ARCHERY</strong>
-          <small>practice, correction, repeat</small>
+          <strong>RESEARCH</strong>
+          <small>Social Futures Lab · UW</small>
         </button>
 
         <button data-zone="travel"
@@ -336,12 +336,12 @@ export default function VersionTwo() {
           onClick={(event) => { if (event.detail === 0 || unlocked.includes("travel")) openZone("travel"); }}
           onPointerEnter={() => setHovered("travel")}
           onPointerLeave={() => setHovered(null)}
-          aria-label="Explore the travel route"
+          aria-label="Explore the software engineering internship"
         >
           <span className="marker-index">05</span>
           <span className="travel-beacon"><i /><i /><i /></span>
-          <strong>TRAVEL</strong>
-          <small>a planned entry into the unknown</small>
+          <strong>INTERNSHIP</strong>
+          <small>Thermo Fisher Scientific</small>
         </button>
 
         {entered && shotCount === 0 && !drawing && <div className="shot-coach"><i /> MOVE TO AIM · HOLD TO DRAW · RELEASE</div>}
@@ -374,45 +374,45 @@ export default function VersionTwo() {
 
             {activeZone === "web" && (
               <div className="v2-panel-body">
-                <p className="panel-sequence">SIGNAL 01 / WEB</p>
-                <h2 id="v2-panel-title">Small sites for real decisions.</h2>
+                <p className="panel-sequence">PROJECT 01 / HTML · CSS · JAVASCRIPT</p>
+                <h2 id="v2-panel-title">Quality of Life in Shanghai.</h2>
                 <p className="panel-lede">
-                  I like turning a concrete problem into something another person
-                  can actually use. The final page will let each website run here,
-                  not sit behind a screenshot.
+                  An interactive neighborhood map shaped by a mixed-methods study
+                  of urban quality of life, built to help residents find nearby
+                  facilities within a walking-distance radius.
                 </p>
                 <div className="v2-web-demo">
-                  <div className="v2-web-tabs"><span>LIVE PREVIEW</span><span>NOTES</span><span>CODE</span></div>
+                  <div className="v2-web-tabs"><span>NEIGHBORHOOD MAP</span><span>20+ RESPONSES</span><span>8-PERSON TEAM</span></div>
                   <div className="v2-web-screen">
-                    <p>DECISION TOOL / 01</p>
-                    <strong>Make the next step<br />easier to choose.</strong>
-                    <button>TRY PROJECT →</button>
+                    <p>WALKING-RADIUS SEARCH</p>
+                    <strong>Find useful places<br />within reach.</strong>
+                    <button>VIEW CASE STUDY →</button>
                   </div>
                 </div>
-                <div className="v2-facts"><span>ROLE <b>Design + code</b></span><span>PRIORITY <b>Useful first</b></span><span>STATE <b>Iterating</b></span></div>
+                <div className="v2-facts"><span>ROLE <b>Team lead + developer</b></span><span>METHOD <b>Questionnaires + interviews</b></span><span>PERIOD <b>Sep 2023 - May 2024</b></span></div>
                 <a className="panel-link" href="/projects#web">CONTINUE INTO PROJECTS →</a>
               </div>
             )}
 
             {activeZone === "algorithm" && (
               <div className="v2-panel-body">
-                <p className="panel-sequence">SIGNAL 02 / ALGORITHM</p>
-                <h2 id="v2-panel-title">Find one route that holds.</h2>
-                <p className="panel-lede">Collect information, test a path, then recalculate when reality changes.</p>
+                <p className="panel-sequence">PROJECT 02 / PYTHON · NUMPY</p>
+                <h2 id="v2-panel-title">Automatic and Satisfactory Course Assignment.</h2>
+                <p className="panel-lede">An allocation system built around satisfaction and efficiency, using Simultaneous Eating and Birkhoff Decomposition.</p>
                 <div className={`v2-path-demo ${algorithmRun ? "is-running" : ""}`}>
                   <div className="path-map">
-                    <span className="path-node path-start">START</span>
-                    <span className="path-node path-check">CHECK</span>
-                    <span className="path-node path-adjust">ADJUST</span>
-                    <span className="path-node path-goal">GOAL</span>
+                    <span className="path-node path-start">INPUT</span>
+                    <span className="path-node path-check">EAT</span>
+                    <span className="path-node path-adjust">DECOMP</span>
+                    <span className="path-node path-goal">ASSIGN</span>
                     <i className="path-segment segment-a" />
                     <i className="path-segment segment-b" />
                     <i className="path-segment segment-c" />
                     <i className="path-runner" />
                   </div>
                   <div className="path-controls">
-                    <span>{algorithmRun ? "PATH HOLDS / 3 CHECKS" : "WAITING FOR A TEST"}</span>
-                    <button onClick={() => setAlgorithmRun((value) => !value)}>{algorithmRun ? "RESET" : "RUN PATH"}</button>
+                    <span>{algorithmRun ? "ALLOCATION COMPLETE / SCHEDULE READY" : "PREFERENCES READY"}</span>
+                    <button onClick={() => setAlgorithmRun((value) => !value)}>{algorithmRun ? "RESET" : "RUN ALLOCATION"}</button>
                   </div>
                 </div>
                 <a className="panel-link" href="/projects#algorithm">CONTINUE INTO THE CASE STUDY →</a>
@@ -421,21 +421,21 @@ export default function VersionTwo() {
 
             {activeZone === "hardware" && (
               <div className="v2-panel-body">
-                <p className="panel-sequence">SIGNAL 03 / HARDWARE</p>
-                <h2 id="v2-panel-title">A thought, made physical.</h2>
-                <p className="panel-lede">Hardware is where an abstract instruction has to survive contact with voltage, timing, noise, and the real world.</p>
+                <p className="panel-sequence">PROJECT 03 / ARDUINO · C/C++ · FUSION</p>
+                <h2 id="v2-panel-title">Monitoring Device for Muscle Usage &amp; Behavior.</h2>
+                <p className="panel-lede">A multi-device system that collects EMG signals over Bluetooth, classifies them on ESP32 microcontrollers, and sends exercise data to a mobile interface.</p>
                 <div className={`v2-device ${deviceOn ? "is-powered" : ""}`}>
                   <div className="device-visual">
-                    <span className="device-module module-input">IN</span>
-                    <span className="device-module module-core">CORE</span>
-                    <span className="device-module module-output">OUT</span>
+                    <span className="device-module module-input">EMG</span>
+                    <span className="device-module module-core">ESP32</span>
+                    <span className="device-module module-output">APP</span>
                     <i className="device-wire wire-a" /><i className="device-wire wire-b" />
                     <i className="device-packet packet-a" /><i className="device-packet packet-b" />
                   </div>
                   <div className="device-readout">
-                    <p>&gt; signal.status</p>
-                    <strong>{deviceOn ? "RECEIVING" : "STANDBY"}</strong>
-                    <button onClick={() => setDeviceOn((value) => !value)}>{deviceOn ? "POWER OFF" : "POWER ON"}</button>
+                    <p>&gt; emg.pipeline</p>
+                    <strong>{deviceOn ? "SIGNAL CLASSIFIED" : "DEVICE READY"}</strong>
+                    <button onClick={() => setDeviceOn((value) => !value)}>{deviceOn ? "STOP STREAM" : "START STREAM"}</button>
                   </div>
                 </div>
                 <a className="panel-link" href="/projects#hardware">CONTINUE INTO THE CASE STUDY →</a>
@@ -444,34 +444,34 @@ export default function VersionTwo() {
 
             {activeZone === "notes" && (
               <div className="v2-panel-body">
-                <p className="panel-sequence">SIGNAL 04 / FIELD NOTES</p>
-                <h2 id="v2-panel-title">Focus is not certainty.</h2>
-                <p className="panel-lede">A target helps direct attention. It does not make the answer appear.</p>
+                <p className="panel-sequence">EXPERIENCE 01 / UNDERGRADUATE RESEARCH</p>
+                <h2 id="v2-panel-title">How do principles shape perceived relevance?</h2>
+                <p className="panel-lede">At UW&apos;s Social Futures Lab, I analyze how agreement on principles affects perceived relevance between cases.</p>
                 <div className="v2-note-stack">
-                  <article><span>OBSERVATION / 01</span><p>I distrust confidence that arrives before understanding.</p><small>Still true. Still checking.</small></article>
-                  <article><span>LEARNING / NOW</span><p>How can interaction feel alive without turning a person into a data point?</p><small>No conclusion yet.</small></article>
-                  <article><span>PERSONAL / TRACE</span><p>I used to practice laser shooting. Now I shoot arrows. The pause before release is part of the shot.</p><small>Maybe that belongs here.</small></article>
+                  <article><span>DATA / SURVEYS</span><p>Case similarity, relevance, and principle agreement.</p><small>Participant responses retained as evidence.</small></article>
+                  <article><span>PIPELINE / PANDAS</span><p>CSV datasets become normalized principle vectors.</p><small>Structured for case analysis.</small></article>
+                  <article><span>STATUS / APR 2026 - PRESENT</span><p>The relationship between agreement and relevance is still under investigation.</p><small>Research assistant · Seattle</small></article>
                 </div>
-                <a className="panel-link" href="/notes">OPEN ALL THOUGHT TRACES →</a>
+                <a className="panel-link" href="/notes">OPEN THE THOUGHT ARCHIVE →</a>
               </div>
             )}
 
             {activeZone === "travel" && (
               <div className="v2-panel-body">
-                <p className="panel-sequence">SIGNAL 05 / TRAVEL</p>
-                <h2 id="v2-panel-title">Plan carefully. Enter anyway.</h2>
-                <p className="panel-lede">I plan routes in detail, keep backup options, and leave enough space for a different life to surprise me.</p>
+                <p className="panel-sequence">EXPERIENCE 02 / SOFTWARE ENGINEERING INTERNSHIP</p>
+                <h2 id="v2-panel-title">Vision, motion, and laboratory workflows.</h2>
+                <p className="panel-lede">At Thermo Fisher Scientific in Shanghai, I work across robot-arm automation, scientific-software testing, workflow analysis, and technical onboarding.</p>
                 <div className={`v2-route-demo ${routeChanged ? "route-b" : "route-a"}`}>
                   <div className="route-stops">
-                    <span><b>08:10</b> DEPART</span>
-                    <span><b>11:40</b> WANDER</span>
-                    <span><b>16:20</b> OPEN TIME</span>
-                    <span><b>?</b> LAUGH IN THE STREET</span>
+                    <span><b>01</b> YOLO26 VISION</span>
+                    <span><b>02</b> ROS2 MOTION</span>
+                    <span><b>03</b> 3500Dx TESTING</span>
+                    <span><b>04</b> QANTIS WORKFLOWS</span>
                   </div>
-                  <button onClick={() => setRouteChanged((value) => !value)}>{routeChanged ? "RETURN TO PLAN A" : "RECALCULATE ROUTE"}</button>
-                  <p>{routeChanged ? "PLAN B FOUND / LESS DIRECT / MORE INTERESTING" : "PLAN A READY / 38 MINUTES OF MARGIN"}</p>
+                  <button onClick={() => setRouteChanged((value) => !value)}>{routeChanged ? "RESET WORKFLOW" : "TRACE THE WORKFLOW"}</button>
+                  <p>{routeChanged ? "VISION → MOTION → VALIDATION → UI STRUCTURE" : "JUNE 2026 - PRESENT / SHANGHAI"}</p>
                 </div>
-                <a className="panel-link" href="/away">FOLLOW THE ROUTE OFF SCREEN →</a>
+                <a className="panel-link" href="/projects">INSPECT THE TECHNICAL WORK →</a>
               </div>
             )}
           </aside>
