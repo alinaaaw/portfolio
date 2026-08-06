@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useArcheryEngine } from "./_components/focus-field/useArcheryEngine";
+import type { LaunchSpec, ZoneId } from "./_components/focus-field/archery-physics";
 
-type ZoneId = "web" | "algorithm" | "hardware" | "notes" | "travel";
+type DrawState = { x: number; y: number; clientX: number; clientY: number; zone: ZoneId | null };
 
 const zoneLabels: Record<ZoneId, string> = {
   web: "WEB / SMALL SYSTEMS",
@@ -22,9 +24,30 @@ export default function VersionTwo() {
   const [routeChanged, setRouteChanged] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [tension, setTension] = useState(0);
-  const [shot, setShot] = useState<{ id: number; x: number; y: number; hit: ZoneId | null } | null>(null);
+  const [unlocked, setUnlocked] = useState<ZoneId[]>([]);
+  const [impactZone, setImpactZone] = useState<ZoneId | null>(null);
+  const [shotCount, setShotCount] = useState(0);
+  const [feedback, setFeedback] = useState("AIM · HOLD · PULL · RELEASE");
   const fieldRef = useRef<HTMLElement>(null);
-  const drawRef = useRef<{ x: number; y: number; clientX: number; clientY: number } | null>(null);
+  const drawRef = useRef<DrawState | null>(null);
+  const tensionRef = useRef(0);
+  const impactTimerRef = useRef<number | null>(null);
+
+  const handleImpact = useCallback((shot: LaunchSpec) => {
+    setShotCount((count) => count + 1);
+    if (!shot.zone) {
+      setFeedback("MISS · OBSERVE · RECALCULATE");
+      return;
+    }
+
+    setUnlocked((current) => current.includes(shot.zone!) ? current : [...current, shot.zone!]);
+    setImpactZone(shot.zone);
+    setFeedback(`IMPACT · ${zoneLabels[shot.zone]} · SIGNAL UNLOCKED`);
+    if (impactTimerRef.current) window.clearTimeout(impactTimerRef.current);
+    impactTimerRef.current = window.setTimeout(() => setImpactZone(null), 900);
+  }, []);
+
+  const { canvasRef, launch, setActive, setAim, setDraw } = useArcheryEngine(handleImpact);
 
   const openZone = (zone: ZoneId) => {
     setEntered(true);
@@ -37,8 +60,15 @@ export default function VersionTwo() {
       if (event.key === "Escape") setActiveZone(null);
     };
     window.addEventListener("keydown", closeWithEscape);
-    return () => window.removeEventListener("keydown", closeWithEscape);
+    return () => {
+      window.removeEventListener("keydown", closeWithEscape);
+      if (impactTimerRef.current) window.clearTimeout(impactTimerRef.current);
+    };
   }, []);
+
+  useEffect(() => {
+    setActive(entered);
+  }, [entered, setActive]);
 
   const lookAround = (event: React.PointerEvent<HTMLElement>) => {
     const field = fieldRef.current;
@@ -46,52 +76,87 @@ export default function VersionTwo() {
     const rect = field.getBoundingClientRect();
     const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
     const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+    if (drawRef.current) {
+      const pull = Math.hypot(event.clientX - drawRef.current.clientX, event.clientY - drawRef.current.clientY);
+      const nextTension = Math.min(1, pull / Math.min(190, rect.width * 0.22));
+      tensionRef.current = nextTension;
+      setTension(nextTension);
+      setDraw(true, nextTension);
+      field.style.setProperty("--pull-x", `${event.clientX - drawRef.current.clientX}px`);
+      field.style.setProperty("--pull-y", `${event.clientY - drawRef.current.clientY}px`);
+      return;
+    }
     field.style.setProperty("--pointer-x", `${x * 100}%`);
     field.style.setProperty("--pointer-y", `${y * 100}%`);
     field.style.setProperty("--look-x", `${(x - 0.5) * -24}px`);
     field.style.setProperty("--look-y", `${(y - 0.5) * -16}px`);
     field.style.setProperty("--look-x-near", `${(x - 0.5) * -42}px`);
     field.style.setProperty("--look-y-near", `${(y - 0.5) * -24}px`);
-    if (drawRef.current) {
-      const pull = Math.hypot(event.clientX - drawRef.current.clientX, event.clientY - drawRef.current.clientY);
-      setTension(Math.min(1, pull / 150));
-    }
+    setAim(x, y);
   };
 
   const beginShot = (event: React.PointerEvent<HTMLElement>) => {
-    if (!entered || (event.target as HTMLElement).closest("button, a")) return;
+    const source = event.target as HTMLElement;
+    if (!entered || source.closest(".v2-intro, .v2-header, a")) return;
     const field = fieldRef.current;
     if (!field) return;
     const rect = field.getBoundingClientRect();
+    const zoneElement = source.closest<HTMLElement>("[data-zone]");
+    const zone = (zoneElement?.dataset.zone as ZoneId | undefined) ?? null;
+    if (zone && unlocked.includes(zone)) return;
+    event.preventDefault();
+
+    const zoneRect = zoneElement?.getBoundingClientRect();
+    const x = zoneRect ? (zoneRect.left + zoneRect.width * 0.5 - rect.left) / rect.width : (event.clientX - rect.left) / rect.width;
+    const y = zoneRect ? (zoneRect.top + zoneRect.height * 0.43 - rect.top) / rect.height : (event.clientY - rect.top) / rect.height;
     drawRef.current = {
-      x: (event.clientX - rect.left) / rect.width,
-      y: (event.clientY - rect.top) / rect.height,
+      x,
+      y,
       clientX: event.clientX,
       clientY: event.clientY,
+      zone,
     };
+    field.style.setProperty("--pointer-x", `${drawRef.current.x * 100}%`);
+    field.style.setProperty("--pointer-y", `${drawRef.current.y * 100}%`);
     field.setPointerCapture(event.pointerId);
     setDrawing(true);
     setTension(0);
+    tensionRef.current = 0;
+    setAim(x, y);
+    setDraw(true, 0);
+    setFeedback("PULL BACK TO BUILD TENSION");
   };
 
   const releaseShot = (event: React.PointerEvent<HTMLElement>) => {
     const aim = drawRef.current;
     if (!aim) return;
-    const targets: Array<[ZoneId, number, number]> = [
-      ["web", .16, .34], ["algorithm", .41, .72], ["hardware", .84, .39],
-      ["notes", .66, .25], ["travel", .83, .75],
-    ];
-    const nearest = targets.reduce((best, target) => {
-      const distance = Math.hypot(aim.x - target[1], aim.y - target[2]);
-      return distance < best.distance ? { zone: target[0], distance } : best;
-    }, { zone: null as ZoneId | null, distance: Infinity });
-    const hit = nearest.distance < .14 ? nearest.zone : null;
-    setShot({ id: Date.now(), x: aim.x, y: aim.y, hit });
+    const power = tensionRef.current;
+    if (power < .12) {
+      setFeedback("PULL FARTHER · THEN RELEASE");
+      setDrawing(false);
+      setTension(0);
+      tensionRef.current = 0;
+      drawRef.current = null;
+      setDraw(false, 0);
+      if (fieldRef.current?.hasPointerCapture(event.pointerId)) fieldRef.current.releasePointerCapture(event.pointerId);
+      return;
+    }
+    launch({ id: Date.now(), x: aim.x, y: aim.y, zone: aim.zone, power });
     setDrawing(false);
     setTension(0);
+    tensionRef.current = 0;
     drawRef.current = null;
     if (fieldRef.current?.hasPointerCapture(event.pointerId)) fieldRef.current.releasePointerCapture(event.pointerId);
-    if (hit) window.setTimeout(() => openZone(hit), 650);
+    setFeedback("ARROW IN FLIGHT · HOLD THE LINE");
+  };
+
+  const cancelShot = () => {
+    drawRef.current = null;
+    tensionRef.current = 0;
+    setDrawing(false);
+    setTension(0);
+    setDraw(false, 0);
+    setFeedback("AIM · HOLD · PULL · RELEASE");
   };
 
   return (
@@ -108,21 +173,22 @@ export default function VersionTwo() {
         </nav>
         <div className="v2-status">
           <span><i /> FIELD ONLINE</span>
-          <span>{discovered.length}/5 FOUND</span>
+          <span>{unlocked.length}/5 FOUND</span>
         </div>
       </header>
 
       <section
-        className={`focus-field ${drawing ? "is-drawing" : ""}`}
+        className={`focus-field ${drawing ? "is-drawing" : ""} ${impactZone ? `has-impact impact-${impactZone}` : ""}`}
         ref={fieldRef}
         onPointerMove={lookAround}
         onPointerDown={beginShot}
         onPointerUp={releaseShot}
-        onPointerCancel={() => { drawRef.current = null; setDrawing(false); setTension(0); }}
+        onPointerCancel={cancelShot}
         onPointerLeave={() => setHovered(null)}
         style={{ "--tension": tension } as React.CSSProperties}
         aria-label="An interactive field containing five portfolio markers"
       >
+        <canvas ref={canvasRef} className="archery-canvas" aria-hidden="true" />
         <div className="focus-cursor" aria-hidden="true"><i /></div>
         <div className="field-sky" aria-hidden="true">
           <span className="sky-glow" />
@@ -149,9 +215,6 @@ export default function VersionTwo() {
           <span className="range-grass grass-a" /><span className="range-grass grass-b" /><span className="range-grass grass-c" />
           <span className="wind-line wind-a" /><span className="wind-line wind-b" />
         </div>
-        <div className="field-bow" aria-hidden="true"><i className="bow-arc" /><i className="bow-string" /><i className="bow-arrow" /></div>
-        {shot && <span key={shot.id} className={`flying-arrow ${shot.hit ? "shot-hit" : "shot-miss"}`} style={{ "--shot-x": `${shot.x * 100}%`, "--shot-y": `${shot.y * 100}%` } as React.CSSProperties} aria-hidden="true" />}
-
         <div className="v2-intro">
           <p>COMPUTER SCIENCE × HUMAN CURIOSITY</p>
           <h1>Follow<br />your <em>focus.</em></h1>
@@ -168,9 +231,9 @@ export default function VersionTwo() {
           </div>
         </div>
 
-        <button
-          className={`field-marker marker-web ${discovered.includes("web") ? "is-found" : ""}`}
-          onClick={() => openZone("web")}
+        <button data-zone="web"
+          className={`field-marker marker-web ${discovered.includes("web") ? "is-found" : ""} ${unlocked.includes("web") ? "is-unlocked" : ""} ${impactZone === "web" ? "is-impacting" : ""}`}
+          onClick={(event) => { if (event.detail === 0 || unlocked.includes("web")) openZone("web"); }}
           onPointerEnter={() => setHovered("web")}
           onPointerLeave={() => setHovered(null)}
           aria-label="Explore web projects"
@@ -184,9 +247,9 @@ export default function VersionTwo() {
           <small>things made usable</small>
         </button>
 
-        <button
-          className={`field-marker marker-algorithm ${discovered.includes("algorithm") ? "is-found" : ""}`}
-          onClick={() => openZone("algorithm")}
+        <button data-zone="algorithm"
+          className={`field-marker marker-algorithm ${discovered.includes("algorithm") ? "is-found" : ""} ${unlocked.includes("algorithm") ? "is-unlocked" : ""} ${impactZone === "algorithm" ? "is-impacting" : ""}`}
+          onClick={(event) => { if (event.detail === 0 || unlocked.includes("algorithm")) openZone("algorithm"); }}
           onPointerEnter={() => setHovered("algorithm")}
           onPointerLeave={() => setHovered(null)}
           aria-label="Explore the algorithm project"
@@ -199,9 +262,9 @@ export default function VersionTwo() {
           <small>reason, test, recalculate</small>
         </button>
 
-        <button
-          className={`field-marker marker-hardware ${discovered.includes("hardware") ? "is-found" : ""}`}
-          onClick={() => openZone("hardware")}
+        <button data-zone="hardware"
+          className={`field-marker marker-hardware ${discovered.includes("hardware") ? "is-found" : ""} ${unlocked.includes("hardware") ? "is-unlocked" : ""} ${impactZone === "hardware" ? "is-impacting" : ""}`}
+          onClick={(event) => { if (event.detail === 0 || unlocked.includes("hardware")) openZone("hardware"); }}
           onPointerEnter={() => setHovered("hardware")}
           onPointerLeave={() => setHovered(null)}
           aria-label="Explore the hardware project"
@@ -217,9 +280,9 @@ export default function VersionTwo() {
           <small>code beyond the screen</small>
         </button>
 
-        <button
-          className={`field-marker marker-notes ${discovered.includes("notes") ? "is-found" : ""}`}
-          onClick={() => openZone("notes")}
+        <button data-zone="notes"
+          className={`field-marker marker-notes ${discovered.includes("notes") ? "is-found" : ""} ${unlocked.includes("notes") ? "is-unlocked" : ""} ${impactZone === "notes" ? "is-impacting" : ""}`}
+          onClick={(event) => { if (event.detail === 0 || unlocked.includes("notes")) openZone("notes"); }}
           onPointerEnter={() => setHovered("notes")}
           onPointerLeave={() => setHovered(null)}
           aria-label="Explore personal field notes"
@@ -236,9 +299,9 @@ export default function VersionTwo() {
           <small>thoughts, not conclusions</small>
         </button>
 
-        <button
-          className={`field-marker marker-travel ${discovered.includes("travel") ? "is-found" : ""}`}
-          onClick={() => openZone("travel")}
+        <button data-zone="travel"
+          className={`field-marker marker-travel ${discovered.includes("travel") ? "is-found" : ""} ${unlocked.includes("travel") ? "is-unlocked" : ""} ${impactZone === "travel" ? "is-impacting" : ""}`}
+          onClick={(event) => { if (event.detail === 0 || unlocked.includes("travel")) openZone("travel"); }}
           onPointerEnter={() => setHovered("travel")}
           onPointerLeave={() => setHovered(null)}
           aria-label="Explore the travel route"
@@ -249,9 +312,10 @@ export default function VersionTwo() {
           <small>planned entry into the unknown</small>
         </button>
 
-        <div className={`field-readout ${hovered || drawing ? "has-signal" : ""}`} aria-live="polite">
-          <span>{drawing ? `DRAW ${Math.round(tension * 100)}%` : shot ? (shot.hit ? "IMPACT / OPENING" : "MISS / RECALCULATE") : hovered ? "SIGNAL DETECTED" : "AIM · HOLD · PULL · RELEASE"}</span>
-          <strong>{drawing ? "RELEASE TO FIRE" : hovered ? zoneLabels[hovered] : "THE FIELD REMEMBERS YOUR SHOTS"}</strong>
+        {entered && shotCount === 0 && !drawing && <div className="shot-coach"><i /> AIM · HOLD · PULL · RELEASE</div>}
+        <div className={`field-readout ${hovered || drawing || impactZone ? "has-signal" : ""}`} aria-live="polite">
+          <span>{drawing ? `DRAW ${Math.round(tension * 100)}%` : feedback}</span>
+          <strong>{drawing ? "RELEASE TO FIRE" : hovered ? (unlocked.includes(hovered) ? "SIGNAL UNLOCKED · CLICK TO OPEN" : zoneLabels[hovered]) : unlocked.length ? "IMPACT LEAVES A TRACE" : "THE FIELD IS WAITING"}</strong>
         </div>
 
         <div className="field-compass" aria-hidden="true">

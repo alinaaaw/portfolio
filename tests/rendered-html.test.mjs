@@ -45,6 +45,8 @@ test("renders the Version 2 Focus Field at the root", async () => {
 
 test("keeps all five signals and lightweight demos", async () => {
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const engine = await readFile(new URL("../app/_components/focus-field/useArcheryEngine.ts", import.meta.url), "utf8");
+  const physics = await readFile(new URL("../app/_components/focus-field/archery-physics.ts", import.meta.url), "utf8");
 
   for (const area of ["web", "algorithm", "hardware", "notes", "travel"]) {
     assert.match(page, new RegExp(`openZone\\(\\"${area}\\"\\)`));
@@ -52,6 +54,14 @@ test("keeps all five signals and lightweight demos", async () => {
   assert.match(page, /RUN PATH/);
   assert.match(page, /POWER ON/);
   assert.match(page, /RECALCULATE ROUTE/);
+  assert.match(page, /AIM · HOLD · PULL · RELEASE/);
+  assert.match(page, /setPointerCapture/);
+  assert.match(page, /data-zone="notes"/);
+  assert.match(page, /PULL FARTHER/);
+  assert.match(page, /SIGNAL UNLOCKED/);
+  assert.match(engine, /requestAnimationFrame/);
+  assert.match(engine, /ResizeObserver/);
+  assert.match(physics, /velocityY.*gravity/);
 });
 
 test("renders four deeper personal rooms", async () => {
