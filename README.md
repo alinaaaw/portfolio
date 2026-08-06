@@ -1,6 +1,6 @@
 # Alina Portfolio — Version 3
 
-This branch contains the **Lab 17** photoreal interactive portfolio direction.
+This branch contains the **Lab 17** interactive 3D portfolio direction.
 
 ## Open locally
 
@@ -10,7 +10,7 @@ the site, and press `Ctrl + C` when finished.
 ## Branch purpose
 
 - Branch: `version3-design`
-- Design: photoreal 2.5D laboratory exploration with a gradual mystery
+- Design: explorable 3D laboratory room with a gradual mystery
 - Status: active and independently editable
 - Versions 1 and 2 are maintained separately.
 
@@ -18,7 +18,8 @@ the site, and press `Ctrl + C` when finished.
 
 ```text
 app/page.tsx              Portfolio narrative and recovered project files
-app/_components/LabGame.tsx  Photographic room, precise hitboxes, and parallax transitions
+app/_components/LabGame.tsx  Three.js room, object hitboxes, and camera transitions
+app/_components/ZoneCloseup3D.tsx  Five interactive Three.js object close-ups
 app/layout.tsx            Metadata and page shell
 public/site.css           Complete visual design and responsive behavior
 public/og.png             Social preview made for Case File 03

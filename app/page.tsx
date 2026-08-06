@@ -1,12 +1,17 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ZoneId } from "./_components/LabGame";
 
 const LabGame = dynamic(() => import("./_components/LabGame"), {
   ssr: false,
   loading: () => <div className="lab-loading"><i /><span>PREPARING LAB 17</span></div>,
+});
+
+const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
+  ssr: false,
+  loading: () => <div className="lab-loading"><i /><span>FOCUSING LOCAL VIEW</span></div>,
 });
 
 type ComputerFile = "desktop" | "about" | "projects" | "map" | "allocation" | "emg" | "experience" | "research" | "internship";
@@ -43,15 +48,10 @@ type DrawerFile = "folder" | "notebook" | "components" | "envelope";
 function BookshelfScene({ onClose }:{ onClose:()=>void }) {
   const [selected,setSelected] = useState<ShelfBook|null>(null);
   const [reverse,setReverse] = useState(false);
-  const positions = [13,26,39.5,52.5,66,79.5];
   return <div className="modal-layer tactile-layer bookshelf-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Bookshelf close-up" onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>04</span><strong>BOOKSHELF / SELECT A BOOK</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
-      <div className="bookshelf-photo-stage">
-        <img src="/lab-bookshelf-closeup.png" alt="Six worn books with bookmarks on a dark wooden shelf" />
-        <p>CLICK A BOOK TO PULL IT FROM THE SHELF</p>
-        {shelfBooks.map((book,index) => <button key={book.id} className="photo-book-hit" style={{left:`${positions[index]}%`}} onClick={() => { setSelected(book); setReverse(false); }} aria-label={`Open ${book.title}`}><span>{book.index}</span><b>{book.title}</b></button>)}
-      </div>
+      <ZoneCloseup3D zone="books" onSelect={(item) => { const book=shelfBooks[Number(item)]; if(book){setSelected(book);setReverse(false);} }} />
       {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
         <div className={`physical-book ${reverse?"reverse":""}`} onMouseDown={(event) => event.stopPropagation()}>
           <div className="book-pages">
@@ -67,9 +67,7 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
 }
 
 function DrawerScene({ onClose }:{ onClose:()=>void }) {
-  const [open,setOpen] = useState(false);
   const [selected,setSelected] = useState<DrawerFile|null>(null);
-  const startY = useRef<number|null>(null);
   const fileCopy: Record<DrawerFile,{meta:string;title:string;copy:string;note:string}> = {
     folder:{meta:"PROJECT FOLDER / 2023—2024",title:"Shanghai, at walking distance.",copy:"Questionnaires, interview summaries, and printed facility maps from the eight-person Quality of Life in Shanghai project.",note:"Ask residents before drawing the route."},
     notebook:{meta:"FIELD LOG / SOCIAL FUTURES LAB",title:"Cases, principles, relevance.",copy:"Small observations recorded before the survey responses were normalized and moved into the Pandas pipeline.",note:"Do not smooth away disagreement."},
@@ -77,27 +75,67 @@ function DrawerScene({ onClose }:{ onClose:()=>void }) {
     envelope:{meta:"SEALED NOTE / RETURN CHANNEL",title:"For the printer, after six traces.",copy:"A routing envelope with the Lab 17 printer address and a field-transmission schedule written inside the flap.",note:"Next report: after Phase 02."},
   };
   const item = selected ? fileCopy[selected] : null;
-  const pullEnd = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    if (startY.current!==null && event.clientY-startY.current>18) setOpen(true);
-    startY.current = null;
-  };
   return <div className="modal-layer tactile-layer drawer-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Desk drawer close-up" onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>02</span><strong>DESK DRAWER / PULL TO OPEN</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
-      <div className={`drawer-photo-stage ${open?"drawer-open":""}`}>
-        <img src="/lab-drawer-open.png" alt="An open wooden drawer containing a folder, notebook, electronics pouch, and envelope" />
-        <div className="drawer-dark" />
-        <button className="drawer-front" onClick={() => setOpen(true)} onPointerDown={(event) => { startY.current=event.clientY; event.currentTarget.setPointerCapture(event.pointerId); }} onPointerUp={pullEnd}><i /><span>{open?"DRAWER OPEN":"GRAB HANDLE AND PULL DOWN"}</span></button>
-        {open&&<div className="drawer-hotspots">
-          <button className="drawer-hit hit-folder" onClick={() => setSelected("folder")}><span>PROJECT FOLDER</span></button>
-          <button className="drawer-hit hit-notebook" onClick={() => setSelected("notebook")}><span>FIELD NOTEBOOK</span></button>
-          <button className="drawer-hit hit-components" onClick={() => setSelected("components")}><span>COMPONENT POUCH</span></button>
-          <button className="drawer-hit hit-envelope" onClick={() => setSelected("envelope")}><span>SEALED ENVELOPE</span></button>
-        </div>}
-      </div>
+      <ZoneCloseup3D zone="drawer" onSelect={(item) => { if(["folder","notebook","components","envelope"].includes(item))setSelected(item as DrawerFile); }} />
       {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><article onMouseDown={(event) => event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p><blockquote>{item.note}</blockquote><button onClick={() => setSelected(null)}>PUT IT BACK ×</button></article></div>}
     </section>
   </div>;
+}
+
+type NotebookItem = "research"|"margin"|"diagram";
+
+function NotebookScene({onClose}:{onClose:()=>void}) {
+  const [selected,setSelected]=useState<NotebookItem|null>(null);
+  const [reverse,setReverse]=useState(false);
+  const pages:Record<NotebookItem,{meta:string;title:string;copy:string;note:string}>={
+    research:{meta:"UW SOCIAL FUTURES LAB / PAGE 17",title:"How do principles shape perceived relevance?",copy:"Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation.",note:"Research first. Ask people next. Leave room for the answer to stay complicated."},
+    margin:{meta:"PERSONAL MARGIN / IN RED",title:"Sounding certain is not the same as understanding.",copy:"A reminder written sideways beside the analysis: uncertainty can be an honest result, not an unfinished performance.",note:"Do not smooth away disagreement."},
+    diagram:{meta:"FIELD INSERT / SIGNAL PATH",title:"A diagram made before the clean version.",copy:"Question, observation, model, test, correction. The arrows loop backward because the first answer is rarely the last useful one.",note:"Ask what the model leaves out."},
+  };
+  const page=selected?pages[selected]:null;
+  return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Research notebook close-up" onMouseDown={(event)=>event.stopPropagation()}>
+    <header><div><span>03</span><strong>RESEARCH BOOK / INSPECT A PAGE</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+    <ZoneCloseup3D zone="notebook" onSelect={(item)=>{if(["research","margin","diagram"].includes(item)){setSelected(item as NotebookItem);setReverse(false);}}}/>
+    {page&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><button className={`notebook-closeup ${reverse?"turned":""}`} onMouseDown={(event)=>event.stopPropagation()} onClick={()=>setReverse((value)=>!value)}><small>{reverse?"REVERSE / PERSONAL MARGIN":page.meta}</small><h2>{reverse?page.note:page.title}</h2><p>{reverse?"A note added after the rest of the page, once the neat explanation had stopped being enough.":page.copy}</p><span>{reverse?"TURN BACK ↶":"TURN THE PAGE ↷"}</span></button></div>}
+  </section></div>;
+}
+
+const boardNotes=[
+  {label:"research first, ask people next",title:"Questions before conclusions.",copy:"Collect context, then talk to the people inside the problem."},
+  {label:"TODO: overthink less",title:"Momentum is also evidence.",copy:"Thinking carefully matters. So does eventually testing the thought."},
+  {label:"backup route B",title:"Preparation creates freedom.",copy:"A Plan B is not pessimism; it is permission to continue."},
+  {label:"I do not know yet",title:"Uncertainty is a valid state.",copy:"Not every question needs to be converted into a confident answer."},
+  {label:"make it useful before impressive",title:"Usefulness before spectacle.",copy:"The interface should help a person do something—not only prove it was difficult to build."},
+];
+
+function BoardScene({onClose}:{onClose:()=>void}) {
+  const [selected,setSelected]=useState<number|null>(null);
+  const note=selected===null?null:boardNotes[selected];
+  return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Bulletin board close-up" onMouseDown={(event)=>event.stopPropagation()}>
+    <header><div><span>05</span><strong>NOTE BOARD / FOLLOW THE THREADS</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+    <ZoneCloseup3D zone="board" onSelect={(item)=>{const index=Number(item);if(boardNotes[index])setSelected(index);}}/>
+    {note&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card note-card" onMouseDown={(event)=>event.stopPropagation()}><small>PINNED MARGIN / {String((selected??0)+1).padStart(2,"0")}</small><h2>{note.title}</h2><blockquote>{note.label}</blockquote><p>{note.copy}</p><button onClick={()=>setSelected(null)}>PIN IT BACK ×</button></article></div>}
+  </section></div>;
+}
+
+type FieldItem="internship"|"target"|"ticket"|"draft";
+const fieldItems:Record<FieldItem,{meta:string;title:string;copy:string;tags?:string[]}>={
+  internship:{meta:"THERMO FISHER SCIENTIFIC / SHANGHAI",title:"Vision, motion, and laboratory workflows.",copy:"Software engineering across YOLO26 vision, ROS2 robot-arm motion, 3500Dx testing, QANTIS workflow analysis, and technical onboarding.",tags:["JUN 2026 — PRESENT","SOFTWARE ENGINEERING"]},
+  target:{meta:"ARCHERY / GROUPING STUDY",title:"Prepare. Focus. Release. Adjust.",copy:"The same pattern appears in the project notes, usually with fewer holes in the paper."},
+  ticket:{meta:"DESTINATION / SMEARED",title:"Outbound confirmed. Return left blank.",copy:"A detailed Plan A is folded behind it. Plan B is written on the reverse. Neither explains four quiet days."},
+  draft:{meta:"FIELD DESK / WORKFLOW DRAFTS",title:"The clean diagram came later.",copy:"Three rough workflow sheets connect camera input, robot motion, instrument checks, and the points where a person needs to intervene."},
+};
+
+function FieldCaseScene({onClose}:{onClose:()=>void}) {
+  const [selected,setSelected]=useState<FieldItem|null>(null);
+  const item=selected?fieldItems[selected]:null;
+  return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Field case close-up" onMouseDown={(event)=>event.stopPropagation()}>
+    <header><div><span>06</span><strong>FIELD CASE / INSPECT THE DESK</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+    <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(["internship","target","ticket","draft"].includes(value))setSelected(value as FieldItem);}}/>
+    {item&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p>{item.tags&&<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div>}<button onClick={()=>setSelected(null)}>RETURN TO CASE ×</button></article></div>}
+  </section></div>;
 }
 
 export default function VersionThree() {
@@ -109,9 +147,6 @@ export default function VersionThree() {
   const [computerFile,setComputerFile] = useState<ComputerFile>("desktop");
   const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
   const [bulletin,setBulletin] = useState(false);
-  const [noteTurned,setNoteTurned] = useState(false);
-  const [activeNote,setActiveNote] = useState(0);
-  const [fieldItem,setFieldItem] = useState<"internship"|"target"|"ticket">("internship");
   const [faxOpen,setFaxOpen] = useState(false);
 
   const inspect = useCallback((zone: ZoneId) => {
@@ -217,23 +252,22 @@ export default function VersionThree() {
                   <button className={selectedComputerFile==="projects"?"selected":""} onClick={() => setSelectedComputerFile("projects")} onDoubleClick={() => openComputerFile("projects")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("projects"); }}><i className="folder-icon" /><span>PROJECTS</span></button>
                   <button className={selectedComputerFile==="experience"?"selected":""} onClick={() => setSelectedComputerFile("experience")} onDoubleClick={() => openComputerFile("experience")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("experience"); }}><i className="folder-icon" /><span>EXPERIENCE</span></button>
                   <button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("research"); }}><i className="file-icon" /><span>FIELD_NOTES.md</span></button>
-                  <p className="desktop-hint">SINGLE CLICK TO SELECT / DOUBLE CLICK TO OPEN</p>
-                  <div className="desktop-welcome"><small>WELCOME / GUEST</small><h2>Wenrui<br />(Alina) Wu</h2><p>Computer Science at the University of Washington. Code, physical systems, and questions about the people around them.</p></div>
+                  <div className="desktop-welcome"><small>WELCOME / GUEST</small><h2>Alina</h2><p>Computer Science at the University of Washington. Code, physical systems, and questions about the people around them.</p></div>
                 </div>}
 
                 {computerFile==="about"&&<article className="os-window text-file"><header><span>ABOUT.txt</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>PROFILE / LAST SAVED RECENTLY</small><h2>I build with code,<br />then look closely at<br />what it meets.</h2><p>Computer science gives me a way to break problems apart. Psychology keeps the human parts from becoming too simple. I collect information before choosing a route, but I try not to confuse preparation with certainty.</p><blockquote>“I do not know yet” is allowed here.</blockquote></div></article>}
 
-                {computerFile==="projects"&&<article className="os-window folder-window"><header><span>PROJECTS / 3 ITEMS · DOUBLE CLICK TO OPEN</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div className="file-list">{projectFiles.map((file) => <button className={selectedComputerFile===file.id?"selected":""} key={file.id} onClick={() => setSelectedComputerFile(file.id)} onDoubleClick={() => openComputerFile(file.id)} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile(file.id); }}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span><b>DOUBLE CLICK</b></button>)}</div></article>}
+                {computerFile==="projects"&&<article className="os-window folder-window"><header><span>PROJECTS / 3 ITEMS</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div className="file-list">{projectFiles.map((file) => <button className={selectedComputerFile===file.id?"selected":""} key={file.id} onClick={() => setSelectedComputerFile(file.id)} onDoubleClick={() => openComputerFile(file.id)} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile(file.id); }}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span></button>)}</div></article>}
 
                 {desktopFile&&<article className="os-window project-window"><header><button onClick={() => setComputerFile("projects")}>← PROJECTS</button><span>{desktopFile.name}</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>{desktopFile.meta}</small><h2>{desktopFile.title}</h2><p>{desktopFile.copy}</p><div>{desktopFile.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><button className="run-file">CASE FILE / VERIFIED</button></div></article>}
 
-                {computerFile==="experience"&&<article className="os-window experience-window"><header><span>EXPERIENCE / 2 ITEMS · DOUBLE CLICK TO OPEN</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")}><span>01 / RESEARCH</span><strong>UW Social Futures Lab</strong><small>APR 2026 — PRESENT</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")}><span>02 / INTERNSHIP</span><strong>Thermo Fisher Scientific</strong><small>JUN 2026 — PRESENT</small></button></div></article>}
+                {computerFile==="experience"&&<article className="os-window experience-window"><header><span>EXPERIENCE / 2 ITEMS</span><button onClick={() => openComputerFile("desktop")}>—</button></header><div><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")}><span>01 / RESEARCH</span><strong>UW Social Futures Lab</strong><small>APR 2026 — PRESENT</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")}><span>02 / INTERNSHIP</span><strong>Thermo Fisher Scientific</strong><small>JUN 2026 — PRESENT</small></button></div></article>}
 
                 {computerFile==="research"&&<article className="os-window text-file"><header><button onClick={() => setComputerFile("experience")}>← EXPERIENCE</button><span>SOCIAL_FUTURES_LAB.md</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>UNDERGRADUATE RESEARCH / UW</small><h2>How do principles shape perceived relevance?</h2><p>Analyzing how agreement on principles affects perceived relevance between cases through surveys, normalized data, and Pandas-based CSV pipelines.</p><blockquote>STATUS: the relationship is still under investigation.</blockquote></div></article>}
 
                 {computerFile==="internship"&&<article className="os-window text-file"><header><button onClick={() => setComputerFile("experience")}>← EXPERIENCE</button><span>THERMO_FISHER.log</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI</small><h2>Vision, motion, and laboratory workflows.</h2><p>Work across YOLO26 computer vision, ROS2 robot-arm motion, 3500Dx scientific-software testing, QANTIS workflow analysis, and technical onboarding.</p><blockquote>JUNE 2026 — PRESENT</blockquote></div></article>}
 
-                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>Alina has not checked in.</strong><p>Wenrui “Alina” Wu has been offline for four days. Her computer continues to sync, but no new lab entry has been recorded.</p><small>Why is this appearing on a portfolio computer?</small></div>
+                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>No new check-in from Alina.</strong><p>This workstation is still syncing, but no new lab entry has been recorded here for four days.</p><small>Why is this appearing on a portfolio computer?</small></div>
               </main>
               <footer className="os-taskbar"><button onClick={() => setComputerFile("desktop")}>AW</button><span>LOCAL FILES</span><span>{bulletin?"1 UNREAD BULLETIN":"NO NEW ALERTS"}</span></footer>
             </div>
@@ -242,23 +276,10 @@ export default function VersionThree() {
       )}
 
       {active==="drawer"&&<DrawerScene onClose={() => setActive(null)} />}
+      {active==="notebook"&&<NotebookScene onClose={() => setActive(null)} />}
       {active==="books"&&<BookshelfScene onClose={() => setActive(null)} />}
-
-      {active&&active!=="computer"&&active!=="drawer"&&active!=="books"&&(
-        <div className={`modal-layer object-layer object-${active}`} onMouseDown={() => setActive(null)}>
-          <section className="object-view" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => event.stopPropagation()}>
-            <header><div><span>{zoneInfo[active].index}</span><strong id="object-title">{zoneInfo[active].label}</strong></div><button onClick={() => setActive(null)}>RETURN TO ROOM ×</button></header>
-
-            {active==="notebook"&&<button className={`notebook-closeup ${noteTurned?"turned":""}`} onClick={() => setNoteTurned((value) => !value)}><small>{noteTurned?"REVERSE / PERSONAL MARGIN":"UW SOCIAL FUTURES LAB / PAGE 17"}</small><h2>{noteTurned?"Sounding certain is not the same as understanding.":"How do principles shape perceived relevance?"}</h2><p>{noteTurned?"Research first. Ask people next. Leave room for the answer to stay complicated.":"Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation."}</p><span>{noteTurned?"TURN BACK ↺":"TURN THE PAGE ↻"}</span></button>}
-
-            {active==="board"&&<div className="board-closeup"><div className="board-notes">{["research first, ask people next","TODO: overthink less","backup route B","I do not know yet","make it useful before impressive"].map((note,index) => <button className={activeNote===index?"selected":""} onClick={() => setActiveNote(index)} key={note}>{note}</button>)}</div><article><small>SELECTED MARGIN / {String(activeNote+1).padStart(2,"0")}</small><h2>{["Questions before conclusions.","Momentum is also evidence.","Preparation creates freedom.","Uncertainty is a valid state.","Usefulness before spectacle."][activeNote]}</h2><p>{["Collect context, then talk to the people inside the problem.","Thinking carefully matters. So does eventually testing the thought.","A Plan B is not pessimism; it is permission to continue.","Not every question needs to be converted into a confident answer.","The interface should help a person do something—not only prove it was difficult to build."][activeNote]}</p></article></div>}
-
-            {active==="fieldcase"&&<div className="fieldcase-closeup"><div className="case-inventory"><button className={fieldItem==="internship"?"selected":""} onClick={() => setFieldItem("internship")}><i className="work-card" /><span>WORK CARD</span></button><button className={fieldItem==="target"?"selected":""} onClick={() => setFieldItem("target")}><i className="case-target" /><span>USED TARGET</span></button><button className={fieldItem==="ticket"?"selected":""} onClick={() => setFieldItem("ticket")}><i className="travel-ticket" /><span>RETURN TICKET?</span></button></div><article>{fieldItem==="internship"&&<><small>THERMO FISHER SCIENTIFIC / SHANGHAI</small><h2>Vision, motion, and laboratory workflows.</h2><p>Software engineering across YOLO26 vision, ROS2 robot-arm motion, 3500Dx testing, QANTIS workflow analysis, and technical onboarding.</p><div className="object-tags"><span>JUN 2026 — PRESENT</span><span>SOFTWARE ENGINEERING</span></div></>}{fieldItem==="target"&&<><small>ARCHERY / GROUPING STUDY</small><h2>Prepare. Focus.<br />Release. Adjust.</h2><p>The same pattern appears in the project notes, usually with fewer holes in the paper.</p></>}{fieldItem==="ticket"&&<><small>DESTINATION / SMEARED</small><h2>Outbound confirmed.<br />Return left blank.</h2><p>A detailed Plan A is folded behind it. Plan B is written on the reverse. Neither explains four quiet days.</p></>}</article></div>}
-
-            <footer className="object-log"><span>ROOM LOG / RECOVERED</span><p>{zoneInfo[active].log}</p></footer>
-          </section>
-        </div>
-      )}
+      {active==="board"&&<BoardScene onClose={() => setActive(null)} />}
+      {active==="fieldcase"&&<FieldCaseScene onClose={() => setActive(null)} />}
 
       {faxOpen&&(
         <div className="modal-layer fax-layer" onMouseDown={() => setFaxOpen(false)}>

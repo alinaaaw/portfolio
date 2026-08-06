@@ -2,7 +2,7 @@
 
 ## Product idea
 
-Version 3 is a lightweight photographic 2.5D portfolio set inside Alina's late-night creative
+Version 3 is a lightweight 3D portfolio set inside Alina's late-night creative
 laboratory. Visitors remain inside one coherent room, look around by dragging,
 and click physical objects to move closer and open dedicated interfaces.
 
@@ -33,24 +33,25 @@ suggests an off-site route, and the final recovered message resolves the story.
 ## Visual language
 
 - Match the social cover's realistic, cinematic late-night laboratory mood.
-- Use photoreal room and object-close-up imagery, practical task lighting,
-  deep natural shadows, subtle parallax, and a restrained film-grain overlay.
+- Use procedural 3D geometry, physical materials, practical task lighting,
+  atmospheric fog, shadows, and a restrained film-grain overlay.
 - Compose the room as a dense, used workspace: computer, instruments, circuits,
   cables, notebooks, papers, glassware, lamps, and personal objects should share
   surfaces instead of reading as isolated exhibits.
 - Deep green-black surfaces frame warm wood and paper evidence.
 - Signal lime means navigable; cyan means recovered; coral means anomaly.
-- Keep the interface sparse, editorial, and readable over the photographic world.
+- Keep the interface sparse, editorial, and readable over the 3D world.
 - Avoid police branding, horror, violence, generic dashboards, and cartoon game UI.
 
 ## Interaction and accessibility
 
 - Desktop supports drag-to-look, hover feedback, and click-to-inspect.
-- Clicking an object triggers a smooth photographic push-in transition.
-- The computer becomes a full-screen operating system; other objects become
-  tactile close-ups with nested interactions: pull the drawer before selecting
-  a file, or pull a physical book before opening and turning its pages.
-- A direct room index exposes every section without requiring spatial navigation.
+- Clicking an object triggers a smooth, temporarily locked camera transition.
+- The computer becomes a full-screen operating system. The other five stations
+  first become explorable Three.js close-ups in the same modeled language as the
+  room, then reveal nested physical evidence: pull the drawer before selecting a
+  file, pull a book before turning its pages, or select a note, insert, or draft.
+- A direct room index exposes every section without requiring 3D navigation.
 - Dialogs close with Escape, a visible close button, or the backdrop.
 - Respect reduced-motion preferences and cap renderer pixel density.
 
