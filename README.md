@@ -1,38 +1,27 @@
-# Alina Portfolio — Version 1 Design
+# Observation Room — Version 4
 
-This branch contains only the **Personal Workbench** portfolio direction.
+Version 4 is an interactive psychological-experiment concept. Visitors make
+four small decisions while the interface gradually reveals the behavioral
+signals it is observing.
 
-## Open locally
+The experience describes a session rather than diagnosing a person. Timing,
+choice changes, pointer movement, and click marks exist only in browser memory
+and are never transmitted.
 
-Double-click `START-WEBSITE.cmd`. Keep the command window open while viewing
-the site, and press `Ctrl + C` when finished.
+## Branch
 
-Local address: <http://127.0.0.1:3000/>
+version4-design
 
-## Branch purpose
+## Local preview
 
-- Branch: `version1-design`
-- Design: editorial Personal Workbench
-- Status: active and independently editable
-- Version 2 is maintained separately in `version2-design`.
+Double-click START-WEBSITE.cmd, then open the local address printed in the
+terminal.
 
-## UI design source of truth
-
-Read `DESIGN.md` before making any UI or interaction change. It defines the
-required product hierarchy, visual language, interaction rules, content voice,
-responsive behavior, and accessibility checks for Version 1.
+Local address: http://127.0.0.1:3104/
 
 ## Main files
 
-```text
-app/page.tsx              Version 1 content and interactions
-app/layout.tsx            Version 1 metadata and page shell
-public/site.css           Version 1 visual design
-public/og.png             Version 1 social preview
-DESIGN.md                 Canonical UI and interaction rules
-VERSION-1.md              Design notes
-START-WEBSITE.cmd         Local launcher
-```
-
-Commit each meaningful change to this branch so earlier states remain
-available in Git history.
+- app/page.tsx — experiment flow, observations, and result trace
+- public/site.css — responsive observation-room visual system
+- app/layout.tsx — metadata and page shell
+- DESIGN.md — Version 4 experience rules

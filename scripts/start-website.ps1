@@ -1,16 +1,17 @@
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$nodeDirectory = Join-Path $projectRoot ".runtime\node-v22.14.0-win-x64"
+$desktopRoot = Split-Path -Parent (Split-Path -Parent $projectRoot)
+$nodeDirectory = Join-Path $desktopRoot "alina-portfolio-demo\.runtime\node-v22.14.0-win-x64"
 $npmCommand = Join-Path $nodeDirectory "npm.cmd"
 $devCommand = Join-Path $projectRoot "node_modules\.bin\vinext.cmd"
-$siteUrl = "http://127.0.0.1:3000/?v=version1"
+$siteUrl = "http://127.0.0.1:3104/?v=version4"
 
 try {
   $existingSite = Invoke-WebRequest -Uri $siteUrl -UseBasicParsing -TimeoutSec 2
   if ($existingSite.StatusCode -eq 200) {
     Start-Process $siteUrl
-    Write-Host "Alina Portfolio Version 1 is already running."
+    Write-Host "Observation Room Version 4 is already running."
     exit 0
   }
 } catch {
@@ -19,7 +20,7 @@ try {
 
 if (-not (Test-Path -LiteralPath $npmCommand)) {
   Write-Host "The portable website runtime is missing."
-  Write-Host "Please ask Codex to restore the local runtime for Version 1."
+  Write-Host "Please ask Codex to restore the local runtime for Version 4."
   exit 1
 }
 
@@ -39,10 +40,10 @@ Start-Process powershell.exe `
   -WindowStyle Hidden
 
 Write-Host ""
-Write-Host "ALINA PORTFOLIO - VERSION 1"
+Write-Host "OBSERVATION ROOM - VERSION 4"
 Write-Host "The browser will open automatically."
 Write-Host "Keep this window open while viewing the site."
 Write-Host "Press Ctrl+C when you are finished."
 Write-Host ""
 
-& $devCommand dev --hostname 127.0.0.1 --port 3000
+& $devCommand dev --hostname 127.0.0.1 --port 3104
