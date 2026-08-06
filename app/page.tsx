@@ -24,7 +24,7 @@ const zoneInfo: Record<ZoneId,{ index:string; label:string; hint:string; log:str
   notebook: { index:"03",label:"RESEARCH BOOK",hint:"TURN THE PAGE",log:"The research notebook separates observations from conclusions and leaves several conclusions unfinished." },
   books: { index:"04",label:"BOOKSHELF",hint:"PULL A BOOK",log:"The shelf connects algorithms, psychology, and travel—the subjects do not stay in separate categories." },
   board: { index:"05",label:"NOTE BOARD",hint:"READ THE MARGINS",log:"The board records how she works: research first, test the route, preserve a Plan B, then keep moving." },
-  fieldcase: { index:"06",label:"FIELD CASE",hint:"OPEN THE CASE",log:"The field case connects laboratory software, travel, and archery. One compartment is conspicuously empty." },
+  fieldcase: { index:"06",label:"FIELD CASE",hint:"PLAN THE NEXT ROUTE",log:"A rolling field station separates what happens next into NEXT, LATER, and MAYBE—alongside the equipment that can leave the lab." },
 };
 
 const projectFiles = [
@@ -55,10 +55,15 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
       {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
         <div className={`physical-book ${reverse?"reverse":""}`} onMouseDown={(event) => event.stopPropagation()}>
           <div className="book-pages">
-            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{reverse?selected.note:selected.heading}</h2><p>{reverse?"A note in the back margin, written after the rest of the page.":selected.copy}</p><i className="page-lines" /></article>
-            <button className="book-page book-page-right" onClick={() => setReverse((value) => !value)} aria-label="Turn book page"><span className="sticky-tab">FIELD NOTE</span><small>{reverse?"RETURN / PAGE 42":"ANNOTATION / PAGE 41"}</small><blockquote>{reverse?selected.copy:selected.note}</blockquote><b>{reverse?"TURN BACK ↶":"TURN PAGE ↷"}</b></button>
+            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{selected.heading}</h2><p>{selected.copy}</p><i className="page-lines" /></article>
+            <article className="book-page book-page-right book-page-under"><small>REFERENCE / CONTINUED</small><h2>{selected.title}</h2><p>{selected.copy}</p><blockquote>{selected.note}</blockquote></article>
+            <div className="book-turning-sheet" aria-hidden="true">
+              <div className="turn-face turn-front book-page"><span className="sticky-tab">FIELD NOTE</span><small>ANNOTATION / PAGE 41</small><blockquote>{selected.note}</blockquote></div>
+              <div className="turn-face turn-back book-page"><small>MARGIN / PAGE 42</small><h2>{selected.title}</h2><p>{selected.note}</p><p>A note added after the main text, once the clean explanation had stopped being enough.</p></div>
+            </div>
             <div className="book-spine" />
           </div>
+          <button className="book-page-control" onClick={() => setReverse((value) => !value)} aria-label={reverse?"Turn back one page":"Turn to the next page"}>{reverse?"← TURN BACK":"TURN PAGE →"}</button>
           <button className="close-book" onClick={() => setSelected(null)}>RETURN BOOK TO SHELF ×</button>
         </div>
       </div>}
@@ -123,16 +128,16 @@ function BoardScene({onClose}:{onClose:()=>void}) {
 type FieldItem="internship"|"target"|"ticket"|"draft";
 const fieldItems:Record<FieldItem,{meta:string;title:string;copy:string;tags?:string[]}>={
   internship:{meta:"THERMO FISHER SCIENTIFIC / SHANGHAI",title:"Vision, motion, and laboratory workflows.",copy:"Software engineering across YOLO26 vision, ROS2 robot-arm motion, 3500Dx testing, QANTIS workflow analysis, and technical onboarding.",tags:["JUN 2026 — PRESENT","SOFTWARE ENGINEERING"]},
-  target:{meta:"ARCHERY / GROUPING STUDY",title:"Prepare. Focus. Release. Adjust.",copy:"The same pattern appears in the project notes, usually with fewer holes in the paper."},
-  ticket:{meta:"DESTINATION / SMEARED",title:"Outbound confirmed. Return left blank.",copy:"A detailed Plan A is folded behind it. Plan B is written on the reverse. Neither explains four quiet days."},
-  draft:{meta:"FIELD DESK / WORKFLOW DRAFTS",title:"The clean diagram came later.",copy:"Three rough workflow sheets connect camera input, robot motion, instrument checks, and the points where a person needs to intervene."},
+  target:{meta:"ARCHERY PAPER / GROUPING STUDY",title:"Prepare. Focus. Release. Adjust.",copy:"A used paper target, folded into the field case rather than mounted like a shield. The same test-and-adjust rhythm appears throughout the project notes."},
+  ticket:{meta:"FIELD ROUTE / RETURN FLEXIBLE",title:"Outbound confirmed. Return left open.",copy:"The route is planned, but the return date stays flexible until the next outdoor experiment closes."},
+  draft:{meta:"FIELD PLANNING / NEXT · LATER · MAYBE",title:"A route for what comes next.",copy:"NEXT: repeat outdoor EMG tests. LATER: refine the classifier and document the robot workflow. MAYBE: leave one slot open for a question that has not been chosen yet."},
 };
 
 function FieldCaseScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<FieldItem|null>(null);
   const item=selected?fieldItems[selected]:null;
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Field case close-up" onMouseDown={(event)=>event.stopPropagation()}>
-    <header><div><span>06</span><strong>FIELD CASE / INSPECT THE DESK</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+    <header><div><span>06</span><strong>FIELD CASE / FUTURE ROUTES</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
     <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(["internship","target","ticket","draft"].includes(value))setSelected(value as FieldItem);}}/>
     {item&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p>{item.tags&&<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div>}<button onClick={()=>setSelected(null)}>RETURN TO CASE ×</button></article></div>}
   </section></div>;
@@ -149,6 +154,17 @@ function PrinterScene({onClose}:{onClose:()=>void}) {
   </div>;
 }
 
+function ContactScene({onClose}:{onClose:()=>void}) {
+  const [cardOpen,setCardOpen]=useState(true);
+  return <div className="modal-layer tactile-layer contact-layer" onMouseDown={onClose}>
+    <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Contact card beside the lab printer" onMouseDown={(event)=>event.stopPropagation()}>
+      <header><div><span>CT</span><strong>PRINTER DESK / CONTACT CARD</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+      <ZoneCloseup3D zone="contact" onSelect={(item)=>{if(item==="contact")setCardOpen(true);}} />
+      {cardOpen&&<div className="contact-reading" onMouseDown={()=>setCardOpen(false)}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>WENRUI “ALINA” WU</small><h2>Let&apos;s continue<br />the conversation.</h2><p>Computer Science · University of Washington</p><a href="mailto:awu78@uw.edu">awu78@uw.edu <span>→</span></a><button onClick={()=>setCardOpen(false)}>RETURN CARD TO DESK ×</button></article></div>}
+    </section>
+  </div>;
+}
+
 export default function VersionThree() {
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
@@ -159,6 +175,7 @@ export default function VersionThree() {
   const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
   const [bulletin,setBulletin] = useState(false);
   const [faxOpen,setFaxOpen] = useState(false);
+  const [contactOpen,setContactOpen] = useState(false);
 
   const inspect = useCallback((zone: ZoneId) => {
     setActive(zone);
@@ -174,7 +191,7 @@ export default function VersionThree() {
   useEffect(() => {
     const close = (event:KeyboardEvent) => {
       if (event.key!=="Escape") return;
-      setActive(null); setIndexOpen(false); setFaxOpen(false);
+      setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false);
     };
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
@@ -201,12 +218,12 @@ export default function VersionThree() {
     <main className={`room-shell ${entered?"room-entered":""}`}>
       <header className="room-nav">
         <button className="room-brand" onClick={() => setIndexOpen(true)}>ALINA.WU <span>/ LAB 17</span></button>
-        <nav><button onClick={() => setIndexOpen(true)}>QUICK INDEX</button><a href="mailto:hello@example.com">CONTACT</a></nav>
+        <nav><button onClick={() => setIndexOpen(true)}>QUICK INDEX</button><button onClick={() => setContactOpen(true)}>CONTACT</button></nav>
         <div className="room-count"><i /> {String(discovered.length).padStart(2,"0")}/06 FOUND</div>
       </header>
 
       <section className="room-viewport" aria-label="Interactive personal laboratory">
-        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen} viewing={active} discovered={discovered} faxReady={solved} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
+        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
         <div className="room-grain" aria-hidden="true" />
         <div className="room-vignette" aria-hidden="true" />
 
@@ -293,6 +310,7 @@ export default function VersionThree() {
       {active==="fieldcase"&&<FieldCaseScene onClose={() => setActive(null)} />}
 
       {faxOpen&&<PrinterScene onClose={()=>setFaxOpen(false)} />}
+      {contactOpen&&<ContactScene onClose={()=>setContactOpen(false)} />}
     </main>
   );
 }

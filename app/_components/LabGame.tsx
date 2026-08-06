@@ -259,6 +259,13 @@ function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
   note.position.set(.15,1.64,-.44);
   note.rotation.y = -.18;
   desk.add(note);
+  const contactCard = box(1.05,.018,.58,palette.paper,.92,.01);
+  contactCard.position.set(1.32,1.64,.58);
+  contactCard.rotation.y = -.12;
+  const cardAccent = box(.05,.012,.46,palette.red,.7,.02);
+  cardAccent.position.set(.92,1.66,.63);
+  cardAccent.rotation.y = -.12;
+  desk.add(contactCard,cardAccent);
   addCable(scene,[[-5.9,1.7,-5.8],[-5.25,1.67,-5.25],[-4.4,1.63,-5.6],[-3.5,1.58,-5.2]],palette.red,.022);
 }
 
@@ -406,15 +413,13 @@ function buildFieldCase(scene: THREE.Scene) {
   lid.position.set(0,1.52,-.9);
   lid.rotation.x = -1.08;
   group.add(base,lid);
-  const target = new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,.06,48),material(palette.paper));
-  target.rotation.x = Math.PI/2;
+  const target = box(1.42,.025,1.42,palette.paper,.96,.01);
   target.position.set(-.85,1.02,.05);
   group.add(target);
-  [.53,.35,.17].forEach((radius,index) => {
-    const colors = [0x507b78,0xcab65b,palette.red];
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,.065,40),material(colors[index]));
-    ring.rotation.x = Math.PI/2;
-    ring.position.set(-.85,1.02,.09+index*.01);
+  ([[.53,.41,0x507b78],[.4,.28,0xcab65b],[.27,.14,palette.red]] as const).forEach(([outer,inner,color]) => {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(inner,outer,40),material(color));
+    ring.rotation.x = -Math.PI/2;
+    ring.position.set(-.85,1.04,.05);
     group.add(ring);
   });
   const ticket = box(1.15,.035,.58,0xcbbb82);
@@ -425,6 +430,12 @@ function buildFieldCase(scene: THREE.Scene) {
   card.position.set(.82,1.05,-.58);
   card.rotation.y = .12;
   group.add(card);
+  for(let index=0;index<3;index+=1){
+    const task=box(.46,.025,.52,[0xd7cba9,0xb8d5cc,palette.signal][index]);
+    task.position.set(.52+index*.5,1.04,.62);
+    task.rotation.y=-.08+index*.06;
+    group.add(task);
+  }
   group.children.forEach((item) => { item.position.y += .62; });
   const cartTop = box(3.75,.16,2.5,0x303a36,.38,.62);
   cartTop.position.y = .58;

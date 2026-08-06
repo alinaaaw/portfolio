@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
-export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer";
+export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
 
 type Props = {
   zone: CloseupZone;
@@ -85,26 +85,37 @@ function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number
   }
   const hingeLeft=cylinder(.07,.26,0x1b2220,16); hingeLeft.rotation.z=Math.PI/2; hingeLeft.position.set(-1.22,1.72,-1.02);
   const hingeRight=hingeLeft.clone(); hingeRight.position.x=1.22; printer.add(hingeLeft,hingeRight);
-  const paperGroup=new THREE.Group();
-  paperGroup.userData.faxPaperGroup=withFax;
-  paperGroup.position.set(0,.88,1.28);
-  paperGroup.scale.z=withFax ? .035 : 1;
-  const paper=roundedBox(2.3,.035,3.05,palette.paper,.025,.96,.01); paper.position.set(0,0,1.46); paper.rotation.x=.025;
-  paperGroup.add(paper);
-  for(let line=0;line<11;line+=1){
-    const mark=box(line===0?1.55:1.75-(line%3)*.18,.018,.025,line===0?palette.red:0x65736d,.7,.02);
-    mark.position.set(-.12,.04,.42+line*.2); paperGroup.add(mark);
-  }
-  const stamp=new THREE.Mesh(new THREE.RingGeometry(.25,.3,28),mat(palette.red,.7,.02)); stamp.rotation.x=-Math.PI/2; stamp.position.set(.67,.055,2.42); paperGroup.add(stamp);
+  let paperGroup:THREE.Group|undefined;
   if(withFax&&hits){
+    paperGroup=new THREE.Group();
+    paperGroup.userData.faxPaperGroup=true;
+    paperGroup.position.set(0,.88,1.28);
+    paperGroup.scale.z=.035;
+    const paper=roundedBox(2.3,.035,3.05,palette.paper,.025,.96,.01); paper.position.set(0,0,1.46); paper.rotation.x=.025;
+    paperGroup.add(paper);
+    for(let line=0;line<11;line+=1){
+      const mark=box(line===0?1.55:1.75-(line%3)*.18,.018,.025,line===0?palette.red:0x65736d,.7,.02);
+      mark.position.set(-.12,.04,.42+line*.2); paperGroup.add(mark);
+    }
+    const stamp=new THREE.Mesh(new THREE.RingGeometry(.25,.3,28),mat(palette.red,.7,.02)); stamp.rotation.x=-Math.PI/2; stamp.position.set(.67,.055,2.42); paperGroup.add(stamp);
     const paperHit=hitBox("fax","READ PRINTED FIELD REPORT",[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
     paperGroup.add(paperHit); hits.push(paperHit);
+    printer.add(paperGroup);
   }
-  printer.add(paperGroup);
   printer.position.set(...position);
   printer.scale.setScalar(scale);
   parent.add(printer);
   return {printer,paperGroup,body,screen};
+}
+
+function addContactCard(parent:THREE.Object3D,position:[number,number,number],rotation=-.08,hits?:HitMesh[]) {
+  const card=roundedBox(2.55,.045,1.45,0xe5dcc6,.055,.92,.01);
+  card.position.set(...position); card.rotation.y=rotation; parent.add(card);
+  const accent=box(.12,.025,1.16,palette.red,.7,.02); accent.position.set(position[0]-.93,position[1]+.045,position[2]); accent.rotation.y=rotation; parent.add(accent);
+  const nameLine=box(1.15,.025,.055,0x283f3a,.72,.02); nameLine.position.set(position[0]-.12,position[1]+.05,position[2]-.32); nameLine.rotation.y=rotation; parent.add(nameLine);
+  for(let line=0;line<3;line+=1){const detail=box(1.25-line*.14,.018,.028,0x6e7c75,.72,.02);detail.position.set(position[0]-.06,position[1]+.05,position[2]+.02+line*.18);detail.rotation.y=rotation;parent.add(detail);}
+  if(hits){const hit=hitBox("contact","OPEN CONTACT CARD",[2.8,.55,1.75],position,[card]);hit.rotation.y=rotation;parent.add(hit);hits.push(hit);}
+  return card;
 }
 
 function addLines(parent:THREE.Object3D,x:number,y:number,z:number,width:number,count:number,vertical=false) {
@@ -117,57 +128,53 @@ function addLines(parent:THREE.Object3D,x:number,y:number,z:number,width:number,
 
 function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const shelf = new THREE.Group();
-  const back = box(7.2,5.1,.18,0x32231b,.92,.02);
-  back.position.set(0,2.55,-.55);
-  const sideL = box(.3,5.5,1.5,palette.wood,.86,.03);
-  sideL.position.set(-3.65,2.55,0);
-  const sideR = sideL.clone(); sideR.position.x=3.65;
-  shelf.add(back,sideL,sideR);
-  for (const y of [.15,2.25,4.55]) {
-    const board = box(7.5,.22,1.55,palette.woodLight,.84,.03);
-    board.position.set(0,y,0);
-    shelf.add(board);
-  }
+  const wall=box(11,6,.18,0x18201e,.96,.03);wall.position.set(0,3,-1.05);scene.add(wall);
+  const back = roundedBox(8.25,4.55,.22,0x32231b,.08,.92,.02);
+  back.position.set(0,2.45,-.48);
+  const sideL = roundedBox(.34,4.9,1.75,palette.wood,.08,.86,.03);
+  sideL.position.set(-4.18,2.45,0);
+  const sideR = sideL.clone(); sideR.position.x=4.18;
+  const base=roundedBox(8.7,.28,1.78,palette.woodLight,.08,.82,.04);base.position.set(0,.25,0);
+  const top=roundedBox(8.7,.24,1.78,palette.wood,.08,.84,.03);top.position.set(0,4.72,0);
+  const frontLip=roundedBox(8.55,.16,.16,0x4a3225,.045,.78,.04);frontLip.position.set(0,.4,.82);
+  shelf.add(back,sideL,sideR,base,top,frontLip);
   const colors=[0x28504a,0x854b3d,0xb29145,0x33473f,0xd0c4a5,0x334d65];
   const labels=["Fair Allocation","Walking Distance","Signals in Motion","Human Systems","Relevance","Field Routes"];
   for (let index=0;index<6;index+=1) {
     const group=new THREE.Group();
-    const height=1.5+(index%3)*.16;
-    const width=.72+(index%2)*.08;
-    const cover=roundedBox(width,height,.78,colors[index],.055,.7,.02);
+    const height=3.42+(index%3)*.22;
+    const width=.92+(index%2)*.12;
+    const cover=roundedBox(width,height,1.04,colors[index],.065,.7,.02);
     cover.position.y=height/2;
-    const pages=roundedBox(width-.12,height-.12,.67,0xd7cba9,.045,.93,.01);
-    pages.position.set(.04,height/2,.08);
-    const band=box(width+.02,.055,.81,index===2?palette.signal:0xbba980,.7,.02);
-    band.position.set(0,height*.7,.01);
-    group.add(cover,pages,band);
+    const pages=roundedBox(width-.13,height-.14,.91,0xd7cba9,.045,.93,.01);
+    pages.position.set(.035,height/2,.08);
+    const spine=roundedBox(.16,height-.12,1.08,colors[index],.05,.68,.02);spine.position.set(-width*.42,height/2,.01);
+    const band=box(width+.025,.07,1.08,index===2?palette.signal:0xbba980,.7,.02);
+    band.position.set(0,height*.72,.01);
+    group.add(cover,pages,spine,band);
+    for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.5,.025,.035,index===4?0x33443f:0xd7cba9,.75,.01);titleMark.position.set(.08,height*.56-mark*.18,.55);group.add(titleMark);}
     if(index===1||index===3||index===5){
-      const bookmark=box(.13,.36,.025,index===3?palette.signal:palette.red);
-      bookmark.position.set(width*.2,height+.13,.05);
+      const bookmark=box(.14,.52,.03,index===3?palette.signal:palette.red);
+      bookmark.position.set(width*.2,height+.2,.08);
       group.add(bookmark);
     }
-    group.position.set(-2.72+index*1.08,.27,.08);
-    group.rotation.z=(index-2.5)*.012;
+    group.position.set(-3.15+index*1.27,.43,.05);
+    group.rotation.z=[-.025,.015,-.018,.028,-.012,.022][index];
     shelf.add(group);
-    const hit=hitBox(String(index),labels[index],[width+.18,height+.25,1],[group.position.x,.27+height/2,.08],[cover,pages,band]);
+    const hit=hitBox(String(index),labels[index],[width+.22,height+.28,1.28],[group.position.x,.43+height/2,.05],[cover,pages,spine,band]);
     shelf.add(hit); hits.push(hit);
   }
-  for(let index=0;index<9;index+=1){
-    const filler=roundedBox(.48+(index%2)*.1,1.1+(index%3)*.1,.7,[0x594237,0x415954,0x82634a][index%3],.045);
-    filler.position.set(-3+index*.72,2.92+(index%2)*.05,0);
-    shelf.add(filler);
-  }
-  shelf.position.y=-.2;
   scene.add(shelf);
 }
 
 function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
-  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; scene.add(desk);
-  const frontEdge=roundedBox(9,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(0,2.03,2.26); scene.add(frontEdge);
+  const workspace=new THREE.Group();workspace.userData.drawerWorkspace=true;scene.add(workspace);
+  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; workspace.add(desk);
+  const frontEdge=roundedBox(9,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(0,2.03,2.26); workspace.add(frontEdge);
   for(const x of [-4.05,4.05]){
-    const leg=roundedBox(.3,2.05,.32,palette.metal,.06,.38,.7); leg.position.set(x,1.02,-1.7); scene.add(leg);
-    const foot=roundedBox(.72,.12,1.25,0x222927,.06,.38,.7); foot.position.set(x,.08,-1.7); scene.add(foot);
+    const leg=roundedBox(.3,2.05,.32,palette.metal,.06,.38,.7); leg.position.set(x,1.02,-1.7); workspace.add(leg);
+    const foot=roundedBox(.72,.12,1.25,0x222927,.06,.38,.7); foot.position.set(x,.08,-1.7); workspace.add(foot);
   }
 
   const cabinet=new THREE.Group();
@@ -176,7 +183,7 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   const cabinetTop=roundedBox(4.25,.18,3.55,palette.wood,.06,.86,.02); cabinetTop.position.set(-1,1.85,-.28);
   const cabinetBottom=roundedBox(4.25,.16,3.55,0x3c2a20,.05,.9,.02); cabinetBottom.position.set(-1,.2,-.28);
   const cabinetBack=box(4.25,1.58,.16,0x30231c,.94,.01); cabinetBack.position.set(-1,1.03,-1.98);
-  cabinet.add(sideLeft,sideRight,cabinetTop,cabinetBottom,cabinetBack); scene.add(cabinet);
+  cabinet.add(sideLeft,sideRight,cabinetTop,cabinetBottom,cabinetBack); workspace.add(cabinet);
 
   const tray=new THREE.Group();
   tray.userData.drawerTray=true;
@@ -207,14 +214,14 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual],true); tray.add(hit); hits.push(hit); });
   tray.position.set(-1,.05,-.36);
-  scene.add(tray);
+  workspace.add(tray);
 
-  buildPrinterModel(scene,[2.25,2.32,-.45],.62);
-  const paperStack=roundedBox(1.65,.12,1.32,palette.paper,.04,.94,.01); paperStack.position.set(2.25,2.43,1.25); paperStack.rotation.y=-.09; scene.add(paperStack);
-  const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); scene.add(mug);
-  const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); scene.add(lampBase);
-  const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); scene.add(lampStem);
-  const shade=new THREE.Mesh(new THREE.ConeGeometry(.42,.55,28,1,true),mat(0x202825,.36,.62)); shade.position.set(3.72,3.72,-1.2); shade.rotation.z=Math.PI; scene.add(shade);
+  buildPrinterModel(workspace,[2.25,2.32,-.45],.62);
+  addContactCard(workspace,[2.45,2.39,1.12],-.09);
+  const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); workspace.add(mug);
+  const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); workspace.add(lampBase);
+  const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); workspace.add(lampStem);
+  const shade=new THREE.Mesh(new THREE.ConeGeometry(.42,.55,28,1,true),mat(0x202825,.36,.62)); shade.position.set(3.72,3.72,-1.2); shade.rotation.z=Math.PI; workspace.add(shade);
 }
 
 function buildPrinter(scene:THREE.Scene,hits:HitMesh[]) {
@@ -226,6 +233,17 @@ function buildPrinter(scene:THREE.Scene,hits:HitMesh[]) {
   const monitorScreen=roundedBox(1.82,1.16,.03,0x153b38,.035,.18,.08); monitorScreen.position.set(-3,1.52,-1.02); monitorScreen.rotation.y=.13; scene.add(monitorScreen);
   const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.48,-1.1); note.rotation.y=-.12; scene.add(note);
   const pen=cylinder(.06,1.55,palette.red,14); pen.rotation.z=Math.PI/2; pen.position.set(3.1,.55,.25); scene.add(pen);
+}
+
+function buildContact(scene:THREE.Scene,hits:HitMesh[]) {
+  const wall=box(11,6,.2,0x18201e,.96,.03);wall.position.set(0,3,-2.8);scene.add(wall);
+  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04);desk.position.y=.18;scene.add(desk);
+  const deskMat=roundedBox(7.7,.035,3.85,0x243632,.05,.95,.02);deskMat.position.y=.38;scene.add(deskMat);
+  buildPrinterModel(scene,[-1.35,.42,-.55],.9);
+  addContactCard(scene,[2.25,.5,.65],-.12,hits);
+  const cardCase=roundedBox(3.15,.12,1.95,0x4a3428,.08,.72,.04);cardCase.position.set(2.25,.37,.65);cardCase.rotation.y=-.12;scene.add(cardCase);
+  const pen=cylinder(.06,1.6,palette.red,14);pen.rotation.z=Math.PI/2;pen.position.set(2.4,.56,-.55);scene.add(pen);
+  const note=roundedBox(1.1,.03,1.05,palette.signal,.035,.9,.01);note.position.set(3.55,.48,-.8);note.rotation.y=.08;scene.add(note);
 }
 
 function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
@@ -274,35 +292,46 @@ function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
 }
 
 function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
-  const table=box(9,.35,5.8,palette.woodLight,.89,.03); table.position.y=.02; scene.add(table);
+  const cartTop=roundedBox(9,.3,5.8,0x34443f,.14,.46,.34);cartTop.position.y=.08;scene.add(cartTop);
+  const inset=roundedBox(8.55,.06,5.35,0x1c2c28,.08,.9,.05);inset.position.y=.27;scene.add(inset);
+  for(const x of [-4.12,4.12]){for(const z of [-2.48,2.48]){const leg=roundedBox(.17,1.55,.17,palette.steel,.05,.34,.72);leg.position.set(x,-.72,z);scene.add(leg);const wheel=cylinder(.17,.11,0x151b19,16);wheel.rotation.z=Math.PI/2;wheel.position.set(x,-1.48,z);scene.add(wheel);}}
+  for(const z of [-2.67,2.67]){const rail=cylinder(.055,8.3,palette.steel,14);rail.rotation.z=Math.PI/2;rail.position.set(0,.48,z);scene.add(rail);}
   const caseGroup=new THREE.Group();
-  const base=roundedBox(5.3,.65,3.35,0x3b3327,.16,.62,.18); base.position.set(-1,.65,-.2);
-  const lid=roundedBox(5.3,.22,3.35,0x604b35,.13,.62,.16); lid.position.set(-1,2.35,-1.45); lid.rotation.x=-1.08;
+  const base=roundedBox(4.75,.62,3.2,0x3b3327,.16,.62,.18); base.position.set(-1.85,.67,-.25);
+  const lid=roundedBox(4.75,.2,3.2,0x604b35,.13,.62,.16); lid.position.set(-1.85,2.25,-1.55); lid.rotation.x=-1.03;
   caseGroup.add(base,lid);
-  const target=new THREE.Mesh(new THREE.CylinderGeometry(.92,.92,.08,48),mat(palette.paper)); target.rotation.x=Math.PI/2; target.position.set(-2,.99,-.2); caseGroup.add(target);
-  [0x507b78,0xcab65b,palette.red].forEach((color,index)=>{ const ring=new THREE.Mesh(new THREE.CylinderGeometry(.7-index*.22,.7-index*.22,.09,40),mat(color)); ring.rotation.x=Math.PI/2; ring.position.set(-2,.99,-.15+index*.01); caseGroup.add(ring); });
-  const card=roundedBox(1.55,.06,.95,0xd8d0b9,.035); card.position.set(.25,1.02,-.7); card.rotation.y=.1; caseGroup.add(card);
-  const ticket=roundedBox(1.65,.06,.78,0xcbbb82,.035); ticket.position.set(.3,1.02,.5); ticket.rotation.y=-.12; caseGroup.add(ticket);
+  const target=roundedBox(1.95,.035,1.95,palette.paper,.035,.97,.01);target.position.set(-2.75,1.02,-.22);target.rotation.y=-.05;caseGroup.add(target);
+  const targetRings=[[.73,.61,0x2d3a37],[.59,.45,0xd7c868],[.43,.28,palette.red],[.26,.08,0x4b7770]] as const;
+  targetRings.forEach(([outer,inner,color])=>{const ring=new THREE.Mesh(new THREE.RingGeometry(inner,outer,40),mat(color,.78,.02));ring.rotation.x=-Math.PI/2;ring.position.set(-2.75,1.05,-.22);ring.rotation.z=-.05;caseGroup.add(ring);});
+  for(const [x,z] of [[-2.86,-.3],[-2.61,-.14],[-2.72,-.38]] as const){const hole=new THREE.Mesh(new THREE.CircleGeometry(.035,12),mat(0x171b19,.9,.02));hole.rotation.x=-Math.PI/2;hole.position.set(x,1.057,z);caseGroup.add(hole);}
+  const card=roundedBox(1.45,.055,.9,0xd8d0b9,.035); card.position.set(-.62,1.02,-.72); card.rotation.y=.1; caseGroup.add(card);
+  const ticket=roundedBox(1.55,.055,.74,0xcbbb82,.035); ticket.position.set(-.58,1.02,.48); ticket.rotation.y=-.12; caseGroup.add(ticket);
+  const strap=cylinder(.055,2.4,palette.red,12);strap.rotation.z=Math.PI/2;strap.position.set(-1.72,1.12,.92);caseGroup.add(strap);
   scene.add(caseGroup);
+  const planBoard=roundedBox(3.25,.1,4.65,0x2b4b43,.1,.86,.05);planBoard.position.set(2.55,.37,0);scene.add(planBoard);
+  const columns=[{x:1.65,color:0xe2d8bd},{x:2.55,color:0xc8d8cf},{x:3.45,color:0xd9b18e}];
   const drafts:THREE.Mesh[]=[];
-  for(let index=0;index<3;index+=1){ const draft=roundedBox(2.05,.05,1.45,index===1?0xd5c99f:palette.paperDark,.035); draft.position.set(2.55+index*.28,.28,-1.35+index*1.25); draft.rotation.y=-.2+index*.12; scene.add(draft); addLines(scene,draft.position.x,.34,draft.position.z-.48,1.45,5); drafts.push(draft); }
+  columns.forEach((column,index)=>{const label=roundedBox(.72,.035,.45,column.color,.03,.94,.01);label.position.set(column.x,.45,-1.78);scene.add(label);for(let row=0;row<3;row+=1){const task=roundedBox(.72,.035,.72,row===2&&index===2?palette.signal:palette.paperDark,.035,.94,.01);task.position.set(column.x,.46,-.9+row*.92);task.rotation.y=(index-1)*.025;scene.add(task);for(let mark=0;mark<3;mark+=1){const line=box(.44-mark*.06,.014,.018,mark===0?palette.red:0x63746d);line.position.set(column.x,.49,-1.08+row*.92+mark*.13);scene.add(line);}drafts.push(task);}});
+  const route=roundedBox(2.75,.04,.72,0xb9aa7f,.035,.95,.01);route.position.set(2.55,.46,1.72);scene.add(route);
+  const routeLine=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(1.5,.5,1.78),new THREE.Vector3(2.15,.51,1.55),new THREE.Vector3(2.85,.51,1.83),new THREE.Vector3(3.55,.51,1.58)]),24,.025,7,false),mat(palette.red,.5,.04));scene.add(routeLine);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["target","USED TARGET",target,[2.1,.65,2.1],[-2,1.15,-.2]],
-    ["internship","WORK CARD",card,[1.85,.55,1.2],[.25,1.18,-.7]],
-    ["ticket","RETURN TICKET",ticket,[1.95,.55,1.05],[.3,1.18,.5]],
-    ["draft","WORKFLOW DRAFTS",drafts[1],[2.8,.55,4],[2.75,.55,0]],
+    ["target","USED ARCHERY PAPER",target,[2.18,.55,2.18],[-2.75,1.2,-.22]],
+    ["internship","WORK CARD",card,[1.7,.5,1.12],[-.62,1.17,-.72]],
+    ["ticket","RETURN TICKET",ticket,[1.8,.5,1.02],[-.58,1.17,.48]],
+    ["draft","NEXT / LATER / MAYBE",drafts[4],[3.35,.55,4.75],[2.55,.67,0]],
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual]); scene.add(hit); hits.push(hit); });
-  const lampBase=cylinder(.42,.12,0x292f2d,28); lampBase.position.set(3.7,.35,1.85); scene.add(lampBase);
+  const clip=cylinder(.12,.85,palette.steel,18);clip.rotation.z=Math.PI/2;clip.position.set(2.55,.53,-2.05);scene.add(clip);
 }
 
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
-  books:{position:[0,3.1,8.6],target:[0,2.35,0],hint:"DRAG TO LOOK · CLICK A BOOK"},
+  books:{position:[0,2.8,9.4],target:[0,2.35,0],hint:"ONE SHELF · CLICK A BOOK SPINE"},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:"CLICK THE METAL HANDLE, THEN SELECT A FILE"},
   notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:"DRAG TO LOOK · CLICK A PAGE OR INSERT"},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:"FOLLOW THE THREADS · CLICK A NOTE"},
-  fieldcase:{position:[0,5.4,7.2],target:[0,.75,0],hint:"INSPECT THE CASE AND THE DRAFTS BESIDE IT"},
+  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:"FIELD PLANNING · INSPECT THE CASE OR TODO BOARD"},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:"INCOMING FIELD REPORT · PRINTING"},
+  contact:{position:[.8,4.6,7.4],target:[1.25,.6,.2],hint:"CONTACT CARD · CLICK TO READ"},
 };
 
 export default function ZoneCloseup3D({zone,onSelect}:Props) {
@@ -327,7 +356,8 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     const camera=new THREE.PerspectiveCamera(42,1,.1,50);
     const view=views[zone];
     const defaultPosition=new THREE.Vector3(...view.position);
-    const target=new THREE.Vector3(...view.target);
+    const baseTarget=new THREE.Vector3(...view.target);
+    const target=baseTarget.clone();
     camera.position.copy(defaultPosition);
     const hits:HitMesh[]=[];
     if(zone==="books")buildBooks(scene,hits);
@@ -336,6 +366,7 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     if(zone==="board")buildBoard(scene,hits);
     if(zone==="fieldcase")buildFieldCase(scene,hits);
     if(zone==="printer")buildPrinter(scene,hits);
+    if(zone==="contact")buildContact(scene,hits);
     scene.add(new THREE.HemisphereLight(0x789892,0x090d0c,.85));
     const warm=new THREE.DirectionalLight(0xffc889,3.4); warm.position.set(-4,8,6); warm.castShadow=true; warm.shadow.mapSize.set(1536,1536); scene.add(warm);
     const cyan=new THREE.PointLight(palette.cyan,8,14,1.8); cyan.position.set(4,3,4); scene.add(cyan);
@@ -351,9 +382,10 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     let orbitY=0;
     let drawerProgress=0;
     let drawerTarget=0;
-    const drawerTray=scene.children.find((child)=>child.userData.drawerTray) as THREE.Group|undefined;
+    let drawerTray:THREE.Group|undefined;
+    let drawerWorkspace:THREE.Group|undefined;
     let faxPaperGroup:THREE.Group|undefined;
-    scene.traverse((child)=>{if(child.userData.faxPaperGroup)faxPaperGroup=child as THREE.Group;});
+    scene.traverse((child)=>{if(child.userData.drawerTray)drawerTray=child as THREE.Group;if(child.userData.drawerWorkspace)drawerWorkspace=child as THREE.Group;if(child.userData.faxPaperGroup)faxPaperGroup=child as THREE.Group;});
     const printStarted=performance.now()+550;
     let printProgress=zone==="printer"?0:1;
     let frame=0;
@@ -375,6 +407,7 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
       if(drawerTray)drawerTray.position.z=-.36+drawerProgress*2.7;
+      if(drawerWorkspace)drawerWorkspace.rotation.y=-drawerProgress*.15;
       if(zone==="printer"&&faxPaperGroup){
         printProgress=THREE.MathUtils.clamp((now-printStarted)/4600,0,1);
         const eased=1-Math.pow(1-printProgress,3);
@@ -382,7 +415,14 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
         faxPaperGroup.position.y=.88-eased*.22;
         if(labelRef.current&&!hovered)labelRef.current.textContent=printProgress>.96?"FIELD REPORT READY · CLICK THE PAPER":"INCOMING FIELD REPORT · PRINTING";
       }
-      const desired=defaultPosition.clone(); desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5; camera.position.lerp(desired,.06); camera.lookAt(target);
+      const desired=defaultPosition.clone();
+      const desiredTarget=baseTarget.clone();
+      if(zone==="drawer"){
+        desired.lerp(new THREE.Vector3(.4,7.15,6.25),drawerProgress);
+        desiredTarget.lerp(new THREE.Vector3(-.85,.72,.85),drawerProgress);
+      }
+      desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
+      camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
     };frame=requestAnimationFrame(tick);
     return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};

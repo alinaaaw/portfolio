@@ -45,16 +45,20 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /EMG classifier is separating intentional contraction from drift/);
   assert.match(page, /bringing the hardware and full logs back to Lab 17/);
   assert.match(page, /mailto:awu78@uw\.edu/);
+  assert.doesNotMatch(page, /mailto:hello@example\.com/);
   assert.match(page, /INCOMING FAX/);
   assert.match(page, /CLICK THE HIGHLIGHTED PRINTER/);
   assert.match(page, /onDoubleClick/);
   assert.doesNotMatch(page, /DOUBLE CLICK TO OPEN/);
   assert.doesNotMatch(page, />DOUBLE CLICK</);
   assert.match(page, /<h2>Alina<\/h2>/);
-  for (const zone of ["drawer", "books", "notebook", "board", "fieldcase", "printer"]) {
+  for (const zone of ["drawer", "books", "notebook", "board", "fieldcase", "printer", "contact"]) {
     assert.match(page, new RegExp(`ZoneCloseup3D zone=\\"${zone}\\"`));
   }
   assert.match(page, /TURN PAGE/);
+  assert.match(page, /book-turning-sheet/);
+  assert.match(page, /FIELD PLANNING \/ NEXT · LATER · MAYBE/);
+  assert.match(page, /PRINTER DESK \/ CONTACT CARD/);
   assert.match(page, /fax-reading/);
 });
 
@@ -79,11 +83,15 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /buildBoard/);
   assert.match(closeups, /buildFieldCase/);
   assert.match(closeups, /buildPrinter/);
+  assert.match(closeups, /buildContact/);
   assert.match(closeups, /RoundedBoxGeometry/);
   assert.match(closeups, /drawerProgress/);
+  assert.match(closeups, /drawerWorkspace/);
   assert.match(closeups, /printProgress/);
   assert.match(closeups, /TubeGeometry/);
-  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "fax-reading", "fax-paper"]) {
+  assert.match(closeups, /if\(withFax&&hits\)/);
+  assert.match(closeups, /USED ARCHERY PAPER/);
+  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
   assert.match(css, /@media \(max-width: 620px\)/);

@@ -204,17 +204,19 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .book-pages::before { content: ""; position: absolute; z-index: 8; inset: -12px -12px -14px 50%; border: 1px solid #9c765a; border-radius: 2px 12px 12px 2px; background: linear-gradient(90deg,#19342e,#31564c 8%,#203e37); transform-origin: left center; animation: openCover 1.15s .22s cubic-bezier(.25,.75,.2,1) both; backface-visibility: hidden; }
 @keyframes openCover { from { transform: rotateY(0); } to { transform: rotateY(-168deg); } }
 .book-page { position: relative; overflow: hidden; border: 0; background-color: #e6dcc0; background-image: repeating-linear-gradient(0deg,transparent 0 27px,rgba(82,116,108,.13) 28px); color: var(--ink); text-align: left; }
-.book-page-left { padding: 55px 45px 40px 58px; border-radius: 8px 0 0 8px; box-shadow: inset -16px 0 22px rgba(72,54,37,.1); }
-.book-page-right { padding: 55px 58px 40px 45px; border-left: 1px solid rgba(60,50,40,.25); border-radius: 0 8px 8px 0; cursor: pointer; box-shadow: inset 16px 0 22px rgba(72,54,37,.1); }
+.book-page-left { padding: 48px 42px 38px 54px; border-radius: 8px 0 0 8px; box-shadow: inset -16px 0 22px rgba(72,54,37,.1); }
+.book-page-right { padding: 48px 54px 38px 42px; border-left: 1px solid rgba(60,50,40,.25); border-radius: 0 8px 8px 0; box-shadow: inset 16px 0 22px rgba(72,54,37,.1); }
 .book-page small { color: #956254; font: 7px var(--font-mono),monospace; }
-.book-page h2 { margin: 38px 0 22px; font: clamp(25px,3vw,43px)/1.18 "Segoe Print",cursive; letter-spacing: -.035em; }
-.book-page p { color: #535b53; font-size: 12px; line-height: 1.75; }
-.book-page blockquote { margin: 90px 0 0; color: #474f48; font: clamp(19px,2.4vw,31px)/1.45 "Segoe Print",cursive; }
-.book-page-right > b { position: absolute; right: 35px; bottom: 25px; color: #a64034; font: 7px var(--font-mono),monospace; }
+.book-page h2 { margin: 30px 0 20px; font: clamp(22px,2.45vw,36px)/1.2 "Segoe Print",cursive; letter-spacing: -.025em; }
+.book-page p { color: #535b53; font-size: 12px; line-height: 1.72; }
+.book-page blockquote { margin: 54px 0 0; color: #474f48; font: clamp(17px,2vw,25px)/1.45 "Segoe Print",cursive; }
+.book-turning-sheet { position: absolute; z-index: 7; top: 0; bottom: 0; left: 50%; width: 50%; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.2,.72,.18,1); }
+.physical-book.reverse .book-turning-sheet { transform: rotateY(-180deg); }
+.turn-face { position: absolute; inset: 0; display: block; padding: 48px 54px 38px 42px; backface-visibility: hidden; box-shadow: 8px 0 15px rgba(60,42,28,.13); }
+.turn-back { padding: 48px 42px 38px 54px; transform: rotateY(180deg); box-shadow: inset -14px 0 20px rgba(60,42,28,.12); }
 .sticky-tab { position: absolute; top: -1px; right: 55px; padding: 17px 9px 12px; background: #d1f45c; color: var(--ink); font: 6px var(--font-mono),monospace; box-shadow: 2px 3px 0 rgba(0,0,0,.15); }
-.book-spine { position: absolute; z-index: 5; top: -3px; bottom: -3px; left: 50%; width: 18px; translate: -50% 0; background: linear-gradient(90deg,rgba(58,42,31,.32),rgba(255,255,255,.22),rgba(58,42,31,.35)); box-shadow: 0 0 12px rgba(0,0,0,.18); pointer-events: none; }
-.physical-book.reverse .book-page-right { animation: turnPaper .46s ease; }
-@keyframes turnPaper { 50% { transform: rotateY(-7deg); filter: brightness(.82); } }
+.book-spine { position: absolute; z-index: 10; top: -3px; bottom: -3px; left: 50%; width: 18px; translate: -50% 0; background: linear-gradient(90deg,rgba(58,42,31,.32),rgba(255,255,255,.22),rgba(58,42,31,.35)); box-shadow: 0 0 12px rgba(0,0,0,.18); pointer-events: none; }
+.book-page-control { position: absolute; left: 50%; bottom: 0; translate: -50% 0; padding: 9px 13px; border: 1px solid var(--signal); background: #101917; color: var(--signal); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .close-book { position: absolute; right: 10px; bottom: 0; padding: 9px 11px; border: 1px solid var(--line); background: #0a1210; color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 
 .drawer-photo-stage > img { opacity: .22; transform: scale(.96) translateY(-3%); transition: opacity .9s,transform 1.15s cubic-bezier(.2,.78,.2,1); }
@@ -333,6 +335,14 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 @keyframes faxReadingIn { from { opacity: 0; transform: scale(.68) translateY(18%); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .fax-return { position: absolute; right: 18px; bottom: 18px; padding: 10px 12px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .printer-layer .tactile-scene > header strong { color: var(--signal); }
+.contact-reading { position: absolute; z-index: 24; inset: 58px 0 0; display: grid; place-items: center; padding: 35px; background: radial-gradient(circle,rgba(34,45,41,.74),rgba(2,6,5,.96)); backdrop-filter: blur(11px); }
+.contact-card-detail { position: relative; width: min(760px,88vw); min-height: 410px; padding: clamp(48px,7vw,82px); border-left: 13px solid var(--red); border-radius: 5px; background-color: #e7dec8; background-image: linear-gradient(110deg,rgba(255,255,255,.45),transparent 42%),repeating-linear-gradient(0deg,rgba(40,50,45,.025) 0 1px,transparent 1px 5px); color: var(--ink); box-shadow: 20px 26px 0 rgba(0,0,0,.35); transform: rotate(-1deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
+.contact-card-detail small { color: var(--red); font: 7px var(--font-mono),monospace; letter-spacing: .12em; }
+.contact-card-detail h2 { margin: 30px 0 24px; font: clamp(38px,6vw,70px)/.98 "Segoe Print",cursive; letter-spacing: -.055em; }
+.contact-card-detail p { color: #59615b; font-size: 13px; }
+.contact-card-detail > a { display: flex; align-items: center; justify-content: space-between; margin-top: 44px; padding: 17px 0; border-top: 1px solid #9da398; border-bottom: 1px solid #9da398; color: #9d3e32; font: 700 clamp(13px,2vw,19px) var(--font-mono),monospace; }
+.contact-card-detail > button { position: absolute; right: 18px; bottom: 17px; padding: 9px 11px; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
+.contact-layer .tactile-scene > header strong { color: var(--cyan); }
 
 @media (max-width: 850px) {
   .room-intro { grid-template-columns: 1fr; gap: 20px; padding: 100px 6vw 5vh; }
@@ -402,6 +412,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .book-pages { inset: 20px 0 46px; grid-template-columns: 1fr; }
   .book-page-left { display: none; }
   .book-page-right { min-height: 100%; border-left: 0; border-radius: 8px; padding: 50px 34px 35px; }
+  .book-turning-sheet { left: 0; width: 100%; }
+  .turn-face, .turn-back { padding: 50px 34px 35px; }
   .book-pages::before { inset: -10px -9px -12px 0; transform-origin: left center; }
   .book-spine { display: none; }
   .book-page blockquote { margin-top: 70px; }
