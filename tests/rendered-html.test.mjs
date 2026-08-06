@@ -37,22 +37,24 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /Muscle Usage.*Behavior Monitor/);
   assert.match(page, /Social Futures Lab/i);
   assert.match(page, /Thermo Fisher Scientific/i);
-  assert.match(page, /no new lab entry has been recorded here for four days/i);
+  assert.match(page, /User has not checked in/i);
+  assert.match(page, /Alina Wu has been offline for four days.*This workstation continues to sync/i);
   assert.doesNotMatch(page, /Her computer/);
   assert.doesNotMatch(page, /I am not missing/);
   assert.match(page, /The signal holds outside the lab/);
   assert.match(page, /EMG classifier is separating intentional contraction from drift/);
   assert.match(page, /bringing the hardware and full logs back to Lab 17/);
-  assert.match(page, /PRINTER ACTIVE/);
+  assert.match(page, /INCOMING FAX/);
+  assert.match(page, /CLICK THE HIGHLIGHTED PRINTER/);
   assert.match(page, /onDoubleClick/);
   assert.doesNotMatch(page, /DOUBLE CLICK TO OPEN/);
   assert.doesNotMatch(page, />DOUBLE CLICK</);
   assert.match(page, /<h2>Alina<\/h2>/);
-  for (const zone of ["drawer", "books", "notebook", "board", "fieldcase"]) {
+  for (const zone of ["drawer", "books", "notebook", "board", "fieldcase", "printer"]) {
     assert.match(page, new RegExp(`ZoneCloseup3D zone=\\"${zone}\\"`));
   }
   assert.match(page, /TURN PAGE/);
-  assert.match(page, /fax-output/);
+  assert.match(page, /fax-reading/);
 });
 
 test("3D room and layered object exploration remain connected", async () => {
@@ -65,6 +67,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(game, /pointermove/);
   assert.match(game, /onInspect/);
   assert.match(game, /faxReady/);
+  assert.match(game, /onPrinterInspect/);
+  assert.match(game, /INCOMING FAX \/ CLICK PRINTER/);
   assert.doesNotMatch(game, /rover/i);
   assert.match(game, /drawer: \[-3\.53, \.84, -5\.38\]/);
   assert.match(closeups, /WebGLRenderer/);
@@ -73,9 +77,12 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /buildNotebook/);
   assert.match(closeups, /buildBoard/);
   assert.match(closeups, /buildFieldCase/);
+  assert.match(closeups, /buildPrinter/);
+  assert.match(closeups, /RoundedBoxGeometry/);
   assert.match(closeups, /drawerProgress/);
+  assert.match(closeups, /printProgress/);
   assert.match(closeups, /TubeGeometry/);
-  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "fax-output", "fax-paper"]) {
+  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
   assert.match(css, /@media \(max-width: 620px\)/);

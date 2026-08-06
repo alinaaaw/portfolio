@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
+type SceneTargetId = ZoneId | "printer";
 
 type LabGameProps = {
   active: boolean;
@@ -12,9 +13,10 @@ type LabGameProps = {
   faxReady: boolean;
   onHover: (zone: ZoneId | null) => void;
   onInspect: (zone: ZoneId) => void;
+  onPrinterInspect: () => void;
 };
 
-type ZoneTarget = THREE.Object3D & { userData: { zone?: ZoneId } };
+type ZoneTarget = THREE.Object3D & { userData: { zone?: SceneTargetId } };
 
 const palette = {
   void: 0x07100f,
@@ -48,13 +50,14 @@ const zonePositions: Record<ZoneId, [number, number, number]> = {
   fieldcase: [-4.9, 1.55, 1.55],
 };
 
-const cameraPoses: Record<ZoneId, { position: [number,number,number]; target: [number,number,number] }> = {
+const cameraPoses: Record<SceneTargetId, { position: [number,number,number]; target: [number,number,number] }> = {
   computer: { position: [-5.7,2.95,-2.75], target: [-5.7,2.45,-6.12] },
   drawer: { position: [-3.5,2.3,-2.55], target: [-3.53,.84,-5.47] },
   notebook: { position: [3.8,4.55,2.3], target: [3.8,1.55,-1.75] },
   books: { position: [8.05,3.45,-2.65], target: [8.2,3,-6.35] },
   board: { position: [1.1,3.35,-4.7], target: [1.1,3.1,-8.5] },
   fieldcase: { position: [-4.9,3.45,4.65], target: [-4.9,1.45,1.55] },
+  printer: { position: [-2.15,3.15,-3.45], target: [-2.15,2.12,-6.5] },
 };
 
 function material(color: number, roughness = .8, metalness = .05, emissive = 0x000000, emissiveIntensity = 0) {
@@ -162,7 +165,7 @@ function addDeskLamp(group: THREE.Group, x: number, z: number) {
   group.add(base,lower,upper,shade,bulb);
 }
 
-function buildComputer(scene: THREE.Scene) {
+function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
   const desk = addDesk(scene,-4.55,-6.35,7.4,2.7);
   const mat = box(4.1,.025,1.75,0x172321,.92,.02);
   mat.position.set(-1.15,1.6,.25);
@@ -203,6 +206,7 @@ function buildComputer(scene: THREE.Scene) {
   desk.add(mouse);
   const printer = box(1.65,.84,1.35,0xbcb5a4,.66,.12);
   printer.position.set(2.38,2.03,-.16);
+  printer.userData.faxPrinter = true;
   desk.add(printer);
   const printerSlot = box(1.2,.08,.07,0x28302e);
   printerSlot.position.set(2.38,2.2,.54);
@@ -218,6 +222,22 @@ function buildComputer(scene: THREE.Scene) {
   paper.userData.faxPaper = true;
   paper.visible = false;
   desk.add(paper);
+  const printerSignal = new THREE.Group();
+  printerSignal.userData.faxSignal = true;
+  printerSignal.visible = false;
+  printerSignal.position.set(2.38,2.2,.56);
+  const printerRing = new THREE.Mesh(new THREE.TorusGeometry(.76,.035,10,48),material(palette.signal,.25,.2,palette.signal,2));
+  printerSignal.add(printerRing);
+  const printerLabel = makeLabel("INCOMING FAX / CLICK PRINTER");
+  printerLabel.position.y = 1.08;
+  printerLabel.scale.set(3.15,.63,1);
+  printerSignal.add(printerLabel);
+  desk.add(printerSignal);
+  const printerHit = new THREE.Mesh(new THREE.BoxGeometry(2.15,1.75,1.85),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false})) as ZoneTarget;
+  printerHit.position.set(2.38,2.16,-.05);
+  printerHit.userData.zone = "printer";
+  desk.add(printerHit);
+  targets.push(printerHit);
 
   const drawerUnit = box(1.75,1.28,1.85,0x4e3b2e,.85,.03);
   drawerUnit.position.set(1.02,.76,-.08);
@@ -490,7 +510,7 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
     scene.add(pipe);
   }
 
-  buildComputer(scene);
+  buildComputer(scene,targets);
   buildNotebookTable(scene);
   buildBooks(scene);
   buildBoard(scene);
@@ -557,19 +577,21 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
   (Object.keys(zonePositions) as ZoneId[]).forEach((zone) => addZone(scene,zone,targets));
 }
 
-export default function LabGame({ active, viewing, discovered, faxReady, onHover, onInspect }: LabGameProps) {
+export default function LabGame({ active, viewing, discovered, faxReady, onHover, onInspect, onPrinterInspect }: LabGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRef = useRef(active);
   const viewingRef = useRef(viewing);
   const discoveredRef = useRef(discovered);
   const faxReadyRef = useRef(faxReady);
   const inspectRef = useRef(onInspect);
+  const printerInspectRef = useRef(onPrinterInspect);
 
   useEffect(() => { activeRef.current = active; },[active]);
   useEffect(() => { viewingRef.current = viewing; },[viewing]);
   useEffect(() => { discoveredRef.current = discovered; },[discovered]);
   useEffect(() => { faxReadyRef.current = faxReady; },[faxReady]);
   useEffect(() => { inspectRef.current = onInspect; },[onInspect]);
+  useEffect(() => { printerInspectRef.current = onPrinterInspect; },[onPrinterInspect]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -621,8 +643,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
     const raycaster = new THREE.Raycaster();
     let pointerX = 0;
     let pointerY = 0;
-    let hovered: ZoneId | null = null;
-    let requested: ZoneId | null = null;
+    let hovered: SceneTargetId | null = null;
+    let requested: SceneTargetId | null = null;
     let requestStarted = 0;
     let requestDelivered = false;
     let dragging = false;
@@ -648,12 +670,12 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
       pointerX = pointer.x;
       pointerY = pointer.y;
       raycaster.setFromCamera(pointer,camera);
-      const hit = raycaster.intersectObjects(targets,false)[0]?.object as ZoneTarget | undefined;
+      const hit = raycaster.intersectObjects(targets,false).map((entry)=>entry.object as ZoneTarget).find((candidate)=>candidate.userData.zone!=="printer"||faxReadyRef.current);
       return hit?.userData.zone ?? null;
     };
     const pointerMove = (event: PointerEvent) => {
       const zone = readPointer(event);
-      if (zone !== hovered) { hovered = zone; onHover(zone); }
+      if (zone !== hovered) { hovered = zone; onHover(zone==="printer"?null:zone); }
       if (dragging) orbit = THREE.MathUtils.clamp(dragOrbit+(event.clientX-dragStartX)*.0025,-.42,.42);
       canvas.style.cursor = zone ? "pointer" : dragging ? "grabbing" : "grab";
     };
@@ -697,7 +719,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
         currentTarget.lerp(desiredTarget,.075);
         if (!requestDelivered && now-requestStarted>720) {
           requestDelivered = true;
-          inspectRef.current(requested);
+          if(requested==="printer")printerInspectRef.current();
+          else inspectRef.current(requested);
         }
       }
       if (viewingRef.current === null && requestDelivered) {
@@ -709,7 +732,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
       targets.forEach((target) => {
         const zone = target.userData.zone;
         const group = target.parent;
-        if (!zone || !group) return;
+        if (!zone || zone==="printer" || !group) return;
         const ring = group.children[0] as THREE.Mesh;
         ring.rotation.z += .012;
         ring.scale.setScalar(1+Math.sin(now*.002+group.position.x)*.09);
@@ -725,9 +748,17 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
           faxMaterial.emissive.setHex(faxReadyRef.current?palette.signal:0x000000);
           faxMaterial.emissiveIntensity = faxReadyRef.current ? 2+Math.sin(now*.008) : 0;
         }
+        if (object.userData.faxPrinter && object instanceof THREE.Mesh) {
+          const printerMaterial=object.material as THREE.MeshStandardMaterial;
+          printerMaterial.emissive.setHex(faxReadyRef.current?palette.signal:0x000000);
+          printerMaterial.emissiveIntensity=faxReadyRef.current ? .18 : 0;
+        }
+        if (object.userData.faxSignal) {
+          object.visible=faxReadyRef.current;
+          if(faxReadyRef.current&&object.children[0])object.children[0].rotation.z+=.014;
+        }
         if (object.userData.faxPaper && object instanceof THREE.Mesh) {
-          object.visible = faxReadyRef.current;
-          if (faxReadyRef.current) object.position.z = .1+Math.sin(now*.0015)*.05;
+          object.visible = false;
         }
       });
       renderer.render(scene,camera);

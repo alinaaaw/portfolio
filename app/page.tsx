@@ -138,6 +138,17 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
   </section></div>;
 }
 
+function PrinterScene({onClose}:{onClose:()=>void}) {
+  const [reportOpen,setReportOpen]=useState(false);
+  return <div className="modal-layer tactile-layer printer-layer" onMouseDown={onClose}>
+    <section className="tactile-scene" role="dialog" aria-modal="true" aria-label="Lab printer close-up" onMouseDown={(event)=>event.stopPropagation()}>
+      <header><div><span>TX</span><strong>LAB 17 PRINTER / INCOMING FIELD REPORT</strong></div><button onClick={onClose}>RETURN TO ROOM ×</button></header>
+      <ZoneCloseup3D zone="printer" onSelect={(item)=>{if(item==="fax")setReportOpen(true);}} />
+      {reportOpen&&<div className="fax-reading" onMouseDown={()=>setReportOpen(false)}><article className="fax-paper fax-reading-paper" onMouseDown={(event)=>event.stopPropagation()}><small>FIELD REPORT / SOURCE: AW / PHASE 02</small><h2 id="fax-title">The signal holds outside the lab.</h2><p>Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.</p><p>I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17.</p><strong>More when I return. — Alina</strong><footer><span>STATUS / PHASE 02 COMPLETE</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer><button className="fax-return" onClick={()=>setReportOpen(false)}>RETURN TO PRINTER ×</button></article></div>}
+    </section>
+  </div>;
+}
+
 export default function VersionThree() {
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
@@ -195,7 +206,7 @@ export default function VersionThree() {
       </header>
 
       <section className="room-viewport" aria-label="Interactive personal laboratory">
-        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen} viewing={active} discovered={discovered} faxReady={solved} onHover={setHovered} onInspect={inspect} />
+        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen} viewing={active} discovered={discovered} faxReady={solved} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
         <div className="room-grain" aria-hidden="true" />
         <div className="room-vignette" aria-hidden="true" />
 
@@ -225,7 +236,7 @@ export default function VersionThree() {
             <div className="explore-dock">
               {zoneOrder.map((zone) => <button className={discovered.includes(zone)?"found":""} key={zone} onClick={() => inspect(zone)}><span>{zoneInfo[zone].index}</span><i>{zoneInfo[zone].label}</i></button>)}
             </div>
-            {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> PRINTER ACTIVE <strong>OPEN FIELD REPORT →</strong></button>}
+            {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> INCOMING FAX <strong>CLICK THE HIGHLIGHTED PRINTER →</strong></button>}
           </>
         )}
       </section>
@@ -267,7 +278,7 @@ export default function VersionThree() {
 
                 {computerFile==="internship"&&<article className="os-window text-file"><header><button onClick={() => setComputerFile("experience")}>← EXPERIENCE</button><span>THERMO_FISHER.log</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI</small><h2>Vision, motion, and laboratory workflows.</h2><p>Work across YOLO26 computer vision, ROS2 robot-arm motion, 3500Dx scientific-software testing, QANTIS workflow analysis, and technical onboarding.</p><blockquote>JUNE 2026 — PRESENT</blockquote></div></article>}
 
-                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>No new check-in from Alina.</strong><p>This workstation is still syncing, but no new lab entry has been recorded here for four days.</p><small>Why is this appearing on a portfolio computer?</small></div>
+                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>User has not checked in.</strong><p>Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded.</p><small>Why is this appearing on a portfolio computer?</small></div>
               </main>
               <footer className="os-taskbar"><button onClick={() => setComputerFile("desktop")}>AW</button><span>LOCAL FILES</span><span>{bulletin?"1 UNREAD BULLETIN":"NO NEW ALERTS"}</span></footer>
             </div>
@@ -281,15 +292,7 @@ export default function VersionThree() {
       {active==="board"&&<BoardScene onClose={() => setActive(null)} />}
       {active==="fieldcase"&&<FieldCaseScene onClose={() => setActive(null)} />}
 
-      {faxOpen&&(
-        <div className="modal-layer fax-layer" onMouseDown={() => setFaxOpen(false)}>
-          <section className="fax-machine" role="dialog" aria-modal="true" aria-labelledby="fax-title" onMouseDown={(event) => event.stopPropagation()}>
-            <header><span>LAB 17 PRINTER / INCOMING</span><button onClick={() => setFaxOpen(false)}>×</button></header>
-            <div className="fax-slot"><i /></div>
-            <div className="fax-output"><article className="fax-paper"><small>FIELD REPORT / SOURCE: AW / PHASE 02</small><h2 id="fax-title">The signal holds outside the lab.</h2><p>Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.</p><p>I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17.</p><strong>More when I return. — Alina</strong><footer><span>STATUS / PHASE 02 COMPLETE</span><a href="mailto:hello@example.com">SEND A REPLY →</a></footer></article></div>
-          </section>
-        </div>
-      )}
+      {faxOpen&&<PrinterScene onClose={()=>setFaxOpen(false)} />}
     </main>
   );
 }

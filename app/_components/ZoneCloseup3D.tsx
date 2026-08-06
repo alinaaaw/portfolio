@@ -2,15 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
-export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase";
+export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer";
 
 type Props = {
   zone: CloseupZone;
   onSelect: (item: string) => void;
 };
 
-type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; visuals?: THREE.Mesh[] } };
+type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; visuals?: THREE.Mesh[] } };
 
 const palette = {
   void: 0x07100f,
@@ -38,6 +39,16 @@ function box(w:number,h:number,d:number,color:number,roughness?:number,metalness
   return mesh;
 }
 
+function roundedBox(w:number,h:number,d:number,color:number,radius=.1,roughness=.78,metalness=.04) {
+  const mesh = new THREE.Mesh(
+    new RoundedBoxGeometry(w,h,d,4,Math.min(radius,w*.2,h*.2,d*.2)),
+    mat(color,roughness,metalness),
+  );
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
 function cylinder(radius:number,height:number,color:number,segments=24) {
   const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,segments),mat(color));
   mesh.castShadow = true;
@@ -45,14 +56,55 @@ function cylinder(radius:number,height:number,color:number,segments=24) {
   return mesh;
 }
 
-function hitBox(item:string,label:string,size:[number,number,number],position:[number,number,number],visuals:THREE.Mesh[],requiresOpen=false) {
+function hitBox(item:string,label:string,size:[number,number,number],position:[number,number,number],visuals:THREE.Mesh[],requiresOpen=false,requiresPrinted=false) {
   const hit = new THREE.Mesh(
     new THREE.BoxGeometry(...size),
     new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),
   ) as HitMesh;
   hit.position.set(...position);
-  hit.userData = {item,label,visuals,requiresOpen};
+  hit.userData = {item,label,visuals,requiresOpen,requiresPrinted};
   return hit;
+}
+
+function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number], scale=1, withFax=false, hits?:HitMesh[]) {
+  const printer=new THREE.Group();
+  const body=roundedBox(3.5,1.42,2.7,0xc8c2b4,.22,.58,.12); body.position.y=.82;
+  const lower=roundedBox(3.3,.72,2.45,0xa8a79f,.16,.66,.16); lower.position.set(0,.35,.06);
+  const scanner=roundedBox(3.28,.22,2.45,0x343c39,.1,.34,.48); scanner.position.set(0,1.62,-.05);
+  const lid=roundedBox(3.04,.12,2.2,0x1d2422,.08,.3,.46); lid.position.set(0,1.79,-.12); lid.rotation.x=-.025;
+  const glass=roundedBox(2.62,.025,1.8,0x729794,.04,.12,.08); glass.position.set(0,1.73,-.1);
+  const control=roundedBox(1.35,.16,.5,0x29312f,.07,.32,.45); control.position.set(.75,1.44,1.24); control.rotation.x=-.22;
+  const screen=roundedBox(.58,.025,.24,0x163c39,.025,.2,.1); screen.position.set(.53,1.52,1.33); screen.rotation.x=-.22;
+  const screenMaterial=screen.material as THREE.MeshStandardMaterial; screenMaterial.emissive.setHex(palette.cyan); screenMaterial.emissiveIntensity=.72;
+  const slot=roundedBox(2.45,.11,.12,0x151b1a,.035,.36,.42); slot.position.set(0,.82,1.37);
+  const tray=roundedBox(2.72,.09,1.8,0x4a504d,.08,.55,.26); tray.position.set(0,.19,1.45); tray.rotation.x=.045;
+  const trayLip=roundedBox(2.75,.18,.12,0x5b625e,.05,.48,.35); trayLip.position.set(0,.24,2.31);
+  printer.add(lower,body,scanner,glass,lid,control,screen,slot,tray,trayLip);
+  for(let index=0;index<4;index+=1){
+    const button=cylinder(.055,.035,index===3?palette.signal:0x858b84,16); button.rotation.x=Math.PI/2; button.position.set(.78+index*.19,1.48,1.5); printer.add(button);
+  }
+  const hingeLeft=cylinder(.07,.26,0x1b2220,16); hingeLeft.rotation.z=Math.PI/2; hingeLeft.position.set(-1.22,1.72,-1.02);
+  const hingeRight=hingeLeft.clone(); hingeRight.position.x=1.22; printer.add(hingeLeft,hingeRight);
+  const paperGroup=new THREE.Group();
+  paperGroup.userData.faxPaperGroup=withFax;
+  paperGroup.position.set(0,.88,1.28);
+  paperGroup.scale.z=withFax ? .035 : 1;
+  const paper=roundedBox(2.3,.035,3.05,palette.paper,.025,.96,.01); paper.position.set(0,0,1.46); paper.rotation.x=.025;
+  paperGroup.add(paper);
+  for(let line=0;line<11;line+=1){
+    const mark=box(line===0?1.55:1.75-(line%3)*.18,.018,.025,line===0?palette.red:0x65736d,.7,.02);
+    mark.position.set(-.12,.04,.42+line*.2); paperGroup.add(mark);
+  }
+  const stamp=new THREE.Mesh(new THREE.RingGeometry(.25,.3,28),mat(palette.red,.7,.02)); stamp.rotation.x=-Math.PI/2; stamp.position.set(.67,.055,2.42); paperGroup.add(stamp);
+  if(withFax&&hits){
+    const paperHit=hitBox("fax","READ PRINTED FIELD REPORT",[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
+    paperGroup.add(paperHit); hits.push(paperHit);
+  }
+  printer.add(paperGroup);
+  printer.position.set(...position);
+  printer.scale.setScalar(scale);
+  parent.add(printer);
+  return {printer,paperGroup,body,screen};
 }
 
 function addLines(parent:THREE.Object3D,x:number,y:number,z:number,width:number,count:number,vertical=false) {
@@ -82,9 +134,9 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     const group=new THREE.Group();
     const height=1.5+(index%3)*.16;
     const width=.72+(index%2)*.08;
-    const cover=box(width,height,.78,colors[index],.7,.02);
+    const cover=roundedBox(width,height,.78,colors[index],.055,.7,.02);
     cover.position.y=height/2;
-    const pages=box(width-.12,height-.12,.67,0xd7cba9,.93,.01);
+    const pages=roundedBox(width-.12,height-.12,.67,0xd7cba9,.045,.93,.01);
     pages.position.set(.04,height/2,.08);
     const band=box(width+.02,.055,.81,index===2?palette.signal:0xbba980,.7,.02);
     band.position.set(0,height*.7,.01);
@@ -101,7 +153,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     shelf.add(hit); hits.push(hit);
   }
   for(let index=0;index<9;index+=1){
-    const filler=box(.48+(index%2)*.1,1.1+(index%3)*.1,.7,[0x594237,0x415954,0x82634a][index%3]);
+    const filler=roundedBox(.48+(index%2)*.1,1.1+(index%3)*.1,.7,[0x594237,0x415954,0x82634a][index%3],.045);
     filler.position.set(-3+index*.72,2.92+(index%2)*.05,0);
     shelf.add(filler);
   }
@@ -110,40 +162,70 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
 }
 
 function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
-  const desk=box(8,.32,4.8,palette.woodLight,.86,.03);
-  desk.position.y=2.1;
-  scene.add(desk);
-  const cabinet=box(6.4,1.7,3.5,palette.wood,.88,.02);
-  cabinet.position.set(0,1.02,-.35);
-  scene.add(cabinet);
+  const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
+  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; scene.add(desk);
+  const frontEdge=roundedBox(9,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(0,2.03,2.26); scene.add(frontEdge);
+  for(const x of [-4.05,4.05]){
+    const leg=roundedBox(.3,2.05,.32,palette.metal,.06,.38,.7); leg.position.set(x,1.02,-1.7); scene.add(leg);
+    const foot=roundedBox(.72,.12,1.25,0x222927,.06,.38,.7); foot.position.set(x,.08,-1.7); scene.add(foot);
+  }
+
+  const cabinet=new THREE.Group();
+  const sideLeft=roundedBox(.22,1.72,3.55,palette.wood,.07,.88,.02); sideLeft.position.set(-3.02,1.03,-.28);
+  const sideRight=sideLeft.clone(); sideRight.position.x=1.02;
+  const cabinetTop=roundedBox(4.25,.18,3.55,palette.wood,.06,.86,.02); cabinetTop.position.set(-1,1.85,-.28);
+  const cabinetBottom=roundedBox(4.25,.16,3.55,0x3c2a20,.05,.9,.02); cabinetBottom.position.set(-1,.2,-.28);
+  const cabinetBack=box(4.25,1.58,.16,0x30231c,.94,.01); cabinetBack.position.set(-1,1.03,-1.98);
+  cabinet.add(sideLeft,sideRight,cabinetTop,cabinetBottom,cabinetBack); scene.add(cabinet);
+
   const tray=new THREE.Group();
   tray.userData.drawerTray=true;
-  const bottom=box(5.75,.14,3.05,0x38271f,.94,.01);
-  bottom.position.y=.42;
-  const left=box(.16,.72,3.1,palette.woodLight,.88,.02); left.position.set(-2.9,.75,0);
-  const right=left.clone(); right.position.x=2.9;
-  const back=box(5.9,.72,.16,palette.woodLight,.88,.02); back.position.set(0,.75,-1.5);
-  const front=box(6.1,1.08,.25,0x76543c,.82,.04); front.position.set(0,.84,1.58);
-  const handle=box(1.05,.16,.18,palette.steel,.35,.72); handle.position.set(0,.88,1.76);
-  tray.add(bottom,left,right,back,front,handle);
-  const folder=box(2.05,.12,1.6,0x8b453a,.88,.01); folder.position.set(-1.65,.57,-.2); folder.rotation.y=-.08;
-  const notebook=box(1.15,.17,1.5,0xd7c9a8,.88,.01); notebook.position.set(.35,.61,-.55); notebook.rotation.y=.04;
-  const envelope=box(2.1,.1,.9,0xb89b65,.91,.01); envelope.position.set(.25,.6,.65); envelope.rotation.y=-.05;
-  const pouch=box(1.3,.18,1.3,0x33413d,.4,.18); pouch.position.set(2,.62,-.25);
-  const circuit=box(.82,.12,.72,0x245e4f,.5,.12); circuit.position.set(2,.78,-.25);
-  tray.add(folder,notebook,envelope,pouch,circuit);
-  const handleHit=hitBox("drawer-handle","PULL DRAWER",[1.5,.55,.55],[0,.88,1.8],[handle,front]);
+  const bottom=roundedBox(3.72,.14,3.12,0x38271f,.06,.94,.01); bottom.position.y=.4;
+  const left=roundedBox(.14,.67,3.12,palette.woodLight,.04,.88,.02); left.position.set(-1.84,.72,0);
+  const right=left.clone(); right.position.x=1.84;
+  const back=roundedBox(3.75,.67,.14,palette.woodLight,.04,.88,.02); back.position.set(0,.72,-1.49);
+  const front=roundedBox(4.02,1.18,.27,0x76543c,.08,.78,.04); front.position.set(0,.87,1.6);
+  const inset=roundedBox(3.5,.72,.06,0x60422f,.06,.86,.02); inset.position.set(0,.87,1.75);
+  const handleBar=cylinder(.095,1.15,palette.steel,22); handleBar.rotation.z=Math.PI/2; handleBar.position.set(0,.92,1.98);
+  const mountLeft=cylinder(.085,.22,palette.steel,18); mountLeft.rotation.x=Math.PI/2; mountLeft.position.set(-.48,.92,1.87);
+  const mountRight=mountLeft.clone(); mountRight.position.x=.48;
+  tray.add(bottom,left,right,back,front,inset,handleBar,mountLeft,mountRight);
+  const folder=roundedBox(1.25,.12,1.65,0x8b453a,.04,.88,.01); folder.position.set(-1.05,.56,-.24); folder.rotation.y=-.08;
+  const notebook=roundedBox(.78,.17,1.46,0xd7c9a8,.06,.88,.01); notebook.position.set(.15,.61,-.56); notebook.rotation.y=.04;
+  const envelope=roundedBox(1.52,.08,.88,0xb89b65,.035,.91,.01); envelope.position.set(.05,.6,.61); envelope.rotation.y=-.05;
+  const pouch=roundedBox(.94,.2,1.24,0x33413d,.12,.4,.18); pouch.position.set(1.23,.62,-.25);
+  const circuit=roundedBox(.65,.11,.66,0x245e4f,.035,.5,.12); circuit.position.set(1.23,.79,-.25);
+  const coil=new THREE.Mesh(new THREE.TorusGeometry(.28,.035,8,28),mat(palette.red,.5,.1)); coil.rotation.x=Math.PI/2; coil.position.set(1.25,.88,.28);
+  tray.add(folder,notebook,envelope,pouch,circuit,coil);
+  const handleHit=hitBox("drawer-handle","PULL THE METAL HANDLE",[1.7,.72,.58],[0,.92,1.99],[handleBar,front,inset]);
   tray.add(handleHit); hits.push(handleHit);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["folder","PROJECT FOLDER",folder,[2.25,.55,1.8],[-1.65,.75,-.2]],
-    ["notebook","FIELD NOTEBOOK",notebook,[1.45,.55,1.75],[.35,.76,-.55]],
-    ["envelope","SEALED ENVELOPE",envelope,[2.3,.5,1.12],[.25,.75,.65]],
-    ["components","COMPONENT POUCH",pouch,[1.65,.6,1.55],[2,.78,-.25]],
+    ["folder","PROJECT FOLDER",folder,[1.42,.55,1.82],[-1.05,.75,-.24]],
+    ["notebook","FIELD NOTEBOOK",notebook,[1,.55,1.7],[.15,.76,-.56]],
+    ["envelope","SEALED ENVELOPE",envelope,[1.7,.5,1.08],[.05,.75,.61]],
+    ["components","COMPONENT POUCH",pouch,[1.2,.65,1.52],[1.23,.8,-.25]],
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual],true); tray.add(hit); hits.push(hit); });
-  tray.position.set(0,.05,-.3);
+  tray.position.set(-1,.05,-.36);
   scene.add(tray);
-  for(const x of [-3.15,3.15]){ const leg=box(.25,2,.25,palette.metal,.4,.68); leg.position.set(x,1,-1.55); scene.add(leg); }
+
+  buildPrinterModel(scene,[2.25,2.32,-.45],.62);
+  const paperStack=roundedBox(1.65,.12,1.32,palette.paper,.04,.94,.01); paperStack.position.set(2.25,2.43,1.25); paperStack.rotation.y=-.09; scene.add(paperStack);
+  const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); scene.add(mug);
+  const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); scene.add(lampBase);
+  const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); scene.add(lampStem);
+  const shade=new THREE.Mesh(new THREE.ConeGeometry(.42,.55,28,1,true),mat(0x202825,.36,.62)); shade.position.set(3.72,3.72,-1.2); shade.rotation.z=Math.PI; scene.add(shade);
+}
+
+function buildPrinter(scene:THREE.Scene,hits:HitMesh[]) {
+  const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
+  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=.18; scene.add(desk);
+  const matBoard=roundedBox(7.6,.035,3.85,0x243632,.05,.95,.02); matBoard.position.y=.38; scene.add(matBoard);
+  buildPrinterModel(scene,[0,.42,-.35],1,true,hits);
+  const monitor=roundedBox(2.15,1.45,.22,0x252d2b,.1,.36,.58); monitor.position.set(-3.12,1.52,-1.15); monitor.rotation.y=.13; scene.add(monitor);
+  const monitorScreen=roundedBox(1.82,1.16,.03,0x153b38,.035,.18,.08); monitorScreen.position.set(-3,1.52,-1.02); monitorScreen.rotation.y=.13; scene.add(monitorScreen);
+  const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.48,-1.1); note.rotation.y=-.12; scene.add(note);
+  const pen=cylinder(.06,1.55,palette.red,14); pen.rotation.z=Math.PI/2; pen.position.set(3.1,.55,.25); scene.add(pen);
 }
 
 function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
@@ -151,8 +233,8 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
   const matBoard=box(6.9,.06,4.6,0x213a35,.95,.02); matBoard.position.y=.27; scene.add(matBoard);
   for(let index=0;index<10;index+=1){ const grid=box(.015,.015,4.35,0x496960); grid.position.set(-3.1+index*.68,.315,0); scene.add(grid); }
   const book=new THREE.Group();
-  const left=box(3.05,.12,3.85,palette.paper,.94,.01); left.position.set(-1.53,.48,0); left.rotation.y=-.025;
-  const right=box(3.05,.12,3.85,0xe8ddc1,.94,.01); right.position.set(1.53,.48,0); right.rotation.y=.025;
+  const left=roundedBox(3.05,.12,3.85,palette.paper,.06,.94,.01); left.position.set(-1.53,.48,0); left.rotation.y=-.025;
+  const right=roundedBox(3.05,.12,3.85,0xe8ddc1,.06,.94,.01); right.position.set(1.53,.48,0); right.rotation.y=.025;
   book.add(left,right);
   addLines(book,-1.53,.55,-1.42,2.45,12);
   addLines(book,1.53,.55,-1.42,2.45,12);
@@ -169,8 +251,8 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
 }
 
 function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
-  const frame=box(8.4,5.35,.35,palette.wood,.86,.03); frame.position.set(0,2.7,-.25); scene.add(frame);
-  const cork=box(7.85,4.82,.18,0x765d42,.98,.01); cork.position.set(0,2.7,0); scene.add(cork);
+  const frame=roundedBox(8.4,5.35,.35,palette.wood,.11,.86,.03); frame.position.set(0,2.7,-.25); scene.add(frame);
+  const cork=roundedBox(7.85,4.82,.18,0x765d42,.06,.98,.01); cork.position.set(0,2.7,0); scene.add(cork);
   const notes=[
     {x:-2.65,y:3.75,w:1.5,h:1.1,color:0xe1d3a4,label:"RESEARCH FIRST"},
     {x:-.7,y:3.55,w:1.65,h:1.35,color:0xb8d5cc,label:"OPEN QUESTION"},
@@ -179,7 +261,7 @@ function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
     {x:-1.9,y:1.65,w:1.85,h:1.2,color:0xc7b77f,label:"USEFUL FIRST"},
   ];
   notes.forEach((note,index)=>{
-    const paper=box(note.w,note.h,.06,note.color,.94,.01); paper.position.set(note.x,note.y,.18); paper.rotation.z=(index-2)*.035; scene.add(paper);
+    const paper=roundedBox(note.w,note.h,.06,note.color,.035,.94,.01); paper.position.set(note.x,note.y,.18); paper.rotation.z=(index-2)*.035; scene.add(paper);
     for(let line=0;line<4;line+=1){ const mark=box(note.w*.68,.018,.02,line===0?palette.red:0x63746d); mark.position.set(note.x,note.y+.25-line*.17,.225); mark.rotation.z=paper.rotation.z; scene.add(mark); }
     const pin=cylinder(.07,.1,index===2?palette.red:palette.signal,12); pin.rotation.x=Math.PI/2; pin.position.set(note.x,note.y+note.h*.37,.27); scene.add(pin);
     const hit=hitBox(String(index),note.label,[note.w+.2,note.h+.2,.45],[note.x,note.y,.28],[paper]); scene.add(hit); hits.push(hit);
@@ -194,16 +276,16 @@ function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
 function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   const table=box(9,.35,5.8,palette.woodLight,.89,.03); table.position.y=.02; scene.add(table);
   const caseGroup=new THREE.Group();
-  const base=box(5.3,.65,3.35,0x3b3327,.62,.18); base.position.set(-1,.65,-.2);
-  const lid=box(5.3,.22,3.35,0x604b35,.62,.16); lid.position.set(-1,2.35,-1.45); lid.rotation.x=-1.08;
+  const base=roundedBox(5.3,.65,3.35,0x3b3327,.16,.62,.18); base.position.set(-1,.65,-.2);
+  const lid=roundedBox(5.3,.22,3.35,0x604b35,.13,.62,.16); lid.position.set(-1,2.35,-1.45); lid.rotation.x=-1.08;
   caseGroup.add(base,lid);
   const target=new THREE.Mesh(new THREE.CylinderGeometry(.92,.92,.08,48),mat(palette.paper)); target.rotation.x=Math.PI/2; target.position.set(-2,.99,-.2); caseGroup.add(target);
   [0x507b78,0xcab65b,palette.red].forEach((color,index)=>{ const ring=new THREE.Mesh(new THREE.CylinderGeometry(.7-index*.22,.7-index*.22,.09,40),mat(color)); ring.rotation.x=Math.PI/2; ring.position.set(-2,.99,-.15+index*.01); caseGroup.add(ring); });
-  const card=box(1.55,.06,.95,0xd8d0b9); card.position.set(.25,1.02,-.7); card.rotation.y=.1; caseGroup.add(card);
-  const ticket=box(1.65,.06,.78,0xcbbb82); ticket.position.set(.3,1.02,.5); ticket.rotation.y=-.12; caseGroup.add(ticket);
+  const card=roundedBox(1.55,.06,.95,0xd8d0b9,.035); card.position.set(.25,1.02,-.7); card.rotation.y=.1; caseGroup.add(card);
+  const ticket=roundedBox(1.65,.06,.78,0xcbbb82,.035); ticket.position.set(.3,1.02,.5); ticket.rotation.y=-.12; caseGroup.add(ticket);
   scene.add(caseGroup);
   const drafts:THREE.Mesh[]=[];
-  for(let index=0;index<3;index+=1){ const draft=box(2.05,.05,1.45,index===1?0xd5c99f:palette.paperDark); draft.position.set(2.55+index*.28,.28,-1.35+index*1.25); draft.rotation.y=-.2+index*.12; scene.add(draft); addLines(scene,draft.position.x,.34,draft.position.z-.48,1.45,5); drafts.push(draft); }
+  for(let index=0;index<3;index+=1){ const draft=roundedBox(2.05,.05,1.45,index===1?0xd5c99f:palette.paperDark,.035); draft.position.set(2.55+index*.28,.28,-1.35+index*1.25); draft.rotation.y=-.2+index*.12; scene.add(draft); addLines(scene,draft.position.x,.34,draft.position.z-.48,1.45,5); drafts.push(draft); }
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
     ["target","USED TARGET",target,[2.1,.65,2.1],[-2,1.15,-.2]],
     ["internship","WORK CARD",card,[1.85,.55,1.2],[.25,1.18,-.7]],
@@ -216,10 +298,11 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
 
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
   books:{position:[0,3.1,8.6],target:[0,2.35,0],hint:"DRAG TO LOOK · CLICK A BOOK"},
-  drawer:{position:[0,5.8,7.4],target:[0,.75,0],hint:"CLICK THE HANDLE, THEN SELECT A FILE"},
+  drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:"CLICK THE METAL HANDLE, THEN SELECT A FILE"},
   notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:"DRAG TO LOOK · CLICK A PAGE OR INSERT"},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:"FOLLOW THE THREADS · CLICK A NOTE"},
   fieldcase:{position:[0,5.4,7.2],target:[0,.75,0],hint:"INSPECT THE CASE AND THE DRAFTS BESIDE IT"},
+  printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:"INCOMING FIELD REPORT · PRINTING"},
 };
 
 export default function ZoneCloseup3D({zone,onSelect}:Props) {
@@ -252,6 +335,7 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     if(zone==="notebook")buildNotebook(scene,hits);
     if(zone==="board")buildBoard(scene,hits);
     if(zone==="fieldcase")buildFieldCase(scene,hits);
+    if(zone==="printer")buildPrinter(scene,hits);
     scene.add(new THREE.HemisphereLight(0x789892,0x090d0c,.85));
     const warm=new THREE.DirectionalLight(0xffc889,3.4); warm.position.set(-4,8,6); warm.castShadow=true; warm.shadow.mapSize.set(1536,1536); scene.add(warm);
     const cyan=new THREE.PointLight(palette.cyan,8,14,1.8); cyan.position.set(4,3,4); scene.add(cyan);
@@ -268,13 +352,17 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     let drawerProgress=0;
     let drawerTarget=0;
     const drawerTray=scene.children.find((child)=>child.userData.drawerTray) as THREE.Group|undefined;
+    let faxPaperGroup:THREE.Group|undefined;
+    scene.traverse((child)=>{if(child.userData.faxPaperGroup)faxPaperGroup=child as THREE.Group;});
+    const printStarted=performance.now()+550;
+    let printProgress=zone==="printer"?0:1;
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
     const resize=()=>{ const rect=canvas.getBoundingClientRect(); renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false); camera.aspect=Math.max(1,rect.width)/Math.max(1,rect.height); camera.updateProjectionMatrix(); };
     const observer=new ResizeObserver(resize); observer.observe(canvas); resize();
     const readHit=(event:PointerEvent)=>{
       const rect=canvas.getBoundingClientRect(); pointer.x=((event.clientX-rect.left)/rect.width)*2-1; pointer.y=-((event.clientY-rect.top)/rect.height)*2+1; raycaster.setFromCamera(pointer,camera);
-      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find((hit)=>!hit.userData.requiresOpen||drawerProgress>.72)??null;
+      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96))??null;
       return found;
     };
     const pointerMove=(event:PointerEvent)=>{
@@ -284,12 +372,19 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
     const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle")drawerTarget=1;else if(item)selectRef.current(item);}canvas.style.cursor=hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
-    const tick=()=>{
+    const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
-      if(drawerTray)drawerTray.position.z=-.3+drawerProgress*2.7;
+      if(drawerTray)drawerTray.position.z=-.36+drawerProgress*2.7;
+      if(zone==="printer"&&faxPaperGroup){
+        printProgress=THREE.MathUtils.clamp((now-printStarted)/4600,0,1);
+        const eased=1-Math.pow(1-printProgress,3);
+        faxPaperGroup.scale.z=.035+eased*.965;
+        faxPaperGroup.position.y=.88-eased*.22;
+        if(labelRef.current&&!hovered)labelRef.current.textContent=printProgress>.96?"FIELD REPORT READY · CLICK THE PAPER":"INCOMING FIELD REPORT · PRINTING";
+      }
       const desired=defaultPosition.clone(); desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5; camera.position.lerp(desired,.06); camera.lookAt(target);
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
-    };tick();
+    };frame=requestAnimationFrame(tick);
     return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
