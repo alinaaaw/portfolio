@@ -221,30 +221,10 @@ export default function VersionTwo() {
       >
         <canvas ref={canvasRef} className="archery-canvas" aria-hidden="true" />
         <div className="focus-cursor" aria-hidden="true"><i /></div>
-        <div className="field-sky" aria-hidden="true">
-          <span className="sky-glow" />
-          <span className="cloud cloud-one" />
-          <span className="cloud cloud-two" />
-          <span className="signal-star star-one" />
-          <span className="signal-star star-two" />
-          <span className="signal-star star-three" />
-        </div>
-        <div className="ridge ridge-far" aria-hidden="true" />
-        <div className="ridge ridge-near" aria-hidden="true" />
-        <div className="field-plane" aria-hidden="true">
-          <span className="field-grid" />
-          <span className="route-line route-line-one" />
-          <span className="route-line route-line-two" />
-          <span className="route-pulse pulse-one" />
-          <span className="route-pulse pulse-two" />
-        </div>
-        <div className="range-world" aria-hidden="true">
-          <span className="range-sun" />
-          <span className="range-cloud cloud-a" /><span className="range-cloud cloud-b" />
-          <span className="range-tree tree-a" /><span className="range-tree tree-b" /><span className="range-tree tree-c" />
-          <span className="range-flag flag-a" /><span className="range-flag flag-b" />
-          <span className="range-grass grass-a" /><span className="range-grass grass-b" /><span className="range-grass grass-c" />
-          <span className="wind-line wind-a" /><span className="wind-line wind-b" />
+        <div className="range-atmosphere" aria-hidden="true">
+          <span className="range-light-leak" />
+          <span className="range-vignette" />
+          <span className="range-grain" />
         </div>
         <InteractiveModel kind="range" className="range-three-stage" interactive={false} />
         <div className="v2-intro">

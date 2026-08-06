@@ -2,50 +2,49 @@
 
 ## Overview
 
-An animated, illustrated digital world that feels professional at first glance
-and more playful through exploration. The style is crafted, alive, warm, and
-slightly unexpected without becoming childish or game-menu heavy.
+A tactile, cinematic clubhouse world built from dark space, aged timber, brushed
+metal, canvas, rope, and paper evidence. It should feel professional on arrival
+and reveal warmth, curiosity, and quiet humor through exploration.
 
-The shared world is an outdoor archery range at late afternoon with an adjacent
-timber clubhouse, repair shed, storage lockers, target archive, and route board.
-Outdoor views use open atmosphere and long depth; interior views use warm wood,
-paper evidence, practical objects, and light that feels connected to the range.
+The outdoor range and the interior rooms belong to one physical place. The range
+must use the same materials, lighting, weight, and camera language as the locker,
+workbench, archive, and route board. Important spatial objects are rendered in 3D;
+2D interface elements are reserved for labels, readouts, annotations, and content.
 
-Use low-poly or 2.5D environments, soft baked-looking light, restrained technical
-labels, and physical interaction. Archery contributes a visual language of rings,
-trajectories, tension, focus, impact, and release.
-
-The interface should create curiosity before it explains. Personality is expressed
-through interaction, environmental traces, corrections, and quiet humor—not direct
-lists of traits.
+Archery contributes tension, focus, trajectory, impact, and release without making
+the portfolio feel militaristic or like a full game. Personality is communicated
+through objects, traces, corrections, and interaction—not adjective lists.
 
 ## Colors
 
-Large surfaces use natural atmospheric colors. Lime and coral are signal colors
-reserved for focus and impact.
+Large surfaces are dark, warm, and low-saturation. Lime and coral are signal colors,
+not decorative fills.
 
-- **Deep Ink (`#101827`)** — text, navigation, dark surfaces, and depth.
-- **Sky Blue (`#88ADD1`)** — atmosphere and open backgrounds.
-- **Field Green (`#667A63`)** — ground, foliage, and secondary surfaces.
-- **Warm Paper (`#F2EBDD`)** — readable content surfaces.
-- **Chalk White (`#F7F4EA`)** — high-contrast text and fine detail.
-- **Target Coral (`#E9664A`)** — impact and committed action.
-- **Focus Lime (`#C7E86A`)** — focus, discovery, and active feedback.
-- **Dusk Peach (`#E9A17F`)** — warmth and atmospheric transitions.
+- **Deep Ink (`#101827`)** — navigation, deep shadow, and high-contrast surfaces.
+- **Charcoal Green (`#1B2824`)** — atmospheric backgrounds and range depth.
+- **Range Green (`#405346`)** — ground, canvas, and environmental surfaces.
+- **Dark Timber (`#3B2B23`)** — structural frames and shadowed wood.
+- **Warm Timber (`#76543B`)** — doors, benches, stands, and handles.
+- **Aged Paper (`#F3E7C8`)** — labels, notes, target faces, and readable surfaces.
+- **Brushed Metal (`#9D9B90`)** — hardware and small structural details.
+- **Focus Lime (`#C9FF69`)** — focus, discovery, and active feedback.
+- **Impact Coral (`#FF7356`)** — impact and committed action.
+- **Dusk Amber (`#E7B06A`)** — warm practical light.
 
-Use only one signal color as the dominant accent in a view. Avoid pure black,
-pure white, rainbow palettes, neon overload, and generic blue-purple gradients.
-Maintain WCAG AA contrast for essential text and controls.
+Use one signal color as the dominant accent in a view. Avoid pure black, pure white,
+rainbow palettes, neon overload, and generic blue-purple gradients. Essential text
+and controls must maintain WCAG AA contrast.
 
 ## Typography
 
 - **Primary sans:** Noto Sans SC or a clean humanist sans-serif for display and body.
 - **Monospace:** Space Mono for labels, states, captions, and metadata.
-- **Optional annotation:** a restrained handwritten face only for very short notes.
+- **Optional annotation:** a restrained handwritten face for very short notes only.
 
-Display headings are large and compact. Body text uses generous line height.
-Monospace labels are small, uppercase, and widely tracked. Outlined type may
-highlight one word in a major heading, never a paragraph.
+Display headings are compact and confident. Body text uses generous line height.
+Monospace labels are small, uppercase, and widely tracked. Typography may sit on
+paper, enamel plates, or dark instrument panels, but should not float as a large
+generic hero block over the environment.
 
 Avoid excessive bold text, terminal styling, and technology-logo walls.
 
@@ -53,59 +52,62 @@ Avoid excessive bold text, terminal styling, and technology-logo walls.
 
 The layout is world-first rather than card-first.
 
-- Use a full-viewport animated environment as the main visual anchor.
-- Maintain clear foreground, middle ground, and background layers.
+- Use a full-viewport 3D environment as the main visual anchor.
+- Maintain clear foreground, middle ground, and background depth.
 - Keep permanent navigation minimal and visually quiet.
 - Reveal detail through focused layers and spatial transitions.
-- Treat route changes as camera movement between parts of one place.
+- Treat route changes as movement between parts of one clubhouse.
 - Use an 8px spacing base and a 720px maximum width for long-form text.
-- Prefer asymmetry, open space, and one strong focal point.
+- Prefer asymmetry, breathing room, and one strong focal point.
 - Simplify composition on mobile instead of shrinking the desktop scene.
 
 Avoid dashboard grids, dense HUD overlays, repeated cards, and large text blocks
-over the animated environment.
+that obscure the environment.
 
-## Elevation & Depth
+## Materials, Lighting & Depth
 
-Create depth through scale, lighting, haze, camera parallax, and overlapping
-environmental layers. Use broad soft shadows and subtle fog.
+Depth comes from perspective, overlapping geometry, restrained haze, contact
+shadows, and material response—not flat decorative layers.
 
-Focused content uses Warm Paper or Deep Ink surfaces that appear connected to
-the world. Avoid heavy glassmorphism, nested shadows, excessive blur, and glowing
-outlines on every object.
+- Give major geometry thickness and softened or chamfered edges.
+- Use rough timber, matte paper, worn canvas, and selectively reflective metal.
+- Light scenes with one warm directional key and a cooler ambient fill.
+- Ground every important object with a contact shadow.
+- Use a human-eye perspective camera with subtle pointer parallax.
+- Keep the outdoor range slightly hazy so it feels connected to the darker rooms.
+- Let focus and impact alter light, camera, or material response in a restrained way.
 
-## Shapes
+Do not use flat clip-path mountains, generic CSS clouds, grid floors, or floating
+icon illustrations as primary scenery. Avoid sterile showroom lighting and glossy
+plastic surfaces.
 
-- Circles, rings, crosshairs, arcs, and trajectories are recurring motifs.
-- Environmental geometry is low-poly with softened or chamfered edges.
-- Interactive elements use distinctive silhouettes rather than labels alone.
-- Borders are thin and precise; organic forms are slightly imperfect.
+## Shapes & Components
 
-Avoid pill-shaped UI everywhere, photorealistic weapons, militaristic styling,
-and generic 3D technology symbols.
-
-## Components
-
-### Surfaces and controls
-
+- Rings, crosshairs, arcs, trajectories, and notches are recurring motifs.
+- Interactive objects use distinctive silhouettes and material cues before labels.
+- Borders are thin and precise; physical surfaces may be slightly imperfect.
 - Controls are compact, high-contrast, and use monospace labels.
-- Primary actions use either Focus Lime or Target Coral.
+- Primary actions use either Focus Lime or Impact Coral.
 - Focus states use a visible 2px Focus Lime outline.
 - Content surfaces favor paper, ink, diagrams, and annotations over generic cards.
 
-### Motion
+Avoid pill-shaped UI everywhere, photorealistic weapons, generic 3D technology
+symbols, and decorative objects that suggest an interaction but do nothing.
 
-- Ambient movement uses asynchronous 8–30 second cycles.
+## Motion
+
+- Ambient movement uses slow, asynchronous 8–30 second cycles.
 - Hover and focus reactions use 120–220ms transitions.
 - Physical responses settle over 400–900ms with natural easing.
 - Spatial transitions use 700–1100ms and preserve visual continuity.
 - Input-linked motion shows tension, weight, trajectory, impact, and settling.
+- Outdoor camera movement should feel observational, not like the whole world floats.
 - Environmental changes may persist during the visit to create memory.
 
 Avoid synchronized loops, constant camera shake, excessive bounce, automatic
 carousels, long intros, and motion without interaction value.
 
-### Accessibility and performance
+## Accessibility & Performance
 
 Support keyboard and touch, provide a non-precision alternative for aiming, and
 respect `prefers-reduced-motion`. Reduce secondary effects on lower-power devices
@@ -115,8 +117,8 @@ and load detailed assets only when needed. Sound is optional and off by default.
 
 ### Do
 
-- Make the world feel alive before input.
-- Use physical feedback and spatial continuity.
+- Make the world feel inhabited before input.
+- Use physical feedback, material continuity, and spatial continuity.
 - Communicate personality indirectly through discovery.
 - Balance professional composition with subtle humor.
 - Keep interactions understandable within a few seconds.
@@ -125,7 +127,7 @@ and load detailed assets only when needed. Sound is optional and off by default.
 
 - Do not use a car, avatar movement, map, score, or complex game controls.
 - Do not describe personality with adjective lists.
-- Do not use generic mountains, grid floors, code rain, or cyberpunk HUDs.
+- Do not let the homepage become a separate bright cartoon world.
 - Do not turn every section into the same card or modal.
 - Do not sacrifice clarity, accessibility, or loading speed for effects.
 - Do not copy another portfolio's assets, composition, or identity.

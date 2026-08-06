@@ -193,38 +193,136 @@ function buildRoutes(group: THREE.Group, targets: InteractivePart[]) {
 }
 
 function buildRange(group: THREE.Group, targets: InteractivePart[]) {
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(24, 15), material(palette.field));
+  const groundMaterial = new THREE.MeshStandardMaterial({
+    color: palette.field,
+    roughness: .98,
+    metalness: 0,
+  });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(34, 30, 12, 12), groundMaterial);
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -2.75;
-  ground.position.z = -2;
+  ground.position.set(0, -3, -6);
   group.add(ground);
-  const positions = [[-5,1.1,-1],[-2.6,-.65,1],[0,.75,-1.8],[2.7,-.45,.7],[5,1.05,-.6]];
-  positions.forEach(([x,y,z], index) => {
+
+  const backWall = box(31, 8, .8, 0x17231f);
+  backWall.position.set(0, .45, -15);
+  group.add(backWall);
+  for (let index = 0; index < 15; index += 1) {
+    const slat = box(1.82, 7.25, .18, index % 3 === 0 ? 0x304036 : 0x26372f);
+    slat.position.set(-13.6 + index * 1.94, .35, -14.52);
+    group.add(slat);
+  }
+
+  const canopy = new THREE.Group();
+  const roof = box(31, .55, 5.2, palette.timberDark);
+  roof.position.set(0, 4.2, -12.3);
+  canopy.add(roof);
+  [-13.8, -7, 0, 7, 13.8].forEach((x) => {
+    const post = box(.38, 7.2, .38, palette.timber);
+    post.position.set(x, .35, -11.35);
+    canopy.add(post);
+  });
+  const beam = box(30.2, .5, .5, palette.timber);
+  beam.position.set(0, 3.55, -11.35);
+  canopy.add(beam);
+  group.add(canopy);
+
+  for (let lane = 0; lane < 5; lane += 1) {
+    const x = -8 + lane * 4;
+    const laneStrip = box(.055, .025, 15.5, 0xb6a77e);
+    laneStrip.position.set(x, -2.95, -3.4);
+    group.add(laneStrip);
+    const shootingLine = box(3.25, .035, .15, lane === 2 ? palette.mint : palette.paper);
+    shootingLine.position.set(x, -2.91, 5.15);
+    group.add(shootingLine);
+  }
+
+  const positions = [
+    [-8, -.35, -5.7],
+    [-4, -.7, -8],
+    [0, -.28, -5.4],
+    [4, -.7, -8],
+    [8, -.35, -5.7],
+  ];
+  positions.forEach(([x, y, z], index) => {
     const target = new THREE.Group();
-    const stand = box(.14,2.4,.14,palette.timberDark);
-    stand.position.y = -1.45;
-    target.add(stand);
-    const face = new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.05,.2,48),material(palette.paper));
+    const backing = box(2.85, 2.85, .34, palette.timberDark);
+    backing.position.z = -.13;
+    target.add(backing);
+
+    const standLeft = box(.2, 2.7, .26, palette.timber);
+    standLeft.position.set(-.85, -2.5, -.2);
+    const standRight = standLeft.clone();
+    standRight.position.x = .85;
+    const braceLeft = box(.18, 2.1, .2, palette.timberDark);
+    braceLeft.position.set(-1.05, -2.85, -.55);
+    braceLeft.rotation.z = -.38;
+    const braceRight = braceLeft.clone();
+    braceRight.position.x = 1.05;
+    braceRight.rotation.z = .38;
+    target.add(standLeft, standRight, braceLeft, braceRight);
+
+    const face = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.25, 1.25, .12, 64),
+      material(palette.paper, .94),
+    );
     face.rotation.x = Math.PI / 2;
+    face.position.z = .12;
     target.add(face);
-    const blue = new THREE.Mesh(new THREE.CylinderGeometry(.67,.67,.215,42),material(palette.blue));
-    blue.rotation.x = Math.PI / 2;
-    blue.position.z = .015;
-    target.add(blue);
-    const orange = new THREE.Mesh(new THREE.CylinderGeometry(.31,.31,.23,36),material(palette.orange));
-    orange.rotation.x = Math.PI / 2;
-    orange.position.z = .035;
-    target.add(orange);
-    const center = new THREE.Mesh(new THREE.CylinderGeometry(.105,.105,.245,24),material(palette.mint));
-    center.rotation.x = Math.PI / 2;
-    center.position.z = .055;
-    target.add(center);
-    target.position.set(x,y,z);
-    target.scale.setScalar(.78 + (z + 2) * .045);
+
+    const rings = [
+      { radius: .88, color: 0x405346, depth: .145 },
+      { radius: .58, color: 0x314c52, depth: .16 },
+      { radius: .32, color: palette.orange, depth: .175 },
+      { radius: .115, color: 0x2a241f, depth: .19 },
+    ];
+    rings.forEach(({ radius, color, depth }) => {
+      const ring = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius, radius, .065, 48),
+        material(color, .86),
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.z = depth;
+      target.add(ring);
+    });
+
+    const numberPlate = box(.62, .28, .08, palette.metal);
+    numberPlate.position.set(0, -1.72, .2);
+    target.add(numberPlate);
+    target.position.set(x, y, z);
+    target.rotation.y = (index - 2) * -.018;
+    target.scale.setScalar(index % 2 ? .82 : .94);
     addInteractive(targets, face, index, "target");
     group.add(target);
   });
-  group.rotation.x = -.08;
+
+  const equipmentRack = new THREE.Group();
+  const rackBack = box(3.1, 3.7, .4, palette.timberDark);
+  rackBack.position.z = -.3;
+  equipmentRack.add(rackBack);
+  for (let index = 0; index < 5; index += 1) {
+    const arrow = new THREE.Mesh(
+      new THREE.CylinderGeometry(.025, .025, 2.7, 8),
+      material(index === 4 ? palette.orange : palette.metal, .4, .55),
+    );
+    arrow.position.set(-1.05 + index * .52, .2, 0);
+    arrow.rotation.z = .035 * (index - 2);
+    equipmentRack.add(arrow);
+  }
+  equipmentRack.position.set(12.1, -1.05, -9.8);
+  group.add(equipmentRack);
+
+  const lampMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffd89a,
+    emissive: 0xe7a85c,
+    emissiveIntensity: 2.2,
+    roughness: .35,
+  });
+  [-9.5, 0, 9.5].forEach((x) => {
+    const shade = new THREE.Mesh(new THREE.CylinderGeometry(.16, .42, .42, 18), lampMaterial);
+    shade.rotation.x = Math.PI;
+    shade.position.set(x, 3.63, -11.05);
+    group.add(shade);
+  });
 }
 
 export default function InteractiveModel({ kind, activeIndex = 0, className = "", title, hint, interactive = true, onSelect }: InteractiveModelProps) {
@@ -238,14 +336,22 @@ export default function InteractiveModel({ kind, activeIndex = 0, className = ""
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: kind !== "range", antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = kind === "range" ? 1.05 : 1.12;
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(kind === "range" ? 38 : 34, 1, .1, 100);
-    camera.position.set(0, kind === "range" ? 1.2 : .25, kind === "range" ? 17 : 14);
+    if (kind === "range") {
+      scene.background = new THREE.Color(0x18231f);
+      scene.fog = new THREE.Fog(0x18231f, 15, 39);
+    }
+    const camera = new THREE.PerspectiveCamera(kind === "range" ? 43 : 34, 1, .1, 100);
+    camera.position.set(0, kind === "range" ? 2.4 : .25, kind === "range" ? 15.8 : 14);
+    if (kind === "range") camera.lookAt(0, -.65, -5.6);
     const root = new THREE.Group();
     const targets: InteractivePart[] = [];
     scene.add(root);
@@ -255,14 +361,27 @@ export default function InteractiveModel({ kind, activeIndex = 0, className = ""
     if (kind === "routes") buildRoutes(root, targets);
     if (kind === "range") buildRange(root, targets);
 
-    scene.add(new THREE.HemisphereLight(0xfff3d7, 0x28413c, 2.25));
-    const key = new THREE.DirectionalLight(0xffdca8, 3.2);
-    key.position.set(-4, 7, 9);
+    scene.add(new THREE.HemisphereLight(kind === "range" ? 0x9fb4ad : 0xfff3d7, 0x18241f, kind === "range" ? 1.45 : 2.25));
+    const key = new THREE.DirectionalLight(0xffd39b, kind === "range" ? 3.8 : 3.2);
+    key.position.set(-7, 10, 8);
     key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.left = -18;
+    key.shadow.camera.right = 18;
+    key.shadow.camera.top = 14;
+    key.shadow.camera.bottom = -12;
+    key.shadow.camera.far = 55;
     scene.add(key);
-    const accent = new THREE.PointLight(palette.mint, 5.5, 22);
-    accent.position.set(5, 2, 5);
+    const accent = new THREE.PointLight(kind === "range" ? 0xe7b06a : palette.mint, kind === "range" ? 12 : 5.5, kind === "range" ? 30 : 22);
+    accent.position.set(kind === "range" ? -8 : 5, kind === "range" ? 4 : 2, kind === "range" ? -5 : 5);
     scene.add(accent);
+
+    scene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.castShadow = kind === "range";
+        object.receiveShadow = true;
+      }
+    });
 
     const pointer = new THREE.Vector2(5, 5);
     const raycaster = new THREE.Raycaster();
@@ -275,6 +394,11 @@ export default function InteractiveModel({ kind, activeIndex = 0, className = ""
       const rect = canvas.getBoundingClientRect();
       renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
       camera.aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
+      if (kind === "range") {
+        camera.fov = camera.aspect < .8 ? 52 : 43;
+        camera.position.z = camera.aspect < .8 ? 27 : 15.8;
+        camera.lookAt(0, -.65, -5.6);
+      }
       camera.updateProjectionMatrix();
     };
     const observer = new ResizeObserver(resize);
@@ -301,9 +425,15 @@ export default function InteractiveModel({ kind, activeIndex = 0, className = ""
 
     const tick = (now: number) => {
       const seconds = now * .001;
-      root.rotation.y += ((pointerX * .09) - root.rotation.y) * .045;
-      root.rotation.x += ((-pointerY * .035) - root.rotation.x) * .04;
-      root.position.y = Math.sin(seconds * .7) * .045;
+      if (kind === "range") {
+        camera.position.x += ((pointerX * .38) - camera.position.x) * .025;
+        camera.position.y += ((2.4 - pointerY * .16) - camera.position.y) * .025;
+        camera.lookAt(pointerX * .18, -.65 - pointerY * .06, -5.6);
+      } else {
+        root.rotation.y += ((pointerX * .09) - root.rotation.y) * .045;
+        root.rotation.x += ((-pointerY * .035) - root.rotation.x) * .04;
+        root.position.y = Math.sin(seconds * .7) * .045;
+      }
 
       root.children.forEach((child) => {
         const index = child.userData.index as number | undefined;
