@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Noto_Sans_SC, Space_Mono } from "next/font/google";
+
 const sans = Noto_Sans_SC({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -11,28 +13,35 @@ const mono = Space_Mono({
   weight: ["400", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Alina — Pixels, Algorithms & People",
-  description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-  openGraph: {
-    title: "ALINA.WU — Pixels, Algorithms & People",
-    description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Alina's interactive personal workbench" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ALINA.WU — Pixels, Algorithms & People",
-    description: "A personal space for websites, algorithms, hardware, and the complexity of being human.",
-    images: ["/og.png"],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+  const origin = `${protocol}://${host}`;
+  const title = "Alina Wu — Case File 03: The Missing Researcher";
+  const description = "Enter an abandoned creative lab and reconstruct Alina through projects, notes, annotations, and five connected clues.";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: `${origin}/og.png`, width: 1200, height: 630, alt: "Case File 03 evidence desk for The Missing Researcher" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${origin}/og.png`],
+    },
+  };
+}
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="stylesheet" href="/site.css" />
-      </head>
+      <head><link rel="stylesheet" href="/site.css" /></head>
       <body className={`${sans.variable} ${mono.variable}`}>{children}</body>
     </html>
   );

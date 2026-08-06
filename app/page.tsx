@@ -1,531 +1,362 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-type PanelId = "web" | "algorithm" | "hardware" | "notes" | "travel";
-type FocusId = "now" | "build" | "learn" | "explore";
-type Shot = { id: number; x: number; y: number; focus: FocusId };
+type ClueId = "terminal" | "route" | "device" | "notebook" | "fieldbag";
 
-const panelNames: Record<PanelId, string> = {
-  web: "WEB / SMALL SITES",
-  algorithm: "ALGORITHM / SEARCH & REASON",
-  hardware: "HARDWARE / PHYSICAL SYSTEMS",
-  notes: "NOTES / THOUGHT FRAGMENTS",
-  travel: "TRAVEL / OFF THE ROUTE",
+type Clue = {
+  code: string;
+  label: string;
+  object: string;
+  title: string;
+  finding: string;
+  deduction: string;
+  project: string;
+  fragment: string;
+  tags: string[];
 };
 
-const panelOrder: PanelId[] = ["web", "algorithm", "hardware", "notes", "travel"];
+const clueOrder: ClueId[] = ["terminal", "route", "device", "notebook", "fieldbag"];
 
-const focusProfiles: Record<FocusId, {
-  index: string;
-  label: string;
-  title: string;
-  summary: string;
-  center: string;
-  detail: [string, string][];
-  panel: PanelId;
-}> = {
-  now: {
-    index: "00",
-    label: "CURRENT FOCUS",
-    title: "Ship the next useful thing.",
-    summary: "A stage becomes real when I can experience it, share it, and turn it into the next plan.",
-    center: "NOW",
-    detail: [["STAGE", "IN PROGRESS"], ["MODE", "BUILD / TEST"], ["BIAS", "KEEP MOVING"]],
-    panel: "algorithm",
+const clues: Record<ClueId, Clue> = {
+  terminal: {
+    code: "E-01",
+    label: "DIGITAL TRACE",
+    object: "UNLOCKED TERMINAL",
+    title: "She makes small websites for real decisions.",
+    finding: "A browser remained open to a working prototype. The polished screen was surrounded by notes about confusing labels, hesitant clicks, and what a person might need next.",
+    deduction: "The subject treats code as a way to remove friction, not as an object to admire from a distance.",
+    project: "SMALL WEB SYSTEMS / DESIGN + DEVELOPMENT",
+    fragment: "make it useful before making it impressive",
+    tags: ["WEB", "INTERACTION", "ITERATION"],
   },
-  build: {
-    index: "01",
-    label: "THINGS I BUILD",
-    title: "Code, then a real result.",
-    summary: "Small websites, algorithms, and hardware are different ways to move a problem from idea to use.",
-    center: "MAKE",
-    detail: [["FIELD", "WEB"], ["LOGIC", "ALGORITHM"], ["OUTPUT", "HARDWARE"]],
-    panel: "web",
+  route: {
+    code: "E-02",
+    label: "ROUTE STUDY",
+    object: "MARKED PATH BOARD",
+    title: "She does not wait for the route to reveal itself.",
+    finding: "The same path was tested, crossed out, and calculated again. A second route is labelled 'not failure — new information.'",
+    deduction: "Algorithms appeal to her because they make reasoning visible: choose, test, revise, continue.",
+    project: "PATHFINDING STUDY / SEARCH + REASONING",
+    fragment: "certainty is optional; a next step is not",
+    tags: ["ALGORITHM", "SEARCH", "TEST"],
   },
-  learn: {
-    index: "02",
-    label: "THINGS I LEARN",
-    title: "Questions before conclusions.",
-    summary: "Computer science gives me structure. Psychology keeps the human parts complex, uncertain, and worth studying.",
-    center: "LEARN",
-    detail: [["METHOD", "RESEARCH"], ["STATE", "UNFINISHED"], ["RULE", "ASK NEXT"]],
-    panel: "notes",
+  device: {
+    code: "E-03",
+    label: "PHYSICAL EVIDENCE",
+    object: "LIVE PROTOTYPE",
+    title: "A thought was wired into the physical world.",
+    finding: "A sensor, microcontroller, and output are connected on the bench. The enclosure is unfinished. The signal path is carefully labelled.",
+    deduction: "The subject needs ideas to leave the screen eventually. She understands by making systems respond.",
+    project: "PHYSICAL COMPUTING / SENSOR → LOGIC → RESPONSE",
+    fragment: "if it cannot respond, it is still only a diagram",
+    tags: ["HARDWARE", "PROTOTYPE", "SYSTEMS"],
   },
-  explore: {
-    index: "03",
-    label: "THINGS I EXPLORE",
-    title: "A planned route into the unknown.",
-    summary: "I plan carefully, keep a backup, and still leave enough room to enter a life I have not experienced before.",
-    center: "GO",
-    detail: [["ROUTE", "PLANNED"], ["MARGIN", "PRESERVED"], ["NEXT", "UNKNOWN"]],
-    panel: "travel",
+  notebook: {
+    code: "E-04",
+    label: "MARGIN NOTES",
+    object: "UNFINISHED NOTEBOOK",
+    title: "Her strongest conclusion is sometimes: not yet.",
+    finding: "Pages combine computer science, psychology, questions about human behaviour, and repeated warnings against sounding certain too early.",
+    deduction: "Curiosity is not decoration here. It is a working method: research first, ask people next, preserve the unresolved parts.",
+    project: "FIELD NOTES / COMPUTING + HUMAN CURIOSITY",
+    fragment: "I do not know yet is a valid research state",
+    tags: ["PSYCHOLOGY", "RESEARCH", "QUESTIONS"],
+  },
+  fieldbag: {
+    code: "E-05",
+    label: "OFF-SITE TRACE",
+    object: "FIELD BAG + TARGET",
+    title: "She plans carefully, then enters the unknown anyway.",
+    finding: "The bag contains a detailed itinerary, a backup route, a marked target, and a blank page titled 'what the plan could not predict.'",
+    deduction: "Travel and archery share a pattern for her: prepare, focus, commit, observe the result, adjust.",
+    project: "FIELD PRACTICE / TRAVEL + ARCHERY",
+    fragment: "leave enough margin for a life not yet experienced",
+    tags: ["TRAVEL", "FOCUS", "PLAN B"],
   },
 };
 
 export default function Home() {
-  const [panel, setPanel] = useState<PanelId | null>(null);
-  const [visited, setVisited] = useState<PanelId[]>([]);
-  const [algorithmRunning, setAlgorithmRunning] = useState(false);
-  const [hardwareOn, setHardwareOn] = useState(false);
-  const [focus, setFocus] = useState<FocusId>("now");
-  const [shots, setShots] = useState<Shot[]>([]);
-  const deskRef = useRef<HTMLDivElement>(null);
-  const targetRef = useRef<HTMLButtonElement>(null);
+  const [entered, setEntered] = useState(false);
+  const [activeClue, setActiveClue] = useState<ClueId | null>(null);
+  const [discovered, setDiscovered] = useState<ClueId[]>([]);
+  const [algorithmRun, setAlgorithmRun] = useState(false);
+  const [deviceOn, setDeviceOn] = useState(false);
+  const [noteTurned, setNoteTurned] = useState(false);
+  const [routeChanged, setRouteChanged] = useState(false);
 
-  const openPanel = (next: PanelId) => {
-    setPanel(next);
-    setVisited((current) =>
-      current.includes(next) ? current : [...current, next],
-    );
+  const openClue = (id: ClueId) => {
+    setActiveClue(id);
+    setDiscovered((current) => current.includes(id) ? current : [...current, id]);
+  };
+
+  const enterLab = () => {
+    setEntered(true);
+    window.setTimeout(() => document.querySelector("#lab")?.scrollIntoView({ behavior: "smooth" }), 120);
   };
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPanel(null);
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActiveClue(null);
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const desk = deskRef.current;
-    if (!desk) return;
-    const rect = desk.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    desk.style.setProperty("--mx", `${x * 12}px`);
-    desk.style.setProperty("--my", `${y * 12}px`);
-    desk.style.setProperty("--nx", `${x * -12}px`);
-    desk.style.setProperty("--ny", `${y * -12}px`);
-  };
-
-  const lockFocus = (next: FocusId, x: number, y: number) => {
-    setFocus(next);
-    setShots((current) => [
-      ...current.slice(-5),
-      { id: Date.now(), x, y, focus: next },
-    ]);
-  };
-
-  const handleTargetPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const target = targetRef.current;
-    if (!target) return;
-    const rect = target.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    target.style.setProperty("--target-x", `${x}%`);
-    target.style.setProperty("--target-y", `${y}%`);
-  };
-
-  const handleTargetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (event.detail === 0) {
-      lockFocus("now", 50, 50);
-      return;
-    }
-
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(3, Math.min(97, ((event.clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(3, Math.min(97, ((event.clientY - rect.top) / rect.height) * 100));
-    const dx = event.clientX - (rect.left + rect.width / 2);
-    const dy = event.clientY - (rect.top + rect.height / 2);
-    const distance = Math.sqrt(dx * dx + dy * dy) / (Math.min(rect.width, rect.height) / 2);
-    const next: FocusId = distance <= 0.24 ? "now" : distance <= 0.48 ? "build" : distance <= 0.72 ? "learn" : "explore";
-    lockFocus(next, x, y);
-  };
-
-  const discoveryMessage = [
-    "Nothing opened yet. Start anywhere.",
-    "One trace found. The workbench is listening.",
-    "Two traces found. A pattern is beginning.",
-    "Three traces found. Projects and questions are connecting.",
-    "Four traces found. One part of the picture remains.",
-    "Surface complete. You have seen how the pieces connect.",
-  ][visited.length];
-
-  const activeFocus = focusProfiles[focus];
-  const nextPanel = panel ? panelOrder[(panelOrder.indexOf(panel) + 1) % panelOrder.length] : "web";
+  const nextClue = activeClue
+    ? clueOrder[(clueOrder.indexOf(activeClue) + 1) % clueOrder.length]
+    : "terminal";
+  const solved = discovered.length === clueOrder.length;
 
   return (
-    <main>
-      <header className="topbar">
-        <a className="wordmark" href="#top" aria-label="Back to the top">
-          ALINA.WU <span>/ FIELD NOTES</span>
-        </a>
-        <nav aria-label="Primary navigation">
-          <a href="#workbench">WORKBENCH</a>
-          <a href="#about">ABOUT</a>
-          <a href="#contact">CONTACT</a>
-        </nav>
+    <main className={entered ? "case-open" : ""}>
+      <header className="case-nav">
+        <a href="#top" className="case-brand">AW / CASE FILE 03</a>
+        <div className="case-state"><i /> {solved ? "SUBJECT LOCATED" : entered ? "INVESTIGATION ACTIVE" : "AWAITING ENTRY"}</div>
+        <a href="#evidence">EVIDENCE {String(discovered.length).padStart(2, "0")}/05</a>
       </header>
 
-      <section className="hero" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow">COMPUTER SCIENCE × HUMAN CURIOSITY</p>
-          <h1>
-            I solve problems with code,
-            <br />
-            and stay curious about the
-            <span className="circled">people</span>{" "}beyond it.
-          </h1>
-          <p className="intro">
-            I build small sites, study algorithms, and connect ideas to physical
-            hardware. This is not a résumé compressed into a few lines. It is a
-            workbench that stays in motion.
+      <section className="intake" id="top">
+        <div className="intake-copy">
+          <p className="kicker">CONFIDENTIAL / PERSON OF INTEREST</p>
+          <h1>A person is<br /><em>missing.</em><br />The work is not.</h1>
+          <p className="case-summary">
+            Alina Wu left no biography, only an unlocked laboratory full of
+            prototypes, questions, routes, and notes written in the margins.
+            Your task is to reconstruct the person from what she left behind.
           </p>
-          <a className="primary-action" href="#workbench">
-            COME IN <span aria-hidden="true">↓</span>
-          </a>
-        </div>
-
-        <div className="focus-map-shell">
-          <div className="target-label-row">
-            <span>FOCUS MAP / LIVE</span>
-            <span>{shots.length === 0 ? "NO MARKS YET" : `${shots.length} MARK${shots.length === 1 ? "" : "S"}`}</span>
-          </div>
-
-          <button
-            className={`focus-target focus-${focus}`}
-            ref={targetRef}
-            onPointerMove={handleTargetPointerMove}
-            onPointerLeave={() => {
-              targetRef.current?.style.setProperty("--target-x", "50%");
-              targetRef.current?.style.setProperty("--target-y", "50%");
-            }}
-            onClick={handleTargetClick}
-            aria-label="Aim at a ring and click to select a focus area"
-          >
-            <span className="target-axis axis-horizontal" aria-hidden="true" />
-            <span className="target-axis axis-vertical" aria-hidden="true" />
-            <span className="target-ring ring-explore"><i>EXPLORE</i></span>
-            <span className="target-ring ring-learn"><i>LEARN</i></span>
-            <span className="target-ring ring-build"><i>BUILD</i></span>
-            <span className="target-core">
-              <small>{activeFocus.index}</small>
-              <strong>{activeFocus.center}</strong>
-              <i>LOCKED</i>
-            </span>
-            {shots.map((shot) => (
-              <span
-                className={`target-shot shot-${shot.focus}`}
-                key={shot.id}
-                style={{ left: `${shot.x}%`, top: `${shot.y}%` }}
-                aria-hidden="true"
-              />
-            ))}
-            <span className="target-crosshair" aria-hidden="true"><i /><i /></span>
-            <span className="target-instruction">MOVE / AIM / CLICK</span>
+          <button className="enter-button" onClick={enterLab}>
+            {entered ? "RETURN TO THE LAB" : "ACCEPT CASE / ENTER LAB"}<span>→</span>
           </button>
-
-          <span className="thought thought-a">travel route</span>
-          <span className="thought thought-b">why would someone choose that?</span>
-          <span className="thought thought-c">unverified</span>
-          <span className="thought thought-d">next step →</span>
-
-          <div className="focus-readout" aria-live="polite">
-            <div className="focus-readout-heading">
-              <span>{activeFocus.index} / {activeFocus.label}</span>
-              <i>FOCUS LOCKED</i>
-            </div>
-            <h2>{activeFocus.title}</h2>
-            <p>{activeFocus.summary}</p>
-            <div className="focus-data">
-              {activeFocus.detail.map(([label, value]) => (
-                <span key={label}><small>{label}</small><b>{value}</b></span>
-              ))}
-            </div>
-            <button className="focus-follow" onClick={() => openPanel(activeFocus.panel)}>
-              FOLLOW THIS TRACE →
-            </button>
-          </div>
-
-          <div className="focus-legend" aria-label="Focus map controls">
-            {(Object.keys(focusProfiles) as FocusId[]).map((id) => (
-              <button
-                className={focus === id ? "active" : ""}
-                key={id}
-                onClick={() => setFocus(id)}
-              >
-                <span>{focusProfiles[id].index}</span>
-                {focusProfiles[id].label}
-              </button>
-            ))}
-          </div>
         </div>
+
+        <div className="missing-file" aria-label="Case intake document">
+          <div className="file-tab">CASE 03</div>
+          <div className="file-stamp">MISSING?</div>
+          <div className="subject-card">
+            <div className="subject-mark"><span>AW</span><i /><i /><i /></div>
+            <div>
+              <small>SUBJECT</small>
+              <strong>ALINA WU</strong>
+              <p>COMPUTER SCIENCE<br />HUMAN CURIOSITY</p>
+            </div>
+          </div>
+          <dl className="case-facts">
+            <div><dt>LAST SEEN</dt><dd>AT THE EDGE OF A QUESTION</dd></div>
+            <div><dt>KNOWN HABIT</dt><dd>LEAVES A PLAN B</dd></div>
+            <div><dt>RISK LEVEL</dt><dd>LIKELY TO KEEP EXPLORING</dd></div>
+          </dl>
+          <p className="handwritten intake-note">Do not trust the résumé.<br />Trust the evidence.</p>
+        </div>
+
+        <div className="scroll-note">SCROLL AFTER ACCEPTING CASE <span>↓</span></div>
       </section>
 
-      <section className="bench-section" id="workbench">
-        <div className="section-heading">
+      <section className="lab-section" id="lab">
+        <header className="section-head">
           <div>
-            <p className="eyebrow">01 / THE WORKBENCH</p>
-            <h2>Look around. No order required.</h2>
+            <p className="kicker">LOCATION 01 / PRIVATE WORKSPACE</p>
+            <h2>The lab was left<br />exactly like this.</h2>
           </div>
-          <div className="guest-note">
-            <span>FOR THE GUEST</span>
-            Everything here can be touched.
-            <br />It probably will not break.
+          <div className="investigator-note">
+            <span>INVESTIGATOR NOTE</span>
+            Five objects appear relevant. Open them in any order. Every object changes the working theory.
           </div>
-        </div>
+        </header>
 
-        <div
-          className="workbench"
-          ref={deskRef}
-          onPointerMove={handlePointerMove}
-        >
-          <div className="bench-grid" aria-hidden="true" />
-          <div className="bench-status">
-            <span><i /> WORKSPACE ONLINE</span>
-            <span className="bench-guidance">{discoveryMessage}</span>
-            <span>{visited.length}/5 DISCOVERED</span>
+        <div className="lab-shell">
+          <div className="lab-status">
+            <span><i /> POWER STILL ON</span>
+            <strong>{discovered.length === 0 ? "NO EVIDENCE LOGGED" : `${discovered.length} OF 5 OBJECTS LOGGED`}</strong>
+            <span>02:17 AM / RECORDED</span>
           </div>
+          <div className="lab-grid" aria-hidden="true" />
+          <div className="window-light" aria-hidden="true"><i /><i /><i /></div>
+          <div className="cable cable-a" aria-hidden="true" />
+          <div className="cable cable-b" aria-hidden="true" />
 
-          <button
-            className="object browser-object"
-            onClick={() => openPanel("web")}
-            aria-label="Open the small website project"
-          >
-            <span className="object-tag">PROJECT 01</span>
-            <span className="browser-chrome"><i /><i /><i /></span>
-            <span className="browser-screen">
-              <strong>small web things</strong>
-              <span className="mini-layout"><i /><i /><i /></span>
-              <small>open preview ↗</small>
+          <button className={`clue-object terminal-object ${discovered.includes("terminal") ? "logged" : ""}`} onClick={() => openClue("terminal")}>
+            <span className="evidence-marker">E-01</span>
+            <span className="terminal-bar"><i /><i /><i /><b>localhost / unfinished</b></span>
+            <span className="terminal-screen">
+              <small>&gt; last_session.log</small>
+              <strong>Build for the<br />person using it.</strong>
+              <i className="cursor" />
             </span>
+            <span className="inspect-label">INSPECT TERMINAL ↗</span>
           </button>
 
-          <button
-            className="object algorithm-object"
-            onClick={() => openPanel("algorithm")}
-            aria-label="Open the algorithm project"
-          >
-            <span className="object-tag light">PROJECT 02</span>
-            <span className="route route-a" />
-            <span className="route route-b" />
-            <span className="node node-a">A</span>
-            <span className="node node-b">?</span>
-            <span className="node node-c">B</span>
-            <strong>find a path</strong>
-            <small>reason · test · recalculate</small>
+          <button className={`clue-object route-object ${discovered.includes("route") ? "logged" : ""}`} onClick={() => openClue("route")}>
+            <span className="evidence-marker">E-02</span>
+            <span className="route-paper">
+              <small>ROUTE STUDY / REV. 7</small>
+              <i className="route-line one" /><i className="route-line two" /><i className="route-line three" />
+              <b className="route-node a">A</b><b className="route-node b">?</b><b className="route-node c">B</b>
+              <em>recalculate ≠ restart</em>
+            </span>
+            <span className="inspect-label">TRACE THE LOGIC ↗</span>
           </button>
 
-          <button
-            className={`object hardware-object ${hardwareOn ? "is-on" : ""}`}
-            onClick={() => openPanel("hardware")}
-            aria-label="Open the hardware project"
-          >
-            <span className="object-tag">PROJECT 03</span>
-            <span className="board-chip">MCU</span>
-            <span className="board-line line-one" />
-            <span className="board-line line-two" />
-            <span className="board-port port-one" />
-            <span className="board-port port-two" />
-            <span className="board-led" />
-            <strong>physical computing</strong>
-            <small>tap to inspect</small>
+          <button className={`clue-object device-object ${discovered.includes("device") ? "logged" : ""}`} onClick={() => openClue("device")}>
+            <span className="evidence-marker">E-03</span>
+            <span className="device-plate">
+              <i className="chip">MCU</i><i className="sensor">IN</i><i className="output">OUT</i>
+              <b className="wire in" /><b className="wire out" /><em />
+            </span>
+            <strong>PROTOTYPE / 04</strong>
+            <span className="inspect-label">TEST THE SIGNAL ↗</span>
           </button>
 
-          <button
-            className="object notes-object"
-            onClick={() => openPanel("notes")}
-            aria-label="Open recent thoughts and learning notes"
-          >
-            <span className="paper-clip" />
-            <span className="hand-note">still learning</span>
-            <strong>thinking lately</strong>
-            <p>Does good interaction make people feel more human—or systems look more human?</p>
-            <small>conclusion: not yet.</small>
+          <button className={`clue-object notebook-object ${discovered.includes("notebook") ? "logged" : ""}`} onClick={() => openClue("notebook")}>
+            <span className="evidence-marker">E-04</span>
+            <span className="clip" />
+            <small>FIELD NOTE / UNDERSIDE OF PAGE</small>
+            <strong>“Does good interaction make people feel more human—or systems look more human?”</strong>
+            <em>conclusion: not yet.</em>
+            <span className="inspect-label">READ THE MARGINS ↗</span>
           </button>
 
-          <button
-            className="object travel-object"
-            onClick={() => openPanel("travel")}
-            aria-label="Open the travel route"
-          >
-            <span className="ticket-edge">FIELD TRIP · 04</span>
-            <strong>Next stop: someone else&apos;s everyday.</strong>
-            <span className="travel-path"><i /><i /><i /></span>
-            <small>A detailed plan, with room for the unexpected.</small>
+          <button className={`clue-object fieldbag-object ${discovered.includes("fieldbag") ? "logged" : ""}`} onClick={() => openClue("fieldbag")}>
+            <span className="evidence-marker">E-05</span>
+            <span className="target-disc"><i /><i /><i /><b /></span>
+            <span className="bag-ticket"><small>FIELD ROUTE 04</small><strong>PLAN A</strong><em>PLAN B →</em></span>
+            <span className="inspect-label">OPEN FIELD BAG ↗</span>
           </button>
 
-          <span className="loose-note note-one">TODO: overthink less</span>
-          <span className="loose-note note-two">backup route B</span>
-          <span className="loose-note note-three">research first, ask people next</span>
+          <span className="lab-annotation annotation-a">coffee cold / screen warm</span>
+          <span className="lab-annotation annotation-b">why five versions?</span>
+          <span className="lab-annotation annotation-c">subject works in questions</span>
         </div>
+      </section>
 
-        <div className={`discovery-ledger ${visited.length === 5 ? "complete" : ""}`}>
-          <div className="ledger-heading">
-            <span>VISITOR TRACE / {String(visited.length).padStart(2, "0")}</span>
-            <strong>{visited.length === 5 ? "SURFACE COMPLETE" : "STILL EXPLORING"}</strong>
+      <section className="evidence-section" id="evidence">
+        <header className="section-head evidence-heading">
+          <div>
+            <p className="kicker">LOCATION 02 / EVIDENCE WALL</p>
+            <h2>Build a theory.<br />Expect corrections.</h2>
           </div>
-          <div className="ledger-items">
-            {panelOrder.map((id, index) => (
+          <div className="evidence-count"><strong>{String(discovered.length).padStart(2, "0")}</strong><span>OF 05<br />CONNECTED</span></div>
+        </header>
+
+        <div className={`evidence-board ${solved ? "solved" : ""}`}>
+          <span className="thread thread-a" aria-hidden="true" /><span className="thread thread-b" aria-hidden="true" />
+          <span className="thread thread-c" aria-hidden="true" /><span className="thread thread-d" aria-hidden="true" />
+          {clueOrder.map((id, index) => {
+            const clue = clues[id];
+            const found = discovered.includes(id);
+            return (
               <button
-                className={visited.includes(id) ? "found" : ""}
+                className={`evidence-card evidence-card-${index + 1} ${found ? "found" : "sealed"}`}
                 key={id}
-                onClick={() => openPanel(id)}
+                onClick={() => openClue(id)}
               >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <b>{panelNames[id].split(" / ")[0]}</b>
-                <i>{visited.includes(id) ? "FOUND" : "OPEN"}</i>
+                <i className="pin" />
+                <small>{clue.code} / {found ? clue.label : "UNEXAMINED"}</small>
+                <strong>{found ? clue.title : "Evidence remains sealed."}</strong>
+                <p>{found ? clue.deduction : "Return to the laboratory and inspect this object."}</p>
+                <span>{found ? "REOPEN FILE ↗" : "GO TO OBJECT ↗"}</span>
               </button>
-            ))}
+            );
+          })}
+
+          <div className={`working-theory ${solved ? "unlocked" : ""}`}>
+            <span className="theory-label">WORKING THEORY / {solved ? "CONFIRMED" : "LOCKED"}</span>
+            {solved ? (
+              <>
+                <div className="located-stamp">LOCATED</div>
+                <h3>She was never missing.<br />She followed the next question.</h3>
+                <p>
+                  The evidence describes a builder who turns uncertainty into experiments:
+                  code when the problem needs structure, hardware when an idea needs a body,
+                  research when people make the answer more complicated, and a Plan B when
+                  the route changes.
+                </p>
+                <a href="mailto:hello@example.com">CONTACT THE SUBJECT →</a>
+              </>
+            ) : (
+              <>
+                <h3>Insufficient evidence.</h3>
+                <p>Connect all five traces before filing a conclusion. Current confidence: {discovered.length * 20}%.</p>
+                <a href="#lab">RETURN TO THE LAB →</a>
+              </>
+            )}
           </div>
-          <p>{discoveryMessage}</p>
-        </div>
-
-        <p className="bench-caption">
-          The workbench remembers what you opened. There is no required order, only a route you leave behind.
-        </p>
-      </section>
-
-      <section className="about-section" id="about">
-        <div className="about-index">02</div>
-        <div className="about-copy">
-          <p className="eyebrow">A WORKING PROFILE</p>
-          <h2>I believe answers are worth looking for,<br />not pretending to have.</h2>
-        </div>
-        <div className="about-notes">
-          <p>
-            I gather information before choosing a route. Computer science
-            teaches me how to break down problems; psychology reminds me that
-            people are not systems waiting to be reduced.
-          </p>
-          <p className="margin-note">I may be less serious once you know me.</p>
         </div>
       </section>
 
-      <footer id="contact">
-        <div>
-          <p className="eyebrow">END OF THIS PAGE / NOT THE NOTES</p>
-          <h2>If an idea made you pause,<br />let&apos;s talk.</h2>
-        </div>
-        <div className="footer-links">
-          <a href="mailto:hello@example.com">EMAIL ↗</a>
-          <a href="#top">GITHUB ↗</a>
-          <a href="#top">BACK TO TOP ↑</a>
-        </div>
+      <footer>
+        <div><span>CASE FILE 03</span><strong>ALINA.WU / THE MISSING RESEARCHER</strong></div>
+        <p>No trait labels were used in this investigation.<br />Only evidence, working theories, and one suspiciously detailed Plan B.</p>
+        <a href="#top">REOPEN CASE ↑</a>
       </footer>
 
-      {panel && (
-        <div className="panel-backdrop" onMouseDown={() => setPanel(null)}>
-          <aside
-            className="detail-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="panel-title"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <div className="panel-head">
-              <span>{panelNames[panel]}</span>
-              <button onClick={() => setPanel(null)} aria-label="Close details">×</button>
+      {activeClue && (
+        <div className="clue-backdrop" onMouseDown={() => setActiveClue(null)}>
+          <aside className="clue-drawer" role="dialog" aria-modal="true" aria-labelledby="clue-title" onMouseDown={(event) => event.stopPropagation()}>
+            <header className="drawer-head">
+              <div><small>{clues[activeClue].code}</small><strong>{clues[activeClue].object}</strong></div>
+              <button onClick={() => setActiveClue(null)} aria-label="Close evidence file">×</button>
+            </header>
+            <div className="drawer-body">
+              <p className="kicker">{clues[activeClue].label} / LOGGED</p>
+              <h2 id="clue-title">{clues[activeClue].title}</h2>
+
+              {activeClue === "terminal" && (
+                <div className="evidence-demo terminal-demo">
+                  <div>CASE_TERMINAL — SESSION RECOVERED</div>
+                  <p><span>09:12</span> simplify the first decision</p>
+                  <p><span>11:40</span> test with someone who did not build it</p>
+                  <p><span>15:06</span> answer the hesitation, not only the click</p>
+                  <strong>&gt; status: still iterating_</strong>
+                </div>
+              )}
+
+              {activeClue === "route" && (
+                <div className={`evidence-demo algorithm-demo ${algorithmRun ? "running" : ""}`}>
+                  <div className="mini-path">
+                    {Array.from({ length: 30 }, (_, index) => <i className={[2, 8, 9, 15, 21, 22].includes(index) ? "wall" : ""} key={index} />)}
+                    <b className="start">A</b><b className="finish">B</b>
+                  </div>
+                  <button onClick={() => setAlgorithmRun((value) => !value)}>{algorithmRun ? "CLEAR ROUTE" : "RUN SEARCH"}</button>
+                </div>
+              )}
+
+              {activeClue === "device" && (
+                <div className={`evidence-demo hardware-demo ${deviceOn ? "powered" : ""}`}>
+                  <div className="hardware-stage"><span>INPUT</span><i /><strong>CORE</strong><i /><span>OUTPUT</span></div>
+                  <div className="hardware-console">&gt; {deviceOn ? "signal received / response confirmed" : "waiting for physical input..."}</div>
+                  <button onClick={() => setDeviceOn((value) => !value)}>{deviceOn ? "POWER OFF" : "POWER ON"}</button>
+                </div>
+              )}
+
+              {activeClue === "notebook" && (
+                <button className={`evidence-demo note-demo ${noteTurned ? "turned" : ""}`} onClick={() => setNoteTurned((value) => !value)}>
+                  <small>{noteTurned ? "REVERSE / PRIVATE MARGIN" : "PAGE 17 / RESEARCH NOTE"}</small>
+                  <strong>{noteTurned ? "Sounding certain is not the same as understanding." : "Code can solve problems. Who decides what counts as a human problem?"}</strong>
+                  <span>{noteTurned ? "TURN BACK ↺" : "TURN THE PAGE ↻"}</span>
+                </button>
+              )}
+
+              {activeClue === "fieldbag" && (
+                <div className={`evidence-demo travel-demo ${routeChanged ? "changed" : ""}`}>
+                  <div><b>08:10</b><span>DEPART / MAIN ROUTE</span></div>
+                  <div><b>11:40</b><span>{routeChanged ? "RAIN / ROUTE B" : "WANDER / UNSCHEDULED"}</span></div>
+                  <div><b>?</b><span>ENTER SOMEONE ELSE&apos;S EVERYDAY</span></div>
+                  <button onClick={() => setRouteChanged((value) => !value)}>{routeChanged ? "RESTORE PLAN A" : "RECALCULATE / PLAN B"}</button>
+                </div>
+              )}
+
+              <div className="evidence-copy">
+                <div><span>OBSERVATION</span><p>{clues[activeClue].finding}</p></div>
+                <div><span>DEDUCTION</span><p>{clues[activeClue].deduction}</p></div>
+              </div>
+              <div className="project-strip"><small>RELATED PROJECT TRACE</small><strong>{clues[activeClue].project}</strong></div>
+              <blockquote>“{clues[activeClue].fragment}”</blockquote>
+              <div className="tag-row">{clues[activeClue].tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
             </div>
-
-            {panel === "web" && (
-              <div className="panel-body">
-                <p className="panel-kicker">SELECTED WEB EXPERIMENT</p>
-                <h3 id="panel-title">Turn a real problem into something people can use.</h3>
-                <div className="live-browser">
-                  <div className="live-browser-bar">localhost / small-website</div>
-                  <div className="live-site">
-                    <span>A SMALL WEBSITE PROJECT</span>
-                    <strong>Not just a screenshot.<br />Try it here.</strong>
-                    <button>TRY THE DEMO →</button>
-                  </div>
-                </div>
-                <div className="project-meta">
-                  <span>ROLE<br /><b>Design & development</b></span>
-                  <span>STATUS<br /><b>Still iterating</b></span>
-                  <span>LESSON<br /><b>Make it useful first</b></span>
-                </div>
-              </div>
-            )}
-
-            {panel === "algorithm" && (
-              <div className="panel-body">
-                <p className="panel-kicker">INTERACTIVE ALGORITHM NOTE</p>
-                <h3 id="panel-title">A route will not reveal itself. Try one.</h3>
-                <div className={`algo-demo ${algorithmRunning ? "running" : ""}`}>
-                  <div className="algo-grid">
-                    {Array.from({ length: 24 }, (_, index) => (
-                      <i key={index} className={[2, 8, 9, 15, 21].includes(index) ? "wall" : ""} />
-                    ))}
-                    <span className="algo-start">S</span>
-                    <span className="algo-end">E</span>
-                  </div>
-                  <div className="algo-control">
-                    <span>{algorithmRunning ? "PATH FOUND · 17 STEPS" : "READY TO SEARCH"}</span>
-                    <button onClick={() => setAlgorithmRunning((value) => !value)}>
-                      {algorithmRunning ? "RESET" : "RUN SEARCH"}
-                    </button>
-                  </div>
-                </div>
-                <p className="panel-copy">The finished project page can run the real algorithm here, letting visitors change the input, step through execution, and see how you approach the problem.</p>
-              </div>
-            )}
-
-            {panel === "hardware" && (
-              <div className="panel-body">
-                <p className="panel-kicker">HARDWARE PROTOTYPE / BENCH TEST</p>
-                <h3 id="panel-title">When code leaves the screen.</h3>
-                <div className={`device-demo ${hardwareOn ? "powered" : ""}`}>
-                  <div className="device-board">
-                    <span className="device-core">CORE</span>
-                    <span className="device-sensor">SENSOR</span>
-                    <span className="device-output">OUT</span>
-                    <i className="signal signal-one" />
-                    <i className="signal signal-two" />
-                  </div>
-                  <div className="device-console">
-                    <p>&gt; device.status</p>
-                    <p>{hardwareOn ? "signal received" : "waiting for input..."}</p>
-                    <button onClick={() => setHardwareOn((value) => !value)}>
-                      {hardwareOn ? "POWER OFF" : "POWER ON"}
-                    </button>
-                  </div>
-                </div>
-                <p className="panel-copy">The final version can use real photographs, signal flow, debugging notes, and a live sample of device data.</p>
-              </div>
-            )}
-
-            {panel === "notes" && (
-              <div className="panel-body notes-panel">
-                <p className="panel-kicker">THOUGHTS IN PROGRESS</p>
-                <h3 id="panel-title">Not a wall of opinions. Traces of thinking.</h3>
-                <blockquote>
-                  “Sounding certain without understanding” may be the state I distrust most.
-                  <span>NOTE: “I do not know yet” is allowed here.</span>
-                </blockquote>
-                <div className="learning-list">
-                  <span>LEARNING NOW</span>
-                  <p>How to make interaction interesting without letting it steal attention from the content.</p>
-                  <span>RECENT QUESTION</span>
-                  <p>Code can solve problems—but what counts as a human problem?</p>
-                </div>
-              </div>
-            )}
-
-            {panel === "travel" && (
-              <div className="panel-body">
-                <p className="panel-kicker">A WELL-PLANNED ESCAPE</p>
-                <h3 id="panel-title">Enter an unfamiliar place. Try another everyday.</h3>
-                <div className="itinerary">
-                  <div><b>08:10</b><span>Departure</span><small>main route</small></div>
-                  <div><b>11:40</b><span>Wander</span><small>deliberately left open</small></div>
-                  <div><b>16:20</b><span>Plan B</span><small>in case it rains</small></div>
-                  <div><b>?</b><span>Laughing in the street with friends</span><small>impossible to schedule, worth expecting</small></div>
-                </div>
-                <p className="panel-copy">Travel is more than an interest tag. It is another way of thinking: plan carefully, preserve some margin, then actually enter the unknown.</p>
-              </div>
-            )}
-
-            <div className="panel-route">
-              <div>
-                <span>NEXT TRACE</span>
-                <small>{visited.length}/5 AREAS DISCOVERED</small>
-              </div>
-              <button onClick={() => openPanel(nextPanel)}>
-                {panelNames[nextPanel]} →
-              </button>
+            <div className="drawer-next">
+              <span>{discovered.length}/5 EVIDENCE LOGGED</span>
+              <button onClick={() => openClue(nextClue)}>NEXT FILE / {clues[nextClue].code} →</button>
             </div>
           </aside>
         </div>

@@ -7,15 +7,13 @@ async function render() {
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
+    new Request("http://localhost/", { headers: { accept: "text/html", host: "localhost" } }),
     {
       ASSETS: {
         fetch: async (request) => {
           const url = new URL(request.url);
           if (url.pathname === "/site.css") {
-            return new Response("/* Version 1 stylesheet */", {
-              headers: { "content-type": "text/css" },
-            });
+            return new Response("/* Version 3 stylesheet */", { headers: { "content-type": "text/css" } });
           }
           return new Response("Not found", { status: 404 });
         },
@@ -25,46 +23,43 @@ async function render() {
   );
 }
 
-test("server-renders the English Version 1 portfolio", async () => {
+test("server-renders the English Version 3 investigation", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /Alina.*Pixels, Algorithms.*People/i);
-  assert.match(html, /I solve problems with code/i);
-  assert.match(html, /WORKBENCH/);
-  assert.match(html, /FOCUS MAP/);
-  assert.match(html, /MOVE \/ AIM \/ CLICK/);
-  assert.match(html, /VISITOR TRACE/);
+  assert.match(html, /Case File 03.*Missing Researcher/i);
+  assert.match(html, /A person is.*missing.*The work is not/is);
+  assert.match(html, /ENTER LAB/);
+  assert.match(html, /EVIDENCE WALL/);
   assert.match(html, /href="\/site\.css"/);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview/);
 });
 
-test("source keeps the five interactive portfolio areas", async () => {
+test("source contains five discoverable evidence files and the final reveal", async () => {
   const page = await import("node:fs/promises").then(({ readFile }) =>
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
   );
 
-  for (const area of ["web", "algorithm", "hardware", "notes", "travel"]) {
-    assert.match(page, new RegExp(`openPanel\\(\\"${area}\\"\\)`));
+  for (const clue of ["terminal", "route", "device", "notebook", "fieldbag"]) {
+    assert.match(page, new RegExp(`openClue\\(\\"${clue}\\"\\)`));
   }
+  assert.match(page, /She was never missing/);
   assert.match(page, /RUN SEARCH/);
   assert.match(page, /POWER ON/);
-  assert.match(page, /handleTargetClick/);
-  assert.match(page, /focusProfiles/);
-  assert.match(page, /NEXT TRACE/);
+  assert.match(page, /RECALCULATE \/ PLAN B/);
 });
 
-test("Version 1 styles the focus and discovery interactions", async () => {
+test("Version 3 styles the lab, evidence board, and responsive investigation", async () => {
   const css = await import("node:fs/promises").then(({ readFile }) =>
     readFile(new URL("../public/site.css", import.meta.url), "utf8"),
   );
 
-  assert.match(css, /\.focus-target/);
-  assert.match(css, /\.target-crosshair/);
-  assert.match(css, /\.discovery-ledger/);
-  assert.match(css, /\.panel-route/);
+  assert.match(css, /\.lab-shell/);
+  assert.match(css, /\.clue-object/);
+  assert.match(css, /\.evidence-board/);
+  assert.match(css, /\.clue-drawer/);
+  assert.match(css, /@media \(max-width: 680px\)/);
 });
-
