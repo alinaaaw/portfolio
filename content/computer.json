@@ -1,7 +1,7 @@
 {
   "ariaLabel": "Alina's computer desktop",
   "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
-  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "about": "ABOUT.TXT", "location": "LAB-17 / LOCAL" },
+  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "readme": "README.TXT", "labLog": "LAB LOG", "location": "LAB-17 / LOCAL" },
   "profile": {
     "triggerAria": "Open Alina Wu's profile",
     "windowTitle": "USER PROFILE / ALINA.WU",
@@ -20,15 +20,34 @@
     "email": "awu78@uw.edu"
   },
   "desktop": {
-    "icons": { "about": "ABOUT.txt", "projects": "PROJECTS", "experience": "EXPERIENCE", "research": "FIELD_NOTES.md" },
+    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE", "research": "FIELD_NOTES.md" },
     "welcome": { "eyebrow": "WELCOME / GUEST", "title": "Alina", "description": "Computer Science at the University of Washington. Code, physical systems, and questions about the people around them." }
   },
-  "about": {
-    "filename": "ABOUT.txt",
-    "meta": "PROFILE / LAST SAVED RECENTLY",
-    "headline": ["I build with code,", "then look closely at", "what it meets."],
-    "description": "Computer science gives me a way to break problems apart. Psychology keeps the human parts from becoming too simple. I collect information before choosing a route, but I try not to confuse preparation with certainty.",
-    "quote": "“I do not know yet” is allowed here."
+  "readme": {
+    "filename": "README.txt",
+    "meta": "WORKSTATION FILE / SHARED NOTES",
+    "title": "WORKSPACE NOTES",
+    "paragraphs": [
+      "Finished work is usually filed under PROJECTS. The context behind it is usually somewhere else.",
+      "Before continuing anything, check the latest LAB LOG. Working decisions may be in the notebook, marked references are on the shelf, and physical iterations should be in the drawer. Anything not ready for a deadline is probably still on the board.",
+      "If I am away, leave comments beside the relevant material. Please do not clean up the unfinished parts—I may still need them."
+    ],
+    "signature": "— Alina"
+  },
+  "labLog": {
+    "filename": "LAB_LOG.md",
+    "meta": "LAB LOG / 1 ENTRY",
+    "entries": [
+      {
+        "date": "JUN 2026",
+        "type": "NEW ROLE",
+        "title": "Joined Thermo Fisher Scientific",
+        "body": [
+          "I'm happy to share that I joined Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
+          "I'm excited to learn, contribute, and work across computer vision, robotics, and scientific software."
+        ]
+      }
+    ]
   },
   "projectsFolder": { "title": "PROJECTS / 3 ITEMS", "back": "← PROJECTS", "verified": "CASE FILE / VERIFIED" },
   "projects": {

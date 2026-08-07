@@ -7,7 +7,7 @@ All visitor-facing copy is stored in the JSON files in this directory. Edit the 
 - `site.json`: Site title, social description, brand labels, shared buttons, and loading messages.
 - `intro.json`: Cover copy and the opening exploration guide.
 - `room.json`: Room navigation, discovery states, quick index, and the six exploration zones.
-- `computer.json`: User profile, desktop labels, projects, experience, About file, and system bulletin.
+- `computer.json`: User profile, desktop labels, README, Lab Log entries, projects, experience, and system bulletin.
 - `books.json`: Bookshelf labels, all six books, and page-turning interface copy.
 - `drawer.json`: Drawer objects, hotspot labels, and expanded document copy.
 - `notebook.json`: Research notebook pages, annotations, and page-turn prompts.

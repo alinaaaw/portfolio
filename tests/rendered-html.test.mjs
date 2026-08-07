@@ -36,7 +36,12 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /from "@\/content"/);
   assert.match(content, /ALINA\.OS/);
   assert.match(content, /PROJECTS \/ 3 ITEMS/);
-  assert.match(content, /ABOUT\.txt/);
+  assert.match(content, /README\.txt/);
+  assert.match(content, /LAB_LOG\.md/);
+  assert.match(content, /Joined Thermo Fisher Scientific/);
+  assert.doesNotMatch(content, /ABOUT\.txt/);
+  assert.doesNotMatch(content, /[‘’]/);
+  assert.match(page, /lab-log-line/);
   assert.match(content, /USER PROFILE \/ ALINA\.WU/);
   assert.match(page, /os-profile-trigger/);
   assert.match(content, /Quality of Life in Shanghai/);

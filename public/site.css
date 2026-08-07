@@ -129,6 +129,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .desktop-icons > button.selected, .file-list button.selected, .experience-window > div button.selected { background: rgba(112,201,192,.16); outline: 1px solid rgba(112,201,192,.65); outline-offset: -1px; }
 .file-icon, .folder-icon, .document-icon { position: relative; display: block; width: 35px; height: 43px; border: 1px solid var(--paper); background: #e5dcc61b; }
 .file-icon::after, .document-icon::after { content: ""; position: absolute; top: 8px; left: 7px; right: 7px; height: 13px; border-top: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan); }
+.log-file-icon::after { height: 19px; border-bottom: 1px solid var(--cyan); background: repeating-linear-gradient(0deg,transparent 0 5px,var(--cyan) 6px 7px); opacity: .72; }
 .folder-icon { width: 47px; height: 34px; border-color: var(--signal); background: #d1f45c1f; }
 .folder-icon::before { content: ""; position: absolute; left: -1px; top: -8px; width: 21px; height: 8px; border: 1px solid var(--signal); border-bottom: 0; }
 .desktop-welcome { grid-column: 3; grid-row: 1 / 5; align-self: end; justify-self: end; width: min(470px,80%); padding: 30px; border: 1px solid rgba(229,220,198,.23); background: rgba(9,17,15,.6); backdrop-filter: blur(7px); }
@@ -145,6 +146,20 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .text-file h2, .project-window h2 { margin: 18px 0 25px; font-size: clamp(36px,4.3vw,66px); line-height: .98; letter-spacing: -.06em; }
 .text-file p, .project-window p { max-width: 610px; color: #46504b; font-size: 13px; line-height: 1.75; }
 .text-file blockquote { margin: 32px 0 0; padding: 14px 18px; border-left: 2px solid var(--red); color: #34433d; font: 15px Georgia, serif; font-style: italic; }
+.readme-file { max-height: 82%; overflow-y: auto; }
+.readme-file h2 { text-transform: none; }
+.readme-file p + p { margin-top: 15px; }
+.lab-log-window { max-height: 82%; overflow: hidden; background: #0b1311; color: #b9c4bd; }
+.lab-log-feed { counter-reset: log-line; max-height: calc(82vh - 38px); overflow-y: auto; padding: 20px 0 30px; background-color: #0b1311; background-image: linear-gradient(90deg,rgba(112,201,192,.025) 1px,transparent 1px); background-size: 42px 100%; font: 10px/1.7 var(--font-mono),monospace; }
+.lab-log-entry { margin: 14px 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.lab-log-line { display: grid; grid-template-columns: 46px minmax(0,1fr); margin: 0; padding: 2px 20px 2px 0; font: inherit; letter-spacing: .02em; }
+.lab-log-line::before { counter-increment: log-line; content: counter(log-line,decimal-leading-zero); padding-right: 12px; border-right: 1px solid #2d3b36; color: #52615b; text-align: right; user-select: none; }
+.lab-log-line > span { min-width: 0; padding-left: 16px; }
+.lab-log-meta { color: #687871; }
+.lab-log-stamp { color: var(--cyan); }
+.lab-log-entry h2 { color: var(--signal); font-weight: 700; }
+.lab-log-entry p { max-width: none; color: #b9c4bd; }
+.lab-log-end { margin-top: 8px; color: #52615b; }
 .folder-window { background: #17231f; color: var(--paper); }
 .file-list button { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 15px; width: 100%; min-height: 88px; padding: 14px 20px; border-bottom: 1px solid #42504a; background: transparent; color: inherit; cursor: pointer; text-align: left; }
 .file-list button:hover { background: #21302c; }
@@ -409,18 +424,22 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .os-bar { grid-template-columns: 1fr auto; height: 46px; }
   .os-bar > div { display: none; }
   .os-screen { grid-template: 1fr 36px / 1fr; height: calc(100% - 46px); }
-  .os-sidebar { position: absolute; z-index: 5; top: 46px; left: 0; right: 0; grid-row: auto; flex-direction: row; align-items: center; height: 48px; padding: 5px 9px; border-right: 0; border-bottom: 1px solid #52605a; }
+  .os-sidebar { position: absolute; z-index: 5; top: 46px; left: 0; right: 0; grid-row: auto; flex-direction: row; align-items: center; height: 48px; overflow-x: auto; padding: 5px 9px; border-right: 0; border-bottom: 1px solid #52605a; }
   .os-sidebar > span { display: none; }
-  .os-sidebar button { padding: 9px 7px; }
+  .os-sidebar button { flex: 0 0 auto; padding: 9px 7px; }
   .os-sidebar .os-profile-trigger { flex: 0 0 36px; width: 36px; height: 36px; margin: 0 3px 0 0; font-size: 11px; }
   .os-workspace { grid-column: 1; padding-top: 48px; }
   .os-taskbar { grid-column: 1; }
-  .desktop-icons { grid-template: repeat(4,75px) / repeat(2,90px); padding: 65px 14px 14px; }
-  .desktop-welcome { grid-column: 1 / 3; grid-row: 3 / 5; align-self: end; justify-self: start; width: 100%; padding: 20px; }
+  .desktop-icons { grid-template: repeat(3,75px) minmax(0,1fr) / repeat(2,90px); padding: 65px 14px 14px; }
+  .desktop-welcome { grid-column: 1 / 3; grid-row: 4; align-self: end; justify-self: start; width: 100%; padding: 20px; }
   .desktop-welcome h2 { font-size: 42px; }
   .os-window { top: 66px; left: 3%; width: 94%; max-height: calc(100% - 76px); overflow-y: auto; }
   .text-file > div, .project-window > div { padding: 28px 22px; }
   .text-file h2, .project-window h2 { font-size: 36px; }
+  .lab-log-feed { padding: 14px 0 24px; font-size: 9px; }
+  .lab-log-line { grid-template-columns: 34px minmax(0,1fr); padding-right: 12px; }
+  .lab-log-line::before { padding-right: 8px; }
+  .lab-log-line > span { padding-left: 10px; }
   .experience-window > div button { grid-template-columns: 1fr; gap: 8px; }
   .profile-window { top: 58px; left: 3%; width: 94%; max-height: calc(100% - 68px); overflow-y: auto; }
   .profile-window-body { grid-template-columns: 1fr; }
