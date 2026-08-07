@@ -41,11 +41,11 @@
     "closeAria": "Close room index"
   },
   "zones": {
-    "computer": { "index": "01", "label": "COMPUTER", "hint": "OPEN FILE SYSTEM", "log": "An active desktop contains projects, experience records, and one bulletin that does not belong.", "sceneLabel": "COMPUTER / WORK" },
-    "drawer": { "index": "02", "label": "DESK DRAWER", "hint": "INSPECT PROTOTYPE", "log": "The drawer contains an EMG prototype, spare components, and labels written before the enclosure existed.", "sceneLabel": "DRAWER / MATERIALS" },
-    "notebook": { "index": "03", "label": "RESEARCH BOOK", "hint": "TURN THE PAGE", "log": "The research notebook separates observations from conclusions and leaves several conclusions unfinished.", "sceneLabel": "NOTEBOOK / PROCESS" },
-    "books": { "index": "04", "label": "BOOKSHELF", "hint": "PULL A BOOK", "log": "The shelf connects algorithms, psychology, and travel—the subjects do not stay in separate categories.", "sceneLabel": "BOOKS / INFLUENCES" },
-    "board": { "index": "05", "label": "NOTE BOARD", "hint": "READ THE MARGINS", "log": "The board records how she works: research first, test the route, preserve a Plan B, then keep moving.", "sceneLabel": "BOARD / PRINCIPLES" },
-    "fieldcase": { "index": "06", "label": "FIELD CASE", "hint": "PLAN THE NEXT ROUTE", "log": "A rolling field station separates what happens next into NEXT, LATER, and MAYBE—alongside the equipment that can leave the lab.", "sceneLabel": "FIELD CASE / LIFE" }
+    "computer": { "index": "01", "label": "COMPUTER", "hint": "Most of the files should be found here.", "log": "An active desktop contains projects, experience records, and one bulletin that does not belong.", "sceneLabel": "COMPUTER / WORK" },
+    "drawer": { "index": "02", "label": "DESK DRAWER", "hint": "Something was left beneath the workbench.", "log": "The drawer contains an EMG prototype, spare components, and labels written before the enclosure existed.", "sceneLabel": "DRAWER / MATERIALS" },
+    "notebook": { "index": "03", "label": "RESEARCH BOOK", "hint": "The margins may say more than the notes.", "log": "The research notebook separates observations from conclusions and leaves several conclusions unfinished.", "sceneLabel": "NOTEBOOK / PROCESS" },
+    "books": { "index": "04", "label": "BOOKSHELF", "hint": "Some references were marked for a reason.", "log": "The shelf connects algorithms, psychology, and travel—the subjects do not stay in separate categories.", "sceneLabel": "BOOKS / INFLUENCES" },
+    "board": { "index": "05", "label": "NOTE BOARD", "hint": "Not every plan was meant to stay here.", "log": "The board records how she works: research first, test the route, preserve a Plan B, then keep moving.", "sceneLabel": "BOARD / PRINCIPLES" },
+    "fieldcase": { "index": "06", "label": "FIELD CASE", "hint": "This case looks ready to leave the lab.", "log": "A rolling field station separates what happens next into NEXT, LATER, and MAYBE—alongside the equipment that can leave the lab.", "sceneLabel": "FIELD CASE / LIFE" }
   }
 }
