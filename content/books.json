@@ -1,0 +1,15 @@
+{
+  "ariaLabel": "Bookshelf close-up",
+  "header": "BOOKSHELF / SELECT A BOOK",
+  "sceneHint": "ONE SHELF · CLICK A BOOK SPINE",
+  "page": { "reference": "REFERENCE / CONTINUED", "tab": "FIELD NOTE", "frontMeta": "ANNOTATION / PAGE 41", "backMeta": "MARGIN / PAGE 42", "backCopy": "A note added after the main text, once the clean explanation had stopped being enough.", "turn": "TURN PAGE →", "turnBack": "← TURN BACK", "turnAria": "Turn to the next page", "turnBackAria": "Turn back one page", "return": "RETURN BOOK TO SHELF ×" },
+  "spineLabels": ["Fair Allocation", "Walking Distance", "Signals in Motion", "Human Systems", "Relevance", "Field Routes"],
+  "books": [
+    { "id": "algorithms", "index": "01", "title": "Fair Allocation", "meta": "ALGORITHMS / BOOKMARK 42", "heading": "Automatic and Satisfactory Course Assignment", "copy": "Simultaneous Eating and Birkhoff Decomposition, annotated with the points where efficiency and student preference stop agreeing cleanly.", "note": "Re-run with the preference ties preserved." },
+    { "id": "city", "index": "02", "title": "Walking Distance", "meta": "FIELD MAP / SHANGHAI", "heading": "Quality of Life in Shanghai", "copy": "Interview notes, questionnaire patterns, and an early neighborhood map folded together before they became an interactive website.", "note": "A useful map begins with somebody's ordinary Tuesday." },
+    { "id": "signals", "index": "03", "title": "Signals in Motion", "meta": "HARDWARE / EMG", "heading": "Muscle Usage & Behavior Monitor", "copy": "Signal sketches for the ESP32 system, including the noisy readings that were more useful than the clean demonstrations.", "note": "Test outside the clean bench." },
+    { "id": "human", "index": "04", "title": "Human Systems", "meta": "PSYCHOLOGY / MARGIN", "heading": "People are not systems waiting to be reduced.", "copy": "Computer science supplies structure. Psychology supplies the warning label: a model can be useful without becoming the whole person.", "note": "Ask what the model leaves out." },
+    { "id": "research", "index": "05", "title": "Relevance", "meta": "UW SOCIAL FUTURES LAB", "heading": "How do principles shape perceived relevance?", "copy": "Survey questions, normalized case data, and a working set of principle vectors. Several conclusions remain deliberately unfinished.", "note": "Sounding certain is not the same as understanding." },
+    { "id": "routes", "index": "06", "title": "Field Routes", "meta": "MAPS / PLAN B", "heading": "A route is a hypothesis.", "copy": "Careful itineraries, alternative paths, and the reminder that preparation is permission to adapt rather than proof that nothing will change.", "note": "Leave the return line open." }
+  ]
+}

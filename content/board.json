@@ -1,0 +1,15 @@
+{
+  "ariaLabel": "Bulletin board close-up",
+  "header": "NOTE BOARD / FOLLOW THE THREADS",
+  "sceneHint": "FOLLOW THE THREADS · CLICK A NOTE",
+  "detailMeta": "PINNED MARGIN /",
+  "returnItem": "PIN IT BACK ×",
+  "hitLabels": ["RESEARCH FIRST", "OPEN QUESTION", "PLAN B", "FIELD ROUTE", "USEFUL FIRST"],
+  "notes": [
+    { "label": "research first, ask people next", "title": "Questions before conclusions.", "copy": "Collect context, then talk to the people inside the problem." },
+    { "label": "TODO: overthink less", "title": "Momentum is also evidence.", "copy": "Thinking carefully matters. So does eventually testing the thought." },
+    { "label": "backup route B", "title": "Preparation creates freedom.", "copy": "A Plan B is not pessimism; it is permission to continue." },
+    { "label": "I do not know yet", "title": "Uncertainty is a valid state.", "copy": "Not every question needs to be converted into a confident answer." },
+    { "label": "make it useful before impressive", "title": "Usefulness before spectacle.", "copy": "The interface should help a person do something—not only prove it was difficult to build." }
+  ]
+}

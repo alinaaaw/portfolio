@@ -1,0 +1,47 @@
+{
+  "ariaLabel": "Alina's computer desktop",
+  "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
+  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "about": "ABOUT.TXT", "location": "LAB-17 / LOCAL" },
+  "profile": {
+    "triggerAria": "Open Alina Wu's profile",
+    "windowTitle": "USER PROFILE / ALINA.WU",
+    "closeAria": "Close user profile",
+    "status": "LOCAL USER / ACTIVE",
+    "name": "Alina Wu",
+    "fullName": "Wenrui Alina Wu",
+    "role": "Computer Science / University of Washington",
+    "locationLabel": "BASE",
+    "location": "Seattle, Washington",
+    "summaryLabel": "PROFILE",
+    "summary": "I work across software, physical systems, and human-centered questions—building projects, studying how people interpret information, and documenting what I learn along the way.",
+    "focusLabel": "CURRENT FOCUS",
+    "focus": ["SOFTWARE", "PHYSICAL SYSTEMS", "HUMAN QUESTIONS"],
+    "contactLabel": "CONTACT",
+    "email": "awu78@uw.edu"
+  },
+  "desktop": {
+    "icons": { "about": "ABOUT.txt", "projects": "PROJECTS", "experience": "EXPERIENCE", "research": "FIELD_NOTES.md" },
+    "welcome": { "eyebrow": "WELCOME / GUEST", "title": "Alina", "description": "Computer Science at the University of Washington. Code, physical systems, and questions about the people around them." }
+  },
+  "about": {
+    "filename": "ABOUT.txt",
+    "meta": "PROFILE / LAST SAVED RECENTLY",
+    "headline": ["I build with code,", "then look closely at", "what it meets."],
+    "description": "Computer science gives me a way to break problems apart. Psychology keeps the human parts from becoming too simple. I collect information before choosing a route, but I try not to confuse preparation with certainty.",
+    "quote": "“I do not know yet” is allowed here."
+  },
+  "projectsFolder": { "title": "PROJECTS / 3 ITEMS", "back": "← PROJECTS", "verified": "CASE FILE / VERIFIED" },
+  "projects": {
+    "map": { "name": "shanghai-map.case", "meta": "HTML · CSS · JAVASCRIPT", "title": "Quality of Life in Shanghai", "copy": "An interactive neighborhood map informed by questionnaires and interviews, helping residents locate useful facilities within walking distance.", "facts": ["TEAM LEAD + DEVELOPER", "8-PERSON TEAM", "SEP 2023 — MAY 2024"] },
+    "allocation": { "name": "course-allocation.py", "meta": "PYTHON · NUMPY", "title": "Automatic and Satisfactory Course Assignment", "copy": "An allocation system designed around satisfaction and efficiency using Simultaneous Eating and Birkhoff Decomposition.", "facts": ["ALLOCATION ALGORITHM", "PREFERENCE-BASED", "TESTED + DOCUMENTED"] },
+    "emg": { "name": "emg-monitor.device", "meta": "ARDUINO · C/C++ · FUSION", "title": "Muscle Usage & Behavior Monitor", "copy": "A multi-device system that collects EMG signals over Bluetooth, classifies them on ESP32 microcontrollers, and sends exercise data to a mobile interface.", "facts": ["ESP32", "EMG + BLUETOOTH", "MOBILE INTERFACE"] }
+  },
+  "experience": {
+    "folderTitle": "EXPERIENCE / 2 ITEMS",
+    "back": "← EXPERIENCE",
+    "research": { "listMeta": "01 / RESEARCH", "organization": "UW Social Futures Lab", "date": "APR 2026 — PRESENT", "filename": "SOCIAL_FUTURES_LAB.md", "meta": "UNDERGRADUATE RESEARCH / UW", "title": "How do principles shape perceived relevance?", "copy": "Analyzing how agreement on principles affects perceived relevance between cases through surveys, normalized data, and Pandas-based CSV pipelines.", "quote": "STATUS: the relationship is still under investigation." },
+    "internship": { "listMeta": "02 / INTERNSHIP", "organization": "Thermo Fisher Scientific", "date": "JUN 2026 — PRESENT", "filename": "THERMO_FISHER.log", "meta": "SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI", "title": "Vision, motion, and laboratory workflows.", "copy": "Work across YOLO26 computer vision, ROS2 robot-arm motion, 3500Dx scientific-software testing, QANTIS workflow analysis, and technical onboarding.", "quote": "JUNE 2026 — PRESENT" }
+  },
+  "bulletin": { "header": "LAB BULLETIN", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
+  "taskbar": { "files": "LOCAL FILES", "unread": "1 UNREAD BULLETIN", "clear": "NO NEW ALERTS" }
+}

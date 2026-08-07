@@ -1,0 +1,51 @@
+{
+  "ariaLabel": "Interactive personal laboratory",
+  "sceneAriaLabel": "Interactive 3D laboratory with six explorable objects",
+  "navigation": {
+    "index": "QUICK INDEX",
+    "contact": "CONTACT",
+    "foundSuffix": "/06 FOUND"
+  },
+  "status": {
+    "label": "LAB STATUS",
+    "instruction": "DRAG TO LOOK · CLICK AN OBJECT TO MOVE CLOSER",
+    "messages": [
+      "ROOM ONLINE / NOTHING UNUSUAL",
+      "ONE OBJECT EXAMINED",
+      "AN UNFILED BULLETIN WAS FOUND",
+      "THREE TRACES CONNECT",
+      "OFF-SITE PATTERN FORMING",
+      "PRINTER RECEIVING DATA",
+      "FIELD REPORT READY / SOURCE AW"
+    ]
+  },
+  "hover": {
+    "signalPrefix": "SIGNAL /",
+    "defaultMeta": "ROOM VIEW",
+    "defaultTitle": "LOOK AROUND THE LAB",
+    "defaultHint": "Six objects can be explored in any order."
+  },
+  "faxAlert": {
+    "title": "INCOMING FAX",
+    "action": "CLICK THE HIGHLIGHTED PRINTER →",
+    "sceneLabel": "PRINTER / UPDATE"
+  },
+  "quickIndex": {
+    "ariaLabel": "Room index",
+    "title": "ROOM INDEX",
+    "eyebrow": "DIRECT ACCESS / OPTIONAL",
+    "headline": ["Everything in", "the room."],
+    "description": "Use this index if you want the portfolio without the scavenger hunt. The room and the files contain the same work.",
+    "found": "FOUND",
+    "open": "OPEN",
+    "closeAria": "Close room index"
+  },
+  "zones": {
+    "computer": { "index": "01", "label": "COMPUTER", "hint": "OPEN FILE SYSTEM", "log": "An active desktop contains projects, experience records, and one bulletin that does not belong.", "sceneLabel": "COMPUTER / WORK" },
+    "drawer": { "index": "02", "label": "DESK DRAWER", "hint": "INSPECT PROTOTYPE", "log": "The drawer contains an EMG prototype, spare components, and labels written before the enclosure existed.", "sceneLabel": "DRAWER / MATERIALS" },
+    "notebook": { "index": "03", "label": "RESEARCH BOOK", "hint": "TURN THE PAGE", "log": "The research notebook separates observations from conclusions and leaves several conclusions unfinished.", "sceneLabel": "NOTEBOOK / PROCESS" },
+    "books": { "index": "04", "label": "BOOKSHELF", "hint": "PULL A BOOK", "log": "The shelf connects algorithms, psychology, and travel—the subjects do not stay in separate categories.", "sceneLabel": "BOOKS / INFLUENCES" },
+    "board": { "index": "05", "label": "NOTE BOARD", "hint": "READ THE MARGINS", "log": "The board records how she works: research first, test the route, preserve a Plan B, then keep moving.", "sceneLabel": "BOARD / PRINCIPLES" },
+    "fieldcase": { "index": "06", "label": "FIELD CASE", "hint": "PLAN THE NEXT ROUTE", "log": "A rolling field station separates what happens next into NEXT, LATER, and MAYBE—alongside the equipment that can leave the lab.", "sceneLabel": "FIELD CASE / LIFE" }
+  }
+}

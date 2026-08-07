@@ -1,0 +1,12 @@
+{
+  "ariaLabel": "Research notebook close-up",
+  "header": "RESEARCH BOOK / INSPECT A PAGE",
+  "sceneHint": "DRAG TO LOOK · CLICK A PAGE OR INSERT",
+  "itemLabels": { "research": "RESEARCH PAGE", "margin": "PERSONAL MARGIN", "diagram": "FIELD DIAGRAM" },
+  "page": { "reverseMeta": "REVERSE / PERSONAL MARGIN", "reverseCopy": "A note added after the rest of the page, once the neat explanation had stopped being enough.", "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
+  "items": {
+    "research": { "meta": "UW SOCIAL FUTURES LAB / PAGE 17", "title": "How do principles shape perceived relevance?", "copy": "Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation.", "note": "Research first. Ask people next. Leave room for the answer to stay complicated." },
+    "margin": { "meta": "PERSONAL MARGIN / IN RED", "title": "Sounding certain is not the same as understanding.", "copy": "A reminder written sideways beside the analysis: uncertainty can be an honest result, not an unfinished performance.", "note": "Do not smooth away disagreement." },
+    "diagram": { "meta": "FIELD INSERT / SIGNAL PATH", "title": "A diagram made before the clean version.", "copy": "Question, observation, model, test, correction. The arrows loop backward because the first answer is rarely the last useful one.", "note": "Ask what the model leaves out." }
+  }
+}

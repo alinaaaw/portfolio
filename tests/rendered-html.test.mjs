@@ -26,42 +26,57 @@ test("server renders a personal laboratory before revealing the mystery", async 
 });
 
 test("source contains six room objects, real work, and a progressive reveal", async () => {
-  const page = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/page.tsx", import.meta.url), "utf8"));
+  const { readFile } = await import("node:fs/promises");
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const contentFiles = ["site","intro","room","computer","books","drawer","notebook","board","field-case","fax-contact"];
+  const content = (await Promise.all(contentFiles.map((name) => readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8")))).join("\n");
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"|active!==\\"${zone}\\"|\\"${zone}\\"`));
   }
-  assert.match(page, /ALINA\.OS/);
-  assert.match(page, /PROJECTS \/ 3 ITEMS/);
-  assert.match(page, /ABOUT\.txt/);
-  assert.match(page, /Quality of Life in Shanghai/);
-  assert.match(page, /Automatic and Satisfactory Course Assignment/);
-  assert.match(page, /Muscle Usage.*Behavior Monitor/);
-  assert.match(page, /Social Futures Lab/i);
-  assert.match(page, /Thermo Fisher Scientific/i);
-  assert.match(page, /User has not checked in/i);
-  assert.match(page, /Alina Wu has been offline for four days.*This workstation continues to sync/i);
-  assert.doesNotMatch(page, /Her computer/);
-  assert.doesNotMatch(page, /Why is this appearing on a portfolio computer/);
-  assert.doesNotMatch(page, /I am not missing/);
-  assert.match(page, /The signal holds outside the lab/);
-  assert.match(page, /EMG classifier is separating intentional contraction from drift/);
-  assert.match(page, /bringing the hardware and full logs back to Lab 17/);
-  assert.match(page, /mailto:awu78@uw\.edu/);
-  assert.doesNotMatch(page, /mailto:hello@example\.com/);
-  assert.match(page, /INCOMING FAX/);
-  assert.match(page, /CLICK THE HIGHLIGHTED PRINTER/);
+  assert.match(page, /from "@\/content"/);
+  assert.match(content, /ALINA\.OS/);
+  assert.match(content, /PROJECTS \/ 3 ITEMS/);
+  assert.match(content, /ABOUT\.txt/);
+  assert.match(content, /USER PROFILE \/ ALINA\.WU/);
+  assert.match(page, /os-profile-trigger/);
+  assert.match(content, /Quality of Life in Shanghai/);
+  assert.match(content, /Automatic and Satisfactory Course Assignment/);
+  assert.match(content, /Muscle Usage.*Behavior Monitor/);
+  assert.match(content, /Social Futures Lab/i);
+  assert.match(content, /Thermo Fisher Scientific/i);
+  assert.match(content, /User has not checked in/i);
+  assert.match(content, /Alina Wu has been offline for four days.*This workstation continues to sync/i);
+  assert.doesNotMatch(content, /Her computer/);
+  assert.doesNotMatch(content, /Why is this appearing on a portfolio computer/);
+  assert.doesNotMatch(content, /I am not missing/);
+  assert.match(content, /The signal holds outside the lab/);
+  assert.match(content, /EMG classifier is separating intentional contraction from drift/);
+  assert.match(content, /bringing the hardware and full logs back to Lab 17/);
+  assert.match(content, /awu78@uw\.edu/);
+  assert.doesNotMatch(content, /hello@example\.com/);
+  assert.match(content, /INCOMING FAX/);
+  assert.match(content, /CLICK THE HIGHLIGHTED PRINTER/);
   assert.match(page, /onDoubleClick/);
   assert.doesNotMatch(page, /DOUBLE CLICK TO OPEN/);
   assert.doesNotMatch(page, />DOUBLE CLICK</);
-  assert.match(page, /<h2>Alina<\/h2>/);
   for (const zone of ["drawer", "books", "notebook", "board", "fieldcase", "printer", "contact"]) {
     assert.match(page, new RegExp(`ZoneCloseup3D zone=\\"${zone}\\"`));
   }
-  assert.match(page, /TURN PAGE/);
+  assert.match(content, /TURN PAGE/);
   assert.match(page, /book-turning-sheet/);
-  assert.match(page, /FIELD PLANNING \/ NEXT · LATER · MAYBE/);
-  assert.match(page, /PRINTER DESK \/ CONTACT CARD/);
+  assert.match(content, /FIELD PLANNING \/ NEXT · LATER · MAYBE/);
+  assert.match(content, /PRINTER DESK \/ CONTACT CARD/);
   assert.match(page, /fax-reading/);
+});
+
+test("editable copy is organized into valid category files", async () => {
+  const { readFile } = await import("node:fs/promises");
+  for (const name of ["site","intro","room","computer","books","drawer","notebook","board","field-case","fax-contact"]) {
+    const source = await readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8");
+    assert.doesNotThrow(() => JSON.parse(source), `${name}.json must remain valid JSON`);
+  }
+  const guide = await readFile(new URL("../content/CONTENT_GUIDE.md", import.meta.url), "utf8");
+  assert.match(guide, /Website Copy Editing Guide/);
 });
 
 test("3D room and layered object exploration remain connected", async () => {
@@ -75,7 +90,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(game, /onInspect/);
   assert.match(game, /faxReady/);
   assert.match(game, /onPrinterInspect/);
-  assert.match(game, /INCOMING FAX \/ CLICK PRINTER/);
+  assert.match(game, /room\.faxAlert\.sceneLabel/);
   assert.doesNotMatch(game, /rover/i);
   assert.match(game, /drawer: \[-3\.53, \.84, -5\.38\]/);
   assert.match(closeups, /WebGLRenderer/);
@@ -94,7 +109,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /printProgress/);
   assert.match(closeups, /TubeGeometry/);
   assert.match(closeups, /if\(withFax&&hits\)/);
-  assert.match(closeups, /USED ARCHERY PAPER/);
+  assert.match(closeups, /fieldCaseContent\.itemLabels\.target/);
   for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }

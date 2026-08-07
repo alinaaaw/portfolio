@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { room } from "@/content";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
@@ -33,12 +34,12 @@ const palette = {
 };
 
 const zoneLabels: Record<ZoneId, string> = {
-  computer: "COMPUTER / FILE SYSTEM",
-  drawer: "DRAWER / PROTOTYPE",
-  notebook: "NOTEBOOK / RESEARCH",
-  books: "BOOKS / ALGORITHMS",
-  board: "BOARD / MARGIN NOTES",
-  fieldcase: "FIELD CASE / EXPERIENCE",
+  computer: room.zones.computer.sceneLabel,
+  drawer: room.zones.drawer.sceneLabel,
+  notebook: room.zones.notebook.sceneLabel,
+  books: room.zones.books.sceneLabel,
+  board: room.zones.board.sceneLabel,
+  fieldcase: room.zones.fieldcase.sceneLabel,
 };
 
 const zonePositions: Record<ZoneId, [number, number, number]> = {
@@ -228,7 +229,7 @@ function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
   printerSignal.position.set(2.38,2.2,.56);
   const printerRing = new THREE.Mesh(new THREE.TorusGeometry(.76,.035,10,48),material(palette.signal,.25,.2,palette.signal,2));
   printerSignal.add(printerRing);
-  const printerLabel = makeLabel("INCOMING FAX / CLICK PRINTER");
+  const printerLabel = makeLabel(room.faxAlert.sceneLabel);
   printerLabel.position.y = 1.08;
   printerLabel.scale.set(3.15,.63,1);
   printerSignal.add(printerLabel);
@@ -797,5 +798,5 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
     };
   },[onHover]);
 
-  return <div className="lab-game"><canvas ref={canvasRef} aria-label="Interactive 3D laboratory with six explorable objects" /></div>;
+  return <div className="lab-game"><canvas ref={canvasRef} aria-label={room.sceneAriaLabel} /></div>;
 }

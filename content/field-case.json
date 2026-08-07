@@ -1,0 +1,13 @@
+{
+  "ariaLabel": "Field case close-up",
+  "header": "FIELD CASE / FUTURE ROUTES",
+  "sceneHint": "FIELD PLANNING · INSPECT THE CASE OR TODO BOARD",
+  "returnItem": "RETURN TO CASE ×",
+  "itemLabels": { "target": "USED ARCHERY PAPER", "internship": "WORK CARD", "ticket": "RETURN TICKET", "draft": "NEXT / LATER / MAYBE" },
+  "items": {
+    "internship": { "meta": "THERMO FISHER SCIENTIFIC / SHANGHAI", "title": "Vision, motion, and laboratory workflows.", "copy": "Software engineering across YOLO26 vision, ROS2 robot-arm motion, 3500Dx testing, QANTIS workflow analysis, and technical onboarding.", "tags": ["JUN 2026 — PRESENT", "SOFTWARE ENGINEERING"] },
+    "target": { "meta": "ARCHERY PAPER / GROUPING STUDY", "title": "Prepare. Focus. Release. Adjust.", "copy": "A used paper target, folded into the field case rather than mounted like a shield. The same test-and-adjust rhythm appears throughout the project notes." },
+    "ticket": { "meta": "FIELD ROUTE / RETURN FLEXIBLE", "title": "Outbound confirmed. Return left open.", "copy": "The route is planned, but the return date stays flexible until the next outdoor experiment closes." },
+    "draft": { "meta": "FIELD PLANNING / NEXT · LATER · MAYBE", "title": "A route for what comes next.", "copy": "NEXT: repeat outdoor EMG tests. LATER: refine the classifier and document the robot workflow. MAYBE: leave one slot open for a question that has not been chosen yet." }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ariaLabel": "Desk drawer close-up",
+  "header": "DESK DRAWER / PULL TO OPEN",
+  "sceneHint": "CLICK THE METAL HANDLE, THEN SELECT A FILE",
+  "handleLabel": "PULL THE METAL HANDLE",
+  "returnItem": "PUT IT BACK ×",
+  "itemLabels": { "folder": "PROJECT FOLDER", "notebook": "FIELD NOTEBOOK", "envelope": "SEALED ENVELOPE", "components": "COMPONENT POUCH" },
+  "items": {
+    "folder": { "meta": "PROJECT FOLDER / 2023—2024", "title": "Shanghai, at walking distance.", "copy": "Questionnaires, interview summaries, and printed facility maps from the eight-person Quality of Life in Shanghai project.", "note": "Ask residents before drawing the route." },
+    "notebook": { "meta": "FIELD LOG / SOCIAL FUTURES LAB", "title": "Cases, principles, relevance.", "copy": "Small observations recorded before the survey responses were normalized and moved into the Pandas pipeline.", "note": "Do not smooth away disagreement." },
+    "components": { "meta": "HARDWARE POUCH / REV. 04", "title": "The prototype left the clean bench.", "copy": "ESP32 board, EMG sensor leads, spare headers, and the component set used for the current outdoor movement tests.", "note": "Noise after fatigue may be useful." },
+    "envelope": { "meta": "SEALED NOTE / RETURN CHANNEL", "title": "For the printer, after six traces.", "copy": "A routing envelope with the Lab 17 printer address and a field-transmission schedule written inside the flap.", "note": "Next report: after Phase 02." }
+  }
+}

@@ -3,6 +3,14 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import {
+  board as boardContent,
+  books as booksContent,
+  drawer as drawerContent,
+  faxContact,
+  fieldCase as fieldCaseContent,
+  notebook as notebookContent,
+} from "@/content";
 
 export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
 
@@ -98,7 +106,7 @@ function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number
       mark.position.set(-.12,.04,.42+line*.2); paperGroup.add(mark);
     }
     const stamp=new THREE.Mesh(new THREE.RingGeometry(.25,.3,28),mat(palette.red,.7,.02)); stamp.rotation.x=-Math.PI/2; stamp.position.set(.67,.055,2.42); paperGroup.add(stamp);
-    const paperHit=hitBox("fax","READ PRINTED FIELD REPORT",[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
+    const paperHit=hitBox("fax",faxContact.printer.paperHitLabel,[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
     paperGroup.add(paperHit); hits.push(paperHit);
     printer.add(paperGroup);
   }
@@ -114,7 +122,7 @@ function addContactCard(parent:THREE.Object3D,position:[number,number,number],ro
   const accent=box(.12,.025,1.16,palette.red,.7,.02); accent.position.set(position[0]-.93,position[1]+.045,position[2]); accent.rotation.y=rotation; parent.add(accent);
   const nameLine=box(1.15,.025,.055,0x283f3a,.72,.02); nameLine.position.set(position[0]-.12,position[1]+.05,position[2]-.32); nameLine.rotation.y=rotation; parent.add(nameLine);
   for(let line=0;line<3;line+=1){const detail=box(1.25-line*.14,.018,.028,0x6e7c75,.72,.02);detail.position.set(position[0]-.06,position[1]+.05,position[2]+.02+line*.18);detail.rotation.y=rotation;parent.add(detail);}
-  if(hits){const hit=hitBox("contact","OPEN CONTACT CARD",[2.8,.55,1.75],position,[card]);hit.rotation.y=rotation;parent.add(hit);hits.push(hit);}
+  if(hits){const hit=hitBox("contact",faxContact.contact.hitLabel,[2.8,.55,1.75],position,[card]);hit.rotation.y=rotation;parent.add(hit);hits.push(hit);}
   return card;
 }
 
@@ -139,7 +147,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const frontLip=roundedBox(8.55,.16,.16,0x4a3225,.045,.78,.04);frontLip.position.set(0,.4,.82);
   shelf.add(back,sideL,sideR,base,top,frontLip);
   const colors=[0x28504a,0x854b3d,0xb29145,0x33473f,0xd0c4a5,0x334d65];
-  const labels=["Fair Allocation","Walking Distance","Signals in Motion","Human Systems","Relevance","Field Routes"];
+  const labels=booksContent.spineLabels;
   for (let index=0;index<6;index+=1) {
     const group=new THREE.Group();
     const height=3.42+(index%3)*.22;
@@ -204,13 +212,13 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   const circuit=roundedBox(.65,.11,.66,0x245e4f,.035,.5,.12); circuit.position.set(1.23,.79,-.25);
   const coil=new THREE.Mesh(new THREE.TorusGeometry(.28,.035,8,28),mat(palette.red,.5,.1)); coil.rotation.x=Math.PI/2; coil.position.set(1.25,.88,.28);
   tray.add(folder,notebook,envelope,pouch,circuit,coil);
-  const handleHit=hitBox("drawer-handle","PULL THE METAL HANDLE",[1.7,.72,.58],[0,.92,1.99],[handleBar,front,inset]);
+  const handleHit=hitBox("drawer-handle",drawerContent.handleLabel,[1.7,.72,.58],[0,.92,1.99],[handleBar,front,inset]);
   tray.add(handleHit); hits.push(handleHit);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["folder","PROJECT FOLDER",folder,[1.42,.55,1.82],[-1.05,.75,-.24]],
-    ["notebook","FIELD NOTEBOOK",notebook,[1,.55,1.7],[.15,.76,-.56]],
-    ["envelope","SEALED ENVELOPE",envelope,[1.7,.5,1.08],[.05,.75,.61]],
-    ["components","COMPONENT POUCH",pouch,[1.2,.65,1.52],[1.23,.8,-.25]],
+    ["folder",drawerContent.itemLabels.folder,folder,[1.42,.55,1.82],[-1.05,.75,-.24]],
+    ["notebook",drawerContent.itemLabels.notebook,notebook,[1,.55,1.7],[.15,.76,-.56]],
+    ["envelope",drawerContent.itemLabels.envelope,envelope,[1.7,.5,1.08],[.05,.75,.61]],
+    ["components",drawerContent.itemLabels.components,pouch,[1.2,.65,1.52],[1.23,.8,-.25]],
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual],true); tray.add(hit); hits.push(hit); });
   tray.position.set(-1,.05,-.36);
@@ -270,9 +278,9 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
   const photo=box(1.25,.05,.95,0x455d59); photo.position.set(-1.55,.62,.62); photo.rotation.y=-.08; book.add(photo);
   const pen=cylinder(.065,2.7,palette.red,12); pen.rotation.z=Math.PI/2; pen.position.set(.9,.72,1.65); book.add(pen);
   scene.add(book);
-  const researchHit=hitBox("research","RESEARCH PAGE",[2.8,.5,3.5],[-1.55,.7,0],[left]);
-  const marginHit=hitBox("margin","PERSONAL MARGIN",[2.8,.5,3.5],[1.55,.7,0],[right,sticky]);
-  const diagramHit=hitBox("diagram","FIELD DIAGRAM",[1.5,.65,1.2],[-1.55,.82,.62],[photo]);
+  const researchHit=hitBox("research",notebookContent.itemLabels.research,[2.8,.5,3.5],[-1.55,.7,0],[left]);
+  const marginHit=hitBox("margin",notebookContent.itemLabels.margin,[2.8,.5,3.5],[1.55,.7,0],[right,sticky]);
+  const diagramHit=hitBox("diagram",notebookContent.itemLabels.diagram,[1.5,.65,1.2],[-1.55,.82,.62],[photo]);
   scene.add(researchHit,marginHit,diagramHit); hits.push(researchHit,marginHit,diagramHit);
   const mug=cylinder(.45,.78,0x29423c,28); mug.position.set(3.25,.66,-1.6); scene.add(mug);
 }
@@ -281,11 +289,11 @@ function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
   const frame=roundedBox(8.4,5.35,.35,palette.wood,.11,.86,.03); frame.position.set(0,2.7,-.25); scene.add(frame);
   const cork=roundedBox(7.85,4.82,.18,0x765d42,.06,.98,.01); cork.position.set(0,2.7,0); scene.add(cork);
   const notes=[
-    {x:-2.65,y:3.75,w:1.5,h:1.1,color:0xe1d3a4,label:"RESEARCH FIRST"},
-    {x:-.7,y:3.55,w:1.65,h:1.35,color:0xb8d5cc,label:"OPEN QUESTION"},
-    {x:1.55,y:3.8,w:1.35,h:1.05,color:0xd9a58f,label:"PLAN B"},
-    {x:2.45,y:2.15,w:1.7,h:1.25,color:0xe2d8bd,label:"FIELD ROUTE"},
-    {x:-1.9,y:1.65,w:1.85,h:1.2,color:0xc7b77f,label:"USEFUL FIRST"},
+    {x:-2.65,y:3.75,w:1.5,h:1.1,color:0xe1d3a4,label:boardContent.hitLabels[0]},
+    {x:-.7,y:3.55,w:1.65,h:1.35,color:0xb8d5cc,label:boardContent.hitLabels[1]},
+    {x:1.55,y:3.8,w:1.35,h:1.05,color:0xd9a58f,label:boardContent.hitLabels[2]},
+    {x:2.45,y:2.15,w:1.7,h:1.25,color:0xe2d8bd,label:boardContent.hitLabels[3]},
+    {x:-1.9,y:1.65,w:1.85,h:1.2,color:0xc7b77f,label:boardContent.hitLabels[4]},
   ];
   notes.forEach((note,index)=>{
     const paper=roundedBox(note.w,note.h,.06,note.color,.035,.94,.01); paper.position.set(note.x,note.y,.18); paper.rotation.z=(index-2)*.035; scene.add(paper);
@@ -324,23 +332,33 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   const route=roundedBox(2.75,.04,.72,0xb9aa7f,.035,.95,.01);route.position.set(2.55,.46,1.72);scene.add(route);
   const routeLine=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(1.5,.5,1.78),new THREE.Vector3(2.15,.51,1.55),new THREE.Vector3(2.85,.51,1.83),new THREE.Vector3(3.55,.51,1.58)]),24,.025,7,false),mat(palette.red,.5,.04));scene.add(routeLine);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["target","USED ARCHERY PAPER",target,[2.18,.55,2.18],[-2.75,1.2,-.22]],
-    ["internship","WORK CARD",card,[1.7,.5,1.12],[-.62,1.17,-.72]],
-    ["ticket","RETURN TICKET",ticket,[1.8,.5,1.02],[-.58,1.17,.48]],
-    ["draft","NEXT / LATER / MAYBE",drafts[4],[3.35,.55,4.75],[2.55,.67,0]],
+    ["target",fieldCaseContent.itemLabels.target,target,[2.18,.55,2.18],[-2.75,1.2,-.22]],
+    ["internship",fieldCaseContent.itemLabels.internship,card,[1.7,.5,1.12],[-.62,1.17,-.72]],
+    ["ticket",fieldCaseContent.itemLabels.ticket,ticket,[1.8,.5,1.02],[-.58,1.17,.48]],
+    ["draft",fieldCaseContent.itemLabels.draft,drafts[4],[3.35,.55,4.75],[2.55,.67,0]],
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual]); scene.add(hit); hits.push(hit); });
   const clip=cylinder(.12,.85,palette.steel,18);clip.rotation.z=Math.PI/2;clip.position.set(2.55,.53,-2.05);scene.add(clip);
 }
 
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
-  books:{position:[0,2.8,9.4],target:[0,2.35,0],hint:"ONE SHELF · CLICK A BOOK SPINE"},
-  drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:"CLICK THE METAL HANDLE, THEN SELECT A FILE"},
-  notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:"DRAG TO LOOK · CLICK A PAGE OR INSERT"},
-  board:{position:[0,3,8.8],target:[0,2.65,0],hint:"FOLLOW THE THREADS · CLICK A NOTE"},
-  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:"FIELD PLANNING · INSPECT THE CASE OR TODO BOARD"},
-  printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:"INCOMING FIELD REPORT · PRINTING"},
-  contact:{position:[.8,4.6,7.4],target:[1.25,.6,.2],hint:"CONTACT CARD · CLICK TO READ"},
+  books:{position:[0,2.8,9.4],target:[0,2.35,0],hint:booksContent.sceneHint},
+  drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
+  notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:notebookContent.sceneHint},
+  board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
+  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
+  printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},
+  contact:{position:[.8,4.6,7.4],target:[1.25,.6,.2],hint:faxContact.contact.sceneHint},
+};
+
+const ariaLabels:Record<CloseupZone,string>={
+  books:booksContent.ariaLabel,
+  drawer:drawerContent.ariaLabel,
+  notebook:notebookContent.ariaLabel,
+  board:boardContent.ariaLabel,
+  fieldcase:fieldCaseContent.ariaLabel,
+  printer:faxContact.printer.ariaLabel,
+  contact:faxContact.contact.ariaLabel,
 };
 
 export default function ZoneCloseup3D({zone,onSelect}:Props) {
@@ -422,7 +440,7 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
         const eased=1-Math.pow(1-printProgress,3);
         faxPaperGroup.scale.z=.035+eased*.965;
         faxPaperGroup.position.y=.88-eased*.22;
-        if(labelRef.current&&!hovered)labelRef.current.textContent=printProgress>.96?"FIELD REPORT READY · CLICK THE PAPER":"INCOMING FIELD REPORT · PRINTING";
+        if(labelRef.current&&!hovered)labelRef.current.textContent=printProgress>.96?faxContact.printer.ready:faxContact.printer.printing;
       }
       const desired=defaultPosition.clone();
       const desiredTarget=baseTarget.clone();
@@ -437,5 +455,5 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
-  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={`Interactive 3D ${zone} close-up`} /><div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
+  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} /><div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
 }
