@@ -565,9 +565,9 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
   wasteBasket.position.set(1.1,.43,1.05);
   scene.add(wasteBasket);
   for (let paperIndex=0; paperIndex<3; paperIndex+=1) {
-    const floorPaper = box(.65,.018,.9,[0xd0c5a8,0xbcae89,0xdfd7c1][paperIndex]);
-    floorPaper.position.set(1.55+paperIndex*.42,.025,1.4+paperIndex*.24);
-    floorPaper.rotation.y = -.25+paperIndex*.28;
+    const floorPaper = box(.65,.026,.9,[0xd0c5a8,0xbcae89,0xdfd7c1][paperIndex]);
+    floorPaper.position.set(1.55+paperIndex*.42,.055+paperIndex*.006,1.4+paperIndex*.24);
+    floorPaper.rotation.set((paperIndex-1)*.008,-.25+paperIndex*.28,(1-paperIndex)*.006);
     scene.add(floorPaper);
   }
 

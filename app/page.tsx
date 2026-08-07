@@ -232,7 +232,7 @@ export default function VersionThree() {
             <div className="intro-copy">
               <p>PERSONAL WORKSPACE / AFTER HOURS</p>
               <h1>Come in.<br />The lab is<br /><em>still awake.</em></h1>
-              <p className="intro-text">This is where Wenrui (Alina) Wu keeps projects, research notes, physical prototypes, and questions that do not fit inside a résumé. Look around. Almost everything has a story.</p>
+              <p className="intro-text">This is where Alina Wu keeps projects, research notes, physical prototypes, and questions that do not fit inside a résumé. Look around. Almost everything has a story.</p>
               <button onClick={() => setEntered(true)}>ENTER LAB 17 <span>→</span></button>
               <div className="intro-identity"><span>WENRUI (ALINA) WU</span><strong>Computer Science / University of Washington</strong></div>
             </div>
@@ -295,7 +295,7 @@ export default function VersionThree() {
 
                 {computerFile==="internship"&&<article className="os-window text-file"><header><button onClick={() => setComputerFile("experience")}>← EXPERIENCE</button><span>THERMO_FISHER.log</span><button onClick={() => setComputerFile("desktop")}>—</button></header><div><small>SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI</small><h2>Vision, motion, and laboratory workflows.</h2><p>Work across YOLO26 computer vision, ROS2 robot-arm motion, 3500Dx scientific-software testing, QANTIS workflow analysis, and technical onboarding.</p><blockquote>JUNE 2026 — PRESENT</blockquote></div></article>}
 
-                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>User has not checked in.</strong><p>Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded.</p><small>Why is this appearing on a portfolio computer?</small></div>
+                <div className={`news-popup ${bulletin?"visible":""}`}><header><span>LAB BULLETIN</span><button onClick={() => setBulletin(false)}>×</button></header><strong>User has not checked in.</strong><p>Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded.</p></div>
               </main>
               <footer className="os-taskbar"><button onClick={() => setComputerFile("desktop")}>AW</button><span>LOCAL FILES</span><span>{bulletin?"1 UNREAD BULLETIN":"NO NEW ALERTS"}</span></footer>
             </div>

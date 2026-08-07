@@ -146,8 +146,8 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     const width=.92+(index%2)*.12;
     const cover=roundedBox(width,height,1.04,colors[index],.065,.7,.02);
     cover.position.y=height/2;
-    const pages=roundedBox(width-.13,height-.14,.91,0xd7cba9,.045,.93,.01);
-    pages.position.set(.035,height/2,.08);
+    const pages=roundedBox(width-.16,height-.16,.78,0xd7cba9,.045,.93,.01);
+    pages.position.set(.035,height/2,-.08);
     const spine=roundedBox(.16,height-.12,1.08,colors[index],.05,.68,.02);spine.position.set(-width*.42,height/2,.01);
     const band=box(width+.025,.07,1.08,index===2?palette.signal:0xbba980,.7,.02);
     band.position.set(0,height*.72,.01);
@@ -218,6 +218,15 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
 
   buildPrinterModel(workspace,[2.25,2.32,-.45],.62);
   addContactCard(workspace,[2.45,2.39,1.12],-.09);
+  const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(-1.2,3.47,-1.25);workspace.add(monitor);
+  const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(-1.2,3.47,-1.09);workspace.add(monitorScreen);
+  const monitorMaterial=monitorScreen.material as THREE.MeshStandardMaterial;monitorMaterial.emissive.setHex(palette.cyan);monitorMaterial.emissiveIntensity=.72;
+  for(let row=0;row<9;row+=1){const length=.55+((row*7)%9)*.18;const line=box(length,.018,.014,row%3===0?palette.signal:palette.cyan,.45,.15);line.position.set(-2.55+length/2,4.08-row*.15,-1.065);const lineMaterial=line.material as THREE.MeshStandardMaterial;lineMaterial.emissive.setHex(row%3===0?palette.signal:palette.cyan);lineMaterial.emissiveIntensity=1.05;workspace.add(line);}
+  const monitorStem=roundedBox(.2,.9,.28,palette.metal,.05,.35,.7);monitorStem.position.set(-1.2,2.7,-1.25);workspace.add(monitorStem);
+  const monitorBase=roundedBox(1.25,.08,.68,palette.metal,.05,.38,.62);monitorBase.position.set(-1.2,2.4,-.95);workspace.add(monitorBase);
+  const keyboard=roundedBox(2.7,.1,.87,0x202725,.055,.5,.45);keyboard.position.set(-1.15,2.4,.58);keyboard.rotation.x=-.035;workspace.add(keyboard);
+  for(let row=0;row<4;row+=1){for(let column=0;column<12;column+=1){const key=roundedBox(.14,.025,.1,column===11?0x8a6b52:0x68716c,.02,.42,.34);key.position.set(-2.03+column*.16,2.465,.32+row*.14);workspace.add(key);}}
+  const mouse=roundedBox(.35,.13,.52,0x303936,.1,.34,.4);mouse.position.set(.62,2.46,.58);workspace.add(mouse);
   const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); workspace.add(mug);
   const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); workspace.add(lampBase);
   const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); workspace.add(lampStem);

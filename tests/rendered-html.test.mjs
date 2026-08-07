@@ -20,6 +20,7 @@ test("server renders a personal laboratory before revealing the mystery", async 
   assert.match(html, /Come in.*lab is.*still awake/is);
   assert.match(html, /ENTER LAB 17/);
   assert.match(html, /Wenrui.*Alina.*Wu/i);
+  assert.match(html, /This is where Alina Wu keeps projects, research notes, physical prototypes, and questions that do not fit inside a résumé/);
   assert.doesNotMatch(html, /missing person/i);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
 });
@@ -40,6 +41,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /User has not checked in/i);
   assert.match(page, /Alina Wu has been offline for four days.*This workstation continues to sync/i);
   assert.doesNotMatch(page, /Her computer/);
+  assert.doesNotMatch(page, /Why is this appearing on a portfolio computer/);
   assert.doesNotMatch(page, /I am not missing/);
   assert.match(page, /The signal holds outside the lab/);
   assert.match(page, /EMG classifier is separating intentional contraction from drift/);
@@ -79,6 +81,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /WebGLRenderer/);
   assert.match(closeups, /buildBooks/);
   assert.match(closeups, /buildDrawer/);
+  assert.match(closeups, /monitorScreen/);
+  assert.match(closeups, /roundedBox\(3\.45,2\.15,\.28/);
   assert.match(closeups, /buildNotebook/);
   assert.match(closeups, /buildBoard/);
   assert.match(closeups, /buildFieldCase/);
