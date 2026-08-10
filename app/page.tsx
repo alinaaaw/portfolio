@@ -39,6 +39,24 @@ const shelfBooks = booksContent.books;
 
 type ShelfBook = (typeof shelfBooks)[number];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
+type ContactCardPhase = "table" | "lifting" | "open" | "returning";
+
+function useContactCard(autoPickup=false) {
+  const [phase,setPhase]=useState<ContactCardPhase>("table");
+  useEffect(()=>{
+    if(!autoPickup)return;
+    const timer=window.setTimeout(()=>setPhase((current)=>current==="table"?"lifting":current),620);
+    return()=>window.clearTimeout(timer);
+  },[autoPickup]);
+  useEffect(()=>{
+    if(phase!=="lifting"&&phase!=="returning")return;
+    const timer=window.setTimeout(()=>setPhase(phase==="lifting"?"open":"table"),phase==="lifting"?850:780);
+    return()=>window.clearTimeout(timer);
+  },[phase]);
+  const pickUp=useCallback(()=>setPhase((current)=>current==="table"?"lifting":current),[]);
+  const returnToTable=useCallback(()=>setPhase((current)=>current==="open"?"returning":current),[]);
+  return {phase,pickUp,returnToTable};
+}
 
 function BookshelfScene({ onClose }:{ onClose:()=>void }) {
   const [selected,setSelected] = useState<ShelfBook|null>(null);
@@ -66,14 +84,14 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
   </div>;
 }
 
-function DrawerScene({ onClose }:{ onClose:()=>void }) {
+function DrawerScene({ onClose,faxPrinted }:{ onClose:()=>void;faxPrinted:boolean }) {
   const [selected,setSelected] = useState<DrawerFile|null>(null);
   const fileCopy = drawerContent.items as Record<DrawerFile,{meta:string;title:string;copy:string;note:string}>;
   const item = selected ? fileCopy[selected] : null;
   return <div className="modal-layer tactile-layer drawer-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={drawerContent.ariaLabel} onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>{zoneInfo.drawer.index}</span><strong>{drawerContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-      <ZoneCloseup3D zone="drawer" onSelect={(item) => { if(["folder","notebook","components","envelope"].includes(item))setSelected(item as DrawerFile); }} />
+      <ZoneCloseup3D zone="drawer" faxPrinted={faxPrinted} onSelect={(item) => { if(["folder","notebook","components","envelope"].includes(item))setSelected(item as DrawerFile); }} />
       {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><article onMouseDown={(event) => event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p><blockquote>{item.note}</blockquote><button onClick={() => setSelected(null)}>{drawerContent.returnItem}</button></article></div>}
     </section>
   </div>;
@@ -118,24 +136,30 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
   </section></div>;
 }
 
-function PrinterScene({onClose}:{onClose:()=>void}) {
+function PrinterScene({onClose,faxPrinted,onFaxPrinted}:{onClose:()=>void;faxPrinted:boolean;onFaxPrinted:()=>void}) {
   const [reportOpen,setReportOpen]=useState(false);
+  const card=useContactCard();
   return <div className="modal-layer tactile-layer printer-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={faxContact.printer.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
       <header><div><span>{faxContact.printer.headerCode}</span><strong>{faxContact.printer.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-      <ZoneCloseup3D zone="printer" onSelect={(item)=>{if(item==="fax")setReportOpen(true);}} />
+      <ZoneCloseup3D zone="printer" faxPrinted={faxPrinted} onFaxPrinted={onFaxPrinted} contactCardRaised={card.phase==="lifting"||card.phase==="open"} onSelect={(item)=>{if(item==="fax")setReportOpen(true);if(item==="contact"){setReportOpen(false);card.pickUp();}}} />
       {reportOpen&&<div className="fax-reading" onMouseDown={()=>setReportOpen(false)}><article className="fax-paper fax-reading-paper" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.printer.report.meta}</small><h2 id="fax-title">{faxContact.printer.report.title}</h2>{faxContact.printer.report.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}<strong>{faxContact.printer.report.signature}</strong><footer><span>{faxContact.printer.report.status}</span><a href={`mailto:${faxContact.contact.email}`}>{faxContact.printer.report.reply}</a></footer><button className="fax-return" onClick={()=>setReportOpen(false)}>{faxContact.printer.report.return}</button></article></div>}
+      {(card.phase==="open"||card.phase==="returning")&&<ContactCardReading returning={card.phase==="returning"} onReturn={card.returnToTable} />}
     </section>
   </div>;
 }
 
-function ContactScene({onClose}:{onClose:()=>void}) {
-  const [cardOpen,setCardOpen]=useState(true);
+function ContactCardReading({returning,onReturn}:{returning:boolean;onReturn:()=>void}) {
+  return <div className={`contact-reading ${returning?"returning":""}`} onMouseDown={onReturn}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.contact.name}</small><h2>{faxContact.contact.headline[0]}<br />{faxContact.contact.headline[1]}</h2><p>{faxContact.contact.role}</p><a href={`mailto:${faxContact.contact.email}`}>{faxContact.contact.email} <span>{siteContent.shared.arrow}</span></a><button onClick={onReturn}>{faxContact.contact.return}</button></article></div>;
+}
+
+function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}) {
+  const card=useContactCard(true);
   return <div className="modal-layer tactile-layer contact-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={faxContact.contact.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
       <header><div><span>{faxContact.contact.headerCode}</span><strong>{faxContact.contact.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-      <ZoneCloseup3D zone="contact" onSelect={(item)=>{if(item==="contact")setCardOpen(true);}} />
-      {cardOpen&&<div className="contact-reading" onMouseDown={()=>setCardOpen(false)}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.contact.name}</small><h2>{faxContact.contact.headline[0]}<br />{faxContact.contact.headline[1]}</h2><p>{faxContact.contact.role}</p><a href={`mailto:${faxContact.contact.email}`}>{faxContact.contact.email} <span>{siteContent.shared.arrow}</span></a><button onClick={()=>setCardOpen(false)}>{faxContact.contact.return}</button></article></div>}
+      <ZoneCloseup3D zone="contact" faxPrinted={faxPrinted} contactCardRaised={card.phase==="lifting"||card.phase==="open"} onSelect={(item)=>{if(item==="contact")card.pickUp();}} />
+      {(card.phase==="open"||card.phase==="returning")&&<ContactCardReading returning={card.phase==="returning"} onReturn={card.returnToTable} />}
     </section>
   </div>;
 }
@@ -151,6 +175,7 @@ export default function VersionThree() {
   const [profileOpen,setProfileOpen] = useState(false);
   const [bulletin,setBulletin] = useState(false);
   const [faxOpen,setFaxOpen] = useState(false);
+  const [faxPrinted,setFaxPrinted] = useState(false);
   const [contactOpen,setContactOpen] = useState(false);
 
   const inspect = useCallback((zone: ZoneId) => {
@@ -192,7 +217,7 @@ export default function VersionThree() {
       </header>
 
       <section className="room-viewport" aria-label={roomContent.ariaLabel}>
-        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
+        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} faxPrinted={faxPrinted} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
         <div className="room-grain" aria-hidden="true" />
         <div className="room-vignette" aria-hidden="true" />
 
@@ -292,14 +317,14 @@ export default function VersionThree() {
         </div>
       )}
 
-      {active==="drawer"&&<DrawerScene onClose={() => setActive(null)} />}
+      {active==="drawer"&&<DrawerScene faxPrinted={faxPrinted} onClose={() => setActive(null)} />}
       {active==="notebook"&&<NotebookScene onClose={() => setActive(null)} />}
       {active==="books"&&<BookshelfScene onClose={() => setActive(null)} />}
       {active==="board"&&<BoardScene onClose={() => setActive(null)} />}
       {active==="fieldcase"&&<FieldCaseScene onClose={() => setActive(null)} />}
 
-      {faxOpen&&<PrinterScene onClose={()=>setFaxOpen(false)} />}
-      {contactOpen&&<ContactScene onClose={()=>setContactOpen(false)} />}
+      {faxOpen&&<PrinterScene faxPrinted={faxPrinted} onFaxPrinted={()=>setFaxPrinted(true)} onClose={()=>setFaxOpen(false)} />}
+      {contactOpen&&<ContactScene faxPrinted={faxPrinted} onClose={()=>setContactOpen(false)} />}
     </main>
   );
 }

@@ -12,6 +12,7 @@ type LabGameProps = {
   viewing: ZoneId | null;
   discovered: ZoneId[];
   faxReady: boolean;
+  faxPrinted: boolean;
   onHover: (zone: ZoneId | null) => void;
   onInspect: (zone: ZoneId) => void;
   onPrinterInspect: () => void;
@@ -589,12 +590,13 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
   (Object.keys(zonePositions) as ZoneId[]).forEach((zone) => addZone(scene,zone,targets));
 }
 
-export default function LabGame({ active, viewing, discovered, faxReady, onHover, onInspect, onPrinterInspect }: LabGameProps) {
+export default function LabGame({ active, viewing, discovered, faxReady, faxPrinted, onHover, onInspect, onPrinterInspect }: LabGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRef = useRef(active);
   const viewingRef = useRef(viewing);
   const discoveredRef = useRef(discovered);
   const faxReadyRef = useRef(faxReady);
+  const faxPrintedRef = useRef(faxPrinted);
   const inspectRef = useRef(onInspect);
   const printerInspectRef = useRef(onPrinterInspect);
 
@@ -602,6 +604,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
   useEffect(() => { viewingRef.current = viewing; },[viewing]);
   useEffect(() => { discoveredRef.current = discovered; },[discovered]);
   useEffect(() => { faxReadyRef.current = faxReady; },[faxReady]);
+  useEffect(() => { faxPrintedRef.current = faxPrinted; },[faxPrinted]);
   useEffect(() => { inspectRef.current = onInspect; },[onInspect]);
   useEffect(() => { printerInspectRef.current = onPrinterInspect; },[onPrinterInspect]);
 
@@ -770,7 +773,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, onHover
           if(faxReadyRef.current&&object.children[0])object.children[0].rotation.z+=.014;
         }
         if (object.userData.faxPaper && object instanceof THREE.Mesh) {
-          object.visible = false;
+          object.visible = faxPrintedRef.current;
         }
       });
       renderer.render(scene,camera);

@@ -371,12 +371,18 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 @keyframes faxReadingIn { from { opacity: 0; transform: scale(.68) translateY(18%); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .fax-return { position: absolute; right: 18px; bottom: 18px; padding: 10px 12px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .printer-layer .tactile-scene > header strong { color: var(--signal); }
-.contact-reading { position: absolute; z-index: 24; inset: 58px 0 0; display: grid; place-items: center; padding: 35px; background: radial-gradient(circle,rgba(34,45,41,.74),rgba(2,6,5,.96)); backdrop-filter: blur(11px); }
-.contact-card-detail { position: relative; width: min(760px,88vw); min-height: 410px; padding: clamp(48px,7vw,82px); border-left: 13px solid var(--red); border-radius: 5px; background-color: #e7dec8; background-image: linear-gradient(110deg,rgba(255,255,255,.45),transparent 42%),repeating-linear-gradient(0deg,rgba(40,50,45,.025) 0 1px,transparent 1px 5px); color: var(--ink); box-shadow: 20px 26px 0 rgba(0,0,0,.35); transform: rotate(-1deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
+.contact-reading { position: absolute; z-index: 24; inset: 58px 0 0; display: grid; place-items: center; padding: 35px; background: radial-gradient(circle,rgba(34,45,41,.48),rgba(2,6,5,.86)); backdrop-filter: blur(7px); animation: contactBackdropIn .56s ease both; }
+.contact-card-detail { position: relative; width: min(620px,82vw); min-height: 330px; padding: clamp(38px,5vw,58px); border-left: 9px solid var(--red); border-radius: 5px; background-color: #e7dec8; background-image: linear-gradient(110deg,rgba(255,255,255,.45),transparent 42%),repeating-linear-gradient(0deg,rgba(40,50,45,.025) 0 1px,transparent 1px 5px); color: var(--ink); box-shadow: 16px 20px 0 rgba(0,0,0,.35); transform-origin: 84% 88%; animation: contactCardPickup .62s cubic-bezier(.16,.84,.24,1) both; will-change: transform,opacity; }
+.contact-reading.returning { pointer-events: none; animation: contactBackdropOut .78s ease both; }
+.contact-reading.returning .contact-card-detail { animation: contactCardReturn .78s cubic-bezier(.55,.02,.72,.3) both; }
+@keyframes contactBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes contactBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes contactCardPickup { 0% { opacity: .3; transform: translate(16vw,13vh) rotate(-7deg) scale(.58); } 70% { opacity: 1; transform: translate(-1vw,-1vh) rotate(1deg) scale(.97); } 100% { opacity: 1; transform: translate(0) rotate(-1deg) scale(1); } }
+@keyframes contactCardReturn { 0% { opacity: 1; transform: translate(0) rotate(-1deg) scale(1); } 36% { opacity: .92; transform: translate(2vw,2vh) rotate(-2deg) scale(.9); } 100% { opacity: .12; transform: translate(26vw,24vh) rotate(-9deg) scale(.24); } }
 .contact-card-detail small { color: var(--red); font: 7px var(--font-mono),monospace; letter-spacing: .12em; }
-.contact-card-detail h2 { margin: 30px 0 24px; font: clamp(38px,6vw,70px)/.98 "Segoe Print",cursive; letter-spacing: -.055em; }
+.contact-card-detail h2 { margin: 24px 0 20px; font: clamp(34px,5vw,56px)/.98 "Segoe Print",cursive; letter-spacing: -.055em; }
 .contact-card-detail p { color: #59615b; font-size: 13px; }
-.contact-card-detail > a { display: flex; align-items: center; justify-content: space-between; margin-top: 44px; padding: 17px 0; border-top: 1px solid #9da398; border-bottom: 1px solid #9da398; color: #9d3e32; font: 700 clamp(13px,2vw,19px) var(--font-mono),monospace; }
+.contact-card-detail > a { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; padding: 14px 0; border-top: 1px solid #9da398; border-bottom: 1px solid #9da398; color: #9d3e32; font: 700 clamp(12px,1.7vw,17px) var(--font-mono),monospace; }
 .contact-card-detail > button { position: absolute; right: 18px; bottom: 17px; padding: 9px 11px; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .contact-layer .tactile-scene > header strong { color: var(--cyan); }
 

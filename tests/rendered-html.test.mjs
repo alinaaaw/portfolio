@@ -70,7 +70,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /TURN PAGE/);
   assert.match(page, /book-turning-sheet/);
   assert.match(content, /FIELD PLANNING \/ NEXT · LATER · MAYBE/);
-  assert.match(content, /PRINTER DESK \/ CONTACT CARD/);
+  assert.match(content, /CONTACT CARD BESIDE PRINTER/);
   assert.match(page, /fax-reading/);
 });
 
@@ -94,6 +94,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(game, /pointermove/);
   assert.match(game, /onInspect/);
   assert.match(game, /faxReady/);
+  assert.match(game, /faxPrinted/);
   assert.match(game, /onPrinterInspect/);
   assert.match(game, /room\.faxAlert\.sceneLabel/);
   assert.doesNotMatch(game, /rover/i);
@@ -108,16 +109,22 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /buildFieldCase/);
   assert.match(closeups, /buildPrinter/);
   assert.match(closeups, /buildContact/);
+  assert.match(closeups, /buildPrinterDesk/);
+  assert.match(closeups, /contactCardGroup/);
+  assert.match(closeups, /contactCardRaised/);
   assert.match(closeups, /RoundedBoxGeometry/);
   assert.match(closeups, /drawerProgress/);
   assert.match(closeups, /drawerWorkspace/);
   assert.match(closeups, /printProgress/);
   assert.match(closeups, /TubeGeometry/);
-  assert.match(closeups, /if\(withFax&&hits\)/);
+  assert.match(closeups, /if\(showFax\)/);
+  assert.match(closeups, /onFaxPrinted/);
   assert.match(closeups, /fieldCaseContent\.itemLabels\.target/);
   for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
   assert.match(css, /@media \(max-width: 620px\)/);
   assert.match(css, /prefers-reduced-motion/);
+  assert.match(css, /contactCardPickup/);
+  assert.match(css, /contactCardReturn/);
 });

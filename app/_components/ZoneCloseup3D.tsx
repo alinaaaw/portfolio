@@ -17,6 +17,9 @@ export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase
 type Props = {
   zone: CloseupZone;
   onSelect: (item: string) => void;
+  faxPrinted?: boolean;
+  onFaxPrinted?: () => void;
+  contactCardRaised?: boolean;
 };
 
 type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; visuals?: THREE.Mesh[] } };
@@ -74,7 +77,7 @@ function hitBox(item:string,label:string,size:[number,number,number],position:[n
   return hit;
 }
 
-function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number], scale=1, withFax=false, hits?:HitMesh[]) {
+function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number], scale=1, showFax=false, hits?:HitMesh[], interactiveFax=false) {
   const printer=new THREE.Group();
   const body=roundedBox(3.5,1.42,2.7,0xc8c2b4,.22,.58,.12); body.position.y=.82;
   const lower=roundedBox(3.3,.72,2.45,0xa8a79f,.16,.66,.16); lower.position.set(0,.35,.06);
@@ -94,7 +97,7 @@ function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number
   const hingeLeft=cylinder(.07,.26,0x1b2220,16); hingeLeft.rotation.z=Math.PI/2; hingeLeft.position.set(-1.22,1.72,-1.02);
   const hingeRight=hingeLeft.clone(); hingeRight.position.x=1.22; printer.add(hingeLeft,hingeRight);
   let paperGroup:THREE.Group|undefined;
-  if(withFax&&hits){
+  if(showFax){
     paperGroup=new THREE.Group();
     paperGroup.userData.faxPaperGroup=true;
     paperGroup.position.set(0,.88,1.28);
@@ -106,8 +109,10 @@ function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number
       mark.position.set(-.12,.04,.42+line*.2); paperGroup.add(mark);
     }
     const stamp=new THREE.Mesh(new THREE.RingGeometry(.25,.3,28),mat(palette.red,.7,.02)); stamp.rotation.x=-Math.PI/2; stamp.position.set(.67,.055,2.42); paperGroup.add(stamp);
-    const paperHit=hitBox("fax",faxContact.printer.paperHitLabel,[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
-    paperGroup.add(paperHit); hits.push(paperHit);
+    if(interactiveFax&&hits){
+      const paperHit=hitBox("fax",faxContact.printer.paperHitLabel,[2.55,.45,3.25],[0,.16,1.45],[paper],false,true);
+      paperGroup.add(paperHit); hits.push(paperHit);
+    }
     printer.add(paperGroup);
   }
   printer.position.set(...position);
@@ -116,14 +121,20 @@ function buildPrinterModel(parent:THREE.Object3D, position:[number,number,number
   return {printer,paperGroup,body,screen};
 }
 
-function addContactCard(parent:THREE.Object3D,position:[number,number,number],rotation=-.08,hits?:HitMesh[]) {
+function addContactCard(parent:THREE.Object3D,position:[number,number,number],rotation=-.08,hits?:HitMesh[],scale=.58) {
+  const group=new THREE.Group();
+  group.userData.contactCard=true;
+  group.position.set(...position);
+  group.rotation.y=rotation;
+  group.scale.setScalar(scale);
   const card=roundedBox(2.55,.045,1.45,0xe5dcc6,.055,.92,.01);
-  card.position.set(...position); card.rotation.y=rotation; parent.add(card);
-  const accent=box(.12,.025,1.16,palette.red,.7,.02); accent.position.set(position[0]-.93,position[1]+.045,position[2]); accent.rotation.y=rotation; parent.add(accent);
-  const nameLine=box(1.15,.025,.055,0x283f3a,.72,.02); nameLine.position.set(position[0]-.12,position[1]+.05,position[2]-.32); nameLine.rotation.y=rotation; parent.add(nameLine);
-  for(let line=0;line<3;line+=1){const detail=box(1.25-line*.14,.018,.028,0x6e7c75,.72,.02);detail.position.set(position[0]-.06,position[1]+.05,position[2]+.02+line*.18);detail.rotation.y=rotation;parent.add(detail);}
-  if(hits){const hit=hitBox("contact",faxContact.contact.hitLabel,[2.8,.55,1.75],position,[card]);hit.rotation.y=rotation;parent.add(hit);hits.push(hit);}
-  return card;
+  const accent=box(.12,.025,1.16,palette.red,.7,.02); accent.position.set(-.93,.045,0);
+  const nameLine=box(1.15,.025,.055,0x283f3a,.72,.02); nameLine.position.set(-.12,.05,-.32);
+  group.add(card,accent,nameLine);
+  for(let line=0;line<3;line+=1){const detail=box(1.25-line*.14,.018,.028,0x6e7c75,.72,.02);detail.position.set(-.06,.05,.02+line*.18);group.add(detail);}
+  if(hits){const hit=hitBox("contact",faxContact.contact.hitLabel,[2.8,.55,1.75],[0,.12,0],[card]);group.add(hit);hits.push(hit);}
+  parent.add(group);
+  return group;
 }
 
 function addLines(parent:THREE.Object3D,x:number,y:number,z:number,width:number,count:number,vertical=false) {
@@ -175,7 +186,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   scene.add(shelf);
 }
 
-function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
+function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
   const workspace=new THREE.Group();workspace.userData.drawerWorkspace=true;scene.add(workspace);
   const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; workspace.add(desk);
@@ -224,8 +235,8 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   tray.position.set(-1,.05,-.36);
   workspace.add(tray);
 
-  buildPrinterModel(workspace,[2.25,2.32,-.45],.62);
-  addContactCard(workspace,[2.45,2.39,1.12],-.09);
+  buildPrinterModel(workspace,[2.25,2.32,-.45],.62,faxPrinted);
+  addContactCard(workspace,[3.52,2.39,1.15],-.12,undefined,.48);
   const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(-1.2,3.47,-1.25);workspace.add(monitor);
   const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(-1.2,3.47,-1.09);workspace.add(monitorScreen);
   const monitorMaterial=monitorScreen.material as THREE.MeshStandardMaterial;monitorMaterial.emissive.setHex(palette.cyan);monitorMaterial.emissiveIntensity=.72;
@@ -241,26 +252,25 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[]) {
   const shade=new THREE.Mesh(new THREE.ConeGeometry(.42,.55,28,1,true),mat(0x202825,.36,.62)); shade.position.set(3.72,3.72,-1.2); shade.rotation.z=Math.PI; workspace.add(shade);
 }
 
-function buildPrinter(scene:THREE.Scene,hits:HitMesh[]) {
+function buildPrinterDesk(scene:THREE.Scene,hits:HitMesh[],withFax:boolean,faxPrinted:boolean) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
   const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=.18; scene.add(desk);
   const matBoard=roundedBox(7.6,.035,3.85,0x243632,.05,.95,.02); matBoard.position.y=.38; scene.add(matBoard);
-  buildPrinterModel(scene,[0,.42,-.35],1,true,hits);
+  buildPrinterModel(scene,[0,.42,-.35],1,withFax||faxPrinted,hits,withFax);
   const monitor=roundedBox(2.15,1.45,.22,0x252d2b,.1,.36,.58); monitor.position.set(-3.12,1.52,-1.15); monitor.rotation.y=.13; scene.add(monitor);
   const monitorScreen=roundedBox(1.82,1.16,.03,0x153b38,.035,.18,.08); monitorScreen.position.set(-3,1.52,-1.02); monitorScreen.rotation.y=.13; scene.add(monitorScreen);
   const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.48,-1.1); note.rotation.y=-.12; scene.add(note);
   const pen=cylinder(.06,1.55,palette.red,14); pen.rotation.z=Math.PI/2; pen.position.set(3.1,.55,.25); scene.add(pen);
+  const cardCase=roundedBox(1.72,.07,1.02,0x4a3428,.06,.72,.04);cardCase.position.set(2.85,.42,.92);cardCase.rotation.y=-.1;scene.add(cardCase);
+  addContactCard(scene,[2.85,.48,.92],-.1,hits,.58);
 }
 
-function buildContact(scene:THREE.Scene,hits:HitMesh[]) {
-  const wall=box(11,6,.2,0x18201e,.96,.03);wall.position.set(0,3,-2.8);scene.add(wall);
-  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04);desk.position.y=.18;scene.add(desk);
-  const deskMat=roundedBox(7.7,.035,3.85,0x243632,.05,.95,.02);deskMat.position.y=.38;scene.add(deskMat);
-  buildPrinterModel(scene,[-1.35,.42,-.55],.9);
-  addContactCard(scene,[2.25,.5,.65],-.12,hits);
-  const cardCase=roundedBox(3.15,.12,1.95,0x4a3428,.08,.72,.04);cardCase.position.set(2.25,.37,.65);cardCase.rotation.y=-.12;scene.add(cardCase);
-  const pen=cylinder(.06,1.6,palette.red,14);pen.rotation.z=Math.PI/2;pen.position.set(2.4,.56,-.55);scene.add(pen);
-  const note=roundedBox(1.1,.03,1.05,palette.signal,.035,.9,.01);note.position.set(3.55,.48,-.8);note.rotation.y=.08;scene.add(note);
+function buildPrinter(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
+  buildPrinterDesk(scene,hits,true,faxPrinted);
+}
+
+function buildContact(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
+  buildPrinterDesk(scene,hits,false,faxPrinted);
 }
 
 function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
@@ -348,7 +358,7 @@ const views:Record<CloseupZone,{position:[number,number,number];target:[number,n
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
   fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},
-  contact:{position:[.8,4.6,7.4],target:[1.25,.6,.2],hint:faxContact.contact.sceneHint},
+  contact:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.contact.sceneHint},
 };
 
 const ariaLabels:Record<CloseupZone,string>={
@@ -361,15 +371,23 @@ const ariaLabels:Record<CloseupZone,string>={
   contact:faxContact.contact.ariaLabel,
 };
 
-export default function ZoneCloseup3D({zone,onSelect}:Props) {
+export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrinted,contactCardRaised=false}:Props) {
   const canvasRef=useRef<HTMLCanvasElement>(null);
   const labelRef=useRef<HTMLDivElement>(null);
   const selectRef=useRef(onSelect);
+  const faxPrintedRef=useRef(faxPrinted);
+  const onFaxPrintedRef=useRef(onFaxPrinted);
+  const contactCardRaisedRef=useRef(contactCardRaised);
   useEffect(()=>{selectRef.current=onSelect;},[onSelect]);
+  useEffect(()=>{faxPrintedRef.current=faxPrinted;},[faxPrinted]);
+  useEffect(()=>{onFaxPrintedRef.current=onFaxPrinted;},[onFaxPrinted]);
+  useEffect(()=>{contactCardRaisedRef.current=contactCardRaised;},[contactCardRaised]);
 
   useEffect(()=>{
     const canvas=canvasRef.current;
     if(!canvas)return;
+    const initialFaxPrinted=faxPrintedRef.current;
+    const initialContactCardRaised=contactCardRaisedRef.current;
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.6));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -388,12 +406,12 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     camera.position.copy(defaultPosition);
     const hits:HitMesh[]=[];
     if(zone==="books")buildBooks(scene,hits);
-    if(zone==="drawer")buildDrawer(scene,hits);
+    if(zone==="drawer")buildDrawer(scene,hits,initialFaxPrinted);
     if(zone==="notebook")buildNotebook(scene,hits);
     if(zone==="board")buildBoard(scene,hits);
     if(zone==="fieldcase")buildFieldCase(scene,hits);
-    if(zone==="printer")buildPrinter(scene,hits);
-    if(zone==="contact")buildContact(scene,hits);
+    if(zone==="printer")buildPrinter(scene,hits,initialFaxPrinted);
+    if(zone==="contact")buildContact(scene,hits,initialFaxPrinted);
     scene.add(new THREE.HemisphereLight(0x789892,0x090d0c,.85));
     const warm=new THREE.DirectionalLight(0xffc889,3.4); warm.position.set(-4,8,6); warm.castShadow=true; warm.shadow.mapSize.set(1536,1536); scene.add(warm);
     const cyan=new THREE.PointLight(palette.cyan,8,14,1.8); cyan.position.set(4,3,4); scene.add(cyan);
@@ -412,9 +430,16 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     let drawerTray:THREE.Group|undefined;
     let drawerWorkspace:THREE.Group|undefined;
     let faxPaperGroup:THREE.Group|undefined;
-    scene.traverse((child)=>{if(child.userData.drawerTray)drawerTray=child as THREE.Group;if(child.userData.drawerWorkspace)drawerWorkspace=child as THREE.Group;if(child.userData.faxPaperGroup)faxPaperGroup=child as THREE.Group;});
+    let contactCardGroup:THREE.Group|undefined;
+    scene.traverse((child)=>{if(child.userData.drawerTray)drawerTray=child as THREE.Group;if(child.userData.drawerWorkspace)drawerWorkspace=child as THREE.Group;if(child.userData.faxPaperGroup)faxPaperGroup=child as THREE.Group;if(child.userData.contactCard)contactCardGroup=child as THREE.Group;});
+    const contactCardOrigin=contactCardGroup?.position.clone();
+    const contactCardRotation=contactCardGroup?.rotation.clone();
+    const contactCardScale=contactCardGroup?.scale.x??1;
     const printStarted=performance.now()+550;
-    let printProgress=zone==="printer"?0:1;
+    let printProgress=zone==="printer"&&!initialFaxPrinted?0:1;
+    let printNotified=initialFaxPrinted;
+    let contactCardProgress=initialContactCardRaised?1:0;
+    if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
     const resize=()=>{ const rect=canvas.getBoundingClientRect(); renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false); camera.aspect=Math.max(1,rect.width)/Math.max(1,rect.height); camera.updateProjectionMatrix(); };
@@ -426,27 +451,44 @@ export default function ZoneCloseup3D({zone,onSelect}:Props) {
     };
     const pointerMove=(event:PointerEvent)=>{
       if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX+delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
-      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current)labelRef.current.textContent=hovered?.userData.label??view.hint;} canvas.style.cursor=next?"pointer":"grab";
+      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current)labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.label??view.hint;} canvas.style.cursor=next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle")drawerTarget=1;else if(item)selectRef.current(item);}canvas.style.cursor=hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item)selectRef.current(item);}canvas.style.cursor=hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
       if(drawerTray)drawerTray.position.z=-.36+drawerProgress*2.7;
       if(drawerWorkspace)drawerWorkspace.rotation.y=-drawerProgress*.15;
-      if(zone==="printer"&&faxPaperGroup){
+      if(zone==="printer"&&faxPaperGroup&&!faxPrintedRef.current){
         printProgress=THREE.MathUtils.clamp((now-printStarted)/4600,0,1);
         const eased=1-Math.pow(1-printProgress,3);
         faxPaperGroup.scale.z=.035+eased*.965;
         faxPaperGroup.position.y=.88-eased*.22;
         if(labelRef.current&&!hovered)labelRef.current.textContent=printProgress>.96?faxContact.printer.ready:faxContact.printer.printing;
+        if(printProgress>.96&&!printNotified){printNotified=true;onFaxPrintedRef.current?.();}
+      }else if(zone==="printer"&&faxPaperGroup){
+        printProgress=1;
+        faxPaperGroup.scale.z=1;
+        faxPaperGroup.position.y=.66;
+        if(labelRef.current&&!hovered)labelRef.current.textContent=faxContact.printer.ready;
+      }
+      if(contactCardGroup&&contactCardOrigin&&contactCardRotation){
+        const cardTarget=contactCardRaisedRef.current?1:0;
+        contactCardProgress=THREE.MathUtils.damp(contactCardProgress,cardTarget,7.2,.016);
+        const eased=contactCardProgress<.5?2*contactCardProgress*contactCardProgress:1-Math.pow(-2*contactCardProgress+2,2)/2;
+        contactCardGroup.position.set(contactCardOrigin.x,contactCardOrigin.y+eased*1.35,contactCardOrigin.z+eased*1.55);
+        contactCardGroup.rotation.set(contactCardRotation.x-eased*.2,contactCardRotation.y-eased*.05,contactCardRotation.z+eased*.025);
+        contactCardGroup.scale.setScalar(contactCardScale*(1+eased*.48));
       }
       const desired=defaultPosition.clone();
       const desiredTarget=baseTarget.clone();
       if(zone==="drawer"){
         desired.lerp(new THREE.Vector3(.4,7.15,6.25),drawerProgress);
         desiredTarget.lerp(new THREE.Vector3(-.85,.72,.85),drawerProgress);
+      }
+      if((zone==="printer"||zone==="contact")&&contactCardProgress>0){
+        desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);

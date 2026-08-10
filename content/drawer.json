@@ -3,6 +3,7 @@
   "header": "DESK DRAWER / PULL TO OPEN",
   "sceneHint": "CLICK THE METAL HANDLE, THEN SELECT A FILE",
   "handleLabel": "PULL THE METAL HANDLE",
+  "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK ×",
   "itemLabels": { "folder": "PROJECT FOLDER", "notebook": "FIELD NOTEBOOK", "envelope": "SEALED ENVELOPE", "components": "COMPONENT POUCH" },
   "items": {
