@@ -31,8 +31,7 @@
       "Read before reorganizing the lab. PROJECTS holds finished work. Working notes, references, and unfinished ideas stay where they were last used.",
       "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, references on the shelf, physical iterations in the drawer, and open questions on the board.",
       "Keep the unfinished parts in place. I may still need them. If I am away, leave comments beside the relevant material."
-    ],
-    "signature": "— Alina"
+    ]
   },
   "labLog": {
     "filename": "LAB_LOG.md",
