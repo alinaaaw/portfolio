@@ -6,16 +6,16 @@
     "triggerAria": "Open Alina Wu's profile",
     "windowTitle": "USER PROFILE / ALINA.WU",
     "closeAria": "Close user profile",
-    "status": "LOCAL USER / ACTIVE",
+    "status": "LOCAL USER / AWAY",
     "name": "Alina Wu",
     "fullName": "Wenrui Wu",
     "role": "Computer Science / University of Washington",
     "locationLabel": "BASE",
     "location": "Seattle, Washington",
     "summaryLabel": "PROFILE",
-    "summary": "I work across software, physical systems, and human-centered questions—building projects, studying how people interpret information, and documenting what I learn along the way.",
+    "summary": "Computer science student focused on human-centered design and software development. Interested in how people understand and use technology.",
     "focusLabel": "CURRENT FOCUS",
-    "focus": ["SOFTWARE", "PHYSICAL SYSTEMS", "HUMAN QUESTIONS"],
+    "focus": ["HUMAN-CENTERED DESIGN", "SOFTWARE DEVELOPMENT", "COMPUTER VISION & ROBOTICS"],
     "contactLabel": "CONTACT",
     "email": "awu78@uw.edu"
   },
@@ -43,7 +43,7 @@
         "type": "NEW ROLE",
         "title": "Joined Thermo Fisher Scientific",
         "body": [
-          "I'm happy to share that I joined Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
+          "I'm happy to share that I am joining Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
           "I'm excited to learn, contribute, and work across computer vision, robotics, and scientific software."
         ]
       }
