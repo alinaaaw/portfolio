@@ -28,9 +28,9 @@
     "meta": "WORKSTATION FILE / SHARED NOTES",
     "title": "WORKSPACE NOTES",
     "paragraphs": [
-      "Finished work is usually filed under PROJECTS. The context behind it is usually somewhere else.",
-      "Before continuing anything, check the latest LAB LOG. Working decisions may be in the notebook, marked references are on the shelf, and physical iterations should be in the drawer. Anything not ready for a deadline is probably still on the board.",
-      "If I am away, leave comments beside the relevant material. Please do not clean up the unfinished parts—I may still need them."
+      "Read before reorganizing the lab. PROJECTS holds finished work. Working notes, references, and unfinished ideas stay where they were last used.",
+      "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, references on the shelf, physical iterations in the drawer, and open questions on the board.",
+      "Keep the unfinished parts in place. Small observations, failed attempts, and half-built ideas may still be useful later."
     ],
     "signature": "— Alina"
   },
