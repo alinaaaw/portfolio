@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import {
   board as boardContent,
@@ -28,6 +29,8 @@ const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
 
 type ProjectFileId = "map" | "allocation" | "emg";
 type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship";
+type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
+type WindowPosition = { x:number; y:number };
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
 
@@ -40,6 +43,65 @@ const shelfBooks = booksContent.books;
 type ShelfBook = (typeof shelfBooks)[number];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
+
+function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,ariaLabel,header,children}:{
+  id:ComputerWindowId;
+  className:string;
+  position:WindowPosition;
+  zIndex:number;
+  onMove:(id:ComputerWindowId,position:WindowPosition)=>void;
+  onFocus:(id:ComputerWindowId)=>void;
+  ariaLabel:string;
+  header:ReactNode;
+  children:ReactNode;
+}) {
+  const windowRef=useRef<HTMLElement>(null);
+  const dragRef=useRef<null|{
+    pointerId:number;
+    startX:number;
+    startY:number;
+    origin:WindowPosition;
+    rect:DOMRect;
+    bounds:DOMRect;
+  }>(null);
+
+  const startDrag=(event:ReactPointerEvent<HTMLElement>)=>{
+    if(window.matchMedia("(max-width: 620px)").matches)return;
+    if((event.target as HTMLElement).closest("button,a"))return;
+    const element=windowRef.current;
+    const parent=element?.parentElement;
+    if(!element||!parent)return;
+    onFocus(id);
+    dragRef.current={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,origin:position,rect:element.getBoundingClientRect(),bounds:parent.getBoundingClientRect()};
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const drag=(event:ReactPointerEvent<HTMLElement>)=>{
+    const state=dragRef.current;
+    if(!state||state.pointerId!==event.pointerId)return;
+    const rawX=event.clientX-state.startX;
+    const rawY=event.clientY-state.startY;
+    const minX=state.bounds.left+8-state.rect.left;
+    const maxX=state.bounds.right-8-state.rect.right;
+    const minY=state.bounds.top+8-state.rect.top;
+    const maxY=state.bounds.bottom-8-state.rect.bottom;
+    onMove(id,{
+      x:state.origin.x+Math.min(Math.max(rawX,Math.min(minX,maxX)),Math.max(minX,maxX)),
+      y:state.origin.y+Math.min(Math.max(rawY,Math.min(minY,maxY)),Math.max(minY,maxY)),
+    });
+  };
+
+  const endDrag=(event:ReactPointerEvent<HTMLElement>)=>{
+    if(dragRef.current?.pointerId!==event.pointerId)return;
+    dragRef.current=null;
+    if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
+  return <article ref={windowRef} className={`os-window draggable-window ${className}`} data-window={id} role="dialog" aria-label={ariaLabel} style={{zIndex,transform:`translate3d(${position.x}px,${position.y}px,0)`}} onPointerDown={()=>onFocus(id)}>
+    <header className="window-titlebar" onPointerDown={startDrag} onPointerMove={drag} onPointerUp={endDrag} onPointerCancel={endDrag}>{header}</header>
+    {children}
+  </article>;
+}
 
 function useContactCard(autoPickup=false) {
   const [phase,setPhase]=useState<ContactCardPhase>("table");
@@ -170,9 +232,9 @@ export default function VersionThree() {
   const [active,setActive] = useState<ZoneId|null>(null);
   const [discovered,setDiscovered] = useState<ZoneId[]>([]);
   const [indexOpen,setIndexOpen] = useState(false);
-  const [computerFile,setComputerFile] = useState<ComputerFile>("desktop");
   const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
-  const [profileOpen,setProfileOpen] = useState(false);
+  const [computerWindows,setComputerWindows] = useState<ComputerWindowId[]>([]);
+  const [windowPositions,setWindowPositions] = useState<Partial<Record<ComputerWindowId,WindowPosition>>>({});
   const [bulletin,setBulletin] = useState(false);
   const [faxOpen,setFaxOpen] = useState(false);
   const [faxPrinted,setFaxPrinted] = useState(false);
@@ -192,20 +254,35 @@ export default function VersionThree() {
   useEffect(() => {
     const close = (event:KeyboardEvent) => {
       if (event.key!=="Escape") return;
-      setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false); setProfileOpen(false);
+      if(active==="computer"&&computerWindows.length){setComputerWindows((current)=>current.slice(0,-1));return;}
+      setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false);
     };
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
+  },[active,computerWindows.length]);
+
+  const focusComputerWindow = useCallback((windowId:ComputerWindowId) => {
+    setComputerWindows((current)=>current.at(-1)===windowId?current:[...current.filter((item)=>item!==windowId),windowId]);
   },[]);
 
   const openComputerFile = (file: ComputerFile) => {
-    setComputerFile(file);
+    if(file==="desktop"){
+      setComputerWindows([]);
+      setSelectedComputerFile(null);
+      return;
+    }
+    focusComputerWindow(file);
     setSelectedComputerFile(null);
-    setProfileOpen(false);
   };
 
+  const closeComputerWindow=(windowId:ComputerWindowId)=>setComputerWindows((current)=>current.filter((item)=>item!==windowId));
+  const moveComputerWindow=(windowId:ComputerWindowId,position:WindowPosition)=>setWindowPositions((current)=>({...current,[windowId]:position}));
+  const showComputerWindow=(windowId:ComputerWindowId)=>computerWindows.includes(windowId);
+  const computerWindowZ=(windowId:ComputerWindowId)=>6+computerWindows.indexOf(windowId);
+  const computerWindowPosition=(windowId:ComputerWindowId)=>windowPositions[windowId]??{x:0,y:0};
+  const returnToComputerWindow=(current:ComputerWindowId,parent:ComputerWindowId)=>{closeComputerWindow(current);focusComputerWindow(parent);};
+
   const solved = discovered.length===zoneOrder.length;
-  const desktopFile = projectFiles.find((file) => file.id===computerFile);
   const status = roomContent.status.messages[discovered.length];
 
   return (
