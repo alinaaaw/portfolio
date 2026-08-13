@@ -35,12 +35,21 @@
   },
   "labLog": {
     "filename": "LAB_LOG.md",
-    "meta": "LAB LOG / 1 ENTRY",
+    "meta": "LAB LOG / 2 ENTRIES",
     "entries": [
+      {
+        "date": "FEB 2026",
+        "type": "NEW PROGRAM",
+        "title": "Entering the Allen School",
+        "body": [
+          "I'm excited to share that I will be joining the Paul G. Allen School of Computer Science & Engineering at the University of Washington next quarter.",
+          "I will officially become a computer science student and continue building toward work in human-centered design and software development."
+        ]
+      },
       {
         "date": "JUN 2026",
         "type": "NEW ROLE",
-        "title": "Joined Thermo Fisher Scientific",
+        "title": "Joining Thermo Fisher Scientific",
         "body": [
           "I'm happy to share that I am joining Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
           "I'm excited to learn, contribute, and work across computer vision, robotics, and scientific software."
