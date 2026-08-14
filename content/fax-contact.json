@@ -9,13 +9,14 @@
     "paperHitLabel": "READ PRINTED FIELD REPORT",
     "report": {
       "meta": "FIELD REPORT / SOURCE: AW / PHASE 02",
-      "title": "The signal holds outside the lab.",
+        "title": "The reference held. The fourth band did not.",
       "paragraphs": [
-        "Quick update from the field: the EMG classifier is separating intentional contraction from drift across repeated movement sets. Fatigue adds noise, but the pattern is staying consistent.",
-        "I moved the test outside because the clean bench was hiding the interesting failures. I am collecting one more night of data, then bringing the hardware and full logs back to Lab 17."
+          "A three-second maximum-effort contraction now establishes the individual reference. The firmware filters and squares the EMG signal, applies Kalman filtering, assigns each sample to one of four relative bands, then reports each band as a percentage of the recorded session.",
+          "One limitation surfaced: every value above the reference collapses into the highest band. The next experiment is to determine when sustained above-reference activity is meaningful enough to trigger recalibration.",
+          "The measurement layer is working. The interface still has to explain the distribution without presenting relative activation as mechanical force—or turning an unfinished interpretation into a recommendation."
       ],
-      "signature": "More when I return. — Alina",
-      "status": "STATUS / PHASE 02 COMPLETE",
+        "signature": "Sending the next trace after calibration. — Alina",
+        "status": "STATUS / INTERFACE + ADAPTIVE REFERENCE",
       "reply": "SEND A REPLY →",
       "return": "RETURN TO PRINTER ×"
     }

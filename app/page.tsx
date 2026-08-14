@@ -42,6 +42,9 @@ const shelfBooks = booksContent.books;
 
 type ShelfBook = (typeof shelfBooks)[number];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
+type DrawerArtifact = {meta:string;title:string|null;copy:string;facts:{label:string;value:string}[];note:string};
+type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];reverseMeta:string;reverseTitle:string|null;reverseCopy:string;note:string};
+type FieldRecord = {meta:string;title:string|null;copy:string;metrics:{value:string;label:string}[];tags:string[]};
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
 
 function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,ariaLabel,header,children}:{
@@ -130,11 +133,11 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
       {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
         <div className={`physical-book ${reverse?"reverse":""}`} onMouseDown={(event) => event.stopPropagation()}>
           <div className="book-pages">
-            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{selected.heading}</h2><p>{selected.copy}</p><i className="page-lines" /></article>
-            <article className="book-page book-page-right book-page-under"><small>{booksContent.page.reference}</small><h2>{selected.title}</h2><p>{selected.copy}</p><blockquote>{selected.note}</blockquote></article>
+            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{selected.title}</h2><p className="book-citation">{selected.citation}</p><p>{selected.summary}</p><a className="book-source-link" href={selected.url} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></article>
+            <article className="book-page book-page-right book-page-under"><small>{booksContent.page.reference}</small><p className="book-annotation">{selected.annotation}</p><small className="book-excerpt-label">{selected.excerptLabel}</small><blockquote>{selected.quoted?`“${selected.excerpt}”`:selected.excerpt}</blockquote><span className="book-provenance">{selected.provenance}</span></article>
             <div className="book-turning-sheet" aria-hidden="true">
-              <div className="turn-face turn-front book-page"><span className="sticky-tab">{booksContent.page.tab}</span><small>{booksContent.page.frontMeta}</small><blockquote>{selected.note}</blockquote></div>
-              <div className="turn-face turn-back book-page"><small>{booksContent.page.backMeta}</small><h2>{selected.title}</h2><p>{selected.note}</p><p>{booksContent.page.backCopy}</p></div>
+              <div className="turn-face turn-front book-page"><span className="sticky-tab">{booksContent.page.tab}</span><small>{selected.excerptLabel}</small><blockquote>{selected.quoted?`“${selected.excerpt}”`:selected.excerpt}</blockquote></div>
+              <div className="turn-face turn-back book-page"><small>{booksContent.page.backMeta}</small><p className="book-annotation">{selected.annotation}</p><p>{booksContent.page.backCopy}</p></div>
             </div>
             <div className="book-spine" />
           </div>
@@ -148,13 +151,13 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
 
 function DrawerScene({ onClose,faxPrinted }:{ onClose:()=>void;faxPrinted:boolean }) {
   const [selected,setSelected] = useState<DrawerFile|null>(null);
-  const fileCopy = drawerContent.items as Record<DrawerFile,{meta:string;title:string;copy:string;note:string}>;
+  const fileCopy = drawerContent.items as Record<DrawerFile,DrawerArtifact>;
   const item = selected ? fileCopy[selected] : null;
   return <div className="modal-layer tactile-layer drawer-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={drawerContent.ariaLabel} onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>{zoneInfo.drawer.index}</span><strong>{drawerContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
       <ZoneCloseup3D zone="drawer" faxPrinted={faxPrinted} onSelect={(item) => { if(["folder","notebook","components","envelope"].includes(item))setSelected(item as DrawerFile); }} />
-      {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><article onMouseDown={(event) => event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p><blockquote>{item.note}</blockquote><button onClick={() => setSelected(null)}>{drawerContent.returnItem}</button></article></div>}
+      {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><article onMouseDown={(event) => event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p><dl className="artifact-facts">{item.facts.map((fact)=><div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl><blockquote>{item.note}</blockquote><button onClick={() => setSelected(null)}>{drawerContent.returnItem}</button></article></div>}
     </section>
   </div>;
 }
@@ -164,12 +167,12 @@ type NotebookItem = "research"|"margin"|"diagram";
 function NotebookScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<NotebookItem|null>(null);
   const [reverse,setReverse]=useState(false);
-  const pages=notebookContent.items as Record<NotebookItem,{meta:string;title:string;copy:string;note:string}>;
+  const pages=notebookContent.items as Record<NotebookItem,NotebookPage>;
   const page=selected?pages[selected]:null;
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={notebookContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.notebook.index}</span><strong>{notebookContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
     <ZoneCloseup3D zone="notebook" onSelect={(item)=>{if(["research","margin","diagram"].includes(item)){setSelected(item as NotebookItem);setReverse(false);}}}/>
-    {page&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><button className={`notebook-closeup ${reverse?"turned":""}`} onMouseDown={(event)=>event.stopPropagation()} onClick={()=>setReverse((value)=>!value)}><small>{reverse?notebookContent.page.reverseMeta:page.meta}</small><h2>{reverse?page.note:page.title}</h2><p>{reverse?notebookContent.page.reverseCopy:page.copy}</p><span>{reverse?notebookContent.page.turnBack:notebookContent.page.turn}</span></button></div>}
+    {page&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className={`notebook-closeup ${reverse?"turned":""}`} onMouseDown={(event)=>event.stopPropagation()}><small>{reverse?page.reverseMeta:page.meta}</small>{(reverse?page.reverseTitle:page.title)&&<h2>{reverse?page.reverseTitle:page.title}</h2>}{reverse?<><p className="notebook-reverse-copy">{page.reverseCopy}</p><blockquote>{page.note}</blockquote></>:<><p className="notebook-lead">{page.lead}</p><ol className="notebook-process">{page.steps.map((step)=><li key={step}>{step}</li>)}</ol></>}<button className="notebook-turn-control" onClick={()=>setReverse((value)=>!value)}>{reverse?notebookContent.page.turnBack:notebookContent.page.turn}</button></article></div>}
   </section></div>;
 }
 
@@ -181,12 +184,12 @@ function BoardScene({onClose}:{onClose:()=>void}) {
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={boardContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.board.index}</span><strong>{boardContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
     <ZoneCloseup3D zone="board" onSelect={(item)=>{const index=Number(item);if(boardNotes[index])setSelected(index);}}/>
-    {note&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card note-card" onMouseDown={(event)=>event.stopPropagation()}><small>{boardContent.detailMeta} {String((selected??0)+1).padStart(2,"0")}</small><h2>{note.title}</h2><blockquote>{note.label}</blockquote><p>{note.copy}</p><button onClick={()=>setSelected(null)}>{boardContent.returnItem}</button></article></div>}
+    {note&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card note-card" onMouseDown={(event)=>event.stopPropagation()}><small>{boardContent.detailMeta} {String((selected??0)+1).padStart(2,"0")} · {note.status}</small><blockquote>{note.label}</blockquote><p>{note.copy}</p><em>{note.detail}</em><button onClick={()=>setSelected(null)}>{boardContent.returnItem}</button></article></div>}
   </section></div>;
 }
 
 type FieldItem="internship"|"target"|"ticket"|"draft";
-const fieldItems=fieldCaseContent.items as Record<FieldItem,{meta:string;title:string;copy:string;tags?:string[]}>;
+const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
 
 function FieldCaseScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<FieldItem|null>(null);
@@ -194,7 +197,7 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={fieldCaseContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.fieldcase.index}</span><strong>{fieldCaseContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
     <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(["internship","target","ticket","draft"].includes(value))setSelected(value as FieldItem);}}/>
-    {item&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small><h2>{item.title}</h2><p>{item.copy}</p>{item.tags&&<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div>}<button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
+    {item&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
   </section></div>;
 }
 
@@ -366,7 +369,7 @@ export default function VersionThree() {
                 </DraggableComputerWindow>}
 
                 {projectFiles.map((file)=>showComputerWindow(file.id)&&<DraggableComputerWindow key={file.id} id={file.id} className="project-window" position={computerWindowPosition(file.id)} zIndex={computerWindowZ(file.id)} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={file.name} header={<><button onClick={() => returnToComputerWindow(file.id,"projects")}>{computerContent.projectsFolder.back}</button><span>{file.name}</span><button onClick={() => closeComputerWindow(file.id)}>{siteContent.shared.minimize}</button></>}>
-                  <div className="os-window-content"><small>{file.meta}</small><h2>{file.title}</h2><p>{file.copy}</p><div>{file.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><button className="run-file">{computerContent.projectsFolder.verified}</button></div>
+                  <div className="os-window-content project-file-content"><small>{file.meta}</small><h2>{file.title}</h2><p className="project-lead">{file.copy}</p><div className="project-facts">{file.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><dl className="project-brief">{file.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><button className="run-file">{computerContent.projectsFolder.verified}</button></div>
                 </DraggableComputerWindow>)}
 
                 {showComputerWindow("experience")&&<DraggableComputerWindow id="experience" className="experience-window" position={computerWindowPosition("experience")} zIndex={computerWindowZ("experience")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.folderTitle} header={<><span>{computerContent.experience.folderTitle}</span><button onClick={() => closeComputerWindow("experience")}>{siteContent.shared.minimize}</button></>}>
@@ -374,11 +377,11 @@ export default function VersionThree() {
                 </DraggableComputerWindow>}
 
                 {showComputerWindow("research")&&<DraggableComputerWindow id="research" className="text-file experience-detail-window" position={computerWindowPosition("research")} zIndex={computerWindowZ("research")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.research.filename} header={<><button onClick={() => returnToComputerWindow("research","experience")}>{computerContent.experience.back}</button><span>{computerContent.experience.research.filename}</span><button onClick={() => closeComputerWindow("research")}>{siteContent.shared.minimize}</button></>}>
-                  <div className="os-window-content"><small>{computerContent.experience.research.meta}</small><h2>{computerContent.experience.research.title}</h2><p>{computerContent.experience.research.copy}</p><blockquote>{computerContent.experience.research.quote}</blockquote></div>
+                  <div className="os-window-content experience-file-content"><small>{computerContent.experience.research.meta}</small><h2>{computerContent.experience.research.title}</h2><p>{computerContent.experience.research.copy}</p><dl className="experience-brief">{computerContent.experience.research.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><blockquote>{computerContent.experience.research.quote}</blockquote></div>
                 </DraggableComputerWindow>}
 
                 {showComputerWindow("internship")&&<DraggableComputerWindow id="internship" className="text-file experience-detail-window" position={computerWindowPosition("internship")} zIndex={computerWindowZ("internship")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.internship.filename} header={<><button onClick={() => returnToComputerWindow("internship","experience")}>{computerContent.experience.back}</button><span>{computerContent.experience.internship.filename}</span><button onClick={() => closeComputerWindow("internship")}>{siteContent.shared.minimize}</button></>}>
-                  <div className="os-window-content"><small>{computerContent.experience.internship.meta}</small><h2>{computerContent.experience.internship.title}</h2><p>{computerContent.experience.internship.copy}</p><blockquote>{computerContent.experience.internship.quote}</blockquote></div>
+                  <div className="os-window-content experience-file-content"><small>{computerContent.experience.internship.meta}</small><h2>{computerContent.experience.internship.title}</h2><p>{computerContent.experience.internship.copy}</p><dl className="experience-brief">{computerContent.experience.internship.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><blockquote>{computerContent.experience.internship.quote}</blockquote></div>
                 </DraggableComputerWindow>}
 
                 {showComputerWindow("profile")&&<DraggableComputerWindow id="profile" className="profile-window" position={computerWindowPosition("profile")} zIndex={computerWindowZ("profile")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.profile.windowTitle} header={<><span>{computerContent.profile.windowTitle}</span><button onClick={() => closeComputerWindow("profile")} aria-label={computerContent.profile.closeAria}>{siteContent.shared.close}</button></>}>

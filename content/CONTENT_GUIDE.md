@@ -15,6 +15,58 @@ All visitor-facing copy is stored in the JSON files in this directory. Edit the 
 - `field-case.json`: Field Case objects, future planning, and item descriptions.
 - `fax-contact.json`: Printer messages, final fax, contact card, email address, and reply link.
 
+## Scene content responsibilities
+
+Use each scene for a distinct kind of personal material. Together, the scenes should reveal more than a conventional résumé without repeating the same information everywhere.
+
+### Computer — Formal Work
+
+Use the computer for clear, structured material that could also appear on a résumé or professional portfolio.
+
+- **Profile:** A concise personal introduction opened from the user avatar.
+- **Projects:** Complete case files for finished or substantial projects.
+- **Experience:** Research, internships, employment, and other formal roles.
+- **README:** Workspace notes written for collaborators who may use the lab, not an explanation of the website.
+- **Lab Log:** Dated professional updates written as authentic log entries. These may cover a new role, project milestone, release, lesson, or change in direction.
+- **About:** Do not add a separate About file. Profile, README, and the physical scenes reveal this information more naturally.
+
+### Books — References
+
+Use the bookshelf for books, papers, articles, documentation, and other references that influenced a project or way of thinking. A book entry should explain why the reference mattered, not only summarize it.
+
+### Notebook — Process Notes
+
+Use the notebook for project thinking, development process, experiments, design decisions, failed attempts, annotations, and unresolved questions. It should show how the work changed over time.
+
+### Board — Principles and Plans
+
+Use the board for working principles, methods, future plans, priorities, hypotheses, and open TODOs. Its content should feel active and provisional rather than like finished project documentation.
+
+### Drawer — Physical Artifacts
+
+Use the drawer for tangible traces of making: prototypes, sketches, components, test materials, discarded versions, printed documents, and small artifacts connected to real work. These objects should add physical evidence that is not already explained by the computer.
+
+### Field Case — Life Outside the Lab
+
+Use the Field Case for experiences gathered away from the workstation: observations, activities, travel, personal interests, field experiments, and ideas brought back from the outside world. It may also hold future directions when they are connected to lived experience rather than formal project planning.
+
+### Fax — A Continuing Investigation
+
+Use the final fax as a message sent back by Alina from work outside the lab. It should report a preliminary finding or meaningful stage of an ongoing investigation. It should not directly announce that Alina was never missing; the content itself should let the visitor infer that she is still working elsewhere.
+
+## Content shapes by scene
+
+The scenes intentionally use different data shapes so the website does not reduce every object to the same title-and-paragraph card.
+
+- **Computer projects and experience:** `details` contains labeled case-file sections. Keep each section evidence-specific.
+- **Books:** `citation`, `summary`, `excerpt`, `quoted`, `annotation`, `provenance`, and `url` separate the source from Alina's margin note. Set `quoted` to `true` only for verified verbatim excerpts.
+- **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
+- **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
+- **Board:** Notes deliberately have no separate title. `label` is the handwritten principle, `copy` gives the evidence, and `detail` is the short margin line.
+- **Field Case:** `metrics` highlights field observations and reported figures; `tags` identifies the route or context. `title` may be `null` when a metric should lead the page.
+
+External sources belong on the bookshelf only when they have a stable citation and URL. Use `provenance` to distinguish original project references, implementation dependencies, and contextual background reading.
+
 ## Safe editing rules
 
 1. Edit only the text inside quotation marks on the right side of a colon.

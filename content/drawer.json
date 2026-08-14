@@ -1,15 +1,59 @@
 {
   "ariaLabel": "Desk drawer close-up",
   "header": "DESK DRAWER / PULL TO OPEN",
-  "sceneHint": "CLICK THE METAL HANDLE, THEN SELECT A FILE",
+  "sceneHint": "PHYSICAL EVIDENCE · OPEN A PACKET",
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK ×",
-  "itemLabels": { "folder": "PROJECT FOLDER", "notebook": "FIELD NOTEBOOK", "envelope": "SEALED ENVELOPE", "components": "COMPONENT POUCH" },
+  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "WORKFLOW TRACE", "envelope": "EVALUATION ENVELOPE", "components": "PROTOTYPE COMPONENTS" },
   "items": {
-    "folder": { "meta": "PROJECT FOLDER / 2023—2024", "title": "Shanghai, at walking distance.", "copy": "Questionnaires, interview summaries, and printed facility maps from the eight-person Quality of Life in Shanghai project.", "note": "Ask residents before drawing the route." },
-    "notebook": { "meta": "FIELD LOG / SOCIAL FUTURES LAB", "title": "Cases, principles, relevance.", "copy": "Small observations recorded before the survey responses were normalized and moved into the Pandas pipeline.", "note": "Do not smooth away disagreement." },
-    "components": { "meta": "HARDWARE POUCH / REV. 04", "title": "The prototype left the clean bench.", "copy": "ESP32 board, EMG sensor leads, spare headers, and the component set used for the current outdoor movement tests.", "note": "Noise after fatigue may be useful." },
-    "envelope": { "meta": "SEALED NOTE / RETURN CHANNEL", "title": "For the printer, after six traces.", "copy": "A routing envelope with the Lab 17 printer address and a field-transmission schedule written inside the flap.", "note": "Next report: after Phase 02." }
+    "folder": {
+      "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
+      "title": "Questionnaires, map traces, campaign notes.",
+      "copy": "An eight-person study of older Shanghai neighborhoods moved from community research into two different interventions: a walking-time map and public information campaigns.",
+      "facts": [
+        { "label": "EARLY PRESENTATION SAMPLE", "value": "48 respondents" },
+        { "label": "AMENITY AWARENESS", "value": "6.75 / 10 average" },
+        { "label": "MAP CONTROL", "value": "5 / 10 / 15-minute zones" },
+        { "label": "VALIDATION", "value": "No formal map user test" }
+      ],
+      "note": "The prototype made nearby facilities visible; it did not prove a long-term improvement in quality of life."
+    },
+    "notebook": {
+      "meta": "THERMO FISHER / PUBLIC-SAFE WORKFLOW TRACE",
+      "title": null,
+      "copy": "A redacted reconstruction of the reasoning used to understand scientific-software workflows before testing or redesign communication.",
+      "facts": [
+        { "label": "3500Dx TESTING", "value": "test case → clarify intent → execute sequence → observe transitions" },
+        { "label": "QANTIS / WINTRACE", "value": "interface → action → resulting interface" },
+        { "label": "DESIGN HANDOFF", "value": "state-transition map in Miro" },
+        { "label": "BOUNDARY", "value": "No proprietary screens or defect details" }
+      ],
+      "note": "Understand the workflow deeply enough to explain it—without publishing the workflow itself."
+    },
+    "components": {
+      "meta": "EMG DEVICE / HARDWARE ITERATION / REV. CURRENT",
+      "title": "The enclosure had to shrink around the electronics.",
+      "copy": "The sensing decision became a packaging problem: solder the signal path, arrange the ESP32 boards and battery, reserve access points, print a shell, then revise the interior around what did not fit.",
+      "facts": [
+        { "label": "CAD ARTIFACT", "value": "1 solid STEP body" },
+        { "label": "SOURCE BOUNDS", "value": "30.79 × 58.00 × 10.00" },
+        { "label": "TOOLS", "value": "Fusion 360 · AutoCAD · 3D printing" },
+        { "label": "CURRENT LAYER", "value": "working embedded prototype" }
+      ],
+      "note": "The model is evidence of iterative packaging and internal component organization—not a finished manufactured enclosure."
+    },
+    "envelope": {
+      "meta": "COURSE ALLOCATION / EVALUATION PACKET",
+      "title": "What happened after the probability matrix?",
+      "copy": "The packet keeps the realization and evaluation stages beside the algorithm instead of presenting the fractional result as the finished system.",
+      "facts": [
+        { "label": "EVALUATION", "value": "1,000 reported Monte Carlo simulations" },
+        { "label": "MAX-WEIGHT RESULT", "value": "≈70% top-two · ≈92% top-three" },
+        { "label": "FEEDBACK", "value": "30+ professors and peers" },
+        { "label": "TRANSFER", "value": "parent–teacher meeting scheduler" }
+      ],
+      "note": "The percentages come from the original presentation and remain reported results until the underlying output is rerun."
+    }
   }
 }

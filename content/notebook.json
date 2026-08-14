@@ -1,12 +1,39 @@
 {
   "ariaLabel": "Research notebook close-up",
   "header": "RESEARCH BOOK / INSPECT A PAGE",
-  "sceneHint": "DRAG TO LOOK · CLICK A PAGE OR INSERT",
-  "itemLabels": { "research": "RESEARCH PAGE", "margin": "PERSONAL MARGIN", "diagram": "FIELD DIAGRAM" },
-  "page": { "reverseMeta": "REVERSE / PERSONAL MARGIN", "reverseCopy": "A note added after the rest of the page, once the neat explanation had stopped being enough.", "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
+  "sceneHint": "CLICK A PAGE · TURN IT OVER FOR THE MARGIN NOTE",
+  "itemLabels": { "research": "EMG DECISION LOG", "margin": "RESEARCH PIPELINE", "diagram": "ALLOCATION REVISION" },
+  "page": { "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
   "items": {
-    "research": { "meta": "UW SOCIAL FUTURES LAB / PAGE 17", "title": "How do principles shape perceived relevance?", "copy": "Survey responses → normalized data → principle vectors → case relevance. The relationship is still under investigation.", "note": "Research first. Ask people next. Leave room for the answer to stay complicated." },
-    "margin": { "meta": "PERSONAL MARGIN / IN RED", "title": "Sounding certain is not the same as understanding.", "copy": "A reminder written sideways beside the analysis: uncertainty can be an honest result, not an unfinished performance.", "note": "Do not smooth away disagreement." },
-    "diagram": { "meta": "FIELD INSERT / SIGNAL PATH", "title": "A diagram made before the clean version.", "copy": "Question, observation, model, test, correction. The arrows loop backward because the first answer is rarely the last useful one.", "note": "Ask what the model leaves out." }
+    "research": {
+      "meta": "EMG DEVICE / DESIGN DECISION / JUL 2025—PRESENT",
+      "title": "The movement can look right while the target muscle stays quiet.",
+      "lead": "A smartwatch could report heart rate, but not whether the intended muscle was actually being recruited. The first design question was therefore not how to display EMG—it was which signal could expose that hidden mismatch.",
+      "steps": ["Candidate A · physiological activity through surface EMG", "Candidate B · angular displacement caused by visible contraction", "Decision · return to EMG after subtle contractions proved difficult to observe geometrically"],
+      "reverseMeta": "CURRENT FIRMWARE / MEASUREMENT CHAIN",
+      "reverseTitle": null,
+      "reverseCopy": "3-second individual calibration → filtering → squared signal → Kalman filtering → four relative-intensity bands → sample counts → session percentages.",
+      "note": "The current result is a distribution of recorded time across relative EMG bands—not force, and not yet an automated coaching recommendation."
+    },
+    "margin": {
+      "meta": "SOCIAL FUTURES LAB / DATA TRANSFORMATION",
+      "title": null,
+      "lead": "The survey data arrived as rows containing repeated, comma-separated ethical-principle labels. Before any statistical question could be tested, those labels needed a stable shared coordinate space.",
+      "steps": ["Read CSV and preserve metadata columns", "Split and count principle labels with Counter", "Normalize each count by the row total", "Write ordered principle dimensions and a JSON-encoded vector", "Continue analysis in Google Sheets and R"],
+      "reverseMeta": "PRELIMINARY RESULT / KEEP THE NULL",
+      "reverseTitle": "No detected relationship is still a result.",
+      "reverseCopy": "The current linear models did not show principle agreement changing with principle frequency for the principles examined. The broader similarity–relevance question remains open.",
+      "note": "Do not turn an ongoing question into a confident conclusion just because a portfolio page prefers closure."
+    },
+    "diagram": {
+      "meta": "COURSE ALLOCATION / VERSION 01 → VERSION 02",
+      "title": "Four objectives, no single winner.",
+      "lead": "Automation, efficiency, fairness, and satisfactoriness were compared separately. The algorithm had to move from ranked preferences to a fractional allocation, then to an assignment that could actually be issued.",
+      "steps": ["Preferences + capacity constraints", "Simultaneous Eating / fractional matrix", "Birkhoff decomposition", "Maximum-weight assignment or random ticket", "Satisfaction scoring + 1,000 reported simulations"],
+      "reverseMeta": "REVISION NOTE / RESIDUAL PROBABILITY",
+      "reverseTitle": null,
+      "reverseCopy": "Version 1 distributed remaining probability through random course choices. Version 2 balanced remaining course capacity against remaining student capacity to reduce unnecessary low-preference allocation.",
+      "note": "Reported presentation result: about 70% top-two and 92% top-three under probabilistic assignment with maximum-weight realization. Preserve this as a reported simulation result until the original output is rerun."
+    }
   }
 }

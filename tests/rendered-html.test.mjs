@@ -20,7 +20,7 @@ test("server renders a personal laboratory before revealing the mystery", async 
   assert.match(html, /Come in.*lab is.*still awake/is);
   assert.match(html, /ENTER LAB 17/);
   assert.match(html, /Wenrui.*Alina.*Wu/i);
-  assert.match(html, /This is where Alina Wu keeps projects, research notes, physical prototypes, and questions that do not fit inside a résumé/);
+  assert.match(html, /This is where Alina Wu keeps software, physical prototypes, research notes, and questions about how systems become useful to people/);
   assert.doesNotMatch(html, /missing person/i);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
 });
@@ -38,7 +38,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /PROJECTS \/ 3 ITEMS/);
   assert.match(content, /README\.txt/);
   assert.match(content, /LAB_LOG\.md/);
-  assert.match(content, /Joined Thermo Fisher Scientific/);
+  assert.match(content, /Joining Thermo Fisher Scientific/);
   assert.doesNotMatch(content, /ABOUT\.txt/);
   assert.doesNotMatch(content, /[‘’]/);
   assert.match(page, /lab-log-line/);
@@ -54,9 +54,9 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /Her computer/);
   assert.doesNotMatch(content, /Why is this appearing on a portfolio computer/);
   assert.doesNotMatch(content, /I am not missing/);
-  assert.match(content, /The signal holds outside the lab/);
-  assert.match(content, /EMG classifier is separating intentional contraction from drift/);
-  assert.match(content, /bringing the hardware and full logs back to Lab 17/);
+  assert.match(content, /The reference held\. The fourth band did not/);
+  assert.match(content, /three-second maximum-effort contraction/i);
+  assert.match(content, /adaptive reference/i);
   assert.match(content, /awu78@uw\.edu/);
   assert.doesNotMatch(content, /hello@example\.com/);
   assert.match(content, /INCOMING FAX/);
@@ -69,7 +69,12 @@ test("source contains six room objects, real work, and a progressive reveal", as
   }
   assert.match(content, /TURN PAGE/);
   assert.match(page, /book-turning-sheet/);
-  assert.match(content, /FIELD PLANNING \/ NEXT · LATER · MAYBE/);
+  assert.match(content, /FIELD CASE \/ OUTSIDE THE LAB/);
+  assert.match(content, /A New Solution to the Random Assignment Problem/);
+  assert.match(content, /How Should We Normalize Electromyograms/);
+  assert.match(page, /artifact-facts/);
+  assert.match(page, /notebook-process/);
+  assert.match(page, /field-metrics/);
   assert.match(content, /CONTACT CARD BESIDE PRINTER/);
   assert.match(page, /fax-reading/);
 });

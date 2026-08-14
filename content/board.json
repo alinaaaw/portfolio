@@ -1,15 +1,15 @@
 {
   "ariaLabel": "Bulletin board close-up",
   "header": "NOTE BOARD / FOLLOW THE THREADS",
-  "sceneHint": "FOLLOW THE THREADS · CLICK A NOTE",
-  "detailMeta": "PINNED MARGIN /",
+  "sceneHint": "SHORT RULES · OPEN QUESTIONS · PUBLICATION BOUNDARIES",
+  "detailMeta": "PINNED NOTE /",
   "returnItem": "PIN IT BACK ×",
-  "hitLabels": ["RESEARCH FIRST", "OPEN QUESTION", "PLAN B", "FIELD ROUTE", "USEFUL FIRST"],
+  "hitLabels": ["RELATIVE, NOT FORCE", "KEEP THE NULL", "SHOW THE TRADEOFF", "TESTING MISSING", "DISCLOSE CAREFULLY"],
   "notes": [
-    { "label": "research first, ask people next", "title": "Questions before conclusions.", "copy": "Collect context, then talk to the people inside the problem." },
-    { "label": "TODO: overthink less", "title": "Momentum is also evidence.", "copy": "Thinking carefully matters. So does eventually testing the thought." },
-    { "label": "backup route B", "title": "Preparation creates freedom.", "copy": "A Plan B is not pessimism; it is permission to continue." },
-    { "label": "I do not know yet", "title": "Uncertainty is a valid state.", "copy": "Not every question needs to be converted into a confident answer." },
-    { "label": "make it useful before impressive", "title": "Usefulness before spectacle.", "copy": "The interface should help a person do something—not only prove it was difficult to build." }
+    { "status": "WORDING CHECK", "label": "relative activation, not force", "copy": "Normalized sEMG can support comparisons against an individual reference. It does not directly measure mechanical muscle force.", "detail": "Use the smallest claim the evidence can carry." },
+    { "status": "RESEARCH STATUS", "label": "keep the null result", "copy": "Principle frequency did not appear to predict agreement in the current models. Similarity and relevance are still under investigation.", "detail": "Uncertainty is not empty space." },
+    { "status": "ALLOCATION TEST", "label": "show which objective moved", "copy": "A faster mechanism is not automatically fairer or more satisfactory. Track automation, efficiency, fairness, and preference outcomes separately.", "detail": "One score can hide the argument." },
+    { "status": "VALIDATION GAP", "label": "prototype ≠ validated product", "copy": "The Shanghai map had category and 5/10/15-minute filters, but no formal user testing. Describe design intent, not proven impact.", "detail": "Build the test before writing the success story." },
+    { "status": "PUBLICATION BOUNDARY", "label": "explain the work, not the proprietary screen", "copy": "For internship material, show responsibility, architecture, and safe outcomes. Keep internal workflows, defects, credentials, and unreleased interfaces out.", "detail": "Clarity without disclosure." }
   ]
 }
