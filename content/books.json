@@ -89,14 +89,14 @@
     {
       "id": "emg-filters",
       "index": "06",
-      "title": "Gravity Analog EMG Sensor and EMGFilters",
-      "meta": "IMPLEMENTATION REFERENCE / DFROBOT + OYMOTION",
-      "citation": "DFRobot and OYMotion · SEN0240 documentation and EMGFilters library",
-      "summary": "Documents the analog sEMG sensor, calibration practice, electrode placement, and the reference filtering library used by the embedded prototype.",
+      "title": "EMGFilters Implementation Reference",
+      "meta": "IMPLEMENTATION DEPENDENCY / OYMOTION",
+      "citation": "OYMotion · EMGFilters reference implementation",
+      "summary": "A reusable sample-by-sample filtering component for EMG streams, with configurable anti-hum, low-pass, and high-pass stages.",
       "excerptLabel": "IMPLEMENTATION NOTE",
       "quoted": false,
-      "excerpt": "Calibration should be repeated when the sensor is worn again.",
-      "annotation": "The filter is an integrated dependency, not an algorithm authored from scratch for this project. The lab notes separate that library from the later calibration, Kalman filtering, band assignment, and session aggregation logic.",
+      "excerpt": "Integrated as a reference component; not presented as original filter design.",
+      "annotation": "The filter is an integrated dependency, not an algorithm authored from scratch for this project. The project work begins with calibration, Kalman filtering, band assignment, and session aggregation.",
       "provenance": "IMPLEMENTATION DEPENDENCY / ATTRIBUTION REQUIRED",
       "url": "https://wiki.dfrobot.com/sen0240/"
     }

@@ -52,7 +52,7 @@
         "title": "Joining Thermo Fisher Scientific",
         "body": [
           "I'm happy to share that I am joining Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
-          "I'm excited to learn, contribute, and work across computer vision, robotics, and scientific software."
+          "I will contribute to YOLO26-based vision for robot-assisted tube handling, 3500Dx localization testing, and QANTIS workflow analysis."
         ]
       }
     ]
@@ -124,14 +124,14 @@
       "date": "JUN 2026 — PRESENT",
       "filename": "THERMO_FISHER.log",
       "meta": "SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI",
-      "title": "Four engineering threads inside one laboratory environment.",
-      "copy": "The role spans perception-to-action integration, dynamic workflow testing, interface-state reconstruction, and technical onboarding. Each thread solves a different operational problem.",
-      "quote": "PUBLIC NOTE: RESPONSIBILITIES ARE SHOWN WITHOUT PROPRIETARY SCREENS, DEFECTS, OR INTERNAL WORKFLOWS.",
+      "title": "Software Engineering Internship",
+      "copy": "Responsibilities span laboratory automation, localized scientific-software validation, workflow analysis for interface design, and technical enablement for team onboarding.",
+      "quote": "JUN 2026 — PRESENT / SHANGHAI",
       "details": [
-        { "label": "VISION + ROBOTICS", "copy": "Retrained YOLO26 for tubes, caps, racks, and empty openings using onboard-camera images, then connected detection output to the available ROS2 robot interface." },
-        { "label": "3500Dx", "copy": "Interpreted ambiguous test cases, clarified expected behavior, and executed black-box dynamic workflow tests for Chinese localization." },
-        { "label": "QANTIS / WINTRACE", "copy": "Mapped interface → action → resulting interface transitions in Miro so UI designers could understand the existing workflow structure." },
-        { "label": "ONBOARDING", "copy": "Handled software training, virtual-machine setup, troubleshooting, and workflow guidance for a new intern." }
+        { "label": "LABORATORY AUTOMATION", "copy": "Built the perception layer for automated laboratory tube handling with YOLO26-based object detection. Connected detection output to ROS2 robot-arm workflows for tube grasping and placement." },
+        { "label": "F1 / 3500Dx", "copy": "Executed black-box dynamic workflow test cases for F1 on the 3500Dx instrument. Clarified expected behavior and product workflows when test cases required additional context." },
+        { "label": "QANTIS", "copy": "For the QANTIS project, analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
+        { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
       ]
     }
   },
