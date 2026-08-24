@@ -172,7 +172,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .file-list small, .file-list b { color: #78847e; font: 6px var(--font-mono), monospace; }
 .file-list b { color: var(--signal); }
 .project-window { top: 13%; left: 15%; }
-.project-window > header { display: grid; grid-template-columns: 1fr auto 1fr; }
+.project-window > header { display: grid; grid-template-columns: minmax(0,1fr) auto; }
 .project-window > header button:last-child { justify-self: end; }
 .project-lead { font-size: 14px !important; }
 .project-facts { display: flex; flex-wrap: wrap; gap: 7px; margin: 28px 0; }
@@ -295,13 +295,16 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .hit-notebook { top: 18%; left: 46%; width: 15%; height: 34%; }
 .hit-components { top: 14%; left: 65%; width: 21%; height: 44%; }
 .hit-envelope { top: 58%; left: 45%; width: 28%; height: 27%; }
-.drawer-document article { position: relative; width: min(760px,88vw); min-height: 450px; max-height: 80vh; overflow-y: auto; padding: clamp(42px,6vw,75px); background-color: #e7ddc2; background-image: repeating-linear-gradient(0deg,transparent 0 31px,rgba(70,105,97,.12) 32px); color: var(--ink); box-shadow: 17px 22px 0 rgba(0,0,0,.35); transform: rotate(-.7deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
+.drawer-document-paper { position: relative; box-sizing: border-box; width: min(760px,88vw); overflow: hidden; background-color: #e7ddc2; background-image: repeating-linear-gradient(0deg,transparent 0 31px,rgba(70,105,97,.12) 32px); color: var(--ink); box-shadow: 17px 22px 0 rgba(0,0,0,.35); transform: rotate(-.7deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
+.drawer-document article { box-sizing: border-box; min-width: 0; min-height: min(450px,80vh); max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: clamp(54px,6vw,75px); scrollbar-width: none; -ms-overflow-style: none; }
+.drawer-document article::-webkit-scrollbar { display: none; }
 @keyframes documentIn { from { opacity: 0; transform: scale(.62) rotate(-5deg); } }
 .drawer-document article small { color: #a44235; font: 7px var(--font-mono),monospace; }
 .drawer-document article h2 { margin: 30px 0 24px; font: clamp(36px,5vw,62px)/1.02 "Segoe Print",cursive; }
 .drawer-document article p { color: #515a53; font-size: 13px; line-height: 1.8; }
 .drawer-document article blockquote { margin: 30px 0; padding: 13px 18px; border-left: 2px solid #a44235; font: 18px "Segoe Print",cursive; }
-.drawer-document article button { position: absolute; right: 18px; bottom: 18px; padding: 9px 11px; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
+.drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 5px 1px 4px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 7px var(--font-mono),monospace; letter-spacing: .08em; }
+.drawer-document-return:hover, .drawer-document-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
 .artifact-facts { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid rgba(38,55,50,.28); border-left: 1px solid rgba(38,55,50,.28); }
 .artifact-facts > div { min-width: 0; padding: 13px 15px; border-right: 1px solid rgba(38,55,50,.28); border-bottom: 1px solid rgba(38,55,50,.28); }
 .artifact-facts dt { color: #a44235; font: 6px var(--font-mono),monospace; }
@@ -511,7 +514,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .book-annotation { font-size: 14px !important; }
   .drawer-front { right: 1%; left: 1%; }
   .drawer-document { padding: 18px; }
-  .drawer-document article { min-height: 62vh; padding: 44px 28px 65px; }
+  .drawer-document article { min-height: min(450px,calc(100svh - 112px)); max-height: calc(100svh - 112px); padding: 56px 28px 44px; }
   .artifact-facts, .field-metrics { grid-template-columns: 1fr; }
   .object-layer, .fax-layer { padding: 0; }
   .object-view { width: 100%; height: 100svh; max-height: none; border: 0; }

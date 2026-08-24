@@ -1,21 +1,21 @@
 {
   "ariaLabel": "Field case close-up",
   "header": "FIELD CASE / OUTSIDE THE LAB",
-  "sceneHint": "COMMUNITY WORK · OBSERVATIONS · NEXT ROUTES",
+  "sceneHint": "COMMUNITY WORK · OBSERVATIONS · QUESTIONS CARRIED BACK",
   "returnItem": "RETURN TO CASE ×",
-  "itemLabels": { "target": "NEIGHBORHOOD MAP", "internship": "SECOND MAJOR", "ticket": "COMMUNITY DISPATCH", "draft": "NEXT ROUTES" },
+  "itemLabels": { "target": "NEIGHBORHOOD MAP", "internship": "STUDY NOTE", "ticket": "COMMUNITY DISPATCH", "draft": "NEXT ROUTES" },
   "items": {
     "internship": {
-      "meta": "FUTURE STUDY / PSYCHOLOGY + COMPUTER SCIENCE",
-      "title": "More ways to understand the person using the system.",
-      "copy": "The planned Psychology second major is not a departure from technical work. It is a way to study perception, behavior, and evidence more carefully alongside software and human-centered design.",
+      "meta": "STUDY NOTE / PEOPLE + SYSTEMS",
+      "title": "The interface is only one part of the system.",
+      "copy": "An expanding interest in how people form expectations, make decisions, and interpret feedback informs the technical work. It is why usability, satisfaction, and understandable outputs recur across otherwise different projects.",
       "metrics": [],
-      "tags": ["FUTURE STUDY", "HUMAN-CENTERED DESIGN"]
+      "tags": ["HUMAN-CENTERED DESIGN", "BEHAVIOR + DECISION-MAKING"]
     },
     "target": {
       "meta": "FIELD OBSERVATION / OLDER SHANGHAI NEIGHBORHOODS",
       "title": null,
-      "copy": "Residents in the early questionnaire knew nearby stores and amenities only moderately well. That observation became a fixed neighborhood map with category filters and walking-time zones.",
+      "copy": "In the early questionnaire sample, residents reported only moderate familiarity with nearby stores and amenities. That observation became a fixed neighborhood map with category filters and walking-time zones.",
       "metrics": [
         { "value": "6.75 / 10", "label": "AVERAGE REPORTED AMENITY AWARENESS" },
         { "value": "5 · 10 · 15", "label": "MINUTE-BASED MAP FILTERS" }
@@ -25,7 +25,7 @@
     "ticket": {
       "meta": "COMMUNITY DISPATCH / INFORMATION CAMPAIGNS",
       "title": null,
-      "copy": "The project also left the screen. One intervention addressed leftovers and food-safety misconceptions among older residents; another focused on recognizing fraud and protecting property.",
+      "copy": "The project extended beyond the map. One intervention addressed food-safety misconceptions about leftovers among older residents; another focused on recognizing fraud and protecting property.",
       "metrics": [
         { "value": "60.42%", "label": "REPORTED NO EXPOSURE TO ANTI-FRAUD PUBLICITY" },
         { "value": "63.16%", "label": "OF THE EXPOSED GROUP SAID IT HAD NOT WORKED FOR THEM" }
@@ -35,7 +35,7 @@
     "draft": {
       "meta": "ROUTE CARD / NEXT · LATER · VERIFY",
       "title": "The next route needs evidence, not just ambition.",
-      "copy": "NEXT: finish the EMG visualization and interpretation layer. LATER: test adaptive calibration and longitudinal comparisons. VERIFY: recover reproducible allocation benchmarks, research sample details, and public-safe robotics metrics.",
+      "copy": "NEXT: turn the EMG measurement output into an understandable session view. LATER: test adaptive calibration and longitudinal comparisons. VERIFY: recover reproducible allocation benchmarks, research-study details, and public-safe robotics metrics.",
       "metrics": [],
       "tags": ["EMG UI", "VALIDATION", "DOCUMENTATION"]
     }

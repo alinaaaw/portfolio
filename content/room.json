@@ -35,17 +35,17 @@
     "title": "ROOM INDEX",
     "eyebrow": "DIRECT ACCESS / OPTIONAL",
     "headline": ["Everything in", "the room."],
-    "description": "Use this index if you want the portfolio without the scavenger hunt. The room and the files contain the same work.",
+    "description": "Use this index for a direct route through the work. The room adds process, artifacts, and open questions to the formal case files.",
     "found": "FOUND",
     "open": "OPEN",
     "closeAria": "Close room index"
   },
   "zones": {
-    "computer": { "index": "01", "label": "COMPUTER", "hint": "Most of the formal work is filed here.", "log": "The desktop holds project case files, research and internship records, and the working notes that connect them.", "sceneLabel": "COMPUTER / WORK" },
-    "drawer": { "index": "02", "label": "DESK DRAWER", "hint": "Something was left beneath the workbench.", "log": "The drawer holds the physical side of the work: EMG hardware, prototypes, components, and printed traces of earlier iterations.", "sceneLabel": "DRAWER / MATERIALS" },
-    "notebook": { "index": "03", "label": "RESEARCH BOOK", "hint": "The margins may say more than the notes.", "log": "The notebook follows questions through models, tests, revisions, and the uncertainty that remains after the data is processed.", "sceneLabel": "NOTEBOOK / PROCESS" },
-    "books": { "index": "04", "label": "BOOKSHELF", "hint": "Some references were marked for a reason.", "log": "The shelf connects allocation algorithms, signal processing, user-centered design, and data research.", "sceneLabel": "BOOKS / INFLUENCES" },
-    "board": { "index": "05", "label": "NOTE BOARD", "hint": "Not every plan was meant to stay here.", "log": "The board records working principles: ask people, expose assumptions, test the tradeoff, and make the result useful.", "sceneLabel": "BOARD / PRINCIPLES" },
-    "fieldcase": { "index": "06", "label": "FIELD CASE", "hint": "The work continues beyond the workstation.", "log": "The case holds community observations, future study plans, and questions about how technical systems meet real people and places.", "sceneLabel": "FIELD CASE / LIFE" }
+    "computer": { "index": "01", "label": "COMPUTER", "hint": "Formal project and experience records are filed here.", "log": "The desktop contains the clearest account of each project: the problem, implementation, evidence, and current limit.", "sceneLabel": "COMPUTER / WORK" },
+    "drawer": { "index": "02", "label": "DESK DRAWER", "hint": "Physical and working evidence sits beneath the workbench.", "log": "The drawer holds prototypes, CAD artifacts, evaluation packets, and the public-safe traces of applied engineering work.", "sceneLabel": "DRAWER / MATERIALS" },
+    "notebook": { "index": "03", "label": "RESEARCH BOOK", "hint": "The margins record decisions, revisions, and what remains uncertain.", "log": "The notebook follows a design question through alternatives, implementation choices, results, and corrections.", "sceneLabel": "NOTEBOOK / PROCESS" },
+    "books": { "index": "04", "label": "BOOKSHELF", "hint": "The references behind the mechanisms are marked.", "log": "The shelf connects allocation theory, EMG interpretation, urban quality of life, and software implementation dependencies.", "sceneLabel": "BOOKS / INFLUENCES" },
+    "board": { "index": "05", "label": "NOTE BOARD", "hint": "Working rules stay visible here.", "log": "The board records the methods that connect the projects: preserve uncertainty, name tradeoffs, and make systems legible before changing them.", "sceneLabel": "BOARD / PRINCIPLES" },
+    "fieldcase": { "index": "06", "label": "FIELD CASE", "hint": "The work continues beyond the workstation.", "log": "The case links community observations, human-centered interests, and questions about how technical systems meet people and places.", "sceneLabel": "FIELD CASE / LIFE" }
   }
 }

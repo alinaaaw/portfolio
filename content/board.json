@@ -1,15 +1,15 @@
 {
   "ariaLabel": "Bulletin board close-up",
   "header": "NOTE BOARD / FOLLOW THE THREADS",
-  "sceneHint": "SHORT RULES · OPEN QUESTIONS · PUBLICATION BOUNDARIES",
+  "sceneHint": "WORKING PRINCIPLES · OPEN QUESTIONS · NEXT TESTS",
   "detailMeta": "PINNED NOTE /",
   "returnItem": "PIN IT BACK ×",
-  "hitLabels": ["RELATIVE, NOT FORCE", "KEEP THE NULL", "SHOW THE TRADEOFF", "TESTING MISSING", "DISCLOSE CAREFULLY"],
+  "hitLabels": ["RELATIVE, NOT FORCE", "KEEP THE NULL", "SHOW THE TRADEOFF", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
   "notes": [
-    { "status": "WORDING CHECK", "label": "relative activation, not force", "copy": "Normalized sEMG can support comparisons against an individual reference. It does not directly measure mechanical muscle force.", "detail": "Use the smallest claim the evidence can carry." },
-    { "status": "RESEARCH STATUS", "label": "keep the null result", "copy": "Principle frequency did not appear to predict agreement in the current models. Similarity and relevance are still under investigation.", "detail": "Uncertainty is not empty space." },
-    { "status": "ALLOCATION TEST", "label": "show which objective moved", "copy": "A faster mechanism is not automatically fairer or more satisfactory. Track automation, efficiency, fairness, and preference outcomes separately.", "detail": "One score can hide the argument." },
-    { "status": "VALIDATION GAP", "label": "prototype ≠ validated product", "copy": "The Shanghai map had category and 5/10/15-minute filters, but no formal user testing. Describe design intent, not proven impact.", "detail": "Build the test before writing the success story." },
-    { "status": "PUBLICATION BOUNDARY", "label": "explain the work, not the proprietary screen", "copy": "For internship material, show responsibility, architecture, and safe outcomes. Keep internal workflows, defects, credentials, and unreleased interfaces out.", "detail": "Clarity without disclosure." }
+    { "status": "MEASUREMENT RULE", "label": "relative activation, not force", "copy": "Normalized EMG supports comparison against an individual reference. It does not directly measure mechanical muscle force, so the interface must not imply more certainty than the signal provides.", "detail": "Make the interpretation as careful as the measurement." },
+    { "status": "RESEARCH RULE", "label": "keep the null result", "copy": "The current models did not find a relationship between principle frequency and agreement. The broader similarity–relevance question remains open, and that boundary belongs in the work.", "detail": "A non-result still narrows the question." },
+    { "status": "DESIGN RULE", "label": "show which objective moved", "copy": "The course-assignment mechanism compares automation, efficiency, fairness, and preference satisfaction separately. Improving one outcome does not establish the others.", "detail": "Name the tradeoff before optimizing it." },
+    { "status": "VALIDATION RULE", "label": "test the intervention", "copy": "The Shanghai map made access to nearby services more visible, but it was not formally user-tested. Design intent and demonstrated impact should stay distinct.", "detail": "Evidence follows the prototype." },
+    { "status": "WORKING METHOD", "label": "make the workflow legible before changing it", "copy": "Clarifying F1 test cases and mapping the existing WinTrace flow created the shared context needed for testing and design discussion. The same habit appears in maps, measurement pipelines, and allocation mechanisms.", "detail": "First understand the system people already inhabit." }
   ]
 }

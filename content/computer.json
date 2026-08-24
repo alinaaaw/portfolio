@@ -63,39 +63,39 @@
       "name": "shanghai-map.case",
       "meta": "CIVIC-TECH CASE / HTML · CSS · JAVASCRIPT",
       "title": "Quality of Life in Shanghai",
-      "copy": "An eight-person mixed-methods project that studied older neighborhoods, then translated community observations into a walking-time map and public information campaigns.",
-      "facts": ["TEAM LEAD + DEVELOPER", "48-PERSON EARLY SAMPLE", "2+ COMMUNITY CAMPAIGNS"],
+      "copy": "Led an eight-person mixed-methods study of older Shanghai neighborhoods. Built an interactive map around nearby services and walking time, then helped translate the findings into community information campaigns.",
+      "facts": ["8-PERSON TEAM", "48-PERSON EARLY SAMPLE", "2+ COMMUNITY CAMPAIGNS"],
       "details": [
-        { "label": "FIELD SIGNAL", "copy": "Respondents reported an average 6.75 / 10 familiarity with nearby stores and amenities." },
-        { "label": "INTERFACE", "copy": "A fixed map combined facility categories with 5-, 10-, and 15-minute walking filters and an early detail-panel interaction." },
-        { "label": "OUTSIDE THE SCREEN", "copy": "The team also produced food-safety and anti-fraud interventions for older residents." },
-        { "label": "EVIDENCE LIMIT", "copy": "The map was a prototype; no formal user testing or long-term quality-of-life outcome was established." }
+        { "label": "FIELD RESEARCH", "copy": "Questionnaires and interviews informed the project. In the early 48-person presentation sample, respondents reported 6.75 / 10 average familiarity with nearby stores and amenities." },
+        { "label": "INTERACTIVE MAP", "copy": "Built a fixed-map interface in HTML, CSS, and JavaScript with facility categories, 5-, 10-, and 15-minute filters, and an early place-detail interaction." },
+        { "label": "COMMUNITY ACTION", "copy": "Organized food-safety and anti-fraud information campaigns for older residents alongside the digital intervention." },
+        { "label": "EVIDENCE LIMIT", "copy": "The map was a prototype designed around the research findings. It was not formally user-tested, and no long-term quality-of-life outcome was measured." }
       ]
     },
     "allocation": {
       "name": "course-allocation.py",
       "meta": "ALGORITHM CASE / PYTHON · NUMPY",
       "title": "Automatic and Satisfactory Course Assignment",
-      "copy": "A capacity-constrained assignment pipeline designed around four separate criteria: automation, efficiency, fairness, and the probability of receiving a preferred course.",
-      "facts": ["1,000 REPORTED SIMULATIONS", "30+ PROFESSORS + PEERS", "SCHEDULER EXTENSION"],
+      "copy": "Built a Python and NumPy assignment pipeline for capacity-constrained courses, treating automation, efficiency, fairness, and preference satisfaction as separate design criteria.",
+      "facts": ["1,000 REPORTED SIMULATIONS", "30+ REVIEWERS", "SCHEDULER EXTENSION"],
       "details": [
-        { "label": "MECHANISM", "copy": "Ranked preferences → Simultaneous Eating → fractional matrix → Birkhoff decomposition → concrete assignment." },
-        { "label": "ITERATION", "copy": "Version 2 redistributed residual probability by balancing remaining course and student capacity instead of choosing leftover courses randomly." },
-        { "label": "REPORTED RESULT", "copy": "Maximum-weight realization reached about 70% top-two and 92% top-three assignments in the original presentation." },
-        { "label": "TRANSFER", "copy": "The framework was later adapted to a parent–teacher meeting time-slot allocation problem." }
+        { "label": "MECHANISM", "copy": "Modeled ranked preferences and course capacity, generated a fractional allocation with Simultaneous Eating, then used Birkhoff decomposition to produce assignments that could be issued." },
+        { "label": "ITERATION", "copy": "Version 2 balanced remaining course capacity against remaining student capacity instead of distributing residual probability through random leftover courses." },
+        { "label": "REPORTED RESULT", "copy": "The original presentation reported that maximum-weight realization placed about 70% of students in a top-two choice and 92% in a top-three choice across 1,000 simulations." },
+        { "label": "TRANSFER", "copy": "Extended the allocation framework to parent–teacher meeting time slots by adapting the scoring logic to a second scheduling context." }
       ]
     },
     "emg": {
       "name": "emg-monitor.device",
       "meta": "PHYSICAL-COMPUTING CASE / ARDUINO · C/C++ · FUSION",
       "title": "Monitoring Device for Muscle Usage & Behavior",
-      "copy": "A working embedded prototype designed to make target-muscle recruitment observable during exercise—not merely to display a raw waveform.",
+      "copy": "An embedded prototype designed to make target-muscle recruitment observable during exercise, rather than only displaying a raw waveform.",
       "facts": ["3-SECOND CALIBRATION", "4 RELATIVE EMG BANDS", "CAD + ESP32 + BLUETOOTH"],
       "details": [
-        { "label": "DESIGN DECISION", "copy": "EMG was selected over angular-displacement sensing after subtle contractions proved difficult to observe through changes in skin geometry." },
-        { "label": "CURRENT CHAIN", "copy": "Filter → square → Kalman filter → individual reference → four bands → session percentage output." },
-        { "label": "PHYSICAL EVIDENCE", "copy": "The current STEP artifact contains one solid body with source bounds of approximately 30.79 × 58.00 × 10.00." },
-        { "label": "CURRENT LIMIT", "copy": "The measurement layer works; the polished visualization, adaptive calibration, and exercise interpretation layers remain in development." }
+        { "label": "DESIGN DECISION", "copy": "Compared EMG with angular-displacement sensing, then selected EMG because subtle target-muscle contraction was not reliably visible through changes in skin geometry." },
+        { "label": "CURRENT CHAIN", "copy": "The firmware filters and squares the signal, applies Kalman filtering, calibrates an individual reference, classifies four relative bands, and reports session percentages." },
+        { "label": "PHYSICAL EVIDENCE", "copy": "Designed the enclosure and internal packaging in Fusion and AutoCAD. The current STEP artifact contains one solid body with source bounds of approximately 30.79 × 58.00 × 10.00." },
+        { "label": "CURRENT LIMIT", "copy": "The current system produces a relative-activation distribution. The visualization, adaptive calibration, and exercise-interpretation layers remain in development." }
       ]
     }
   },
@@ -109,13 +109,13 @@
       "filename": "SOCIAL_FUTURES_LAB.md",
       "meta": "UNDERGRADUATE RESEARCH / UW",
       "title": "How does agreement on principles affect perceived relevance?",
-      "copy": "Turning ethical-case survey responses into a shared quantitative representation that can be analyzed without erasing the original metadata.",
+      "copy": "Transforming ethical-case survey responses into a shared quantitative representation while preserving the metadata needed for later analysis.",
       "quote": "STATUS: THE BROADER SIMILARITY–RELEVANCE QUESTION REMAINS OPEN.",
       "details": [
-        { "label": "TRANSFORMATION", "copy": "Parse comma-separated principle labels, count occurrences, normalize by the row total, and construct ordered principle vectors." },
-        { "label": "TOOL DIVISION", "copy": "Python and pandas for transformation; Google Sheets for subsequent formulas; R for regression analysis shared with the team." },
-        { "label": "CURRENT RESULT", "copy": "The present linear models did not detect principle agreement changing with principle frequency for the principles examined." },
-        { "label": "CONTRIBUTION", "copy": "Data transformation and empirical analysis—not authorship of the lab’s ethical-principle taxonomy." }
+        { "label": "TRANSFORMATION", "copy": "Parsed comma-separated principle labels, counted occurrences, normalized each count by the row total, and constructed ordered principle vectors." },
+        { "label": "TOOL DIVISION", "copy": "Used Python and pandas for transformation, Google Sheets for subsequent formulas, and R for regression analysis shared with the team." },
+        { "label": "CURRENT RESULT", "copy": "Current linear models did not find a relationship between principle frequency and agreement for the principles examined." },
+        { "label": "CONTRIBUTION", "copy": "Contributed data transformation and empirical analysis; the lab's ethical-principle taxonomy was not my authorship." }
       ]
     },
     "internship": {
@@ -126,11 +126,11 @@
       "meta": "SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI",
       "title": "Software Engineering Internship",
       "copy": "Responsibilities span laboratory automation, localized scientific-software validation, workflow analysis for interface design, and technical enablement for team onboarding.",
-      "quote": "JUN 2026 — PRESENT / SHANGHAI",
+      "quote": "YOLO26 / ROS2 / AGENTIC ENGINEERING / SOFTWARE TESTING",
       "details": [
         { "label": "LABORATORY AUTOMATION", "copy": "Built the perception layer for automated laboratory tube handling with YOLO26-based object detection. Connected detection output to ROS2 robot-arm workflows for tube grasping and placement." },
         { "label": "F1 / 3500Dx", "copy": "Executed black-box dynamic workflow test cases for F1 on the 3500Dx instrument. Clarified expected behavior and product workflows when test cases required additional context." },
-        { "label": "QANTIS", "copy": "For the QANTIS project, analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
+        { "label": "QANTIS", "copy": "Analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
         { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
       ]
     }

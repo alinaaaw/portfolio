@@ -7,9 +7,9 @@
   "items": {
     "research": {
       "meta": "EMG DEVICE / DESIGN DECISION / JUL 2025—PRESENT",
-      "title": "The movement can look right while the target muscle stays quiet.",
-      "lead": "A smartwatch could report heart rate, but not whether the intended muscle was actually being recruited. The first design question was therefore not how to display EMG—it was which signal could expose that hidden mismatch.",
-      "steps": ["Candidate A · physiological activity through surface EMG", "Candidate B · angular displacement caused by visible contraction", "Decision · return to EMG after subtle contractions proved difficult to observe geometrically"],
+      "title": "Exercise form does not always reveal target-muscle recruitment.",
+      "lead": "The first design question was not how to display EMG. It was which signal could show whether the intended muscle was actually active during an exercise.",
+      "steps": ["Candidate A · physiological activity through surface EMG", "Candidate B · angular displacement through visible contraction", "Decision · select EMG after subtle contraction proved unreliable to observe geometrically"],
       "reverseMeta": "CURRENT FIRMWARE / MEASUREMENT CHAIN",
       "reverseTitle": null,
       "reverseCopy": "3-second individual calibration → filtering → squared signal → Kalman filtering → four relative-intensity bands → sample counts → session percentages.",
@@ -18,17 +18,17 @@
     "margin": {
       "meta": "SOCIAL FUTURES LAB / DATA TRANSFORMATION",
       "title": null,
-      "lead": "The survey data arrived as rows containing repeated, comma-separated ethical-principle labels. Before any statistical question could be tested, those labels needed a stable shared coordinate space.",
+      "lead": "The survey data arrived as rows of repeated, comma-separated ethical-principle labels. Before testing a statistical question, the labels needed a stable shared coordinate space.",
       "steps": ["Read CSV and preserve metadata columns", "Split and count principle labels with Counter", "Normalize each count by the row total", "Write ordered principle dimensions and a JSON-encoded vector", "Continue analysis in Google Sheets and R"],
       "reverseMeta": "PRELIMINARY RESULT / KEEP THE NULL",
       "reverseTitle": "No detected relationship is still a result.",
-      "reverseCopy": "The current linear models did not show principle agreement changing with principle frequency for the principles examined. The broader similarity–relevance question remains open.",
+      "reverseCopy": "The current linear models did not find a relationship between principle frequency and agreement for the principles examined. The broader similarity–relevance question remains open.",
       "note": "Do not turn an ongoing question into a confident conclusion just because a portfolio page prefers closure."
     },
     "diagram": {
       "meta": "COURSE ALLOCATION / VERSION 01 → VERSION 02",
       "title": "Four objectives, no single winner.",
-      "lead": "Automation, efficiency, fairness, and satisfactoriness were compared separately. The algorithm had to move from ranked preferences to a fractional allocation, then to an assignment that could actually be issued.",
+      "lead": "Automation, efficiency, fairness, and preference satisfaction were compared separately. The algorithm had to move from ranked preferences to a fractional allocation, then to an assignment that could actually be issued.",
       "steps": ["Preferences + capacity constraints", "Simultaneous Eating / fractional matrix", "Birkhoff decomposition", "Maximum-weight assignment or random ticket", "Satisfaction scoring + 1,000 reported simulations"],
       "reverseMeta": "REVISION NOTE / RESIDUAL PROBABILITY",
       "reverseTitle": null,
