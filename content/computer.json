@@ -20,7 +20,7 @@
     "email": "awu78@uw.edu"
   },
   "desktop": {
-    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE", "research": "FIELD_NOTES.md" },
+    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE" },
     "welcome": { "eyebrow": "WELCOME / GUEST", "title": "Alina", "description": "Computer Science at the University of Washington. Code, physical systems, and questions about the people around them." }
   },
   "readme": {
