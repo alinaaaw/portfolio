@@ -80,31 +80,34 @@
 - [ ] 确认所有场景都能在不依赖 AI Bot 的情况下独立表达核心信息。
 - [ ] 运行测试和 production build。
 
-## Phase 2：把正式网站放到 GitHub `main`
-
-- [ ] 拉取 GitHub 最新状态并比较 `main` 与当前设计分支，先处理可能的冲突和其他 worktree 的未合并工作。
-- [ ] 为合并前状态创建一个中性命名的备份 tag，确保可以恢复，但不要继续把旧版本编号当作产品名称。
-- [ ] 通过 Pull Request 将经过内容验收的网站合并到 `main`。
-- [ ] 确认 GitHub 默认分支仍为 `main`，README 首页展示的是 Lab 17 正式网站。
-- [ ] 在全新的本地目录或干净环境中从 `main` 安装依赖、运行测试并完成 production build。
-- [ ] 确认 GitHub 仓库没有 `.env`、API Key、Cloudflare Token、私有 dossier 或不应公开的文件。
-
-完成标准：GitHub `main` 是唯一的正式网站源代码，并且可以从干净环境成功构建。
-
-## Phase 3：移除旧的版本编号身份
+## Phase 2：移除旧的版本编号身份
 
 这里的目标是移除名称和维护结构中的旧版本身份，不是丢失 Git 历史。
 
+- [ ] 拉取 GitHub 最新状态并比较 `main` 与当前设计分支，先处理可能的冲突和其他 worktree 中仍需保留的工作。
+- [ ] 在开始清理前创建一个中性命名的备份 tag，记录当前可恢复状态，但不要继续把旧版本编号当作产品名称。
 - [ ] 将 `package.json` 和 `package-lock.json` 中的项目名改为中性的 `alina-portfolio`；正式发布前先将旧设计编号重置为预发布版本 `0.9.0`。
 - [ ] 重写 README，使其只介绍 Alina Portfolio / Lab 17，不再介绍某个设计版本或专用分支。
 - [ ] 将旧概念文档中仍然有效的设计规则合并到 `DESIGN.md`，然后删除重复的旧概念文档。
 - [ ] 更新 `DESIGN.md` 标题和正文中的旧版本名称。
 - [ ] 检查页面 metadata、Open Graph 图片文字、测试名称、脚本名称和注释。
 - [ ] 全仓库搜索旧版本编号、旧分支名称和旧产品名称，确保正式文件中不再出现。
-- [ ] `main` 验证完成后，再删除不再需要的远程设计分支、本地分支和对应 worktree；执行删除前单独确认目标。
-- [ ] 完成清理后更新本 TODO，移除为了执行清理而暂时保留的旧名称和链接。
+- [ ] 在当前工作分支运行测试和 production build，确认重命名和文档清理没有破坏网站。
 
-完成标准：访客、GitHub 首页、构建产物和维护文档都只把它称为 Alina Portfolio 或 Lab 17。
+完成标准：准备合并的工作分支已经通过验证；访客可见内容、构建产物和维护文档都只把网站称为 Alina Portfolio 或 Lab 17。
+
+## Phase 3：把正式网站放到 GitHub `main`
+
+- [ ] 最后比较 `main` 与已经完成 Phase 2 清理的工作分支，确认 Pull Request 只包含准备正式保留的内容。
+- [ ] 确认仓库没有 `.env`、API Key、Cloudflare Token、私有 dossier 或不应公开的文件。
+- [ ] 通过 Pull Request 将经过内容验收和旧名称清理的网站合并到 `main`。
+- [ ] 确认 GitHub 默认分支仍为 `main`，README 首页展示的是 Alina Portfolio / Lab 17 正式网站。
+- [ ] 在全新的本地目录或干净环境中从 `main` 安装依赖、运行测试并完成 production build。
+- [ ] 确认 `main` 的 commit、构建结果和 Phase 2 验收过的工作分支一致。
+- [ ] `main` 验证成功后，再删除不需要的远程设计分支、本地分支和对应 worktree；删除前单独确认精确目标。
+- [ ] 完成合并与分支清理后更新本 TODO，移除为了执行迁移而暂时保留的旧名称、分支和比较链接。
+
+完成标准：GitHub `main` 是唯一的正式网站源代码，可以从干净环境成功构建，并且旧工作分支在确认不再需要后得到安全清理。
 
 ## Phase 4：建立版本编号和手动发布制度
 
