@@ -1,135 +1,151 @@
 # Backend Roadmap
 
-This document records possible backend features for future versions of the Lab 17 portfolio. These are product ideas, not current functionality. The website currently remains a JSON-driven interactive frontend.
+This document defines when and why backend capabilities should be added to the Lab 17 portfolio. It is a product and architecture roadmap, not a description of current functionality.
 
-## Content Management
+## 1. Current State and Principles
 
-Create a private editor where Alina can add or update projects, experience entries, Lab Log posts, notes, links, and images without editing JSON or application code.
+The website is currently a JSON-driven interactive frontend. Visitor-facing content is stored in `content/*.json`, imported by the application, and published as part of each site build. The existing portfolio does not require a database or CMS to function.
 
-Possible capabilities:
+Add backend infrastructure only when a feature needs at least one of the following:
 
-- Secure owner login
-- Draft and published states
-- Scheduled publishing
-- Reordering and categorizing entries
-- Previewing changes inside the lab before publishing
-- Revision history and rollback
+- A secret that must never reach the browser
+- Persistent or shared data
+- Private owner-only tools
+- Dynamic publishing without rebuilding the website
+- Server-side validation, rate limiting, or abuse protection
 
-## Contact and Messages
+Backend work should follow these principles:
 
-Allow visitors to contact Alina through an interaction that belongs naturally in the lab, such as picking up the business card, using the workstation, or leaving a note near the printer.
+- Preserve the atmosphere and exploration structure of the lab.
+- Introduce capabilities gradually instead of replacing the JSON system at once.
+- Keep structural scene configuration and stable interface labels in JSON.
+- Collect the minimum visitor data needed for a clear product purpose.
+- Treat AI output as a draft or sourced answer, never as unquestioned truth.
+- Prefer simple, reversible implementations with clear fallback behavior.
 
-This feature needs more design work before implementation. A contact form should not feel like a generic form placed on top of the scene, and it should not expose a private inbox or create unnecessary security and maintenance work.
+## 2. Phase One: AI Lab Guide and Dossier Q&A
 
-### Possible approaches
+The first backend feature should be an in-world AI guide. It should help visitors explore the lab and answer detailed questions about Alina's work without breaking the mystery or exposing private material.
 
-#### Email Link Only
+### Visitor Experience
 
-Keep the current `mailto:` link. The visitor writes from their own email application, and the website stores nothing.
+The guide receives lightweight context about the current scene, discovered objects, and exploration progress. It can then:
 
-- Lowest maintenance
-- No message database or privacy policy needed
-- Naturally preserves the visitor's real email identity
-- Depends on the visitor having an email application configured
-- Offers little control over the experience
+- Answer questions about projects, experience, research, and process
+- Suggest a relevant scene, object, file, or next action
+- Connect related material from different areas of the lab
+- Avoid revealing content the visitor has not unlocked
 
-#### Server-Sent Contact Form
+### Approved Knowledge Base
 
-Add a short in-world form and send the message to `awu78@uw.edu` through a transactional email service. Do not permanently store the message on the website.
+The assistant should answer only from approved public materials:
 
-- Provides a smoother experience than `mailto:`
-- Keeps the interaction inside the lab
-- Avoids building a full private inbox
-- Requires server-side validation, rate limiting, spam protection, and an email provider
-- The interface must clearly explain what information is being sent
+- Project summaries and case studies
+- Professional experience and public resume content
+- Research notes and design-process documentation
+- Selected public dossier files
+- Navigation descriptions for the interactive lab
 
-#### Private Message Inbox
+When the knowledge base does not support an answer, the guide should say so rather than inventing information. Answers should reference the relevant source file or section when possible.
 
-Save messages in a database and show them in an owner-only dashboard, with optional email notifications.
+### Request Architecture
 
-- Supports message status, notes, search, and history
-- Could become an interesting hidden workstation feature for the owner
-- Introduces more personal-data responsibility
-- Requires authentication, retention rules, deletion tools, spam controls, and ongoing maintenance
+1. The browser sends the question and exploration context to `POST /api/guide`.
+2. A Cloudflare Worker validates and rate-limits the request.
+3. The Worker calls the OpenAI Responses API and uses File Search with a vector store containing the approved dossier files.
+4. The endpoint returns a concise answer, source references, and an optional exploration suggestion.
 
-### Recommended direction
+The `OPENAI_API_KEY` must be stored as a Cloudflare secret and used only by the Worker. It must never appear in browser code, public environment variables, or the repository.
 
-Start with the existing email link. If visitors have trouble using it, move to a minimal server-sent form that asks only for name, email, and message. Deliver messages by email without storing them permanently.
+### Safety and Privacy
 
-The interaction could work like this:
+- Clearly identify the guide as an AI assistant.
+- Limit question length, answer length, and request frequency.
+- Add abuse protection such as Turnstile if needed.
+- Keep conversation state in the browser or short-lived server state for the first version.
+- Do not permanently store full chat transcripts in the MVP.
+- Provide a useful fallback when the AI service is unavailable.
 
-1. The visitor selects Contact.
-2. The camera moves to the printer desk and the business card is picked up.
-3. The card offers two choices: open email or leave a message.
-4. Leave a message opens a small workstation-style note window.
-5. After a successful send, the printer produces a short transmission receipt.
+## 3. Phase Two: Analytics and Feedback
 
-Before adding the form, define:
+After the AI guide works reliably, add privacy-conscious analytics that combine exploration behavior, AI question patterns, and direct visitor feedback. These should be treated as one analytics system rather than separate tracking features.
 
-- Which email delivery service to use
-- Whether any message data is retained
-- Rate limits per visitor
-- Spam protection that does not interrupt the atmosphere
-- A clear success and failure state
-- Whether attachments are prohibited
-- How the sender's email address is verified or validated
+### Useful Events and Metrics
 
-## Anonymous Exploration Analytics
+Exploration events:
 
-Record anonymous interaction events to understand how visitors explore the portfolio.
-
-Useful events might include:
-
-- Scene entered
-- Object inspected
-- Computer file opened
-- Project opened
-- Fax discovered
+- Scene entered or object inspected
+- Computer file, book, or project opened
+- Fax discovered or exploration completed
 - Contact method selected
-- Exploration completed
 
-Use aggregate data rather than invasive tracking. Avoid collecting typed content, precise location, or unnecessary identifying information.
+AI guide events:
 
-## Persistent Exploration Progress
+- Normalized question topic, such as projects, experience, research, contact, or navigation
+- Dossier files or sections retrieved
+- Answered, unanswered, refused, or failed result
+- Suggested location and whether the visitor followed it
+- Response latency and approximate usage or cost range
+- Whether the visitor continued exploring after using the guide
 
-Remember which clues and objects a visitor has already explored so they can continue later.
+Feedback events:
 
-Possible states:
+- Helpful or not-helpful rating
+- Optional short visitor comment
+- Missing information or unanswered-question category
 
-- Discovered objects
-- Opened files and books
-- Completed clue sequences
-- Fax unlocked or read
-- Last visited scene
+### Privacy Rules
 
-Anonymous progress could begin with browser storage. Account-based or cross-device progress would require a backend and authentication.
+- Prefer aggregate events and normalized topics over raw question text.
+- Do not store IP addresses, precise location, or unnecessary identifiers.
+- Use a random anonymous session identifier only when events need to be connected into a journey.
+- If raw questions or feedback are retained, provide notice, redact sensitive information, define a short retention period, and support deletion.
 
-## Hidden Content and Server-Side Unlocks
+An owner dashboard could summarize popular topics, unanswered questions, helpfulness ratings, common exploration journeys, and recent feedback. Cloudflare D1 is an appropriate datastore once persistent analytics are introduced.
 
-Keep selected files, messages, or endings on the server until the visitor satisfies an exploration condition.
+## 4. Phase Three: Content Management and Publishing
 
-This could prevent major reveals from being visible immediately in the downloaded frontend data and make the mystery structure more meaningful. The server should validate unlock conditions rather than trusting only the browser.
+The CMS should be a small private publishing tool, not a replacement for the entire website architecture.
 
-## File and Media Uploads
+### Hybrid Content Model
 
-Allow Alina to upload project images, papers, PDFs, prototypes, and research artifacts through the private content editor.
+Keep these items in JSON because they are structural and rarely change:
 
-The system would need:
+- Scene configuration and object identifiers
+- Navigation labels and interaction controls
+- Stable system messages and shared interface copy
+- Data shapes required by the 3D experience
 
-- File-type and size restrictions
-- Image optimization and accessible descriptions
-- Private drafts and public assets
-- Replacement and deletion tools
-- Storage cleanup for unused files
-- Safe PDF and document handling
+Move frequently updated editorial content to Cloudflare D1 only when needed:
 
-Uploaded material could appear naturally as computer files, books, drawer documents, or pinned board references.
+- Lab Log entries
+- Project updates and case studies
+- Books and references
+- Drafts, publication state, and revision metadata
 
-## Live Lab Log
+The website should keep a safe JSON fallback if dynamic content cannot be loaded.
 
-Publish new Lab Log entries without rebuilding the site. Entries could behave like professional updates while remaining written as authentic lab records rather than generic social-media posts.
+### Staged CMS Rollout
 
-Potential fields:
+0. Continue using local JSON with AI-assisted editing and normal site deployment.
+1. Build the smallest private CMS for Lab Log entries only.
+2. After the Lab Log workflow is proven, expand the editor to projects and books.
+3. Add images, PDFs, and other media only after text publishing is stable.
+4. Add scheduling or advanced revision management only when there is a demonstrated need.
+
+### Minimum CMS Workflow
+
+1. Alina signs in to the private owner area.
+2. She creates an entry manually or asks AI to generate a structured draft from her notes.
+3. She edits the draft and previews it inside the lab presentation.
+4. She explicitly approves and publishes it.
+5. She can unpublish or roll back to an earlier revision.
+
+AI-generated content must never publish automatically. The editor should validate the generated structure before previewing or saving it.
+
+### Lab Log First Release
+
+The first CMS-managed content type should contain only the fields needed by the existing Lab Log:
 
 - Date and time
 - Entry type
@@ -138,28 +154,64 @@ Potential fields:
 - Related project or experience
 - Tags
 - Draft or published status
+- Revision timestamp
 
-## Real-Time Lab Events
+This provides useful dynamic publishing without requiring the 3D application to be rebuilt around a general-purpose CMS.
 
-Allow new events to arrive while a visitor is exploring, such as a fax, workstation alert, status update, or newly synchronized Lab Log entry.
+### Media Uploads Later
 
-Possible uses:
+When media management becomes necessary, use private drafts and public assets with:
 
-- Alina sends a new research update from the owner dashboard
-- The printer receives a time-limited fax
-- A workstation file changes from pending to synchronized
-- Special events appear during a launch, internship, or project release
+- File-type and size restrictions
+- Image optimization and accessible descriptions
+- Safe PDF and document handling
+- Replacement, deletion, and unused-file cleanup
+- Cloudflare R2 or an equivalent object store
 
-Real-time delivery adds infrastructure and should be used only when the event changes the experience meaningfully. Most updates can use normal database requests or periodic refreshes instead.
+Uploaded material could appear as computer files, books, drawer documents, or pinned board references.
 
-## Suggested Implementation Order
+## 5. Optional Future Capabilities
 
-1. Anonymous exploration analytics
-2. Private content management and Live Lab Log publishing
-3. File and media uploads
-4. Persistent exploration progress
-5. Server-side unlocks
-6. Carefully designed contact messaging
-7. Real-time lab events
+These features should wait until the AI guide, analytics, and basic publishing workflow are stable.
 
-The first backend version should remain small. Content management and lightweight analytics provide the clearest value without changing the core atmosphere of the portfolio.
+### Exploration Progress and Server-Side Unlocks
+
+Anonymous progress can begin in browser storage and include discovered objects, opened files, completed clue sequences, the fax state, and the last visited scene.
+
+Use backend storage only for cross-device progress, account-based progress, or hidden content that must not be included in downloaded frontend data. For protected reveals, the server should validate unlock conditions rather than trusting only the browser.
+
+### Contact and Messages
+
+Keep the existing `mailto:` interaction initially. If visitors have trouble using it, add a short in-world form that sends name, email, and message through a transactional email service without permanently storing the message.
+
+The form would require server-side validation, rate limiting, spam protection, clear success and failure states, and a decision about email verification. A private message inbox should be considered only if search, status, history, or internal notes later provide enough value to justify the additional personal-data responsibility.
+
+### Real-Time Lab Events
+
+Real-time delivery could support a newly received fax, workstation alert, synchronized Lab Log entry, or time-limited project event. Most updates should use ordinary database requests or periodic refreshes. Add real-time infrastructure only when immediate delivery materially improves the experience.
+
+## 6. Expected Backend Services
+
+| Capability | Likely service | Introduce when |
+| --- | --- | --- |
+| API routes, secret handling, and validation | Cloudflare Worker | AI guide MVP |
+| Dossier retrieval and answer generation | OpenAI Responses API and File Search | AI guide MVP |
+| Anonymous analytics and feedback | Cloudflare D1 | Analytics phase |
+| CMS records, drafts, and revisions | Cloudflare D1 | Lab Log CMS |
+| Uploaded images and documents | Cloudflare R2 | Media phase |
+| Contact delivery | Transactional email provider | Only if a form replaces `mailto:` |
+| Device-local exploration progress | Browser storage | Before any account system |
+
+## 7. Implementation Order
+
+0. Keep the current JSON publishing workflow and use AI-assisted local editing when helpful.
+1. Build the AI Lab Guide MVP with an approved dossier knowledge base and no permanent chat storage.
+2. Add unified exploration analytics, AI question analytics, and user feedback.
+3. Build the private Lab Log CMS with AI drafting, manual approval, preview, publishing, and rollback.
+4. Expand the proven CMS workflow to projects and books.
+5. Add file and media uploads.
+6. Add persistent exploration progress and server-side unlocks if the experience requires them.
+7. Add a server-sent contact form only if the existing email link is insufficient.
+8. Add real-time lab events only for a clearly defined experience.
+
+The AI Lab Guide provides the clearest reason to introduce a backend. The CMS should follow only after the guide and analytics create a real need for private data tools. This order keeps the first backend small while preserving a path toward dynamic publishing and richer visitor insight.
