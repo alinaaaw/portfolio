@@ -29,9 +29,6 @@ yarn-error.log*
 .pnpm-debug.log*
 .preview*.log
 
-# local source material
-/Wenrui_Wu_Portfolio_Source_Dossier.md
-
 # env files (can opt-in for committing if needed)
 .env*
 
