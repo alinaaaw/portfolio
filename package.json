@@ -1,6 +1,6 @@
 {
-  "name": "alina-portfolio-version3",
-  "version": "3.0.0",
+  "name": "alina-portfolio",
+  "version": "0.8.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
