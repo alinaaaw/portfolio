@@ -4,12 +4,12 @@
   "sceneHint": "WORKING PRINCIPLES · OPEN QUESTIONS · NEXT TESTS",
   "detailMeta": "PINNED NOTE /",
   "returnItem": "PIN IT BACK ×",
-  "hitLabels": ["RELATIVE, NOT FORCE", "KEEP THE NULL", "SHOW THE TRADEOFF", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
+  "hitLabels": ["DEVELOP THE SOFTWARE", "CHECK THE CONFOUNDER", "SHOW THE TRADEOFF", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
   "notes": [
-    { "status": "MEASUREMENT RULE", "label": "relative activation, not force", "copy": "Normalized EMG supports comparison against an individual reference. It does not directly measure mechanical muscle force, so the interface must not imply more certainty than the signal provides.", "detail": "Make the interpretation as careful as the measurement." },
-    { "status": "RESEARCH RULE", "label": "keep the null result", "copy": "The current models did not find a relationship between principle frequency and agreement. The broader similarity–relevance question remains open, and that boundary belongs in the work.", "detail": "A non-result still narrows the question." },
-    { "status": "DESIGN RULE", "label": "show which objective moved", "copy": "The course-assignment mechanism compares automation, efficiency, fairness, and preference satisfaction separately. Improving one outcome does not establish the others.", "detail": "Name the tradeoff before optimizing it." },
-    { "status": "VALIDATION RULE", "label": "test the intervention", "copy": "The Shanghai map made access to nearby services more visible, but it was not formally user-tested. Design intent and demonstrated impact should stay distinct.", "detail": "Evidence follows the prototype." },
-    { "status": "WORKING METHOD", "label": "make the workflow legible before changing it", "copy": "Clarifying F1 test cases and mapping the existing WinTrace flow created the shared context needed for testing and design discussion. The same habit appears in maps, measurement pipelines, and allocation mechanisms.", "detail": "First understand the system people already inhabit." }
+    { "status": "NEXT PHASE", "label": "develop the software around the signal", "copy": "The hardware prototype now produces a four-band session summary. The next phase is to improve the data processing, develop the software, and design the UI.", "detail": "Turn a working measurement into a usable system." },
+    { "status": "ANALYSIS NOTE", "label": "check potential confounders", "copy": "The main study asks whether principle agreement influences perceived relevance between cases. Before interpreting that relationship, the analysis tested whether principle frequency could also affect agreement. No relationship was detected for the principles examined.", "detail": "Check what else could be shaping the result." },
+    { "status": "DESIGN RULE", "label": "one metric does not prove the others", "copy": "An improvement in aggregate preference outcomes does not establish that an allocation is fair or efficient. Each objective needs its own evidence.", "detail": "Name the tradeoff before optimizing it." },
+    { "status": "VALIDATION RULE", "label": "test the intervention", "copy": "A map can make nearby services visible by design. Whether residents can understand and use it is a separate question that requires observation and user testing.", "detail": "Design intent is a hypothesis, not an outcome." },
+    { "status": "WORKING METHOD", "label": "make the workflow legible before changing it", "copy": "F1 test cases and WinTrace state maps served the same purpose: establish how the existing system behaves before testing, explaining, or redesigning it.", "detail": "Understand the current workflow before proposing the next one." }
   ]
 }

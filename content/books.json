@@ -26,7 +26,7 @@
       "excerptLabel": "ABSTRACT / SHORT EXCERPT",
       "quoted": true,
       "excerpt": "PS is envy-free, RP is not; RP is strategy-proof, PS is not.",
-      "annotation": "This is the intellectual starting point for the course-allocation project’s simultaneous-eating stage. It explains why fairness, efficiency, and resistance to manipulation cannot be treated as one interchangeable objective.",
+      "annotation": "This reference informed the project’s simultaneous-eating stage and clarified the mechanism-level tradeoffs behind probabilistic assignment.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://www.sciencedirect.com/science/article/pii/S0022053100927108"
     },
@@ -40,7 +40,7 @@
       "excerptLabel": "ABSTRACT / SHORT EXCERPT",
       "quoted": true,
       "excerpt": "Agents are allowed to be indifferent between objects.",
-      "annotation": "The paper widens the design space beyond clean preference lists. It is a useful reminder that a real allocation interface must eventually decide how to represent ties and incomplete certainty.",
+      "annotation": "This reference extends the project’s theoretical foundation beyond strict preference rankings by considering cases in which participants may be indifferent between options.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://www.sciencedirect.com/science/article/pii/S0022053105001079"
     },
@@ -98,7 +98,7 @@
       "excerpt": "Integrated as a reference component; not presented as original filter design.",
       "annotation": "The filter is an integrated dependency, not an algorithm authored from scratch for this project. The project work begins with calibration, Kalman filtering, band assignment, and session aggregation.",
       "provenance": "IMPLEMENTATION DEPENDENCY / ATTRIBUTION REQUIRED",
-      "url": "https://wiki.dfrobot.com/sen0240/"
+      "url": "https://github.com/oymotion/EMGFilters"
     }
   ]
 }

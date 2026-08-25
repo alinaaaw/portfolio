@@ -3,7 +3,7 @@
   "header": "FIELD CASE / OUTSIDE THE LAB",
   "sceneHint": "COMMUNITY WORK · OBSERVATIONS · QUESTIONS CARRIED BACK",
   "returnItem": "RETURN TO CASE ×",
-  "itemLabels": { "target": "NEIGHBORHOOD MAP", "internship": "STUDY NOTE", "ticket": "COMMUNITY DISPATCH", "draft": "NEXT ROUTES" },
+  "itemLabels": { "target": "NEIGHBORHOOD MAP", "internship": "STUDY NOTE", "ticket": "COMMUNITY DISPATCH", "draft": "ALLOCATION FIELD NOTES" },
   "items": {
     "internship": {
       "meta": "STUDY NOTE / PEOPLE + SYSTEMS",
@@ -15,17 +15,17 @@
     "target": {
       "meta": "FIELD OBSERVATION / OLDER SHANGHAI NEIGHBORHOODS",
       "title": null,
-      "copy": "In the early questionnaire sample, residents reported only moderate familiarity with nearby stores and amenities. That observation became a fixed neighborhood map with category filters and walking-time zones.",
+      "copy": "In the early 48-person questionnaire sample, residents reported only moderate familiarity with nearby stores and amenities. That observation motivated a neighborhood-access map organized around nearby facilities and walking time.",
       "metrics": [
         { "value": "6.75 / 10", "label": "AVERAGE REPORTED AMENITY AWARENESS" },
-        { "value": "5 · 10 · 15", "label": "MINUTE-BASED MAP FILTERS" }
+        { "value": "48", "label": "EARLY QUESTIONNAIRE SAMPLE" }
       ],
       "tags": ["COMMUNITY RESEARCH", "CIVIC TECH"]
     },
     "ticket": {
       "meta": "COMMUNITY DISPATCH / INFORMATION CAMPAIGNS",
       "title": null,
-      "copy": "The project extended beyond the map. One intervention addressed food-safety misconceptions about leftovers among older residents; another focused on recognizing fraud and protecting property.",
+      "copy": "The project extended beyond the map. One intervention addressed food-safety misconceptions about leftovers; another focused on recognizing fraud and protecting property. Some participants later described the anti-fraud lecture as informative and said it clarified information they had been unsure about.",
       "metrics": [
         { "value": "60.42%", "label": "REPORTED NO EXPOSURE TO ANTI-FRAUD PUBLICITY" },
         { "value": "63.16%", "label": "OF THE EXPOSED GROUP SAID IT HAD NOT WORKED FOR THEM" }
@@ -33,11 +33,14 @@
       "tags": ["FOOD SAFETY", "ANTI-FRAUD EDUCATION"]
     },
     "draft": {
-      "meta": "ROUTE CARD / NEXT · LATER · VERIFY",
-      "title": "The next route needs evidence, not just ambition.",
-      "copy": "NEXT: turn the EMG measurement output into an understandable session view. LATER: test adaptive calibration and longitudinal comparisons. VERIFY: recover reproducible allocation benchmarks, research-study details, and public-safe robotics metrics.",
-      "metrics": [],
-      "tags": ["EMG UI", "VALIDATION", "DOCUMENTATION"]
+      "meta": "CHINA THINKS BIG / ALGORITHM TRANSFER",
+      "title": "The mechanism moved beyond course allocation.",
+      "copy": "Presented the project to 30+ professors and peers at the National Round of China Thinks Big. Discussions focused on possible applications and the need for real-world preference data. The framework was later deployed for a class-wide parent–teacher meeting. It reduced manual planning, balanced attendance across time slots, and kept adjusted appointments close to parent preferences.",
+      "metrics": [
+        { "value": "30+", "label": "PROFESSORS + PEERS" },
+        { "value": "CLASS-WIDE", "label": "PARENT–TEACHER SCHEDULING PILOT" }
+      ],
+      "tags": ["EXTERNAL DISCUSSION", "RANKED PREFERENCES", "REAL-WORLD DEPLOYMENT"]
     }
   }
 }

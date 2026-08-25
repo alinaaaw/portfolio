@@ -5,55 +5,55 @@
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK ×",
-  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "EVALUATION ENVELOPE", "components": "PROTOTYPE COMPONENTS" },
+  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALLOCATION SOURCE FILES", "components": "PROTOTYPE COMPONENTS" },
   "items": {
     "folder": {
       "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
-      "title": "Questionnaires, map traces, and campaign drafts.",
-      "copy": "A physical record of the Shanghai project: community research, the walking-time map, and information materials for food safety and anti-fraud awareness.",
+      "title": "From resident research to a map, a poster, and a community lecture.",
+      "copy": "Questionnaire summaries and presentation pages sit beside three responses developed from the study. A printed map draft organizes nearby facilities by walking time. A food-safety poster addresses misconceptions about leftovers, while anti-fraud lecture notes translate survey gaps into practical guidance for older residents.",
       "facts": [
-        { "label": "EARLY PRESENTATION SAMPLE", "value": "48 respondents" },
-        { "label": "AMENITY AWARENESS", "value": "6.75 / 10 average" },
-        { "label": "MAP CONTROL", "value": "5 / 10 / 15-minute zones" },
-        { "label": "VALIDATION", "value": "No formal map user test" }
+        { "label": "RESEARCH RECORD", "value": "20+ questionnaires and interviews · 48-person early presentation sample" },
+        { "label": "MAP DRAFT", "value": "facility markers · category filters · 5 / 10 / 15-minute walking zones" },
+        { "label": "FOOD-SAFETY POSTER", "value": "leftover-related health risks · misconception correction · community distribution" },
+        { "label": "ANTI-FRAUD LECTURE", "value": "fraud recognition · property protection · qualitative resident feedback" }
       ],
-      "note": "The map and campaigns were designed from the research findings. They are not evidence of a measured long-term quality-of-life improvement."
+      "note": "The packet preserves two kinds of response to the same research: a digital tool for finding nearby services and community materials for information gaps identified during the study."
     },
     "notebook": {
-      "meta": "THERMO FISHER / ROBOTIC TUBE HANDLING / DRAFT EVIDENCE",
-      "title": "Detection experiments for robot-assisted tube handling.",
-      "copy": "A working packet for retraining YOLO26 and connecting detection output to a ROS2 robot-arm workflow. The quantitative entries below are clearly marked placeholders until public-safe training artifacts are selected.",
+      "meta": "THERMO FISHER / ROBOTIC TUBE HANDLING / TEST PACKET",
+      "title": "Three model iterations for a four-class perception-to-action workflow.",
+      "copy": "A working packet of robot-camera captures, Roboflow exports, training runs, held-out comparisons, and saved real-hardware workflow frames. It traces the detector from three classes to four and the system from perception-only tests to verified pickup and placement.",
       "facts": [
-        { "label": "DATASET · PLACEHOLDER", "value": "1,240 labeled images · 4 classes" },
-        { "label": "EVALUATION · PLACEHOLDER", "value": "mAP50 0.91 · precision 0.93" },
-        { "label": "SYSTEM PATH", "value": "YOLO26 detection → ROS2 action" },
-        { "label": "EVIDENCE TO ADD", "value": "Roboflow labels · training curves · detection frames" }
+        { "label": "DATASET V3", "value": "203 images · 4,729 instances · 4 classes" },
+        { "label": "HELD-OUT TEST", "value": "15 images · 0.926 mAP50–95" },
+        { "label": "SYSTEM TESTING", "value": "≈98% reported workflow success" },
+        { "label": "PROCESS RECORD", "value": "155 raw captures · 1,358 saved frames" }
       ],
-      "note": "Replace the placeholder figures with selected public-safe screenshots and final metrics before publishing the case as evidence."
+      "note": "The latest detector also recorded 0.977 precision and 0.974 recall. Remaining unsuccessful runs involved intermittent camera or hardware faults; recovery tooling restores operation, but the root cause remains unresolved."
     },
     "components": {
       "meta": "EMG DEVICE / HARDWARE ITERATION / REV. CURRENT",
       "title": "The enclosure had to shrink around the electronics.",
-      "copy": "The hardware moved through physical constraints as well as signal processing: solder the signal path, position the ESP32 boards and battery, reserve access points, print a shell, then revise the enclosure around the components.",
+      "copy": "Built and soldered the signal path, then arranged the ESP32 boards and battery inside a compact wearable enclosure. The body and lid reserve openings for the power switch and charging port so the device can be operated and recharged while assembled.",
       "facts": [
-        { "label": "CAD ARTIFACT", "value": "1 solid STEP body" },
-        { "label": "SOURCE BOUNDS", "value": "30.79 × 58.00 × 10.00" },
-        { "label": "TOOLS", "value": "Fusion 360 · AutoCAD · 3D printing" },
-        { "label": "CURRENT LAYER", "value": "working embedded prototype" }
+        { "label": "ENCLOSURE", "value": "separate body + lid" },
+        { "label": "INTERNAL SPACE", "value": "ESP32 boards · battery · component clearances" },
+        { "label": "USER ACCESS", "value": "switch opening · charging port" },
+        { "label": "CURRENT STATE", "value": "working hardware prototype" }
       ],
-      "note": "The model documents iterative packaging and internal component organization. It is a CAD prototype, not a finished manufactured enclosure."
+      "note": "The hardware prototype is assembled and operational. Software behavior, data analysis, and the user interface still require further development."
     },
     "envelope": {
-      "meta": "COURSE ALLOCATION / EVALUATION PACKET",
-      "title": "A fractional allocation still needs a usable assignment.",
-      "copy": "This packet keeps realization and evaluation beside the allocation mechanism. The work does not stop at a probability matrix; it also tests how a concrete assignment affects preference outcomes.",
+      "meta": "COURSE ALLOCATION / PYTHON WORKING SET",
+      "title": "Four scripts, one allocation pipeline.",
+      "copy": "The project remains organized as a staged set of Python files. Each file records a different part of the allocation mechanism.",
       "facts": [
-        { "label": "EVALUATION", "value": "1,000 reported Monte Carlo simulations" },
-        { "label": "MAX-WEIGHT RESULT", "value": "≈70% top-two · ≈92% top-three" },
-        { "label": "FEEDBACK", "value": "30+ professors and peers" },
-        { "label": "TRANSFER", "value": "parent–teacher meeting scheduler" }
+        { "label": "TASK 01", "value": "synthetic preference generation" },
+        { "label": "TASK 01+02", "value": "fractional allocation · decomposition" },
+        { "label": "TASK 03", "value": "deterministic assignment" },
+        { "label": "TASK 04", "value": "satisfaction scoring" }
       ],
-      "note": "The percentages are reported results from the original presentation and should be rerun before being treated as reproducible benchmarks."
+      "note": "The original presentation preserves the reported findings. Raw simulation output and runtime benchmark files have not yet been recovered."
     }
   }
 }

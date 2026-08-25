@@ -2,7 +2,7 @@
   "ariaLabel": "Research notebook close-up",
   "header": "RESEARCH BOOK / INSPECT A PAGE",
   "sceneHint": "CLICK A PAGE · TURN IT OVER FOR THE MARGIN NOTE",
-  "itemLabels": { "research": "EMG DECISION LOG", "margin": "RESEARCH PIPELINE", "diagram": "ALLOCATION REVISION" },
+  "itemLabels": { "research": "EMG DECISION LOG", "margin": "RESEARCH QUESTION", "diagram": "ALLOCATION REVISION" },
   "page": { "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
   "items": {
     "research": {
@@ -13,27 +13,27 @@
       "reverseMeta": "CURRENT FIRMWARE / MEASUREMENT CHAIN",
       "reverseTitle": null,
       "reverseCopy": "3-second individual calibration → filtering → squared signal → Kalman filtering → four relative-intensity bands → sample counts → session percentages.",
-      "note": "The current result is a distribution of recorded time across relative EMG bands—not force, and not yet an automated coaching recommendation."
+      "note": "The current result is a distribution of recorded samples across four relative EMG bands—an approximation of time distribution under stable sampling, not an automated coaching recommendation."
     },
     "margin": {
-      "meta": "SOCIAL FUTURES LAB / DATA TRANSFORMATION",
-      "title": null,
-      "lead": "The survey data arrived as rows of repeated, comma-separated ethical-principle labels. Before testing a statistical question, the labels needed a stable shared coordinate space.",
-      "steps": ["Read CSV and preserve metadata columns", "Split and count principle labels with Counter", "Normalize each count by the row total", "Write ordered principle dimensions and a JSON-encoded vector", "Continue analysis in Google Sheets and R"],
-      "reverseMeta": "PRELIMINARY RESULT / KEEP THE NULL",
-      "reverseTitle": "No detected relationship is still a result.",
-      "reverseCopy": "The current linear models did not find a relationship between principle frequency and agreement for the principles examined. The broader similarity–relevance question remains open.",
-      "note": "Do not turn an ongoing question into a confident conclusion just because a portfolio page prefers closure."
+      "meta": "SOCIAL FUTURES LAB / RESEARCH QUESTION",
+      "title": "Can principle agreement help explain why one case feels relevant to another?",
+      "lead": "The current analysis approaches that broader question through a smaller test: whether the frequency of a principle predicts agreement with it.",
+      "steps": ["Broader question · principle patterns and perceived relevance", "Current test · principle frequency and agreement", "Current result · no relationship detected for the principles examined", "Next direction · return to similarity and relevance at the case level"],
+      "reverseMeta": "MARGIN NOTE / INTERPRETATION",
+      "reverseTitle": "The broader question is still open.",
+      "reverseCopy": "The current result narrows one hypothesis, but it does not yet explain perceived relevance between cases.",
+      "note": "Keep preliminary findings proportional to the evidence."
     },
     "diagram": {
       "meta": "COURSE ALLOCATION / VERSION 01 → VERSION 02",
-      "title": "Four objectives, no single winner.",
-      "lead": "Automation, efficiency, fairness, and preference satisfaction were compared separately. The algorithm had to move from ranked preferences to a fractional allocation, then to an assignment that could actually be issued.",
-      "steps": ["Preferences + capacity constraints", "Simultaneous Eating / fractional matrix", "Birkhoff decomposition", "Maximum-weight assignment or random ticket", "Satisfaction scoring + 1,000 reported simulations"],
+      "title": "Residual probability changed the allocation.",
+      "lead": "After preferred courses reached capacity, some students still had unassigned probability. The remaining allocation rule could push them unnecessarily toward lower-ranked courses.",
+      "steps": ["Identify unassigned student probability", "Check remaining course capacity", "Version 1 · distribute residual probability through random course choices", "Inspect unnecessary low-preference allocation", "Version 2 · balance remaining student demand with remaining course capacity"],
       "reverseMeta": "REVISION NOTE / RESIDUAL PROBABILITY",
       "reverseTitle": null,
-      "reverseCopy": "Version 1 distributed remaining probability through random course choices. Version 2 balanced remaining course capacity against remaining student capacity to reduce unnecessary low-preference allocation.",
-      "note": "Reported presentation result: about 70% top-two and 92% top-three under probabilistic assignment with maximum-weight realization. Preserve this as a reported simulation result until the original output is rerun."
+      "reverseCopy": "Version 2 changed how the remaining probability was distributed. The revision was designed to produce a more balanced fractional matrix, but it still required separate evaluation for fairness and satisfaction.",
+      "note": "A cleaner residual rule is an algorithmic improvement, not proof of a fair outcome."
     }
   }
 }

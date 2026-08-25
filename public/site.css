@@ -348,6 +348,11 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .notebook-process { display: grid; gap: 0; max-width: 820px; margin: 22px 0 45px; padding: 0; list-style: none; counter-reset: process; }
 .notebook-process li { display: grid; grid-template-columns: 34px 1fr; padding: 8px 0; color: #424b45; font: 11px/1.55 var(--font-mono),monospace; counter-increment: process; }
 .notebook-process li::before { content: counter(process,decimal-leading-zero); color: #a44235; }
+.notebook-pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 7px; max-width: 840px; margin: 42px 0 18px; }
+.notebook-pipeline-step { display: inline-flex; align-items: center; gap: 7px; }
+.notebook-pipeline-step mark { padding: 9px 12px 8px; border: 1px solid rgba(76,91,82,.2); background: linear-gradient(transparent 48%,rgba(209,244,92,.62) 48% 88%,transparent 88%),#eee5c6; color: #34423d; box-shadow: 2px 3px 0 rgba(78,69,48,.18); font: 10px/1.35 var(--font-mono),monospace; transform: rotate(-1deg); }
+.notebook-pipeline-step:nth-child(even) mark { background: linear-gradient(transparent 48%,rgba(241,177,91,.52) 48% 88%,transparent 88%),#eee5c6; transform: rotate(1deg); }
+.notebook-pipeline-step b { color: #a44235; font: 18px/1 "Segoe Print",cursive; transform: rotate(-4deg); }
 .notebook-closeup blockquote { max-width: 760px; margin: 34px 0 60px; padding-left: 18px; border-left: 2px solid #a44235; color: #4b5049; font: 18px/1.55 "Segoe Print",cursive; }
 .notebook-turn-control { margin-top: auto; align-self: flex-start; padding: 9px 12px; border: 1px solid #a44235; background: transparent; color: var(--red); cursor: pointer; font: 8px var(--font-mono),monospace; }
 

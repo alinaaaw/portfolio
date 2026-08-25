@@ -3,20 +3,20 @@
     "ariaLabel": "Lab printer close-up",
     "headerCode": "TX",
     "header": "PRINTER / UPDATE",
-    "sceneHint": "INCOMING FIELD REPORT · PRINTING",
-    "printing": "INCOMING FIELD REPORT · PRINTING",
-    "ready": "FIELD REPORT READY · CLICK THE PAPER",
-    "paperHitLabel": "READ PRINTED FIELD REPORT",
+    "sceneHint": "INCOMING PROTOTYPE REPORT · PRINTING",
+    "printing": "INCOMING PROTOTYPE REPORT · PRINTING",
+    "ready": "PROTOTYPE REPORT READY · CLICK THE PAPER",
+    "paperHitLabel": "READ PRINTED PROTOTYPE REPORT",
     "report": {
-      "meta": "FIELD REPORT / SOURCE: AW / PHASE 02",
-        "title": "The reference held. The fourth band did not.",
+      "meta": "PROTOTYPE REPORT / SOURCE: AW / FEEDBACK ROUND 01",
+        "title": "The first wellbeing prototype is ready for feedback.",
       "paragraphs": [
-          "A three-second maximum-effort contraction now establishes the individual reference. The firmware filters and squares the EMG signal, applies Kalman filtering, assigns each sample to one of four relative bands, then reports each band as a percentage of the recorded session.",
-          "One limitation surfaced: every value above the reference collapses into the highest band. The next experiment is to determine when sustained above-reference activity is meaningful enough to trigger recalibration.",
-          "The measurement layer is working. The interface still has to explain the distribution without presenting relative activation as mechanical force—or turning an unfinished interpretation into a recommendation."
+          "The first interactive prototype is working. It guides users through a short reflection: list what is on their mind, place each concern in time, identify the emotion, and decide what can be acted on now.",
+          "Concerns that cannot be changed immediately move into a release exercise. The session closes with any concrete actions the user chose to carry forward.",
+          "The concept draws from EDUC 215 and independent reading on wellbeing. Feedback from professors and teaching staff will guide revisions to the prompts, emotional pacing, exit paths, and safety boundaries."
       ],
-        "signature": "Sending the next trace after calibration. — Alina",
-        "status": "STATUS / INTERFACE + ADAPTIVE REFERENCE",
+        "signature": "Sending the next version after the feedback round. — Alina",
+        "status": "STATUS / INTERACTIVE PROTOTYPE · FEEDBACK IN PROGRESS",
       "reply": "SEND A REPLY →",
       "return": "RETURN TO PRINTER ×"
     }
