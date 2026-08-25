@@ -241,7 +241,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .evidence-card blockquote { margin: 28px 0; padding: 14px 18px; border-left: 2px solid #a44235; color: #434b45; font: 20px/1.5 "Segoe Print",cursive; }
 .evidence-card.note-card blockquote { margin-top: 54px; border-left: 0; padding: 0; font-size: clamp(29px,4vw,48px); line-height: 1.18; }
 .evidence-card.note-card em { display: block; margin-top: 30px; color: #986052; font: 15px/1.5 "Segoe Print",cursive; }
-.evidence-card > button, .paper-return-control, .drawer-document-return { position: absolute; z-index: 2; right: 18px; bottom: 18px; padding: 9px 11px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
+.evidence-card > button, .paper-return-control { position: absolute; z-index: 2; right: 18px; bottom: 18px; padding: 9px 11px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .bookshelf-photo-stage, .drawer-photo-stage { position: absolute; inset: 58px 0 0; overflow: hidden; }
 .bookshelf-photo-stage > img, .drawer-photo-stage > img { width: 100%; height: 100%; object-fit: cover; user-select: none; }
 .bookshelf-photo-stage > p { position: absolute; z-index: 3; top: 18px; left: 50%; margin: 0; translate: -50% 0; padding: 8px 11px; border: 1px solid rgba(229,220,198,.34); background: rgba(7,16,15,.76); color: #adb6af; font: 6px var(--font-mono),monospace; backdrop-filter: blur(7px); }
@@ -308,7 +308,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .drawer-document article h2 { margin: 30px 0 24px; font: clamp(36px,5vw,62px)/1.02 "Segoe Print",cursive; }
 .drawer-document article p { color: #515a53; font-size: 13px; line-height: 1.8; }
 .drawer-document article blockquote { margin: 30px 0; padding: 13px 18px; border-left: 2px solid #a44235; font: 18px "Segoe Print",cursive; }
-.paper-return-control:hover, .paper-return-control:focus-visible, .drawer-document-return:hover, .drawer-document-return:focus-visible { background: #35443f; color: var(--signal); }
+.paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
+.drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 5px 1px 4px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 7px var(--font-mono),monospace; letter-spacing: .08em; }
+.drawer-document-return:hover, .drawer-document-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
 .artifact-facts { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid rgba(38,55,50,.28); border-left: 1px solid rgba(38,55,50,.28); }
 .artifact-facts > div { min-width: 0; padding: 13px 15px; border-right: 1px solid rgba(38,55,50,.28); border-bottom: 1px solid rgba(38,55,50,.28); }
 .artifact-facts dt { color: #a44235; font: 6px var(--font-mono),monospace; }
@@ -360,7 +362,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .notebook-pipeline-step:nth-child(even) mark { background: linear-gradient(transparent 48%,rgba(241,177,91,.52) 48% 88%,transparent 88%),#eee5c6; transform: rotate(1deg); }
 .notebook-pipeline-step b { color: #a44235; font: 18px/1 "Segoe Print",cursive; transform: rotate(-4deg); }
 .notebook-closeup blockquote { max-width: 760px; margin: 34px 0 60px; padding-left: 18px; border-left: 2px solid #a44235; color: #4b5049; font: 18px/1.55 "Segoe Print",cursive; }
-.notebook-turn-control { margin-top: auto; align-self: flex-start; padding: 9px 12px; border: 1px solid #a44235; background: transparent; color: var(--red); cursor: pointer; font: 8px var(--font-mono),monospace; }
+.notebook-turn-control { position: absolute; z-index: 2; bottom: 65px; left: 8%; padding: 9px 12px; border: 1px solid #a44235; background: #eee3bf; color: var(--red); cursor: pointer; font: 8px var(--font-mono),monospace; }
+.notebook-closeup.turned .notebook-turn-control { background: #d8cca6; }
 
 .book-shelf { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 10px; overflow: hidden; padding: 48px 30px 58px; background: linear-gradient(90deg,#241a14,#3b2b21 13%,#302219 87%,#1f1712); box-shadow: inset 18px 0 #1d1510,inset -18px 0 #1d1510,inset 0 -48px #17110d; }
 .book-shelf::after { content: ""; position: absolute; right: 16px; bottom: 38px; left: 16px; height: 16px; border-top: 1px solid #8b6549; background: #563b29; box-shadow: 0 9px 15px rgba(0,0,0,.42); }
@@ -538,6 +541,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .drawer-tray i, .case-inventory i { width: 61px; height: 47px; }
   .notebook-closeup { width: calc(100% - 30px); min-height: 72vh; margin: 15px; }
   .notebook-scroll { overflow-y: auto; padding: 35px 12%; }
+  .notebook-turn-control { bottom: 45px; left: 12%; }
   .notebook-closeup h2 { margin-top: 45px; font-size: 25px; }
   .notebook-closeup p { font-size: 13px; }
   .notebook-lead { margin-top: 30px !important; }
