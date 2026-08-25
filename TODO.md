@@ -109,9 +109,28 @@
 
 完成标准：GitHub `main` 是唯一的正式网站源代码，可以从干净环境成功构建，并且旧工作分支在确认不再需要后得到安全清理。
 
+## Phase 3.5：发布 Cloudflare 外部预览版 `0.8.0`
+
+这一阶段提前让外部用户访问网站，但它仍是未完成的 preview，不是 `alinawu.com` 的正式 production release。使用独立的 `*.workers.dev` Preview URL，不创建稳定版 GitHub Release，也不绑定正式域名。
+
+- [ ] 确认 `main` 已完成 Phase 1–3，并且 `package.json` 与 `package-lock.json` 都显示 `0.8.0`。
+- [ ] 在网站低调但可见的位置标注 `v0.8.0 Preview` 或 `Work in progress`，让测试用户知道内容和交互仍可能变化。
+- [ ] 从干净的 `main` 安装依赖、运行测试和 production build；再次检查 repository 与 bundle 中没有 secret、私有 dossier、公司机密或不应公开的个人资料。
+- [ ] 在 Cloudflare Workers 创建或连接 Alina Portfolio Worker，并在配置中明确启用 `workers_dev` 与 `preview_urls`，不要依赖不同 Wrangler 版本的默认值。
+- [ ] 使用 Cloudflare Worker version upload 创建新版本，不把它推广到 production traffic；为 `0.8.0` 设置稳定、易识别的 preview alias，例如 `v0-8`。
+- [ ] 记录 Preview URL、Git commit SHA、Cloudflare version ID、上传日期和 `0.8.0` 简要说明，确保之后能确认外部用户看到的是哪一份代码。
+- [ ] 决定访问范围：需要任何拿到链接的人都能进入时保持 public preview；只邀请指定测试者时，使用 Cloudflare Access 的 email allowlist 与 One-time PIN。
+- [ ] 为 preview 页面设置 `noindex, nofollow`，避免未完成版本进入搜索引擎；正式 `1.0.0` 发布前再移除。
+- [ ] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
+- [ ] 使用真实 Preview URL 检查桌面端、手机端、核心探索路线、所有外部链接、404 和资源加载失败状态。
+- [ ] 普通 push 到 `main` 不自动更新这个外部 Preview URL；只有 Alina 确认一批修改已经可供测试后，才手动上传并移动 preview alias。
+- [ ] `0.8.0` 期间的多次外部测试由 Cloudflare version ID 与 Git commit 区分，不为了每次反馈修复反复增加产品版本号。
+
+完成标准：外部用户可以通过独立 Cloudflare Preview URL 访问标明为 `0.8.0 Preview` 的网站；`alinawu.com` 和 production traffic 均未改变，后续更新仍由 Alina 手动决定。
+
 ## Phase 4：建立版本编号和手动发布制度
 
-版本号代表已经正式发布给访客的版本，不代表 commit 数量、设计分支编号或每天的开发进度。没有正式发布的普通修改不需要升级版本号。
+版本号代表一份有明确身份、可供外部测试或已经正式发布的版本，不代表 commit 数量、设计分支编号或每天的开发进度。普通修改不需要升级版本号。
 
 ### 4.1 版本编号规则
 
@@ -123,8 +142,8 @@
 | `MINOR` | 向后兼容的重要新增 | 新项目、新场景、新内容类型、一轮明显的 3D 升级或新的访客功能 | `1.1.3` → `1.2.0` |
 | `PATCH` | 修复和小幅改进 | 错字、链接、手机布局、点击区域、性能、无障碍或小型视觉修复 | `1.2.0` → `1.2.1` |
 
-- [ ] 当前可运行、正在完善内容和发布结构的开发基线使用 `0.8.0`；普通 commit 不反复增加这个号码。
-- [ ] Phase 1–3 完成、正式网站进入 `main` 并准备公开预览时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
+- [ ] 当前可运行的网站以及 Phase 3.5 的第一轮外部 Preview 使用 `0.8.0`；普通 commit 和测试反馈修复不反复增加这个号码。
+- [ ] 3D 改进和正式发布结构基本完成、准备进行更完整的 beta 验收时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
 - [ ] 文字、3D 和发布流程全部完成，网站达到“如果没有阻塞问题就可以正式上线”的状态时使用 `1.0.0-rc.1`；如果发现问题，依次使用 `rc.2`、`rc.3`。
 - [ ] 第一次绑定 `alinawu.com` 的公开稳定版设为 `1.0.0`。
 - [ ] 将新增项目、场景或明显 3D 升级作为 `MINOR` 发布，例如 `1.1.0`。
@@ -432,16 +451,16 @@ Release date:
 
 完成标准：普通 push 和 `main` 合并都不会更新 `alinawu.com`；只有 Alina 发布 GitHub Release 并通过 production approval 后，正式网站才会变化。
 
-## Phase 5：建立 Cloudflare 预览部署
+## Phase 5：完善 Cloudflare 预览自动化
 
-这一阶段只验证托管流程，不绑定 `alinawu.com` 作为正式域名。
+这一阶段在 Phase 3.5 的手动 `0.8.0` 外部预览基础上，建立可重复的长期 preview 流程；仍不绑定 `alinawu.com` 作为正式域名。
 
-- [ ] 在 Cloudflare Workers 中创建或连接用于 Alina Portfolio 的 Worker，确认配置与当前 vinext/Worker 项目一致。
+- [ ] 复核 Phase 3.5 创建或连接的 Alina Portfolio Worker，确认配置与当前 vinext/Worker 项目一致。
 - [ ] 以 GitHub Actions 作为 production release controller，不允许 Cloudflare 在每次 `main` push 后自动推广新版本。
 - [ ] 如果保留 Cloudflare 原生 Git 集成，将 push 的 deploy command 设置为只上传 version，不自动切换 production traffic。
-- [ ] 通过 `preview.yml` 首次上传到独立的 `*.workers.dev` versioned preview URL。
+- [ ] 将 Phase 3.5 的手动上传整理成 `preview.yml`，继续生成独立的 `*.workers.dev` versioned URL，并按需要更新 `staging` 或版本 alias。
 - [ ] 确认普通 push 只产生 CI 结果；只有明确触发 preview workflow 时才产生新的 Cloudflare preview version。
-- [ ] 确认预览失败时可以查看 GitHub Actions 和 Cloudflare 日志，但不会影响当前正式 deployment。
+- [ ] 预览失败时优先检查 GitHub Actions 的构建与上传日志；Cloudflare Preview URL 当前不支持 Workers Logs、`wrangler tail` 或 Logpush，不能把这些日志能力作为排错前提。
 - [ ] 暂时不绑定自定义域名；如果预览内容不适合公开，使用 Cloudflare Access 或关闭公开预览。
 
 完成标准：`main` 可以稳定生成可访问的 Cloudflare 预览站点，但 `alinawu.com` 尚未切换到它。
