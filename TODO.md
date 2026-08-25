@@ -86,7 +86,7 @@
 
 - [ ] 拉取 GitHub 最新状态并比较 `main` 与当前设计分支，先处理可能的冲突和其他 worktree 中仍需保留的工作。
 - [ ] 在开始清理前创建一个中性命名的备份 tag，记录当前可恢复状态，但不要继续把旧版本编号当作产品名称。
-- [ ] 将 `package.json` 和 `package-lock.json` 中的项目名改为中性的 `alina-portfolio`；正式发布前先将旧设计编号重置为预发布版本 `0.9.0`。
+- [ ] 将 `package.json` 和 `package-lock.json` 中的项目名改为中性的 `alina-portfolio`；清理旧设计编号时将当前开发基线重置为 `0.8.0`。
 - [ ] 重写 README，使其只介绍 Alina Portfolio / Lab 17，不再介绍某个设计版本或专用分支。
 - [ ] 将旧概念文档中仍然有效的设计规则合并到 `DESIGN.md`，然后删除重复的旧概念文档。
 - [ ] 更新 `DESIGN.md` 标题和正文中的旧版本名称。
@@ -123,8 +123,9 @@
 | `MINOR` | 向后兼容的重要新增 | 新项目、新场景、新内容类型、一轮明显的 3D 升级或新的访客功能 | `1.1.3` → `1.2.0` |
 | `PATCH` | 修复和小幅改进 | 错字、链接、手机布局、点击区域、性能、无障碍或小型视觉修复 | `1.2.0` → `1.2.1` |
 
-- [ ] 将正式上线前的整理阶段设为 `0.9.0`。
-- [ ] 第一次完整发布前使用 `1.0.0-rc.1` 作为 release candidate；如果发现问题，依次使用 `rc.2`、`rc.3`。
+- [ ] 当前可运行、正在完善内容和发布结构的开发基线使用 `0.8.0`；普通 commit 不反复增加这个号码。
+- [ ] Phase 1–3 完成、正式网站进入 `main` 并准备公开预览时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
+- [ ] 文字、3D 和发布流程全部完成，网站达到“如果没有阻塞问题就可以正式上线”的状态时使用 `1.0.0-rc.1`；如果发现问题，依次使用 `rc.2`、`rc.3`。
 - [ ] 第一次绑定 `alinawu.com` 的公开稳定版设为 `1.0.0`。
 - [ ] 将新增项目、场景或明显 3D 升级作为 `MINOR` 发布，例如 `1.1.0`。
 - [ ] 将只包含修复的版本作为 `PATCH` 发布，例如 `1.1.1`。
@@ -322,6 +323,8 @@ npm version major --no-git-tag-version
 也可以为第一次发布或 prerelease 指定准确版本：
 
 ```bash
+npm version 0.8.0 --no-git-tag-version
+npm version 0.9.0-beta.1 --no-git-tag-version
 npm version 1.0.0-rc.1 --no-git-tag-version
 npm version 1.0.0 --no-git-tag-version
 ```
@@ -332,7 +335,7 @@ npm version 1.0.0 --no-git-tag-version
 - [ ] 执行后检查两个 package 文件中的 version 完全一致。
 - [ ] 不为了单独一次 commit 或一次 push 增加版本号。
 - [ ] 一个正式 release 只增加一次版本号；测试期间的继续修改仍属于同一个待发布版本。
-- [ ] 如果 release candidate 需要再次验收，增加 prerelease 编号，例如 `rc.1` → `rc.2`，不要提前发布稳定版。
+- [ ] 如果 beta 或 release candidate 需要再次验收，增加 prerelease 编号，例如 `beta.1` → `beta.2` 或 `rc.1` → `rc.2`，不要提前发布稳定版。
 
 #### 手动增加版本概要
 
