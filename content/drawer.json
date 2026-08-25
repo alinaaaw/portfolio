@@ -5,14 +5,14 @@
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK ×",
-  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALLOCATION SOURCE FILES", "components": "PROTOTYPE COMPONENTS" },
+  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALGORITHM COMPARISON NOTES", "components": "PROTOTYPE COMPONENTS" },
   "items": {
     "folder": {
       "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
       "title": "From resident research to a map, a poster, and a community lecture.",
       "copy": "Questionnaire summaries and presentation pages sit beside three responses developed from the study. A printed map draft organizes nearby facilities by walking time. A food-safety poster addresses misconceptions about leftovers, while anti-fraud lecture notes translate survey gaps into practical guidance for older residents.",
       "facts": [
-        { "label": "RESEARCH RECORD", "value": "20+ questionnaires and interviews · 48-person early presentation sample" },
+        { "label": "RESEARCH RECORD", "value": "questionnaire summaries · 48-person early presentation sample" },
         { "label": "MAP DRAFT", "value": "facility markers · category filters · 5 / 10 / 15-minute walking zones" },
         { "label": "FOOD-SAFETY POSTER", "value": "leftover-related health risks · misconception correction · community distribution" },
         { "label": "ANTI-FRAUD LECTURE", "value": "fraud recognition · property protection · qualitative resident feedback" }
@@ -25,11 +25,11 @@
       "copy": "A working packet of robot-camera captures, Roboflow exports, training runs, held-out comparisons, and saved real-hardware workflow frames. It traces the detector from three classes to four and the system from perception-only tests to verified pickup and placement.",
       "facts": [
         { "label": "DATASET V3", "value": "203 images · 4,729 instances · 4 classes" },
-        { "label": "HELD-OUT TEST", "value": "15 images · 0.926 mAP50–95" },
+        { "label": "HELD-OUT TEST", "value": "15 images · 0.977 precision · 0.974 recall · 0.926 mAP50–95" },
         { "label": "SYSTEM TESTING", "value": "≈98% reported workflow success" },
         { "label": "PROCESS RECORD", "value": "155 raw captures · 1,358 saved frames" }
       ],
-      "note": "The latest detector also recorded 0.977 precision and 0.974 recall. Remaining unsuccessful runs involved intermittent camera or hardware faults; recovery tooling restores operation, but the root cause remains unresolved."
+      "note": "Remaining unsuccessful runs involved intermittent camera or hardware faults. Recovery tooling restores operation, but the root cause remains unresolved."
     },
     "components": {
       "meta": "EMG DEVICE / HARDWARE ITERATION / REV. CURRENT",
@@ -44,16 +44,16 @@
       "note": "The hardware prototype is assembled and operational. Software behavior, data analysis, and the user interface still require further development."
     },
     "envelope": {
-      "meta": "COURSE ALLOCATION / PYTHON WORKING SET",
-      "title": "Four scripts, one allocation pipeline.",
-      "copy": "The project remains organized as a staged set of Python files. Each file records a different part of the allocation mechanism.",
+      "meta": "COURSE ALLOCATION / METHOD EVALUATION",
+      "title": "No method led every criterion.",
+      "copy": "Compared First-Come-First-Serve, Random Ticket, and probabilistic assignment with maximum-weight realization. FCFS required the least CPU time. Random Ticket made the final outcome harder to predict. The probabilistic approach produced the strongest reported satisfaction result.",
       "facts": [
-        { "label": "TASK 01", "value": "synthetic preference generation" },
-        { "label": "TASK 01+02", "value": "fractional allocation · decomposition" },
-        { "label": "TASK 03", "value": "deterministic assignment" },
-        { "label": "TASK 04", "value": "satisfaction scoring" }
+        { "label": "AUTOMATION", "value": "FCFS · lowest CPU time" },
+        { "label": "FAIRNESS", "value": "Random Ticket · randomized realization" },
+        { "label": "SATISFACTION", "value": "Probabilistic + Maximum Weight" },
+        { "label": "EVALUATION", "value": "satisfaction mean + standard deviation · assignment completion · capacity violations" }
       ],
-      "note": "The original presentation preserves the reported findings. Raw simulation output and runtime benchmark files have not yet been recovered."
+      "note": "These tradeoffs motivated a mechanism that balanced limited course capacity across automation, efficiency, fairness, and overall student satisfaction. Fairness is presented here as an original project criterion, not as a formally proven guarantee."
     }
   }
 }

@@ -2,6 +2,7 @@
   "ariaLabel": "Research notebook close-up",
   "header": "RESEARCH BOOK / INSPECT A PAGE",
   "sceneHint": "CLICK A PAGE · TURN IT OVER FOR THE MARGIN NOTE",
+  "returnItem": "PUT IT BACK ×",
   "itemLabels": { "research": "EMG DECISION LOG", "margin": "RESEARCH QUESTION", "diagram": "ALLOCATION REVISION" },
   "page": { "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
   "items": {
@@ -27,13 +28,13 @@
     },
     "diagram": {
       "meta": "COURSE ALLOCATION / VERSION 01 → VERSION 02",
-      "title": "Residual probability changed the allocation.",
-      "lead": "After preferred courses reached capacity, some students still had unassigned probability. The remaining allocation rule could push them unnecessarily toward lower-ranked courses.",
-      "steps": ["Identify unassigned student probability", "Check remaining course capacity", "Version 1 · distribute residual probability through random course choices", "Inspect unnecessary low-preference allocation", "Version 2 · balance remaining student demand with remaining course capacity"],
+      "title": "Residual probability needed a better rule.",
+      "lead": "Some courses still had capacity while some students still had unassigned probability. Version 1 filled this gap through random course choices, which could add unnecessary probability to lower-ranked courses.",
+      "steps": ["Identify students with unassigned probability", "Measure the capacity remaining in each course", "Version 1 · select from the remaining courses at random", "Failure mode · unnecessary probability on lower-ranked courses", "Version 2 · balance remaining student capacity with remaining course capacity"],
       "reverseMeta": "REVISION NOTE / RESIDUAL PROBABILITY",
-      "reverseTitle": null,
-      "reverseCopy": "Version 2 changed how the remaining probability was distributed. The revision was designed to produce a more balanced fractional matrix, but it still required separate evaluation for fairness and satisfaction.",
-      "note": "A cleaner residual rule is an algorithmic improvement, not proof of a fair outcome."
+      "reverseTitle": "Version 2 balanced what remained.",
+      "reverseCopy": "Version 2 replaced random residual assignment with a capacity-balancing rule. The goal was to reduce unnecessary low-preference allocation and produce a more even probability matrix.",
+      "note": "This changed the allocation logic, not only the code."
     }
   }
 }

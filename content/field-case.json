@@ -35,7 +35,7 @@
     "draft": {
       "meta": "CHINA THINKS BIG / ALGORITHM TRANSFER",
       "title": "The mechanism moved beyond course allocation.",
-      "copy": "Presented the project to 30+ professors and peers at the National Round of China Thinks Big. Discussions focused on possible applications and the need for real-world preference data. The framework was later deployed for a class-wide parent–teacher meeting. It reduced manual planning, balanced attendance across time slots, and kept adjusted appointments close to parent preferences.",
+      "copy": "Presented the project at the National Round of China Thinks Big. Discussions focused on possible applications and the need for real-world preference data. The framework was later deployed for a class-wide parent–teacher meeting. It reduced manual planning, balanced attendance across time slots, and kept adjusted appointments close to parent preferences.",
       "metrics": [
         { "value": "30+", "label": "PROFESSORS + PEERS" },
         { "value": "CLASS-WIDE", "label": "PARENT–TEACHER SCHEDULING PILOT" }

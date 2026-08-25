@@ -4,11 +4,11 @@
   "sceneHint": "WORKING PRINCIPLES · OPEN QUESTIONS · NEXT TESTS",
   "detailMeta": "PINNED NOTE /",
   "returnItem": "PIN IT BACK ×",
-  "hitLabels": ["DEVELOP THE SOFTWARE", "CHECK THE CONFOUNDER", "SHOW THE TRADEOFF", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
+  "hitLabels": ["DEVELOP THE SOFTWARE", "CHECK THE CONFOUNDER", "EVALUATE THE DISTRIBUTION", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
   "notes": [
     { "status": "NEXT PHASE", "label": "develop the software around the signal", "copy": "The hardware prototype now produces a four-band session summary. The next phase is to improve the data processing, develop the software, and design the UI.", "detail": "Turn a working measurement into a usable system." },
     { "status": "ANALYSIS NOTE", "label": "check potential confounders", "copy": "The main study asks whether principle agreement influences perceived relevance between cases. Before interpreting that relationship, the analysis tested whether principle frequency could also affect agreement. No relationship was detected for the principles examined.", "detail": "Check what else could be shaping the result." },
-    { "status": "DESIGN RULE", "label": "one metric does not prove the others", "copy": "An improvement in aggregate preference outcomes does not establish that an allocation is fair or efficient. Each objective needs its own evidence.", "detail": "Name the tradeoff before optimizing it." },
+    { "status": "EVALUATION RULE", "label": "evaluate the whole distribution", "copy": "Evaluate both the mean and standard deviation of satisfaction scores. Overall satisfaction should describe outcomes across the full student group, not one individual assignment.", "detail": "The average is only one part of the result." },
     { "status": "VALIDATION RULE", "label": "test the intervention", "copy": "A map can make nearby services visible by design. Whether residents can understand and use it is a separate question that requires observation and user testing.", "detail": "Design intent is a hypothesis, not an outcome." },
     { "status": "WORKING METHOD", "label": "make the workflow legible before changing it", "copy": "F1 test cases and WinTrace state maps served the same purpose: establish how the existing system behaves before testing, explaining, or redesigning it.", "detail": "Understand the current workflow before proposing the next one." }
   ]

@@ -64,7 +64,7 @@
       "meta": "CIVIC-TECH CASE / HTML · CSS · JAVASCRIPT",
       "title": "Quality of Life in Shanghai",
       "copy": "Led an eight-person mixed-methods study of quality of life in older Shanghai neighborhoods. Translated the findings into a neighborhood-access map and community information campaigns.",
-      "facts": ["SEP 2023—MAY 2024", "20+ QUESTIONNAIRES + INTERVIEWS", "8-PERSON TEAM"],
+      "facts": ["SEP 2023—MAY 2024", "MIXED-METHODS STUDY", "8-PERSON TEAM"],
       "details": [
         { "label": "FIELD RESEARCH", "copy": "Collected and analyzed 20+ questionnaires and interviews. The mixed-methods study examined neighborhood services, safety, and everyday information needs." },
         { "label": "INTERACTIVE MAP", "copy": "Built a fixed-map prototype in HTML, CSS, and JavaScript. It organized nearby facilities by category and 5-, 10-, and 15-minute walking zones, with an early point-detail interaction." },
@@ -76,12 +76,12 @@
       "meta": "ALGORITHM CASE / PYTHON · NUMPY",
       "title": "Automatic and Satisfactory Course Assignment",
       "copy": "Independently designed and implemented a Python course-allocation system for capacity-constrained electives. The system uses ranked preferences to improve overall student satisfaction.",
-      "facts": ["JAN 2024—MAR 2025", "1,000 REPORTED SIMULATIONS", "LIVE CLASS-WIDE PILOT"],
+      "facts": ["JAN 2024—MAR 2025", "4 EVALUATION CRITERIA", "2 ALLOCATION CONTEXTS"],
       "details": [
         { "label": "ALLOCATION METHOD", "copy": "Generated a fractional allocation through Simultaneous Eating. Birkhoff decomposition then converted it into possible final assignments." },
         { "label": "SYSTEM STRUCTURE", "copy": "Separated preference generation, fractional allocation, deterministic realization, and evaluation into distinct Python stages." },
         { "label": "REPORTED EVALUATION", "copy": "Tested the mechanism across 1,000 simulations with synthetically generated preferences and course capacities. The original presentation reported approximately 70% top-two and 92% top-three assignments." },
-        { "label": "LIVE DEPLOYMENT", "copy": "Adapted the framework for parent–teacher meeting schedules. The system assigned parents to preferred time slots and was piloted in a live, class-wide meeting." }
+        { "label": "LIVE DEPLOYMENT", "copy": "Adapted and deployed the framework for parent–teacher meeting schedules." }
       ]
     },
     "emg": {
@@ -128,7 +128,6 @@
       "quote": "YOLO26 / RGB-D / ROS2 / AGENTIC ENGINEERING / SOFTWARE TESTING",
       "details": [
         { "label": "ROBOTIC TUBE HANDLING", "copy": "Developed a four-class YOLO26 perception pipeline for automated tube handling. Integrated RGB-D target localization with ROS2 chassis and robot-arm workflows for pickup and placement." },
-        { "label": "VALIDATION", "copy": "The latest detector reached 0.926 mAP50–95, 0.977 precision, and 0.974 recall on a 15-image local held-out test split. The overall robot workflow completed approximately 98% of real-hardware test runs successfully." },
         { "label": "F1 / 3500Dx", "copy": "Executed black-box dynamic workflow test cases for F1 on the 3500Dx instrument. Clarified expected behavior and product workflows when test cases required additional context." },
         { "label": "QANTIS", "copy": "Analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
         { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
