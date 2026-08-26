@@ -11,6 +11,8 @@
     {"id":"frankenstein","title":"Frankenstein","author":"Mary Shelley","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
     {"id":"power-of-now","title":"The Power of Now","author":"Eckhart Tolle","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
     {"id":"whole-brain-living","title":"Whole Brain Living","author":"Jill Bolte Taylor","meta":"CURRENTLY READING / BOOKMARKED","summary":"The book currently in progress on this shelf.","annotation":"The signal-green bookmark marks the current read.","isReading":true},
+    {"id":"to-live","title":"To Live","author":"Yu Hua","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
+    {"id":"cries-in-the-drizzle","title":"Cries in the Drizzle","author":"Yu Hua","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
     {"id":"malice","title":"Malice","author":"Keigo Higashino","meta":"READ / KEIGO HIGASHINO SERIES","summary":"A confirmed read from a favorite author series.","annotation":"Filed in the dedicated Keigo Higashino row.","isReading":false},
     {"id":"journey-under-midnight-sun","title":"Journey Under the Midnight Sun","author":"Keigo Higashino","meta":"READ / KEIGO HIGASHINO SERIES","summary":"A confirmed read from a favorite author series.","annotation":"Filed in the dedicated Keigo Higashino row.","isReading":false}
   ],

@@ -88,6 +88,8 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /PERSONAL SHELF \/ BOOKS \+ FILMS/);
   assert.match(content, /"openingEnabled": false/);
   assert.match(content, /Whole Brain Living/);
+  assert.match(content, /To Live/);
+  assert.match(content, /Cries in the Drizzle/);
   assert.match(content, /Keigo Higashino Series/);
   assert.match(content, /Journey Under the Midnight Sun/);
   assert.match(content, /Farewell My Concubine/);
@@ -139,7 +141,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
-  assert.match(closeups, /makeBook\(book,index,-\.94\+index\*\.63,\.43,true,false\)/);
+  assert.match(closeups, /makeBook\(book,index,-\.42\+index\*\.5,\.43,true,false\)/);
   assert.match(closeups, /mediaBasket=true/);
   assert.match(closeups, /filmBasket\.add\(group\)/);
   assert.match(closeups, /filmBasket\.rotation\.y=Math\.PI\/2/);

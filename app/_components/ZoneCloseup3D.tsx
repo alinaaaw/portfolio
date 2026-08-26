@@ -165,7 +165,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const makeBook=(book:{id:string;title:string;author:string;isReading:boolean},index:number,x:number,y:number,series=false,selectable=true)=>{
     const group=new THREE.Group();
     const height=series?2.02:1.94+(index%2)*.12;
-    const width=series ? .58 : .68;
+    const width=series ? .48 : .5;
     const color=series?0x402946:bookColors[index%bookColors.length];
     const cover=roundedBox(width,height,.92,color,.055,.67,.02);cover.position.y=height/2;
     const pages=roundedBox(width-.12,height-.13,.71,palette.paper,.035,.94,.01);pages.position.set(.028,height/2,-.075);
@@ -178,10 +178,10 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(hit);hits.push(hit);}
     return {group,cover,pages,spine,band};
   };
-  books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.62+index*.69,.43));
+  books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.62+index*.52,.43));
   const seriesBooks=books.filter((book)=>book.author==="Keigo Higashino");
-  const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.94+index*.63,.43,true,false));
-  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.32,2.28,1.12],[-.625,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(seriesHit);hits.push(seriesHit);
+  const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.42+index*.5,.43,true,false));
+  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.04,2.28,1.12],[-.17,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(seriesHit);hits.push(seriesHit);
 
   const filmBasket=new THREE.Group();filmBasket.userData.mediaBasket=true;
   filmBasket.position.set(1.25,0,.03);filmBasket.rotation.y=Math.PI/2;
