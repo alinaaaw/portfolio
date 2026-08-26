@@ -10,8 +10,9 @@ type CountryGeometry =
 type CountryFeature = {c:number;g:CountryGeometry|null};
 export type FieldCaseMapView = "world"|"usa"|"asia";
 export type FieldCaseMapCamera = {centerLon:number;centerLat:number;zoom:number};
-type FieldCaseWorldGroup = "usa-west"|"usa-northeast"|"florida"|"china"|"japan-korea"|"thailand";
-export type FieldCaseTravelPin = {name:string;coordinate:Coordinate;region:Exclude<FieldCaseMapView,"world">;worldGroup:FieldCaseWorldGroup};
+type FieldCaseCountry = "United States"|"China"|"Japan"|"South Korea"|"Thailand";
+type FieldCaseWorldGroup = "seattle"|"san-francisco"|"southern-california"|"mid-atlantic"|"boston"|"florida"|"busan"|"bangkok"|"chongqing"|"xian"|"east-china"|"osaka"|"tokyo"|"beijing"|"macau"|"qingdao"|"dalian"|"beihai"|"lijiang";
+export type FieldCaseTravelPin = {name:string;coordinate:Coordinate;country:FieldCaseCountry;region:Exclude<FieldCaseMapView,"world">;worldGroup:FieldCaseWorldGroup};
 export type FieldCaseMapPinHit = {id:string;x:number;y:number;radius:number;count:number;names:readonly string[];targetView:Exclude<FieldCaseMapView,"world">};
 
 export const FIELD_CASE_MAP_VIEWS:Record<FieldCaseMapView,FieldCaseMapCamera> = {
@@ -21,30 +22,30 @@ export const FIELD_CASE_MAP_VIEWS:Record<FieldCaseMapView,FieldCaseMapCamera> = 
 };
 
 export const FIELD_CASE_TRAVEL_PINS:readonly FieldCaseTravelPin[] = [
-  {name:"Seattle",coordinate:[-122.3321,47.6062],region:"usa",worldGroup:"usa-west"},
-  {name:"San Francisco",coordinate:[-122.4194,37.7749],region:"usa",worldGroup:"usa-west"},
-  {name:"Los Angeles",coordinate:[-118.2437,34.0522],region:"usa",worldGroup:"usa-west"},
-  {name:"San Diego",coordinate:[-117.1611,32.7157],region:"usa",worldGroup:"usa-west"},
-  {name:"New York City",coordinate:[-74.006,40.7128],region:"usa",worldGroup:"usa-northeast"},
-  {name:"Philadelphia",coordinate:[-75.1652,39.9526],region:"usa",worldGroup:"usa-northeast"},
-  {name:"Boston",coordinate:[-71.0589,42.3601],region:"usa",worldGroup:"usa-northeast"},
-  {name:"Orlando",coordinate:[-81.3792,28.5383],region:"usa",worldGroup:"florida"},
-  {name:"Busan",coordinate:[129.0756,35.1796],region:"asia",worldGroup:"japan-korea"},
-  {name:"Bangkok",coordinate:[100.5018,13.7563],region:"asia",worldGroup:"thailand"},
-  {name:"Chongqing",coordinate:[106.5516,29.563],region:"asia",worldGroup:"china"},
-  {name:"Xi'an",coordinate:[108.9398,34.3416],region:"asia",worldGroup:"china"},
-  {name:"Shanghai",coordinate:[121.4737,31.2304],region:"asia",worldGroup:"china"},
-  {name:"Osaka",coordinate:[135.5023,34.6937],region:"asia",worldGroup:"japan-korea"},
-  {name:"Tokyo",coordinate:[139.6917,35.6895],region:"asia",worldGroup:"japan-korea"},
-  {name:"Beijing",coordinate:[116.4074,39.9042],region:"asia",worldGroup:"china"},
-  {name:"Macau",coordinate:[113.5439,22.1987],region:"asia",worldGroup:"china"},
-  {name:"Qingdao",coordinate:[120.3826,36.0671],region:"asia",worldGroup:"china"},
-  {name:"Dalian",coordinate:[121.6147,38.914],region:"asia",worldGroup:"china"},
-  {name:"Beihai",coordinate:[109.1202,21.4813],region:"asia",worldGroup:"china"},
-  {name:"Nanjing",coordinate:[118.7969,32.0603],region:"asia",worldGroup:"china"},
-  {name:"Suzhou",coordinate:[120.5853,31.2989],region:"asia",worldGroup:"china"},
-  {name:"Yixing",coordinate:[119.8233,31.3406],region:"asia",worldGroup:"china"},
-  {name:"Lijiang",coordinate:[100.233,26.8721],region:"asia",worldGroup:"china"},
+  {name:"Seattle",coordinate:[-122.3321,47.6062],country:"United States",region:"usa",worldGroup:"seattle"},
+  {name:"San Francisco",coordinate:[-122.4194,37.7749],country:"United States",region:"usa",worldGroup:"san-francisco"},
+  {name:"Los Angeles",coordinate:[-118.2437,34.0522],country:"United States",region:"usa",worldGroup:"southern-california"},
+  {name:"San Diego",coordinate:[-117.1611,32.7157],country:"United States",region:"usa",worldGroup:"southern-california"},
+  {name:"New York City",coordinate:[-74.006,40.7128],country:"United States",region:"usa",worldGroup:"mid-atlantic"},
+  {name:"Philadelphia",coordinate:[-75.1652,39.9526],country:"United States",region:"usa",worldGroup:"mid-atlantic"},
+  {name:"Boston",coordinate:[-71.0589,42.3601],country:"United States",region:"usa",worldGroup:"boston"},
+  {name:"Orlando",coordinate:[-81.3792,28.5383],country:"United States",region:"usa",worldGroup:"florida"},
+  {name:"Busan",coordinate:[129.0756,35.1796],country:"South Korea",region:"asia",worldGroup:"busan"},
+  {name:"Bangkok",coordinate:[100.5018,13.7563],country:"Thailand",region:"asia",worldGroup:"bangkok"},
+  {name:"Chongqing",coordinate:[106.5516,29.563],country:"China",region:"asia",worldGroup:"chongqing"},
+  {name:"Xi'an",coordinate:[108.9398,34.3416],country:"China",region:"asia",worldGroup:"xian"},
+  {name:"Shanghai",coordinate:[121.4737,31.2304],country:"China",region:"asia",worldGroup:"east-china"},
+  {name:"Osaka",coordinate:[135.5023,34.6937],country:"Japan",region:"asia",worldGroup:"osaka"},
+  {name:"Tokyo",coordinate:[139.6917,35.6895],country:"Japan",region:"asia",worldGroup:"tokyo"},
+  {name:"Beijing",coordinate:[116.4074,39.9042],country:"China",region:"asia",worldGroup:"beijing"},
+  {name:"Macau",coordinate:[113.5439,22.1987],country:"China",region:"asia",worldGroup:"macau"},
+  {name:"Qingdao",coordinate:[120.3826,36.0671],country:"China",region:"asia",worldGroup:"qingdao"},
+  {name:"Dalian",coordinate:[121.6147,38.914],country:"China",region:"asia",worldGroup:"dalian"},
+  {name:"Beihai",coordinate:[109.1202,21.4813],country:"China",region:"asia",worldGroup:"beihai"},
+  {name:"Nanjing",coordinate:[118.7969,32.0603],country:"China",region:"asia",worldGroup:"east-china"},
+  {name:"Suzhou",coordinate:[120.5853,31.2989],country:"China",region:"asia",worldGroup:"east-china"},
+  {name:"Yixing",coordinate:[119.8233,31.3406],country:"China",region:"asia",worldGroup:"east-china"},
+  {name:"Lijiang",coordinate:[100.233,26.8721],country:"China",region:"asia",worldGroup:"lijiang"},
 ];
 
 // Natural Earth 1:110m Admin-0 Countries, reduced to geometry and MAPCOLOR7.
@@ -254,21 +255,21 @@ function drawViewportPin(
   count:number,
 ) {
   context.fillStyle="rgba(26,43,39,.28)";
-  context.beginPath();context.ellipse(x+radius*.35,y+radius*1.3,radius*.85,radius*.36,0,0,Math.PI*2);context.fill();
+  context.beginPath();context.ellipse(x+radius*.3,y+radius*.18,radius*.7,radius*.28,0,0,Math.PI*2);context.fill();
   context.strokeStyle="#873b31";
   context.lineWidth=Math.max(1.5,radius*.22);
-  context.beginPath();context.moveTo(x,y+radius*.7);context.lineTo(x,y-radius*.75);context.stroke();
+  context.beginPath();context.moveTo(x,y);context.lineTo(x,y-radius*1.4);context.stroke();
   context.fillStyle="#b94e3e";
-  context.beginPath();context.arc(x,y-radius,radius,0,Math.PI*2);context.fill();
+  context.beginPath();context.arc(x,y-radius*1.65,radius,0,Math.PI*2);context.fill();
   if(count>1){
     context.fillStyle="#fff8da";
     context.font=`700 ${Math.round(radius*1.15)}px monospace`;
     context.textAlign="center";
     context.textBaseline="middle";
-    context.fillText(String(count),x,y-radius*.94);
+    context.fillText(String(count),x,y-radius*1.6);
   }else{
     context.fillStyle="rgba(255,248,218,.86)";
-    context.beginPath();context.arc(x-radius*.32,y-radius*1.3,radius*.24,0,Math.PI*2);context.fill();
+    context.beginPath();context.arc(x-radius*.32,y-radius*1.95,radius*.24,0,Math.PI*2);context.fill();
   }
 }
 

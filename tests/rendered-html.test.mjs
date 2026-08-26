@@ -170,8 +170,16 @@ test("field case map uses real country geometry instead of hand-drawn continents
     assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.equal([...mapSource.matchAll(/\{name:"/g)].length, 24);
+  assert.equal([...mapSource.matchAll(/country:"/g)].length, 24);
   assert.equal([...mapSource.matchAll(/region:"asia"/g)].length, 16);
-  assert.equal([...mapSource.matchAll(/worldGroup:"china"/g)].length, 12);
+  const worldGroups = [...mapSource.matchAll(/worldGroup:"([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(worldGroups).size, 19);
+  assert.match(mapSource, /name:"Seattle"[^\n]+worldGroup:"seattle"/);
+  assert.match(mapSource, /name:"Los Angeles"[^\n]+worldGroup:"southern-california"/);
+  assert.match(mapSource, /name:"San Diego"[^\n]+worldGroup:"southern-california"/);
+  assert.match(mapSource, /name:"Busan"[^\n]+country:"South Korea"[^\n]+worldGroup:"busan"/);
+  assert.match(mapSource, /name:"Osaka"[^\n]+country:"Japan"[^\n]+worldGroup:"osaka"/);
+  assert.doesNotMatch(mapSource, /japan-korea|usa-west/);
   const mapReading = page.match(/function FieldMapReading[\s\S]*?\n}\n\nfunction FieldCaseScene/)?.[0] ?? "";
   assert.match(mapReading, /onWheel/);
   assert.match(mapReading, /setPointerCapture/);
