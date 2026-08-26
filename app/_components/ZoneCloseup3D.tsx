@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { createFieldCaseWorldMapTexture, FIELD_CASE_LAYOUT_PINS, pinPosition } from "./fieldCaseMap";
+import { createFieldCaseWorldMapTexture, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -356,12 +356,12 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   const worldMap=new THREE.Mesh(new THREE.PlaneGeometry(mapWidth,mapDepth),new THREE.MeshStandardMaterial({map:mapTexture,roughness:.9,metalness:0}));
   worldMap.rotation.x=-Math.PI/2;worldMap.position.set(mapCenterX,.445,mapCenterZ);worldMap.receiveShadow=true;worldMap.userData.fieldCaseTexture=mapTexture;scene.add(worldMap);
   for(const x of [mapCenterX-mapWidth*.47,mapCenterX+mapWidth*.47]){for(const z of [mapCenterZ-mapDepth*.44,mapCenterZ+mapDepth*.44]){const corner=roundedBox(.22,.035,.13,palette.steel,.025,.4,.55);corner.position.set(x,.47,z);scene.add(corner);}}
-  FIELD_CASE_LAYOUT_PINS.forEach((coordinate,index)=>{
+  FIELD_CASE_TRAVEL_PINS.forEach(({coordinate})=>{
     const [x,z]=pinPosition(coordinate,mapCenterX,mapCenterZ,mapWidth,mapDepth);
-    const foot=new THREE.Mesh(new THREE.RingGeometry(.045,.068,16),mat(index===1?palette.signal:palette.red,.62,.04));foot.rotation.x=-Math.PI/2;foot.position.set(x,.458,z);scene.add(foot);
-    const stem=cylinder(.022,.16,index===1?palette.signal:palette.red,10);stem.position.set(x,.54,z);scene.add(stem);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(.075,12,8),mat(index===1?palette.signal:palette.red,.55,.06));head.position.set(x,.66,z);head.castShadow=true;scene.add(head);
-    const glint=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),mat(0xf2e9c9,.4,.02));glint.position.set(x-.025,.692,z+.025);scene.add(glint);
+    const foot=new THREE.Mesh(new THREE.RingGeometry(.018,.03,14),mat(palette.red,.62,.04));foot.rotation.x=-Math.PI/2;foot.position.set(x,.458,z);scene.add(foot);
+    const stem=cylinder(.01,.1,palette.red,8);stem.position.set(x,.515,z);scene.add(stem);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.035,10,7),mat(palette.red,.55,.06));head.position.set(x,.59,z);head.castShadow=true;scene.add(head);
+    const glint=new THREE.Mesh(new THREE.SphereGeometry(.008,7,5),mat(0xf2e9c9,.4,.02));glint.position.set(x-.012,.602,z+.012);scene.add(glint);
   });
   const compassRing=new THREE.Mesh(new THREE.RingGeometry(.12,.17,24),mat(0x7b503f,.76,.02));compassRing.rotation.x=-Math.PI/2;compassRing.position.set(3.93,.465,.26);scene.add(compassRing);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[

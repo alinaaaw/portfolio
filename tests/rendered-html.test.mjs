@@ -72,6 +72,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /WORLD MAP \/ TRAVEL PINS/);
   assert.match(page, /field-map-reading/);
   assert.match(page, /drawFieldCaseWorldMap/);
+  assert.doesNotMatch(content, /editable layout markers|Replace prompts and layout pins/);
   assert.match(content, /REFERENCES\.web/);
   assert.match(content, /Books and films will live here/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
@@ -146,5 +147,9 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
   assert.match(mapSource, /fill\("evenodd"\)/);
   assert.match(mapSource, /\[-width,0,width\]/);
+  assert.match(mapSource, /FIELD_CASE_TRAVEL_PINS/);
+  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo"]) {
+    assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
   assert.doesNotMatch(mapSource, /landMasses/);
 });

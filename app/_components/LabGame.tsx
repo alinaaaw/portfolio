@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { room } from "@/content";
-import { createFieldCaseWorldMapTexture, FIELD_CASE_LAYOUT_PINS, pinPosition } from "./fieldCaseMap";
+import { createFieldCaseWorldMapTexture, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
@@ -512,9 +512,9 @@ function buildFieldCase(scene: THREE.Scene) {
   const mapTexture=createFieldCaseWorldMapTexture(512);
   const worldMap=new THREE.Mesh(new THREE.PlaneGeometry(mapWidth,mapDepth),new THREE.MeshStandardMaterial({map:mapTexture,roughness:.9,metalness:0}));
   worldMap.rotation.x=-Math.PI/2;worldMap.position.set(mapCenterX,mapPaperY,mapCenterZ);worldMap.userData.fieldCaseTexture=mapTexture;group.add(worldMap);
-  FIELD_CASE_LAYOUT_PINS.forEach((coordinate,index)=>{
+  FIELD_CASE_TRAVEL_PINS.forEach(({coordinate})=>{
     const [x,z]=pinPosition(coordinate,mapCenterX,mapCenterZ,mapWidth,mapDepth);
-    const pin=cylinder(.024,.13,index===1?palette.signal:palette.red,8);pin.position.set(x,mapPaperY+.07,z);group.add(pin);
+    const pin=cylinder(.012,.1,palette.red,8);pin.position.set(x,mapPaperY+.055,z);group.add(pin);
   });
   const compassRing=new THREE.Mesh(new THREE.RingGeometry(.055,.08,18),material(0x7b503f,.76,.02));compassRing.rotation.x=-Math.PI/2;compassRing.position.set(1.94,mapPaperY+.01,.19);group.add(compassRing);
   const mapClip=cylinder(.05,.36,palette.steel,12);mapClip.rotation.z=Math.PI/2;mapClip.position.set(mapCenterX,mapPaperY+.035,-.72);group.add(mapClip);

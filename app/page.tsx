@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
-import { drawFieldCaseWorldMap } from "./_components/fieldCaseMap";
+import { drawFieldCaseWorldMap, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -205,9 +205,9 @@ function FieldMapReading({item,onClose}:{item:FieldRecord;onClose:()=>void}) {
     if(canvas)drawFieldCaseWorldMap(canvas,1400,true);
   },[]);
   return <article className="field-map-reading" onMouseDown={(event)=>event.stopPropagation()}>
-    <header><small>{item.meta}</small><h2>{item.title}</h2><span>LAYOUT PINS / REPLACE WITH CONFIRMED PLACES</span></header>
-    <div className="field-map-sheet"><canvas ref={canvasRef} aria-label="World map with editable travel layout pins" /></div>
-    <footer><p>{item.copy}</p><div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div></footer>
+    <header><small>{item.meta}</small><h2>{item.title}</h2><span>{FIELD_CASE_TRAVEL_PINS.length} CONFIRMED PLACES / UNITED STATES + ASIA</span></header>
+    <div className="field-map-sheet"><canvas ref={canvasRef} aria-label={`World map showing ${FIELD_CASE_TRAVEL_PINS.length} places Alina has visited`} /></div>
+    <footer><div><p>{item.copy}</p><ul className="field-map-places">{FIELD_CASE_TRAVEL_PINS.map(({name})=><li key={name}>{name}</li>)}</ul></div><div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div></footer>
     <button onClick={onClose}>{fieldCaseContent.returnItem}</button>
   </article>;
 }

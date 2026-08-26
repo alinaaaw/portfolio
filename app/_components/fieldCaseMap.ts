@@ -8,14 +8,24 @@ type CountryGeometry =
   | {type:"Polygon";coordinates:CountryPolygon}
   | {type:"MultiPolygon";coordinates:readonly CountryPolygon[]};
 type CountryFeature = {c:number;g:CountryGeometry|null};
+export type FieldCaseTravelPin = {name:string;coordinate:Coordinate};
 
-// Decorative pin positions only. Replace these coordinates when confirmed travel
-// locations are available; the interface copy deliberately does not claim them.
-export const FIELD_CASE_LAYOUT_PINS:readonly Coordinate[] = [
-  [-112,42],
-  [-4,51],
-  [103,20],
-  [143,-27],
+export const FIELD_CASE_TRAVEL_PINS:readonly FieldCaseTravelPin[] = [
+  {name:"Seattle",coordinate:[-122.3321,47.6062]},
+  {name:"San Francisco",coordinate:[-122.4194,37.7749]},
+  {name:"Los Angeles",coordinate:[-118.2437,34.0522]},
+  {name:"San Diego",coordinate:[-117.1611,32.7157]},
+  {name:"New York City",coordinate:[-74.006,40.7128]},
+  {name:"Philadelphia",coordinate:[-75.1652,39.9526]},
+  {name:"Boston",coordinate:[-71.0589,42.3601]},
+  {name:"Orlando",coordinate:[-81.3792,28.5383]},
+  {name:"Busan",coordinate:[129.0756,35.1796]},
+  {name:"Bangkok",coordinate:[100.5018,13.7563]},
+  {name:"Chongqing",coordinate:[106.5516,29.563]},
+  {name:"Xi'an",coordinate:[108.9398,34.3416]},
+  {name:"Shanghai",coordinate:[121.4737,31.2304]},
+  {name:"Osaka",coordinate:[135.5023,34.6937]},
+  {name:"Tokyo",coordinate:[139.6917,35.6895]},
 ];
 
 // Natural Earth 1:110m Admin-0 Countries, reduced to geometry and MAPCOLOR7.
@@ -127,17 +137,18 @@ export function drawFieldCaseWorldMap(canvas:HTMLCanvasElement,resolution=1024,s
     context.lineWidth=Math.max(1,resolution/700);
     context.strokeRect(12,12,width-24,height-24);
     if(showPins){
-      FIELD_CASE_LAYOUT_PINS.forEach((coordinate,index)=>{
+      const pinRadius=Math.max(3,resolution*.0035);
+      FIELD_CASE_TRAVEL_PINS.forEach(({coordinate})=>{
         const {x,y}=project(coordinate,width,height);
         context.fillStyle="rgba(26,43,39,.28)";
-        context.beginPath();context.ellipse(x+4,y+9,resolution*.009,resolution*.0045,0,0,Math.PI*2);context.fill();
-        context.strokeStyle=index===1?"#9cb83f":"#873b31";
-        context.lineWidth=Math.max(3,resolution/320);
-        context.beginPath();context.moveTo(x,y+8);context.lineTo(x,y-12);context.stroke();
-        context.fillStyle=index===1?"#d1f45c":"#b94e3e";
-        context.beginPath();context.arc(x,y-15,resolution*.009,0,Math.PI*2);context.fill();
+        context.beginPath();context.ellipse(x+pinRadius*.3,y+pinRadius*1.2,pinRadius*.8,pinRadius*.34,0,0,Math.PI*2);context.fill();
+        context.strokeStyle="#873b31";
+        context.lineWidth=Math.max(1.5,resolution/550);
+        context.beginPath();context.moveTo(x,y+pinRadius*.65);context.lineTo(x,y-pinRadius*.8);context.stroke();
+        context.fillStyle="#b94e3e";
+        context.beginPath();context.arc(x,y-pinRadius,pinRadius,0,Math.PI*2);context.fill();
         context.fillStyle="rgba(255,248,218,.8)";
-        context.beginPath();context.arc(x-resolution*.003,y-18,resolution*.0025,0,Math.PI*2);context.fill();
+        context.beginPath();context.arc(x-pinRadius*.32,y-pinRadius*1.3,pinRadius*.25,0,Math.PI*2);context.fill();
       });
     }
   }

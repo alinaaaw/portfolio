@@ -33,10 +33,9 @@ const countryPaths=source.flatMap((country,index)=>{
 
 const grid=[...Array(11)].map((_,index)=>`<line x1="${(index+1)*width/12}" y1="0" x2="${(index+1)*width/12}" y2="${height}"/>`).join("")
   +[...Array(5)].map((_,index)=>`<line x1="0" y1="${(index+1)*height/6}" x2="${width}" y2="${(index+1)*height/6}"/>`).join("");
-const pins=[[-112,42],[-4,51],[103,20],[143,-27]].map((coordinate,index)=>{
+const pins=[[-122.3321,47.6062],[-122.4194,37.7749],[-118.2437,34.0522],[-117.1611,32.7157],[-74.006,40.7128],[-75.1652,39.9526],[-71.0589,42.3601],[-81.3792,28.5383],[129.0756,35.1796],[100.5018,13.7563],[106.5516,29.563],[108.9398,34.3416],[121.4737,31.2304],[135.5023,34.6937],[139.6917,35.6895]].map((coordinate)=>{
   const [x,y]=project(coordinate);
-  const fill=index===1?"#d1f45c":"#b94e3e";
-  return `<g><line x1="${x}" y1="${y+8}" x2="${x}" y2="${y-12}" stroke="${fill}" stroke-width="4"/><circle cx="${x}" cy="${y-15}" r="12.6" fill="${fill}"/><circle cx="${x-4}" cy="${y-19}" r="3.5" fill="#fff8da"/></g>`;
+  return `<g><line x1="${x}" y1="${y+3}" x2="${x}" y2="${y-4}" stroke="#873b31" stroke-width="2.5"/><circle cx="${x}" cy="${y-5}" r="4.9" fill="#b94e3e"/><circle cx="${x-1.5}" cy="${y-6.5}" r="1.2" fill="#fff8da"/></g>`;
 }).join("");
 
 const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">

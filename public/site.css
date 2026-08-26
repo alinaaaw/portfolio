@@ -281,6 +281,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-sheet canvas { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; background: #d9cfad; }
 .field-map-reading > footer { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px 26px; align-items: start; margin-top: 16px; }
 .field-map-reading > footer p { max-width: 700px; margin: 0; color: #eee7d6; font-size: 11px; line-height: 1.65; }
+.field-map-places { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.field-map-places li { padding: 5px 7px; border: 1px solid rgba(238,231,214,.28); background: rgba(24,42,37,.2); color: #e7ddc2; font: 6px var(--font-mono),monospace; }
 .field-map-reading .object-tags { justify-content: flex-end; margin: 0; }
 .field-map-reading .object-tags span { border-color: rgba(238,231,214,.38); color: #d9cfad; }
 .field-map-reading > button { position: absolute; top: 18px; right: 18px; padding: 9px 11px; border: 1px solid rgba(238,231,214,.35); background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
