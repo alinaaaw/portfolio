@@ -351,8 +351,14 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.doesNotMatch(css, /\.field-map-photo-stage\.is-loading > img \{[^}]*transform:/);
   assert.match(css, /\.field-map-photo-loading, \.field-map-photo-message \{[^}]*position: absolute/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*border: 0/);
+  assert.match(css, /\.field-map-photo-stage \{[^}]*background: transparent/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*box-shadow: none/);
   assert.match(css, /\.field-map-photo-loading \{[^}]*background: transparent/);
+  assert.match(css, /\.field-map-photo-message\.lost \{[^}]*background: transparent/);
+  assert.match(css, /\.field-map-photo-loading i \{[^}]*rgba\(79,70,48,.28\)/);
+  assert.doesNotMatch(css, /\.field-map-photo-stage \{[^}]*background: #293732/);
+  assert.doesNotMatch(css, /\.field-map-photo-message\.lost \{[^}]*background: #f2ead3/);
+  assert.doesNotMatch(css, /\.field-map-photo-loading i \{[^}]*rgba\(246,237,211,.4\)/);
   assert.doesNotMatch(css, /\.field-map-photo-stage \{[^}]*inset 0 0 0 5px/);
   assert.doesNotMatch(css, /\.field-map-photo-stage \{[^}]*3px 5px/);
   assert.match(css, /padding: 15px 15px 12px/);
