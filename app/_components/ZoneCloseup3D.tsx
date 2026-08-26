@@ -149,13 +149,13 @@ function addLines(parent:THREE.Object3D,x:number,y:number,z:number,width:number,
 function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const shelf = new THREE.Group();
   const wall=box(11,6,.18,0x18201e,.96,.03);wall.position.set(0,3,-1.05);scene.add(wall);
-  const back = roundedBox(8.25,4.55,.22,0x32231b,.08,.92,.02);
-  back.position.set(0,2.45,-.48);
-  const sideL = roundedBox(.34,4.9,1.75,palette.wood,.08,.86,.03);
-  sideL.position.set(-4.18,2.45,0);
+  const back = roundedBox(8.25,2.95,.22,0x32231b,.08,.92,.02);
+  back.position.set(0,1.72,-.48);
+  const sideL = roundedBox(.34,3.2,1.75,palette.wood,.08,.86,.03);
+  sideL.position.set(-4.18,1.7,0);
   const sideR = sideL.clone(); sideR.position.x=4.18;
   const base=roundedBox(8.7,.28,1.78,palette.woodLight,.08,.82,.04);base.position.set(0,.25,0);
-  const top=roundedBox(8.7,.24,1.78,palette.wood,.08,.84,.03);top.position.set(0,4.72,0);
+  const top=roundedBox(8.7,.24,1.78,palette.wood,.08,.84,.03);top.position.set(0,3.27,0);
   const frontLip=roundedBox(8.55,.16,.16,0x4a3225,.045,.78,.04);frontLip.position.set(0,.4,.82);
   shelf.add(back,sideL,sideR,base,top,frontLip);
 
@@ -404,7 +404,7 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
 }
 
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
-  books:{position:[0,2.8,9.4],target:[0,2.35,0],hint:booksContent.sceneHint},
+  books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
   notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:notebookContent.sceneHint},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
