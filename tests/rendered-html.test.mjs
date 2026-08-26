@@ -340,10 +340,16 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.doesNotMatch(page, /manifest\.json/);
   assert.match(css, /\.field-map-memory/);
   assert.match(css, /\.field-map-memory \{[^}]*var\(--photo-frame-width/);
+  assert.match(css, /\.field-map-memory \{[^}]*grid-template-columns: minmax\(0,1fr\)/);
   assert.match(css, /\.field-map-memory \{[^}]*background-color: #ded2ad/);
   assert.match(css, /animation: fieldMapMemoryIn/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*aspect-ratio: var\(--photo-aspect/);
+  assert.match(css, /\.field-map-memory > header, \.field-map-photo-stage, \.field-map-memory > footer \{[^}]*min-width: 0[^}]*max-width: 100%/);
+  assert.match(css, /\.field-map-photo-stage \{[^}]*grid-template-columns: minmax\(0,1fr\)/);
+  assert.match(css, /\.field-map-photo-stage \{[^}]*width: auto/);
   assert.match(css, /\.field-map-photo-stage > img \{[^}]*object-fit: contain/);
+  assert.match(css, /\.field-map-photo-stage > img \{[^}]*min-width: 0[^}]*max-width: 100%/);
+  assert.doesNotMatch(css, /\.field-map-photo-stage > img \{[^}]*max-width: none/);
   assert.match(css, /\.field-map-photo-stage\.is-loading > img \{[^}]*filter: blur/);
   assert.match(css, /\.field-map-photo-stage\.is-loading > img \{[^}]*opacity: 1/);
   assert.doesNotMatch(css, /\.field-map-photo-stage\.is-loading > img \{[^}]*transform:/);
