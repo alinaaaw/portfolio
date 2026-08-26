@@ -1,15 +1,17 @@
 {
   "ariaLabel": "Lab 17 launch board close-up",
-  "header": "LAB 17 LAUNCH BOARD / TODO",
-  "sceneHint": "ROADMAP · ACTIVE PHASES · NEXT CHECKS",
-  "detailMeta": "ROADMAP NOTE /",
+  "header": "LAB 17 / PINNED TODO",
+  "sceneHint": "SMALL NOTES · ACTIVE IDEAS · NEXT BUILDS",
+  "detailMeta": "PINNED TODO /",
   "returnItem": "PIN IT BACK",
-  "hitLabels": ["EMG / NEXT PHASE", "CONTENT / VERIFY", "ONE SITE / CLEAN UP", "3D / REFINE", "PREVIEW / RELEASE"],
+  "hitLabels": ["EMG / NEXT BUILD", "AI GUIDE / FIRST PASS", "KNOWLEDGE / APPROVE", "FEEDBACK / LISTEN", "LAB LOG / PUBLISH", "3D / POLISH", "PREVIEW / CHECK"],
   "notes": [
-    { "status": "PHASE / EMG", "label": "shape the next EMG iteration", "copy": "Develop the software around the existing signal, refine data processing, and sketch a clearer interface for reviewing a session.", "detail": "Move from a working measurement toward a usable experience." },
-    { "status": "ACTIVE / CONTENT", "label": "edit, verify, and simplify", "copy": "Review each scene for clear, distinct, public-safe storytelling. Confirm facts and keep only details that help visitors understand the work.", "detail": "Every claim stays concise and supportable." },
-    { "status": "NEXT / CONSOLIDATION", "label": "make Lab 17 the one official site", "copy": "Retire outdated naming, consolidate the durable documentation, and prepare one clean source of truth for the portfolio.", "detail": "One identity, one maintained home." },
-    { "status": "NEXT / 3D + INTERACTION", "label": "refine the room and its interactions", "copy": "Polish models, framing, lighting, and object behavior across desktop and mobile so exploration feels intentional and clear.", "detail": "Keep the atmosphere; remove the friction." },
-    { "status": "GATE / PREVIEW + RELEASE", "label": "preview, listen, then release", "copy": "Run final content, accessibility, interaction, and performance checks. Share a controlled preview, gather feedback, and publish only when the room is ready.", "detail": "Release readiness is a checkpoint, not a date." }
+    { "status": "NOW / EMG", "label": "turn the EMG model into an explorable exhibit", "copy": "Prepare a web-ready model, useful viewpoints, and a clear fallback so the prototype can be understood without slowing down the room.", "detail": "Show how it is assembled, not only what it looks like." },
+    { "status": "BACKEND / AI GUIDE", "label": "prototype a small Lab Guide", "copy": "Let visitors ask about the public work already inside Lab 17, with answers grounded in an approved portfolio knowledge base.", "detail": "A guide to the room—not a general chatbot." },
+    { "status": "CONTENT / APPROVAL", "label": "separate approved facts from working notes", "copy": "Keep the future guide aligned with confirmed public content while unfinished ideas remain clearly provisional.", "detail": "Publish what is verified; keep drafts in the lab." },
+    { "status": "BACKEND / FEEDBACK", "label": "add a quiet feedback loop", "copy": "Learn which objects visitors explore and where the experience becomes unclear, without turning the portfolio into a tracking dashboard.", "detail": "Collect only what can improve the visit." },
+    { "status": "PUBLISHING / LAB LOG", "label": "make Lab Log updates easier to publish", "copy": "Start with a small editorial flow for dated lab notes before considering a larger content system.", "detail": "One useful publishing path before a full CMS." },
+    { "status": "NEXT / 3D", "label": "polish the room one object at a time", "copy": "Refine framing, scale, lighting, hover states, and touch targets across desktop and mobile.", "detail": "Keep the atmosphere; remove the friction." },
+    { "status": "GATE / PREVIEW", "label": "walk the whole room before release", "copy": "Check content, accessibility, performance, and the complete exploration path in a controlled preview.", "detail": "Release readiness is a checkpoint, not a date." }
   ]
 }

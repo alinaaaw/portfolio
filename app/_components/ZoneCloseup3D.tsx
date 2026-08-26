@@ -314,14 +314,20 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
   addLines(book,-1.53,.55,-1.42,2.45,12);
   addLines(book,1.53,.55,-1.42,2.45,12);
   const spine=box(.2,.18,3.9,0x6f5039,.78,.03); spine.position.set(0,.51,0); book.add(spine);
-  const sticky=box(.7,.05,.75,palette.signal); sticky.position.set(1.9,.6,-.72); sticky.rotation.y=.08; book.add(sticky);
+  const comparisonSheet=roundedBox(1.92,.045,1.48,0xd8cba3,.035,.92,.01); comparisonSheet.position.set(1.55,.6,.12); comparisonSheet.rotation.y=.035;
+  const comparisonBars=[
+    {width:1.18,z:-.34,color:0x8b5a4c},
+    {width:.88,z:.04,color:0x59746d},
+    {width:1.48,z:.42,color:palette.signal},
+  ].map(({width,z,color})=>{const bar=roundedBox(width,.025,.12,color,.02,.56,.06);bar.position.set(.92+width/2,.635,z);return bar;});
+  book.add(comparisonSheet,...comparisonBars);
   const photo=box(1.25,.05,.95,0x455d59); photo.position.set(-1.55,.62,.62); photo.rotation.y=-.08; book.add(photo);
   const pen=cylinder(.065,2.7,palette.red,12); pen.rotation.z=Math.PI/2; pen.position.set(.9,.72,1.65); book.add(pen);
   scene.add(book);
   // The page is the interaction target. The blue diagram remains a sketch on
   // the paper instead of taking hover away from the page underneath it.
   const researchHit=hitBox("research",notebookContent.itemLabels.research,[3.02,.5,3.72],[-1.53,.7,0],[left,photo]);
-  const marginHit=hitBox("margin",notebookContent.itemLabels.margin,[2.8,.5,3.5],[1.55,.7,0],[right,sticky]);
+  const marginHit=hitBox("margin",notebookContent.itemLabels.margin,[3.02,.5,3.72],[1.53,.7,0],[right,comparisonSheet,...comparisonBars]);
   scene.add(researchHit,marginHit); hits.push(researchHit,marginHit);
 
   // A recognisable angle-poise lamp replaces the ambiguous cylinder that used
@@ -356,19 +362,24 @@ function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
   const frame=roundedBox(8.4,5.35,.35,palette.wood,.11,.86,.03); frame.position.set(0,2.7,-.25); scene.add(frame);
   const cork=roundedBox(7.85,4.82,.18,0x765d42,.06,.98,.01); cork.position.set(0,2.7,0); scene.add(cork);
   const notes=[
-    {x:-2.65,y:3.75,w:1.5,h:1.1,color:0xe1d3a4,label:boardContent.hitLabels[0]},
-    {x:-.7,y:3.55,w:1.65,h:1.35,color:0xb8d5cc,label:boardContent.hitLabels[1]},
-    {x:1.55,y:3.8,w:1.35,h:1.05,color:0xd9a58f,label:boardContent.hitLabels[2]},
-    {x:2.45,y:2.15,w:1.7,h:1.25,color:0xe2d8bd,label:boardContent.hitLabels[3]},
-    {x:-1.9,y:1.65,w:1.85,h:1.2,color:0xc7b77f,label:boardContent.hitLabels[4]},
+    {x:-2.75,y:3.95,w:1.28,h:.94,color:0xe1d3a4,label:boardContent.hitLabels[0]},
+    {x:-1.03,y:3.67,w:1.3,h:1,color:0xb9d6ce,label:boardContent.hitLabels[1]},
+    {x:.68,y:3.95,w:1.15,h:.9,color:0xd8a895,label:boardContent.hitLabels[2]},
+    {x:2.38,y:3.65,w:1.35,h:1,color:0xe2d8bd,label:boardContent.hitLabels[3]},
+    {x:-2.42,y:2.08,w:1.42,h:1.02,color:0xc7b77f,label:boardContent.hitLabels[4]},
+    {x:-.52,y:2.28,w:1.24,h:.94,color:0xd7c9a8,label:boardContent.hitLabels[5]},
+    {x:1.42,y:1.82,w:1.4,h:1.04,color:0xb7ccc5,label:boardContent.hitLabels[6]},
   ];
   notes.forEach((note,index)=>{
-    const paper=roundedBox(note.w,note.h,.06,note.color,.035,.94,.01); paper.position.set(note.x,note.y,.18); paper.rotation.z=(index-2)*.035; scene.add(paper);
-    for(let line=0;line<4;line+=1){ const mark=box(note.w*.68,.018,.02,line===0?palette.red:0x63746d); mark.position.set(note.x,note.y+.25-line*.17,.225); mark.rotation.z=paper.rotation.z; scene.add(mark); }
-    const pin=cylinder(.07,.1,index===2?palette.red:palette.signal,12); pin.rotation.x=Math.PI/2; pin.position.set(note.x,note.y+note.h*.37,.27); scene.add(pin);
+    const paper=roundedBox(note.w,note.h,.045,note.color,.025,.94,.01); paper.position.set(note.x,note.y,.18); paper.rotation.z=(index-3)*.024; scene.add(paper);
+    for(let line=0;line<3;line+=1){ const mark=box(note.w*.62,.014,.016,line===0?palette.red:0x63746d); mark.position.set(note.x,note.y+.18-line*.16,.225); mark.rotation.z=paper.rotation.z; scene.add(mark); }
+    const pin=cylinder(.055,.08,index===0?palette.red:palette.signal,12); pin.rotation.x=Math.PI/2; pin.position.set(note.x,note.y+note.h*.36,.27); scene.add(pin);
     const hit=hitBox(String(index),note.label,[note.w+.2,note.h+.2,.45],[note.x,note.y,.28],[paper]); scene.add(hit); hits.push(hit);
   });
-  const connections:[[number,number],[number,number]][]=[[[ -2.65,3.75],[-.7,3.55]],[[-.7,3.55],[1.55,3.8]],[[1.55,3.8],[2.45,2.15]],[[-1.9,1.65],[2.45,2.15]]];
+  const connections:[[number,number],[number,number]][]=[
+    [[-2.75,3.95],[-1.03,3.67]],[[-1.03,3.67],[.68,3.95]],[[.68,3.95],[2.38,3.65]],
+    [[-2.75,3.95],[-2.42,2.08]],[[-1.03,3.67],[-.52,2.28]],[[2.38,3.65],[1.42,1.82]],
+  ];
   connections.forEach(([a,b])=>{
     const curve=new THREE.LineCurve3(new THREE.Vector3(a[0],a[1],.26),new THREE.Vector3(b[0],b[1],.26));
     const thread=new THREE.Mesh(new THREE.TubeGeometry(curve,12,.018,6,false),mat(palette.red,.55,.05)); scene.add(thread);
