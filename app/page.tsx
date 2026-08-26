@@ -226,6 +226,8 @@ function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.ran
 
 function FieldMapReading({onClose}:{onClose:()=>void}) {
   const canvasRef=useRef<HTMLCanvasElement>(null);
+  const photoCloseRef=useRef<HTMLButtonElement>(null);
+  const hadSelectedPinRef=useRef(false);
   const pinHitsRef=useRef<readonly FieldCaseMapPinHit[]>([]);
   const pointersRef=useRef(new Map<number,{x:number;y:number}>());
   const gestureRef=useRef<{center:{x:number;y:number};distance:number}|null>(null);
@@ -271,13 +273,27 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   useEffect(()=>{
     if(!selectedPin)return;
     const onKeyDown=(event:KeyboardEvent)=>{
-      if(event.key==="Escape")setSelectedPin(null);
+      if(event.key==="Escape"){event.preventDefault();event.stopImmediatePropagation();setSelectedPin(null);return;}
+      if(event.key==="Tab"){
+        const dialog=photoCloseRef.current?.closest<HTMLElement>(".field-map-memory");
+        const controls=dialog?Array.from(dialog.querySelectorAll<HTMLButtonElement>("button:not([disabled])")):[];
+        const first=controls[0],last=controls[controls.length-1];
+        if(first&&last&&event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(first&&last&&!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      }
       if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowLeft")setPhotoIndex((current)=>(current-1+photos.length)%photos.length);
       if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowRight")setPhotoIndex((current)=>(current+1)%photos.length);
     };
-    window.addEventListener("keydown",onKeyDown);
-    return ()=>window.removeEventListener("keydown",onKeyDown);
+    window.addEventListener("keydown",onKeyDown,true);
+    return ()=>window.removeEventListener("keydown",onKeyDown,true);
   },[photoStatus,photos.length,selectedPin]);
+
+  useEffect(()=>{
+    let frame=0;
+    if(selectedPin){hadSelectedPinRef.current=true;frame=requestAnimationFrame(()=>photoCloseRef.current?.focus());}
+    else if(hadSelectedPinRef.current){hadSelectedPinRef.current=false;frame=requestAnimationFrame(()=>canvasRef.current?.focus());}
+    return ()=>cancelAnimationFrame(frame);
+  },[selectedPin]);
 
   const canvasPoint=useCallback((clientX:number,clientY:number)=>{
     const canvas=canvasRef.current;
@@ -380,20 +396,20 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
   return <article className="field-map-reading field-map-only" role="dialog" aria-label="Interactive travel map" onMouseDown={(event)=>event.stopPropagation()}>
     <div className="field-map-sheet">
-      <canvas ref={canvasRef} aria-label="Interactive world map of places Alina has visited" onWheel={(event)=>{event.preventDefault();zoomAt(canvasPoint(event.clientX,event.clientY),Math.exp(-event.deltaY*.0015));}} onDoubleClick={(event)=>zoomAt(canvasPoint(event.clientX,event.clientY),1.8)} onPointerDown={beginPointer} onPointerMove={movePointer} onPointerUp={(event)=>endPointer(event)} onPointerCancel={(event)=>endPointer(event,true)}/>
+      <canvas ref={canvasRef} tabIndex={0} aria-label="Interactive world map of places Alina has visited" onWheel={(event)=>{event.preventDefault();zoomAt(canvasPoint(event.clientX,event.clientY),Math.exp(-event.deltaY*.0015));}} onDoubleClick={(event)=>zoomAt(canvasPoint(event.clientX,event.clientY),1.8)} onPointerDown={beginPointer} onPointerMove={movePointer} onPointerUp={(event)=>endPointer(event)} onPointerCancel={(event)=>endPointer(event,true)}/>
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
-      {selectedPin&&<aside className="field-map-memory" aria-label={`${selectedPin.name} travel photos`}>
-        <header><div><small>{selectedPin.country} · FIELD FILE</small><h2>{selectedPin.name}</h2></div><button aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
-        <div className="field-map-photo-stage">
+      {selectedPin&&<aside className="field-map-memory" role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
+        <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
+        <div className={`field-map-photo-stage is-${photoStatus}`}>
           {photoStatus==="loading"&&<div className="field-map-photo-message"><i/><strong>DEVELOPING FILM...</strong></div>}
           {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong></div>}
           {photoStatus==="ready"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onError={()=>{setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
         </div>
         {photoStatus==="ready"&&photos[photoIndex]&&<footer>
-          <div><strong>{String(photoIndex+1).padStart(2,"0")} / {String(photos.length).padStart(2,"0")}</strong><span>{photos[photoIndex].caption||"FIELD MEMORY"}</span></div>
-          {photos.length>1&&<nav aria-label="Photo controls"><button aria-label="Previous photo" onClick={()=>setPhotoIndex((current)=>(current-1+photos.length)%photos.length)}>←</button><button aria-label="Next photo" onClick={()=>setPhotoIndex((current)=>(current+1)%photos.length)}>→</button></nav>}
+          <div><strong aria-live="polite">{String(photoIndex+1).padStart(2,"0")} / {String(photos.length).padStart(2,"0")}</strong><span>{photos[photoIndex].caption||"TRAVEL MEMORY"}</span></div>
+          {photos.length>1&&<nav aria-label="Photo controls"><button type="button" aria-label="Previous photo" onClick={()=>setPhotoIndex((current)=>(current-1+photos.length)%photos.length)}>←</button><button type="button" aria-label="Next photo" onClick={()=>setPhotoIndex((current)=>(current+1)%photos.length)}>→</button></nav>}
         </footer>}
       </aside>}
     </div>

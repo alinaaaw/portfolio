@@ -230,6 +230,10 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapReading, /field-map-views/);
   assert.match(mapReading, /travelPhotosForPin/);
   assert.match(mapReading, /field-map-memory/);
+  assert.match(mapReading, /aria-labelledby="field-map-memory-title"/);
+  assert.match(mapReading, /field-map-photo-stage is-/);
+  assert.match(mapReading, /photoCloseRef/);
+  assert.match(mapReading, /tabIndex=\{0\}/);
   assert.match(mapReading, /Previous photo/);
   assert.match(mapReading, /Next photo/);
   assert.match(mapReading, /randomLostTravelMessage/);
@@ -238,6 +242,10 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(photoLibrary, /localeCompare/);
   assert.doesNotMatch(page, /manifest\.json/);
   assert.match(css, /\.field-map-memory/);
+  assert.match(css, /\.field-map-memory \{[^}]*width: min\(480px/);
+  assert.match(css, /\.field-map-memory \{[^}]*background-color: #ded2ad/);
+  assert.match(css, /animation: fieldMapMemoryIn/);
+  assert.match(css, /\.field-map-photo-stage > img \{[^}]*max-width: 100%/);
   assert.match(photoGuide, /不需要修改代码/);
   assert.match(nycGuide, /new-york-city/);
   assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);
