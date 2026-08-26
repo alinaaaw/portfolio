@@ -403,7 +403,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .drawer-document article { box-sizing: border-box; min-width: 0; min-height: min(450px,80vh); max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: clamp(54px,6vw,75px); }
 @keyframes documentIn { from { opacity: 0; transform: scale(.62) rotate(-5deg); } }
 .drawer-document article small { color: #a44235; font: 7px var(--font-mono),monospace; }
-.drawer-document article h2 { margin: 30px 0 24px; font: clamp(36px,5vw,62px)/1.02 "Segoe Print",cursive; }
+.drawer-document article h2 { margin: 26px 0 22px; font: clamp(30px,4vw,48px)/1.08 "Segoe Print",cursive; }
 .drawer-document article p { color: #515a53; font-size: 13px; line-height: 1.8; }
 .drawer-document article blockquote { margin: 30px 0; padding: 13px 18px; border-left: 2px solid #a44235; font: 18px "Segoe Print",cursive; }
 .paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
