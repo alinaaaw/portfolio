@@ -16,12 +16,12 @@
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
-  scrollbar-color: rgba(112,201,192,.52) rgba(7,16,15,.14);
+  scrollbar-color: rgba(58,132,126,.9) rgba(7,16,15,.14);
 }
 *::-webkit-scrollbar { width: 5px; height: 5px; }
 *::-webkit-scrollbar-track { background: rgba(7,16,15,.14); }
-*::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(112,201,192,.52); }
-*::-webkit-scrollbar-thumb:hover { background: rgba(209,244,92,.62); }
+*::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(58,132,126,.9); }
+*::-webkit-scrollbar-thumb:hover { background: rgba(70,165,156,.98); }
 html, body { width: 100%; min-height: 100%; margin: 0; background: var(--void); }
 body { overflow: hidden; color: var(--paper); font-family: var(--font-sans), Arial, sans-serif; }
 button, a { font: inherit; }
