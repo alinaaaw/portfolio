@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
-import { drawFieldCaseWorldMap, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
+import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS } from "./_components/fieldCaseMap";
+import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView } from "./_components/fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -52,13 +53,16 @@ type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];re
 type FieldRecord = {meta:string;title:string|null;copy:string;metrics:{value:string;label:string}[];tags:string[]};
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
 
-function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,ariaLabel,header,children}:{
+function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,onClose,onToggleMaximize,isMaximized,ariaLabel,header,children}:{
   id:ComputerWindowId;
   className:string;
   position:WindowPosition;
   zIndex:number;
   onMove:(id:ComputerWindowId,position:WindowPosition)=>void;
   onFocus:(id:ComputerWindowId)=>void;
+  onClose:(id:ComputerWindowId)=>void;
+  onToggleMaximize?:(id:ComputerWindowId)=>void;
+  isMaximized?:boolean;
   ariaLabel:string;
   header:ReactNode;
   children:ReactNode;
@@ -74,6 +78,7 @@ function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,ar
   }>(null);
 
   const startDrag=(event:ReactPointerEvent<HTMLElement>)=>{
+    if(isMaximized)return;
     if(window.matchMedia("(max-width: 620px)").matches)return;
     if((event.target as HTMLElement).closest("button,a"))return;
     const element=windowRef.current;
@@ -105,8 +110,8 @@ function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,ar
     if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
-  return <article ref={windowRef} className={`os-window draggable-window ${className}`} data-window={id} role="dialog" aria-label={ariaLabel} style={{zIndex,transform:`translate3d(${position.x}px,${position.y}px,0)`}} onPointerDown={()=>onFocus(id)}>
-    <header className="window-titlebar" onPointerDown={startDrag} onPointerMove={drag} onPointerUp={endDrag} onPointerCancel={endDrag}>{header}</header>
+  return <article ref={windowRef} className={`os-window draggable-window ${className}${isMaximized?" is-maximized":""}`} data-window={id} role="dialog" aria-label={ariaLabel} style={{zIndex,transform:isMaximized?undefined:`translate3d(${position.x}px,${position.y}px,0)`}} onPointerDown={()=>onFocus(id)}>
+    <header className="window-titlebar" onPointerDown={startDrag} onPointerMove={drag} onPointerUp={endDrag} onPointerCancel={endDrag}>{header}<div className="window-controls">{onToggleMaximize&&<button className="window-maximize" type="button" onClick={()=>onToggleMaximize(id)} aria-label={isMaximized?"Restore window":"Maximize window"} aria-pressed={Boolean(isMaximized)}>{isMaximized?"↙":"□"}</button>}<button className="window-close" type="button" onClick={()=>onClose(id)} aria-label={`Close ${ariaLabel}`}>×</button></div></header>
     {children}
   </article>;
 }
@@ -198,17 +203,138 @@ function BoardScene({onClose}:{onClose:()=>void}) {
 type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
 
-function FieldMapReading({item,onClose}:{item:FieldRecord;onClose:()=>void}) {
+function FieldMapReading({onClose}:{onClose:()=>void}) {
   const canvasRef=useRef<HTMLCanvasElement>(null);
+  const pinHitsRef=useRef<readonly FieldCaseMapPinHit[]>([]);
+  const pointersRef=useRef(new Map<number,{x:number;y:number}>());
+  const gestureRef=useRef<{center:{x:number;y:number};distance:number}|null>(null);
+  const pressRef=useRef<{id:number;x:number;y:number;moved:boolean}|null>(null);
+  const [camera,setCamera]=useState<FieldCaseMapCamera>({...FIELD_CASE_MAP_VIEWS.world});
+  const [activeView,setActiveView]=useState<FieldCaseMapView>("world");
+
+  const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
+    const canvas=canvasRef.current;
+    const zoom=Math.min(10,Math.max(1,next.zoom));
+    const width=canvas?.width??1400,height=canvas?.height??700;
+    const scale=Math.min(width/360,height/180)*zoom;
+    const latitudeLimit=Math.max(0,90-height/(2*scale));
+    return {
+      centerLon:((next.centerLon+540)%360)-180,
+      centerLat:Math.min(latitudeLimit,Math.max(-latitudeLimit,next.centerLat)),
+      zoom,
+    };
+  },[]);
+
+  const chooseView=useCallback((view:FieldCaseMapView)=>{
+    setActiveView(view);
+    setCamera({...FIELD_CASE_MAP_VIEWS[view]});
+  },[]);
+
+  const canvasPoint=useCallback((clientX:number,clientY:number)=>{
+    const canvas=canvasRef.current;
+    if(!canvas)return {x:0,y:0};
+    const rect=canvas.getBoundingClientRect();
+    return {x:(clientX-rect.left)*canvas.width/rect.width,y:(clientY-rect.top)*canvas.height/rect.height};
+  },[]);
+
+  const zoomAt=useCallback((point:{x:number;y:number},factor:number)=>{
+    const canvas=canvasRef.current;
+    if(!canvas)return;
+    setCamera((current)=>{
+      const oldScale=Math.min(canvas.width/360,canvas.height/180)*current.zoom;
+      const zoom=Math.min(10,Math.max(1,current.zoom*factor));
+      const newScale=Math.min(canvas.width/360,canvas.height/180)*zoom;
+      const longitude=current.centerLon+(point.x-canvas.width/2)/oldScale;
+      const latitude=current.centerLat-(point.y-canvas.height/2)/oldScale;
+      return normalizeCamera({
+        centerLon:longitude-(point.x-canvas.width/2)/newScale,
+        centerLat:latitude+(point.y-canvas.height/2)/newScale,
+        zoom,
+      });
+    });
+  },[normalizeCamera]);
+
   useEffect(()=>{
     const canvas=canvasRef.current;
-    if(canvas)drawFieldCaseWorldMap(canvas,1400,true);
-  },[]);
-  return <article className="field-map-reading" onMouseDown={(event)=>event.stopPropagation()}>
-    <header><small>{item.meta}</small><h2>{item.title}</h2><span>{FIELD_CASE_TRAVEL_PINS.length} CONFIRMED PLACES / UNITED STATES + ASIA</span></header>
-    <div className="field-map-sheet"><canvas ref={canvasRef} aria-label={`World map showing ${FIELD_CASE_TRAVEL_PINS.length} places Alina has visited`} /></div>
-    <footer><div><p>{item.copy}</p><ul className="field-map-places">{FIELD_CASE_TRAVEL_PINS.map(({name})=><li key={name}>{name}</li>)}</ul></div><div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div></footer>
-    <button onClick={onClose}>{fieldCaseContent.returnItem}</button>
+    const sheet=canvas?.parentElement;
+    if(!canvas||!sheet)return;
+    const draw=()=>{
+      const ratio=Math.min(window.devicePixelRatio||1,2);
+      const width=Math.max(1,Math.round(sheet.clientWidth*ratio));
+      const height=Math.max(1,Math.round(sheet.clientHeight*ratio));
+      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
+      pinHitsRef.current=drawFieldCaseMapViewport(canvas,camera);
+    };
+    draw();
+    const observer=new ResizeObserver(draw);
+    observer.observe(sheet);
+    return ()=>observer.disconnect();
+  },[camera]);
+
+  const beginPointer=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
+    if(event.pointerType==="mouse"&&event.button!==0)return;
+    const point=canvasPoint(event.clientX,event.clientY);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    pointersRef.current.set(event.pointerId,point);
+    if(pointersRef.current.size===1)pressRef.current={id:event.pointerId,...point,moved:false};
+    if(pointersRef.current.size===2){
+      const [first,second]=Array.from(pointersRef.current.values());
+      gestureRef.current={center:{x:(first.x+second.x)/2,y:(first.y+second.y)/2},distance:Math.hypot(second.x-first.x,second.y-first.y)};
+      if(pressRef.current)pressRef.current.moved=true;
+    }
+  };
+  const movePointer=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
+    const previous=pointersRef.current.get(event.pointerId);
+    if(!previous)return;
+    const point=canvasPoint(event.clientX,event.clientY);
+    pointersRef.current.set(event.pointerId,point);
+    if(pressRef.current&&Math.hypot(point.x-pressRef.current.x,point.y-pressRef.current.y)>6*(canvasRef.current?.width??1)/(canvasRef.current?.clientWidth||1))pressRef.current.moved=true;
+    if(pointersRef.current.size===1){
+      const canvas=canvasRef.current;if(!canvas)return;
+      setCamera((current)=>{
+        const scale=Math.min(canvas.width/360,canvas.height/180)*current.zoom;
+        return normalizeCamera({...current,centerLon:current.centerLon-(point.x-previous.x)/scale,centerLat:current.centerLat+(point.y-previous.y)/scale});
+      });
+    }else if(pointersRef.current.size===2){
+      const [first,second]=Array.from(pointersRef.current.values());
+      const center={x:(first.x+second.x)/2,y:(first.y+second.y)/2};
+      const distance=Math.max(1,Math.hypot(second.x-first.x,second.y-first.y));
+      const prior=gestureRef.current;
+      if(prior){
+        const canvas=canvasRef.current;if(!canvas)return;
+        setCamera((current)=>{
+          const baseScale=Math.min(canvas.width/360,canvas.height/180);
+          const oldScale=baseScale*current.zoom;
+          const zoom=Math.min(10,Math.max(1,current.zoom*distance/prior.distance));
+          const newScale=baseScale*zoom;
+          const anchorLon=current.centerLon+(prior.center.x-canvas.width/2)/oldScale;
+          const anchorLat=current.centerLat-(prior.center.y-canvas.height/2)/oldScale;
+          return normalizeCamera({centerLon:anchorLon-(center.x-canvas.width/2)/newScale,centerLat:anchorLat+(center.y-canvas.height/2)/newScale,zoom});
+        });
+      }
+      gestureRef.current={center,distance};
+    }
+  };
+  const endPointer=(event:ReactPointerEvent<HTMLCanvasElement>,cancelled=false)=>{
+    const point=canvasPoint(event.clientX,event.clientY);
+    const press=pressRef.current;
+    pointersRef.current.delete(event.pointerId);
+    gestureRef.current=null;
+    if(pointersRef.current.size===1){const remaining=Array.from(pointersRef.current.entries())[0];pressRef.current={id:remaining[0],...remaining[1],moved:true};}
+    else if(pointersRef.current.size===0)pressRef.current=null;
+    if(!cancelled&&press?.id===event.pointerId&&!press.moved){
+      const hit=pinHitsRef.current.find((candidate)=>Math.hypot(candidate.x-point.x,candidate.y-point.y)<=candidate.radius);
+      if(hit&&camera.zoom<2.25)chooseView(hit.targetView);
+    }
+  };
+
+  return <article className="field-map-reading field-map-only" role="dialog" aria-label="Interactive travel map" onMouseDown={(event)=>event.stopPropagation()}>
+    <div className="field-map-sheet">
+      <canvas ref={canvasRef} aria-label="Interactive world map of places Alina has visited" onWheel={(event)=>{event.preventDefault();zoomAt(canvasPoint(event.clientX,event.clientY),Math.exp(-event.deltaY*.0015));}} onDoubleClick={(event)=>zoomAt(canvasPoint(event.clientX,event.clientY),1.8)} onPointerDown={beginPointer} onPointerMove={movePointer} onPointerUp={(event)=>endPointer(event)} onPointerCancel={(event)=>endPointer(event,true)}/>
+      <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
+      <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
+      <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
+    </div>
   </article>;
 }
 
@@ -219,7 +345,7 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
     <header><div><span>{zoneInfo.fieldcase.index}</span><strong>{fieldCaseContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
       <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(value in fieldItems)setSelected(value as FieldItem);}}/>
     {Object.keys(fieldItems).length===0&&<article className="collection-empty-state field-empty-state"><small>{fieldCaseContent.emptyState.meta}</small><h2>{fieldCaseContent.emptyState.title}</h2><p>{fieldCaseContent.emptyState.copy}</p><em>{fieldCaseContent.emptyState.note}</em></article>}
-    {item&&selected==="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><FieldMapReading item={item} onClose={()=>setSelected(null)}/></div>}
+    {item&&selected==="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><FieldMapReading onClose={()=>setSelected(null)}/></div>}
     {item&&selected!=="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
   </section></div>;
 }
@@ -261,6 +387,7 @@ export default function VersionThree() {
   const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
   const [computerWindows,setComputerWindows] = useState<ComputerWindowId[]>([]);
   const [windowPositions,setWindowPositions] = useState<Partial<Record<ComputerWindowId,WindowPosition>>>({});
+  const [maximizedWindow,setMaximizedWindow] = useState<ComputerWindowId|null>(null);
   const [referenceFilter,setReferenceFilter] = useState<ReferenceFilter>("all");
   const [bulletin,setBulletin] = useState(false);
   const [faxOpen,setFaxOpen] = useState(false);
@@ -281,12 +408,12 @@ export default function VersionThree() {
   useEffect(() => {
     const close = (event:KeyboardEvent) => {
       if (event.key!=="Escape") return;
-      if(active==="computer"&&computerWindows.length){setComputerWindows((current)=>current.slice(0,-1));return;}
+      if(active==="computer"&&computerWindows.length){const closing=computerWindows.at(-1); setComputerWindows((current)=>current.slice(0,-1)); setMaximizedWindow((current)=>current===closing?null:current); return;}
       setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false);
     };
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
-  },[active,computerWindows.length]);
+  },[active,computerWindows]);
 
   const focusComputerWindow = useCallback((windowId:ComputerWindowId) => {
     setComputerWindows((current)=>current.at(-1)===windowId?current:[...current.filter((item)=>item!==windowId),windowId]);
@@ -295,6 +422,7 @@ export default function VersionThree() {
   const openComputerFile = (file: ComputerFile) => {
     if(file==="desktop"){
       setComputerWindows([]);
+      setMaximizedWindow(null);
       setSelectedComputerFile(null);
       return;
     }
@@ -309,11 +437,30 @@ export default function VersionThree() {
     setSelectedComputerFile(null);
   };
 
-  const closeComputerWindow=(windowId:ComputerWindowId)=>setComputerWindows((current)=>current.filter((item)=>item!==windowId));
+  const closeComputerWindow=(windowId:ComputerWindowId)=>{
+    setComputerWindows((current)=>current.filter((item)=>item!==windowId));
+    setMaximizedWindow((current)=>current===windowId?null:current);
+  };
   const moveComputerWindow=(windowId:ComputerWindowId,position:WindowPosition)=>setWindowPositions((current)=>({...current,[windowId]:position}));
+  const toggleMaximizedWindow=(windowId:ComputerWindowId)=>setMaximizedWindow((current)=>current===windowId?null:windowId);
   const showComputerWindow=(windowId:ComputerWindowId)=>computerWindows.includes(windowId);
   const computerWindowZ=(windowId:ComputerWindowId)=>6+computerWindows.indexOf(windowId);
   const computerWindowPosition=(windowId:ComputerWindowId)=>windowPositions[windowId]??{x:0,y:0};
+  const computerTaskbarItem=(windowId:ComputerWindowId)=>{
+    if(windowId==="references")return {icon:"◉",label:"REFERENCES"};
+    if(windowId==="projects")return {icon:"▰",label:"PROJECTS"};
+    if(windowId==="experience")return {icon:"▰",label:"EXPERIENCE"};
+    if(windowId==="profile")return {icon:"●",label:"PROFILE"};
+    if(windowId==="lablog")return {icon:"≡",label:"LAB LOG"};
+    if(windowId==="readme")return {icon:"▤",label:"README"};
+    if(windowId==="map")return {icon:"▤",label:"MAP"};
+    if(windowId==="allocation")return {icon:"▤",label:"ALLOCATION"};
+    if(windowId==="emg")return {icon:"▤",label:"EMG"};
+    if(windowId==="research")return {icon:"▤",label:"RESEARCH"};
+    return {icon:"▤",label:"INTERNSHIP"};
+  };
+  const taskbarWindowIds:ComputerWindowId[]=["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"];
+  const taskbarWindows=taskbarWindowIds.filter(showComputerWindow);
   const solved = discovered.length===zoneOrder.length;
   const status = roomContent.status.messages[discovered.length];
   const visibleReferences = referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
@@ -373,9 +520,9 @@ export default function VersionThree() {
       {active==="computer"&&(
         <div className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
-            <header className="os-bar"><span>{computerContent.topBar.title}</span><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setActive(null); }}>{computerContent.topBar.leave}</button></header>
+            <header className="os-bar"><span>{computerContent.topBar.title}</span><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
-              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("readme")}>{computerContent.sidebar.readme}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
+              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
               <main className="os-workspace">
                 <div className="desktop-icons">
                   <button className={selectedComputerFile==="readme"?"selected":""} onClick={() => setSelectedComputerFile("readme")} onDoubleClick={() => openComputerFile("readme")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("readme"); }}><i className="file-icon" /><span>{computerContent.desktop.icons.readme}</span></button>
@@ -386,23 +533,23 @@ export default function VersionThree() {
                   <div className="desktop-welcome"><small>{computerContent.desktop.welcome.eyebrow}</small><h2>{computerContent.desktop.welcome.title}</h2><p>{computerContent.desktop.welcome.description}</p></div>
                 </div>
 
-                {showComputerWindow("readme")&&<DraggableComputerWindow id="readme" className="text-file readme-file" position={computerWindowPosition("readme")} zIndex={computerWindowZ("readme")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.readme.filename} header={<><span>{computerContent.readme.filename}</span><button onClick={() => closeComputerWindow("readme")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("readme")&&<DraggableComputerWindow id="readme" className="text-file readme-file" position={computerWindowPosition("readme")} zIndex={computerWindowZ("readme")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.readme.filename} header={<span>{computerContent.readme.filename}</span>}>
                   <div className="os-window-content"><small>{computerContent.readme.meta}</small><h2>{computerContent.readme.title}</h2>{computerContent.readme.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("lablog")&&<DraggableComputerWindow id="lablog" className="lab-log-window" position={computerWindowPosition("lablog")} zIndex={computerWindowZ("lablog")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.labLog.filename} header={<><span>{computerContent.labLog.filename}</span><button onClick={() => closeComputerWindow("lablog")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("lablog")&&<DraggableComputerWindow id="lablog" className="lab-log-window" position={computerWindowPosition("lablog")} zIndex={computerWindowZ("lablog")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.labLog.filename} header={<span>{computerContent.labLog.filename}</span>}>
                   <div className="os-window-content lab-log-feed"><p className="lab-log-line lab-log-meta"><span>{computerContent.labLog.meta}</span></p>{computerContent.labLog.entries.map((entry)=><article className="lab-log-entry" key={`${entry.date}-${entry.title}`}><p className="lab-log-line lab-log-stamp"><span>[{entry.date}] {entry.type}</span></p><h2 className="lab-log-line"><span>{entry.title}</span></h2>{entry.body.map((paragraph)=><p className="lab-log-line" key={paragraph}><span>{paragraph}</span></p>)}<p className="lab-log-line lab-log-end" aria-hidden="true"><span>---</span></p></article>)}</div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("projects")&&<DraggableComputerWindow id="projects" className="folder-window" position={computerWindowPosition("projects")} zIndex={computerWindowZ("projects")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.projectsFolder.title} header={<><span>{computerContent.projectsFolder.title}</span><button onClick={() => closeComputerWindow("projects")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("projects")&&<DraggableComputerWindow id="projects" className="folder-window" position={computerWindowPosition("projects")} zIndex={computerWindowZ("projects")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.projectsFolder.title} header={<span>{computerContent.projectsFolder.title}</span>}>
                   <div className="os-window-content file-list">{projectFiles.map((file) => <button className={selectedComputerFile===file.id?"selected":""} key={file.id} onClick={() => setSelectedComputerFile(file.id)} onDoubleClick={() => openComputerFile(file.id)} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile(file.id); }}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span></button>)}</div>
                 </DraggableComputerWindow>}
 
-                {projectFiles.map((file)=>showComputerWindow(file.id)&&<DraggableComputerWindow key={file.id} id={file.id} className="project-window" position={computerWindowPosition(file.id)} zIndex={computerWindowZ(file.id)} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={file.name} header={<><span>{file.name}</span><button onClick={() => closeComputerWindow(file.id)}>{siteContent.shared.minimize}</button></>}>
+                {projectFiles.map((file)=>showComputerWindow(file.id)&&<DraggableComputerWindow key={file.id} id={file.id} className="project-window" position={computerWindowPosition(file.id)} zIndex={computerWindowZ(file.id)} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={file.name} header={<span>{file.name}</span>}>
                   <div className="os-window-content project-file-content"><small>{file.meta}</small><h2>{file.title}</h2><p className="project-lead">{file.copy}</p><div className="project-facts">{file.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><dl className="project-brief">{file.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><div className="project-file-actions"><button className="project-reference-link" onClick={()=>openReferences(file.id)}>{referencesContent.browser.projectLink}</button><button className="run-file">{computerContent.projectsFolder.verified}</button></div></div>
                 </DraggableComputerWindow>)}
 
-                {showComputerWindow("references")&&<DraggableComputerWindow id="references" className="reference-browser-window" position={computerWindowPosition("references")} zIndex={computerWindowZ("references")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={referencesContent.browser.ariaLabel} header={<><span>{referencesContent.browser.filename}</span><button onClick={() => closeComputerWindow("references")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("references")&&<DraggableComputerWindow id="references" className="reference-browser-window" position={computerWindowPosition("references")} zIndex={computerWindowZ("references")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} onToggleMaximize={toggleMaximizedWindow} isMaximized={maximizedWindow==="references"} ariaLabel={referencesContent.browser.ariaLabel} header={<span>{referencesContent.browser.filename}</span>}>
                   <div className="os-window-content reference-browser-content">
                     <div className="reference-browser-bar"><span aria-hidden="true">● ● ●</span><div>{referencesContent.browser.address}</div></div>
                     <header className="reference-site-header"><small>{referencesContent.browser.meta}</small><h2>{referencesContent.browser.title}</h2><p>{referencesContent.browser.intro}</p></header>
@@ -411,19 +558,19 @@ export default function VersionThree() {
                   </div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("experience")&&<DraggableComputerWindow id="experience" className="experience-window" position={computerWindowPosition("experience")} zIndex={computerWindowZ("experience")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.folderTitle} header={<><span>{computerContent.experience.folderTitle}</span><button onClick={() => closeComputerWindow("experience")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("experience")&&<DraggableComputerWindow id="experience" className="experience-window" position={computerWindowPosition("experience")} zIndex={computerWindowZ("experience")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.experience.folderTitle} header={<span>{computerContent.experience.folderTitle}</span>}>
                   <div className="os-window-content"><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("research");}}><span>{computerContent.experience.research.listMeta}</span><strong>{computerContent.experience.research.organization}</strong><small>{computerContent.experience.research.date}</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("internship");}}><span>{computerContent.experience.internship.listMeta}</span><strong>{computerContent.experience.internship.organization}</strong><small>{computerContent.experience.internship.date}</small></button></div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("research")&&<DraggableComputerWindow id="research" className="text-file experience-detail-window" position={computerWindowPosition("research")} zIndex={computerWindowZ("research")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.research.filename} header={<><span>{computerContent.experience.research.filename}</span><button onClick={() => closeComputerWindow("research")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("research")&&<DraggableComputerWindow id="research" className="text-file experience-detail-window" position={computerWindowPosition("research")} zIndex={computerWindowZ("research")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.experience.research.filename} header={<span>{computerContent.experience.research.filename}</span>}>
                   <div className="os-window-content experience-file-content"><small>{computerContent.experience.research.meta}</small><h2>{computerContent.experience.research.title}</h2><p>{computerContent.experience.research.copy}</p><dl className="experience-brief">{computerContent.experience.research.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><blockquote>{computerContent.experience.research.quote}</blockquote></div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("internship")&&<DraggableComputerWindow id="internship" className="text-file experience-detail-window" position={computerWindowPosition("internship")} zIndex={computerWindowZ("internship")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.internship.filename} header={<><span>{computerContent.experience.internship.filename}</span><button onClick={() => closeComputerWindow("internship")}>{siteContent.shared.minimize}</button></>}>
+                {showComputerWindow("internship")&&<DraggableComputerWindow id="internship" className="text-file experience-detail-window" position={computerWindowPosition("internship")} zIndex={computerWindowZ("internship")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.experience.internship.filename} header={<span>{computerContent.experience.internship.filename}</span>}>
                   <div className="os-window-content experience-file-content"><small>{computerContent.experience.internship.meta}</small><h2>{computerContent.experience.internship.title}</h2><p>{computerContent.experience.internship.copy}</p><dl className="experience-brief">{computerContent.experience.internship.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><blockquote>{computerContent.experience.internship.quote}</blockquote></div>
                 </DraggableComputerWindow>}
 
-                {showComputerWindow("profile")&&<DraggableComputerWindow id="profile" className="profile-window" position={computerWindowPosition("profile")} zIndex={computerWindowZ("profile")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.profile.windowTitle} header={<><span>{computerContent.profile.windowTitle}</span><button onClick={() => closeComputerWindow("profile")} aria-label={computerContent.profile.closeAria}>{siteContent.shared.close}</button></>}>
+                {showComputerWindow("profile")&&<DraggableComputerWindow id="profile" className="profile-window" position={computerWindowPosition("profile")} zIndex={computerWindowZ("profile")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.profile.windowTitle} header={<span>{computerContent.profile.windowTitle}</span>}>
                   <div className="os-window-content profile-window-body">
                     <section className="profile-identity">
                       <div className="profile-avatar" aria-hidden="true">{siteContent.brand.initials}</div>
@@ -443,7 +590,7 @@ export default function VersionThree() {
 
                 <div className={`news-popup ${bulletin?"visible":""}`}><header><span>{computerContent.bulletin.header}</span><button onClick={() => setBulletin(false)}>{siteContent.shared.close}</button></header><strong>{computerContent.bulletin.title}</strong><p>{computerContent.bulletin.copy}</p></div>
               </main>
-              <footer className="os-taskbar"><button onClick={() => openComputerFile("desktop")}>{siteContent.brand.initials}</button><span>{computerContent.taskbar.files}</span><span>{bulletin?computerContent.taskbar.unread:computerContent.taskbar.clear}</span></footer>
+              <footer className="os-taskbar"><button className="taskbar-home" onClick={() => openComputerFile("desktop")} aria-label="Show desktop">{siteContent.brand.initials}</button><div className="taskbar-apps" aria-label="Open applications">{taskbarWindows.map((windowId)=>{const item=computerTaskbarItem(windowId);return <button className={`taskbar-app ${computerWindows.at(-1)===windowId?"active":""}`} key={windowId} onClick={()=>focusComputerWindow(windowId)} aria-label={`Focus ${item.label}`} aria-pressed={computerWindows.at(-1)===windowId}><i aria-hidden="true">{item.icon}</i><span>{item.label}</span></button>;})}</div><span className="taskbar-files">{computerContent.taskbar.files}</span><span className="taskbar-alert">{bulletin?computerContent.taskbar.unread:computerContent.taskbar.clear}</span></footer>
             </div>
           </div>
         </div>

@@ -127,9 +127,16 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .os-sidebar .os-profile-trigger:hover { background: var(--signal); color: var(--ink); box-shadow: 0 0 20px rgba(209,244,92,.18); }
 .os-sidebar > span { margin-top: auto; color: #55605b; text-align: center; font: 6px var(--font-mono), monospace; }
 .os-workspace { position: relative; grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; overflow: hidden; background-color: #263734; background-image: linear-gradient(rgba(112,201,192,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(112,201,192,.04) 1px,transparent 1px),radial-gradient(circle at 74% 36%,#35524a,#172421 58%); background-size: 42px 42px,42px 42px,auto; }
-.os-taskbar { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; gap: 22px; padding: 0 12px; border-top: 1px solid #52605a; background: #08100f; color: #77827c; font: 6px var(--font-mono), monospace; }
-.os-taskbar button { width: 24px; height: 24px; background: var(--signal); color: var(--ink); cursor: pointer; font: 700 7px var(--font-mono), monospace; }
-.os-taskbar span:last-child { margin-left: auto; color: var(--cyan); }
+.os-taskbar { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0 12px; border-top: 1px solid #52605a; background: #08100f; color: #77827c; font: 6px var(--font-mono), monospace; }
+.os-taskbar button { cursor: pointer; font: 700 7px var(--font-mono), monospace; }
+.taskbar-home { flex: 0 0 24px; width: 24px; height: 24px; background: var(--signal); color: var(--ink); }
+.taskbar-apps { display: flex; align-items: stretch; gap: 4px; min-width: 0; overflow-x: auto; }
+.taskbar-app { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 7px; border: 1px solid #3d4c46; background: #14211e; color: #9da9a1; white-space: nowrap; }
+.taskbar-app:hover, .taskbar-app.active { border-color: var(--signal); background: #263630; color: var(--signal); }
+.taskbar-app i { color: var(--cyan); font-size: 11px; font-style: normal; }
+.taskbar-app span { font-size: 6px; }
+.taskbar-files { margin-left: auto; white-space: nowrap; }
+.taskbar-alert { flex: 0 0 auto; color: var(--cyan); white-space: nowrap; }
 
 .desktop-icons { display: grid; grid-template: repeat(4,88px) / 105px 105px 1fr; gap: 12px; width: 100%; height: 100%; padding: 26px; }
 .desktop-icons > button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 96px; background: transparent; color: var(--paper); cursor: pointer; font: 9px var(--font-mono), monospace; }
@@ -152,6 +159,14 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .os-window > .window-titlebar { position: relative; z-index: 1; flex: 0 0 38px; cursor: grab; touch-action: none; user-select: none; }
 .window-titlebar > span { font-size: 9px; }
 .os-window > .window-titlebar:active { cursor: grabbing; }
+.window-controls { display: flex; align-self: stretch; margin-right: -13px; }
+.window-controls button { display: grid; place-items: center; width: 38px; min-width: 38px; height: 38px; border-left: 1px solid #3d4945; font-size: 16px !important; line-height: 1; }
+.window-controls .window-maximize { color: var(--cyan); font-size: 15px !important; }
+.window-controls .window-close { color: #f0ece0; }
+.window-controls .window-close:hover { background: #a44235; color: white; }
+.window-controls .window-maximize:hover { background: #2a3b36; color: var(--signal); }
+.os-window.is-maximized { top: 0; left: 0; width: 100%; min-height: 100%; height: 100%; max-height: none; box-shadow: none; }
+.os-window.is-maximized > .window-titlebar { cursor: default; }
 .os-window > .os-window-content { min-height: 0; overflow: auto; }
 .text-file > .os-window-content, .project-window > .os-window-content { padding: clamp(28px,4vw,58px); }
 .text-file small, .project-window small { color: #b34132; font: 7px var(--font-mono), monospace; }
@@ -272,20 +287,17 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .evidence-card.field-card { width: min(640px,86vw); min-height: 0; padding: 40px 48px 54px; }
 .evidence-card.field-card h2 { margin: 22px 0 16px; font-size: clamp(32px,4vw,48px); }
 .evidence-card.field-card p { margin: 0; line-height: 1.65; }
-.field-map-reading { position: relative; box-sizing: border-box; width: min(1050px,92vw); max-height: calc(100vh - 130px); overflow-y: auto; padding: 22px 22px 26px; border: 1px solid #8a7453; background: #5c4934; color: var(--paper); box-shadow: 18px 24px 0 rgba(0,0,0,.38); transform: rotate(-.35deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
-.field-map-reading > header { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 24px; align-items: end; margin: 0 44px 14px 0; }
-.field-map-reading > header small { color: #d1f45c; font: 7px var(--font-mono),monospace; letter-spacing: .08em; }
-.field-map-reading > header h2 { grid-column: 1; margin: 3px 0 0; font: clamp(28px,3.6vw,48px)/1 "Segoe Print",cursive; letter-spacing: -.04em; }
-.field-map-reading > header span { grid-column: 2; grid-row: 1 / 3; color: #d9cfad; font: 6px/1.5 var(--font-mono),monospace; text-align: right; }
-.field-map-sheet { position: relative; padding: 10px; border: 1px solid #aa9469; background: #2b3c37; box-shadow: inset 0 0 0 4px rgba(4,11,10,.25),0 9px 15px rgba(0,0,0,.28); }
-.field-map-sheet canvas { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; background: #d9cfad; }
-.field-map-reading > footer { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px 26px; align-items: start; margin-top: 16px; }
-.field-map-reading > footer p { max-width: 700px; margin: 0; color: #eee7d6; font-size: 11px; line-height: 1.65; }
-.field-map-places { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
-.field-map-places li { padding: 5px 7px; border: 1px solid rgba(238,231,214,.28); background: rgba(24,42,37,.2); color: #e7ddc2; font: 6px var(--font-mono),monospace; }
-.field-map-reading .object-tags { justify-content: flex-end; margin: 0; }
-.field-map-reading .object-tags span { border-color: rgba(238,231,214,.38); color: #d9cfad; }
-.field-map-reading > button { position: absolute; top: 18px; right: 18px; padding: 9px 11px; border: 1px solid rgba(238,231,214,.35); background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
+.field-map-reading { position: relative; box-sizing: border-box; width: min(1200px,96vw); height: min(760px,calc(100vh - 128px)); overflow: hidden; padding: 0; border: 1px solid #8a7453; background: #d9cfad; box-shadow: 18px 24px 0 rgba(0,0,0,.38); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
+.field-map-sheet { position: absolute; inset: 0; overflow: hidden; background: #d9cfad; }
+.field-map-sheet canvas { display: block; width: 100%; height: 100%; background: #d9cfad; touch-action: none; overscroll-behavior: contain; cursor: grab; }
+.field-map-sheet canvas:active { cursor: grabbing; }
+.field-map-views, .field-map-zoom { position: absolute; z-index: 2; display: flex; gap: 5px; }
+.field-map-views { top: 14px; left: 14px; }
+.field-map-zoom { right: 14px; bottom: 14px; }
+.field-map-views button, .field-map-zoom button, .field-map-return { min-width: 44px; min-height: 44px; border: 1px solid rgba(231,221,194,.5); background: rgba(22,32,29,.88); color: var(--paper); box-shadow: 3px 4px 0 rgba(0,0,0,.24); cursor: pointer; font: 7px var(--font-mono),monospace; backdrop-filter: blur(8px); }
+.field-map-views button.active { border-color: var(--signal); color: var(--signal); }
+.field-map-zoom button { font-size: 17px; }
+.field-map-return { position: absolute; z-index: 3; top: 14px; right: 14px; font-size: 17px; }
 .evidence-card.note-card { max-width: 590px; min-height: 400px; background-color: #e9dfa8; transform: rotate(1.2deg); }
 .evidence-card small { color: #a44235; font: 7px var(--font-mono),monospace; }
 .evidence-card h2 { margin: 30px 0 24px; font: clamp(35px,5vw,61px)/1.04 "Segoe Print",cursive; letter-spacing: -.045em; }
@@ -537,11 +549,15 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .os-sidebar button { flex: 0 0 auto; padding: 9px 7px; }
   .os-sidebar .os-profile-trigger { flex: 0 0 36px; width: 36px; height: 36px; margin: 0 3px 0 0; font-size: 11px; }
   .os-workspace { grid-column: 1; padding-top: 48px; }
-  .os-taskbar { grid-column: 1; }
+  .os-taskbar { grid-column: 1; gap: 7px; padding: 0 8px; }
+  .taskbar-app { padding: 0 5px; }
+  .taskbar-files { display: none; }
+  .taskbar-alert { max-width: 82px; overflow: hidden; text-overflow: ellipsis; }
   .desktop-icons { grid-template: repeat(3,75px) minmax(0,1fr) / repeat(2,90px); padding: 65px 14px 14px; }
   .desktop-welcome { grid-column: 1 / 3; grid-row: 4; align-self: end; justify-self: start; width: 100%; padding: 20px; }
   .desktop-welcome h2 { font-size: 42px; }
   .os-window { top: 66px; left: 3%; width: 94%; max-height: calc(100% - 76px); overflow: hidden; transform: none !important; }
+  .os-window.is-maximized { top: 0; left: 0; width: 100%; min-height: 100%; height: 100%; max-height: 100%; }
   .os-window > .window-titlebar { cursor: default; touch-action: auto; }
   .os-window > .os-window-content { overflow-y: auto; }
   .text-file > .os-window-content, .project-window > .os-window-content { padding: 28px 22px; }
@@ -591,13 +607,11 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .drawer-document article { min-height: min(450px,calc(100svh - 112px)); max-height: calc(100svh - 112px); padding: 56px 28px 44px; }
   .artifact-facts, .field-metrics { grid-template-columns: 1fr; }
   .object-layer, .fax-layer { padding: 0; }
-  .field-detail { padding: 10px; }
-  .field-map-reading { width: 100%; max-height: calc(100svh - 78px); padding: 14px 14px 18px; transform: none; }
-  .field-map-reading > header { grid-template-columns: 1fr; margin-right: 42px; }
-  .field-map-reading > header span { display: none; }
-  .field-map-reading > footer { grid-template-columns: 1fr; }
-  .field-map-reading .object-tags { justify-content: flex-start; }
-  .field-map-sheet { padding: 5px; }
+  .field-detail { padding: 0; }
+  .field-map-reading { width: 100%; height: calc(100svh - 58px); max-height: none; border: 0; box-shadow: none; transform: none; }
+  .field-map-views { top: 10px; left: 10px; }
+  .field-map-return { top: 10px; right: 10px; }
+  .field-map-zoom { right: 10px; bottom: 10px; }
   .object-view { width: 100%; height: 100svh; max-height: none; border: 0; }
   .object-view > header { padding: 0 14px; }
   .drawer-tray, .case-inventory { grid-template-columns: 1fr 1fr 1fr; padding: 18px 10px; }

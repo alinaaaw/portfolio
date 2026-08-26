@@ -44,6 +44,17 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /lab-log-line/);
   assert.match(content, /USER PROFILE \/ ALINA\.WU/);
   assert.match(page, /os-profile-trigger/);
+  assert.match(page, /onToggleMaximize=\{toggleMaximizedWindow\}/);
+  assert.match(page, /maximizedWindow===\"references\"/);
+  assert.match(page, /window-maximize/);
+  assert.match(page, /window-close/);
+  assert.match(page, /taskbar-apps/);
+  assert.match(page, /taskbarWindows\.map\(\(windowId\)=>/);
+  assert.match(page, /taskbarWindowIds\.filter\(showComputerWindow\)/);
+  assert.match(page, /label:"REFERENCES"/);
+  assert.match(page, /label:"ALLOCATION"/);
+  assert.match(page, /computerContent\.sidebar\.references\}<\/button><button onClick=\{\(\) => openComputerFile\(\"lablog\"\)\}/);
+  assert.doesNotMatch(page, /computerContent\.sidebar\.readme/);
   assert.match(content, /Quality of Life in Shanghai/);
   assert.match(content, /Automatic and Satisfactory Course Assignment/);
   assert.match(content, /Monitoring Device for Muscle Usage.*Behavior/);
@@ -71,7 +82,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /FIELD CASE \/ LIFE OUTSIDE THE LAB/);
   assert.match(content, /WORLD MAP \/ TRAVEL PINS/);
   assert.match(page, /field-map-reading/);
-  assert.match(page, /drawFieldCaseWorldMap/);
+  assert.match(page, /drawFieldCaseMapViewport/);
   assert.doesNotMatch(content, /editable layout markers|Replace prompts and layout pins/);
   assert.match(content, /REFERENCES\.web/);
   assert.match(content, /Books and films will live here/);
@@ -137,19 +148,31 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /contactCardPickup/);
   assert.match(css, /contactCardReturn/);
+  assert.match(css, /\.os-window\.is-maximized/);
+  assert.match(css, /\.window-controls/);
+  assert.match(css, /\.taskbar-app\.active/);
 });
 
 test("field case map uses real country geometry instead of hand-drawn continents", async () => {
   const { readFile } = await import("node:fs/promises");
   const mapSource = await readFile(new URL("../app/_components/fieldCaseMap.ts", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const countries = JSON.parse(await readFile(new URL("../app/_components/worldCountries110m.json", import.meta.url), "utf8"));
   assert.ok(countries.length >= 170, "the map should retain Natural Earth country coverage");
   assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
   assert.match(mapSource, /fill\("evenodd"\)/);
   assert.match(mapSource, /\[-width,0,width\]/);
   assert.match(mapSource, /FIELD_CASE_TRAVEL_PINS/);
+  assert.match(mapSource, /FIELD_CASE_MAP_VIEWS/);
+  assert.match(mapSource, /worldGroup/);
+  assert.match(mapSource, /camera\.zoom<2\.25/);
   for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo"]) {
     assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+  const mapReading = page.match(/function FieldMapReading[\s\S]*?\n}\n\nfunction FieldCaseScene/)?.[0] ?? "";
+  assert.match(mapReading, /onWheel/);
+  assert.match(mapReading, /setPointerCapture/);
+  assert.match(mapReading, /field-map-views/);
+  assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);
   assert.doesNotMatch(mapSource, /landMasses/);
 });

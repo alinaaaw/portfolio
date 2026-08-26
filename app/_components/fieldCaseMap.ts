@@ -8,24 +8,34 @@ type CountryGeometry =
   | {type:"Polygon";coordinates:CountryPolygon}
   | {type:"MultiPolygon";coordinates:readonly CountryPolygon[]};
 type CountryFeature = {c:number;g:CountryGeometry|null};
-export type FieldCaseTravelPin = {name:string;coordinate:Coordinate};
+export type FieldCaseMapView = "world"|"usa"|"asia";
+export type FieldCaseMapCamera = {centerLon:number;centerLat:number;zoom:number};
+type FieldCaseWorldGroup = "usa-west"|"usa-northeast"|"florida"|"china"|"japan-korea"|"thailand";
+export type FieldCaseTravelPin = {name:string;coordinate:Coordinate;region:Exclude<FieldCaseMapView,"world">;worldGroup:FieldCaseWorldGroup};
+export type FieldCaseMapPinHit = {id:string;x:number;y:number;radius:number;count:number;names:readonly string[];targetView:Exclude<FieldCaseMapView,"world">};
+
+export const FIELD_CASE_MAP_VIEWS:Record<FieldCaseMapView,FieldCaseMapCamera> = {
+  world:{centerLon:0,centerLat:0,zoom:1},
+  usa:{centerLon:-97.5,centerLat:37.5,zoom:5.1},
+  asia:{centerLon:111.5,centerLat:30,zoom:4.5},
+};
 
 export const FIELD_CASE_TRAVEL_PINS:readonly FieldCaseTravelPin[] = [
-  {name:"Seattle",coordinate:[-122.3321,47.6062]},
-  {name:"San Francisco",coordinate:[-122.4194,37.7749]},
-  {name:"Los Angeles",coordinate:[-118.2437,34.0522]},
-  {name:"San Diego",coordinate:[-117.1611,32.7157]},
-  {name:"New York City",coordinate:[-74.006,40.7128]},
-  {name:"Philadelphia",coordinate:[-75.1652,39.9526]},
-  {name:"Boston",coordinate:[-71.0589,42.3601]},
-  {name:"Orlando",coordinate:[-81.3792,28.5383]},
-  {name:"Busan",coordinate:[129.0756,35.1796]},
-  {name:"Bangkok",coordinate:[100.5018,13.7563]},
-  {name:"Chongqing",coordinate:[106.5516,29.563]},
-  {name:"Xi'an",coordinate:[108.9398,34.3416]},
-  {name:"Shanghai",coordinate:[121.4737,31.2304]},
-  {name:"Osaka",coordinate:[135.5023,34.6937]},
-  {name:"Tokyo",coordinate:[139.6917,35.6895]},
+  {name:"Seattle",coordinate:[-122.3321,47.6062],region:"usa",worldGroup:"usa-west"},
+  {name:"San Francisco",coordinate:[-122.4194,37.7749],region:"usa",worldGroup:"usa-west"},
+  {name:"Los Angeles",coordinate:[-118.2437,34.0522],region:"usa",worldGroup:"usa-west"},
+  {name:"San Diego",coordinate:[-117.1611,32.7157],region:"usa",worldGroup:"usa-west"},
+  {name:"New York City",coordinate:[-74.006,40.7128],region:"usa",worldGroup:"usa-northeast"},
+  {name:"Philadelphia",coordinate:[-75.1652,39.9526],region:"usa",worldGroup:"usa-northeast"},
+  {name:"Boston",coordinate:[-71.0589,42.3601],region:"usa",worldGroup:"usa-northeast"},
+  {name:"Orlando",coordinate:[-81.3792,28.5383],region:"usa",worldGroup:"florida"},
+  {name:"Busan",coordinate:[129.0756,35.1796],region:"asia",worldGroup:"japan-korea"},
+  {name:"Bangkok",coordinate:[100.5018,13.7563],region:"asia",worldGroup:"thailand"},
+  {name:"Chongqing",coordinate:[106.5516,29.563],region:"asia",worldGroup:"china"},
+  {name:"Xi'an",coordinate:[108.9398,34.3416],region:"asia",worldGroup:"china"},
+  {name:"Shanghai",coordinate:[121.4737,31.2304],region:"asia",worldGroup:"china"},
+  {name:"Osaka",coordinate:[135.5023,34.6937],region:"asia",worldGroup:"japan-korea"},
+  {name:"Tokyo",coordinate:[139.6917,35.6895],region:"asia",worldGroup:"japan-korea"},
 ];
 
 // Natural Earth 1:110m Admin-0 Countries, reduced to geometry and MAPCOLOR7.
@@ -43,7 +53,9 @@ function project([longitude,latitude]:Coordinate,width:number,height:number) {
 function traceRing(context:CanvasRenderingContext2D,ring:Ring,width:number,height:number) {
   let previousX:number|undefined;
   ring.forEach((coordinate,index)=>{
-    let {x,y}=project(coordinate,width,height);
+    const projected=project(coordinate,width,height);
+    let x=projected.x;
+    const y=projected.y;
     if(previousX!==undefined){
       while(x-previousX>width/2)x-=width;
       while(previousX-x>width/2)x+=width;
@@ -152,6 +164,164 @@ export function drawFieldCaseWorldMap(canvas:HTMLCanvasElement,resolution=1024,s
       });
     }
   }
+}
+
+function wrappedLongitudeDelta(longitude:number,centerLon:number) {
+  return ((longitude-centerLon+540)%360)-180;
+}
+
+function viewportScale(width:number,height:number,camera:FieldCaseMapCamera) {
+  return Math.min(width/360,height/180)*camera.zoom;
+}
+
+function projectViewport(coordinate:Coordinate,width:number,height:number,camera:FieldCaseMapCamera,wrap=false) {
+  const [longitude,latitude]=coordinate;
+  const scale=viewportScale(width,height,camera);
+  const longitudeDelta=wrap?wrappedLongitudeDelta(longitude,camera.centerLon):longitude-camera.centerLon;
+  return {x:width/2+longitudeDelta*scale,y:height/2-(latitude-camera.centerLat)*scale};
+}
+
+function traceViewportRing(
+  context:CanvasRenderingContext2D,
+  ring:Ring,
+  width:number,
+  height:number,
+  camera:FieldCaseMapCamera,
+  worldPixelWidth:number,
+) {
+  let previousX:number|undefined;
+  ring.forEach((coordinate,index)=>{
+    let {x,y}=projectViewport(coordinate,width,height,camera);
+    if(previousX!==undefined){
+      while(x-previousX>worldPixelWidth/2)x-=worldPixelWidth;
+      while(previousX-x>worldPixelWidth/2)x+=worldPixelWidth;
+    }
+    if(index===0)context.moveTo(x,y);else context.lineTo(x,y);
+    previousX=x;
+  });
+  context.closePath();
+}
+
+function drawViewportCountries(context:CanvasRenderingContext2D,width:number,height:number,camera:FieldCaseMapCamera) {
+  const worldPixelWidth=360*viewportScale(width,height,camera);
+  context.strokeStyle="rgba(41,65,57,.7)";
+  context.lineWidth=Math.max(.7,width/1500);
+  context.lineJoin="round";
+  context.lineCap="round";
+  countryFeatures.forEach((country,index)=>{
+    if(!country.g)return;
+    const fill=countryColors[(country.c-1+countryColors.length)%countryColors.length]??countryColors[index%countryColors.length];
+    const polygons=country.g.type==="Polygon"?[country.g.coordinates]:country.g.coordinates;
+    polygons.forEach((polygon)=>{
+      for(const offset of [-worldPixelWidth,0,worldPixelWidth]){
+        context.save();
+        context.translate(offset,0);
+        context.beginPath();
+        polygon.forEach((ring)=>traceViewportRing(context,ring,width,height,camera,worldPixelWidth));
+        context.fillStyle=fill;
+        context.fill("evenodd");
+        context.stroke();
+        context.restore();
+      }
+    });
+  });
+}
+
+function meanCoordinate(pins:readonly FieldCaseTravelPin[]):Coordinate {
+  const latitude=pins.reduce((sum,pin)=>sum+pin.coordinate[1],0)/pins.length;
+  const longitudeRadians=pins.map((pin)=>pin.coordinate[0]*Math.PI/180);
+  const longitude=Math.atan2(
+    longitudeRadians.reduce((sum,value)=>sum+Math.sin(value),0),
+    longitudeRadians.reduce((sum,value)=>sum+Math.cos(value),0),
+  )*180/Math.PI;
+  return [longitude,latitude];
+}
+
+function drawViewportPin(
+  context:CanvasRenderingContext2D,
+  x:number,
+  y:number,
+  radius:number,
+  count:number,
+) {
+  context.fillStyle="rgba(26,43,39,.28)";
+  context.beginPath();context.ellipse(x+radius*.35,y+radius*1.3,radius*.85,radius*.36,0,0,Math.PI*2);context.fill();
+  context.strokeStyle="#873b31";
+  context.lineWidth=Math.max(1.5,radius*.22);
+  context.beginPath();context.moveTo(x,y+radius*.7);context.lineTo(x,y-radius*.75);context.stroke();
+  context.fillStyle="#b94e3e";
+  context.beginPath();context.arc(x,y-radius,radius,0,Math.PI*2);context.fill();
+  if(count>1){
+    context.fillStyle="#fff8da";
+    context.font=`700 ${Math.round(radius*1.15)}px monospace`;
+    context.textAlign="center";
+    context.textBaseline="middle";
+    context.fillText(String(count),x,y-radius*.94);
+  }else{
+    context.fillStyle="rgba(255,248,218,.86)";
+    context.beginPath();context.arc(x-radius*.32,y-radius*1.3,radius*.24,0,Math.PI*2);context.fill();
+  }
+}
+
+export function drawFieldCaseMapViewport(
+  canvas:HTMLCanvasElement,
+  camera:FieldCaseMapCamera,
+):readonly FieldCaseMapPinHit[] {
+  const context=canvas.getContext("2d");
+  if(!context)return [];
+  const {width,height}=canvas;
+  context.fillStyle="#d9cfad";
+  context.fillRect(0,0,width,height);
+  context.save();
+  context.beginPath();context.rect(0,0,width,height);context.clip();
+  context.strokeStyle="rgba(63,91,82,.2)";
+  context.lineWidth=Math.max(1,width/1100);
+  const scale=viewportScale(width,height,camera);
+  const worldPixelWidth=360*scale;
+  for(let longitude=-180;longitude<=180;longitude+=30){
+    const projected=projectViewport([longitude,0],width,height,camera);
+    for(const offset of [-worldPixelWidth,0,worldPixelWidth]){
+      const x=projected.x+offset;
+      if(x>=0&&x<=width){context.beginPath();context.moveTo(x,0);context.lineTo(x,height);context.stroke();}
+    }
+  }
+  for(let latitude=-60;latitude<=60;latitude+=30){
+    const {y}=projectViewport([camera.centerLon,latitude],width,height,camera);
+    if(y>=0&&y<=height){context.beginPath();context.moveTo(0,y);context.lineTo(width,y);context.stroke();}
+  }
+  drawViewportCountries(context,width,height,camera);
+
+  const verticalFold=context.createLinearGradient(width*.48,0,width*.52,0);
+  verticalFold.addColorStop(0,"rgba(73,59,40,0)");verticalFold.addColorStop(.45,"rgba(73,59,40,.1)");verticalFold.addColorStop(.55,"rgba(255,248,218,.16)");verticalFold.addColorStop(1,"rgba(73,59,40,0)");
+  context.fillStyle=verticalFold;context.fillRect(width*.48,0,width*.04,height);
+  const horizontalFold=context.createLinearGradient(0,height*.46,0,height*.54);
+  horizontalFold.addColorStop(0,"rgba(73,59,40,0)");horizontalFold.addColorStop(.45,"rgba(73,59,40,.08)");horizontalFold.addColorStop(.55,"rgba(255,248,218,.14)");horizontalFold.addColorStop(1,"rgba(73,59,40,0)");
+  context.fillStyle=horizontalFold;context.fillRect(0,height*.46,width,height*.08);
+
+  const groupedPins=new Map<FieldCaseWorldGroup,FieldCaseTravelPin[]>();
+  FIELD_CASE_TRAVEL_PINS.forEach((pin)=>groupedPins.set(pin.worldGroup,[...(groupedPins.get(pin.worldGroup)??[]),pin]));
+  const markerGroups:readonly (readonly FieldCaseTravelPin[])[]=camera.zoom<2.25
+    ? Array.from(groupedPins.values())
+    : FIELD_CASE_TRAVEL_PINS.map((pin)=>[pin]);
+  const hits:FieldCaseMapPinHit[]=[];
+  markerGroups.forEach((pins)=>{
+    const coordinate=meanCoordinate(pins);
+    const {x,y}=projectViewport(coordinate,width,height,camera,true);
+    if(x<0||x>width||y<0||y>height)return;
+    const radius=pins.length>1?Math.max(9,width/125):Math.max(4.5,width/260);
+    drawViewportPin(context,x,y,radius,pins.length);
+    hits.push({
+      id:pins[0].worldGroup,
+      x,y,
+      radius:Math.max(radius*1.7,width/70),
+      count:pins.length,
+      names:pins.map((pin)=>pin.name),
+      targetView:pins[0].region,
+    });
+  });
+  context.restore();
+  context.strokeStyle="#7b503f";context.lineWidth=Math.max(3,width/300);context.strokeRect(4,4,width-8,height-8);
+  return hits;
 }
 
 export function createFieldCaseWorldMapTexture(resolution=1024) {
