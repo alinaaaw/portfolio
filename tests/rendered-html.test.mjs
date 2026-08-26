@@ -196,6 +196,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(notebook, /Random Ticket/);
   assert.match(notebook, /Probabilistic \+ Maximum Weight/);
   assert.doesNotMatch(notebook, /dossier/i);
+  assert.doesNotMatch(notebook, /"diagram"|ALLOCATION REVISION|Residual probability needed a better rule/);
   assert.doesNotMatch(notebook, /TURN IT OVER|TURN THE PAGE|TURN BACK/);
   assert.match(css, /\.model-detail \.notebook-closeup \{[^}]*aspect-ratio: \.79/);
   assert.match(css, /\.model-detail \.notebook-closeup \{[^}]*width: min\(630px,86vw/);
