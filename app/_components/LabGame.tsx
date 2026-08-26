@@ -86,7 +86,7 @@ function makeLabel(text: string) {
     context.lineWidth = 4;
     context.strokeRect(5,5,630,118);
     context.fillStyle = "#d1f45c";
-    context.font = "700 28px monospace";
+    context.font = "700 38px monospace";
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(text,320,65);
@@ -144,27 +144,79 @@ function addDesk(scene: THREE.Scene, x: number, z: number, width: number, depth:
   return group;
 }
 
-function addCable(scene: THREE.Scene, points: [number,number,number][], color: number, radius = .018) {
-  const curve = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)));
-  const cable = new THREE.Mesh(new THREE.TubeGeometry(curve,32,radius,7,false),material(color,.55,.15));
-  scene.add(cable);
+function addCable(parent: THREE.Object3D, points: [number,number,number][], color: number, radius = .018) {
+  const curve = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)),false,"centripetal");
+  const cable = new THREE.Mesh(new THREE.TubeGeometry(curve,48,radius,8,false),material(color,.55,.15));
+  parent.add(cable);
   return cable;
 }
 
-function addDeskLamp(group: THREE.Group, x: number, z: number) {
-  const base = cylinder(.42,.09,0x252c2a,30);
-  base.position.set(x,1.64,z);
-  const lower = cylinder(.045,1.15,0x343d3a,14);
-  lower.position.set(x,2.18,z);
-  const upper = cylinder(.04,1.1,0x343d3a,14);
-  upper.position.set(x-.36,2.87,z);
-  upper.rotation.z = -.7;
-  const shade = new THREE.Mesh(new THREE.ConeGeometry(.5,.58,32,1,true),material(0x1b2321,.32,.72));
-  shade.position.set(x-.72,3.25,z);
-  shade.rotation.z = Math.PI;
-  const bulb = new THREE.PointLight(0xffbf7d,12,7,1.65);
-  bulb.position.set(x-.72,2.95,z);
-  group.add(base,lower,upper,shade,bulb);
+function addJumperLead(parent: THREE.Object3D, points: [[number,number,number],[number,number,number],[number,number,number],[number,number,number]], color: number) {
+  const curve = new THREE.CubicBezierCurve3(...points.map((point) => new THREE.Vector3(...point)) as [THREE.Vector3,THREE.Vector3,THREE.Vector3,THREE.Vector3]);
+  const lead = new THREE.Mesh(new THREE.TubeGeometry(curve,48,.023,8,false),material(color,.46,.16));
+  parent.add(lead);
+  return lead;
+}
+
+function addDeskLamp(group: THREE.Group, x: number, z: number, rotationY = -1) {
+  const lamp = new THREE.Group();
+  lamp.position.set(x,1.58,z);
+  lamp.rotation.y = rotationY;
+
+  const base = cylinder(.34,.09,0x26312e,32);
+  base.position.y = .045;
+  const baseCap = cylinder(.21,.035,palette.steel,28);
+  baseCap.position.y = .105;
+  const switchButton = box(.13,.045,.09,palette.red,.46,.18);
+  switchButton.position.set(.13,.14,.03);
+
+  const lowerJoint = cylinder(.11,.18,palette.steel,24);
+  lowerJoint.position.set(0,.24,0);
+  lowerJoint.rotation.x = Math.PI/2;
+  const lowerArms = [-.075,.075].map((offset) => {
+    const arm = cylinder(.035,1.02,0x56635e,14);
+    arm.position.set(0,.76,offset);
+    return arm;
+  });
+  const elbow = cylinder(.12,.22,palette.steel,24);
+  elbow.position.set(0,1.29,0);
+  elbow.rotation.x = Math.PI/2;
+
+  const armAngle = -.88;
+  const armLength = 1.15;
+  const armX = Math.sin(-armAngle)*armLength;
+  const armY = Math.cos(armAngle)*armLength;
+  const upperArms = [-.065,.065].map((offset) => {
+    const arm = cylinder(.034,armLength,0x56635e,14);
+    arm.position.set(armX/2,1.29+armY/2,offset);
+    arm.rotation.z = armAngle;
+    return arm;
+  });
+  const headJoint = cylinder(.13,.24,palette.steel,24);
+  headJoint.position.set(armX,1.29+armY,0);
+  headJoint.rotation.x = Math.PI/2;
+
+  const head = new THREE.Group();
+  head.position.set(armX+.03,1.29+armY-.02,0);
+  head.rotation.z = -.3;
+  const shade = new THREE.Mesh(
+    new THREE.CylinderGeometry(.22,.48,.46,32,1,true),
+    material(0x334b45,.3,.48),
+  );
+  shade.position.y = -.27;
+  const reflector = cylinder(.35,.025,0xd6c8a9,32);
+  reflector.position.y = -.5;
+  const shadeRim = new THREE.Mesh(new THREE.TorusGeometry(.48,.022,8,40),material(palette.steel,.28,.72));
+  shadeRim.position.y = -.5;
+  shadeRim.rotation.x = Math.PI/2;
+  const bulbMesh = new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),material(0xffc98c,.25,.02,0xffb96a,1.2));
+  bulbMesh.position.y = -.56;
+  const bulb = new THREE.PointLight(0xffbf7d,8,5.5,1.8);
+  bulb.position.set(0,-.62,.04);
+  head.add(shade,reflector,shadeRim,bulbMesh,bulb);
+
+  lamp.add(base,baseCap,switchButton,lowerJoint,...lowerArms,elbow,...upperArms,headJoint,head);
+  group.add(lamp);
 }
 
 function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
@@ -253,7 +305,6 @@ function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
     desk.add(handle);
   }
 
-  addDeskLamp(desk,3.05,-.55);
   const mug = cylinder(.28,.5,0x253b36,28);
   mug.position.set(.78,1.86,-.38);
   desk.add(mug);
@@ -319,8 +370,19 @@ function buildNotebookTable(scene: THREE.Scene) {
   const sensor = box(.48,.08,.72,0x2b3431,.5,.45);
   sensor.position.set(-2.35,1.76,.72);
   desk.add(sensor);
-  addCable(scene,[[2.15,1.77,-1.25],[1.55,2.1,-1.6],[.75,1.82,-1.5],[-.05,1.79,-1.92]],palette.red,.016);
-  addCable(scene,[[1.2,1.78,-1.22],[.5,2.2,-1.58],[-.45,1.86,-1.55],[-.92,1.8,-1.72]],palette.cyan,.016);
+  addJumperLead(desk,[[-1.78,1.95,-.35],[-1.88,2.28,-.12],[-2.08,2.28,.28],[-2.2,1.88,.5]],palette.red);
+  addJumperLead(desk,[[-1.32,1.95,-.15],[-1.42,2.38,.12],[-2.28,2.38,.67],[-2.43,1.88,.86]],palette.cyan);
+  const leadConnectors = [
+    {x:-1.78,y:1.91,z:-.35,color:palette.red},
+    {x:-2.2,y:1.845,z:.5,color:palette.red},
+    {x:-1.32,y:1.91,z:-.15,color:palette.cyan},
+    {x:-2.43,y:1.845,z:.86,color:palette.cyan},
+  ];
+  leadConnectors.forEach(({x,y,z,color}) => {
+    const connector = box(.14,.075,.11,color,.38,.22);
+    connector.position.set(x,y,z);
+    desk.add(connector);
+  });
 
   const rack = box(1.3,.12,.5,0x5f4938,.76,.05);
   rack.position.set(-2.15,1.7,-1.08);
@@ -337,6 +399,7 @@ function buildNotebookTable(scene: THREE.Scene) {
   loosePaper.position.set(-.15,1.66,.45);
   loosePaper.rotation.y = .16;
   desk.add(loosePaper);
+  addDeskLamp(desk,2.65,-1.3,-2.15);
 }
 
 function buildBooks(scene: THREE.Scene) {
@@ -664,8 +727,11 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let requestDelivered = false;
     let dragging = false;
     let dragStartX = 0;
+    let dragStartY = 0;
     let dragOrbit = 0;
+    let dragPitch = 0;
     let orbit = 0;
+    let pitch = 0;
     let frame = 0;
 
     const resize = () => {
@@ -691,7 +757,10 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const pointerMove = (event: PointerEvent) => {
       const zone = readPointer(event);
       if (zone !== hovered) { hovered = zone; onHover(zone==="printer"?null:zone); }
-      if (dragging) orbit = THREE.MathUtils.clamp(dragOrbit+(event.clientX-dragStartX)*.0025,-.42,.42);
+      if (dragging) {
+        orbit = THREE.MathUtils.clamp(dragOrbit-(event.clientX-dragStartX)*.0025,-.42,.42);
+        pitch = THREE.MathUtils.clamp(dragPitch+(event.clientY-dragStartY)*.003,-.22,.26);
+      }
       canvas.style.cursor = zone ? "pointer" : dragging ? "grabbing" : "grab";
     };
     const pointerDown = (event: PointerEvent) => {
@@ -703,7 +772,9 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       } else {
         dragging = true;
         dragStartX = event.clientX;
+        dragStartY = event.clientY;
         dragOrbit = orbit;
+        dragPitch = pitch;
         canvas.setPointerCapture(event.pointerId);
       }
     };
@@ -722,9 +793,9 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
         const desiredPosition = defaultPosition.clone();
         desiredPosition.x = Math.sin(orbit)*11.5 + pointerX*.18;
         desiredPosition.z = Math.cos(orbit)*11.5;
-        desiredPosition.y += -pointerY*.15;
+        desiredPosition.y += pitch*6-pointerY*.1;
         camera.position.lerp(desiredPosition,.035);
-        currentTarget.lerp(defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,-pointerY*.08,0)),.04);
+        currentTarget.lerp(defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,pitch*.75-pointerY*.05,0)),.04);
       }
       if (requested) {
         const pose = cameraPoses[requested];
