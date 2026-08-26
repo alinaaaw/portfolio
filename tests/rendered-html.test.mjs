@@ -308,6 +308,8 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapReading, /field-map-photo-stage is-/);
   assert.match(mapReading, /photoCloseRef/);
   assert.match(mapReading, /tabIndex=\{0\}/);
+  assert.match(mapReading, /onLoad=\{\(event\)=>finishPhotoLoad\(event\.currentTarget\)\}/);
+  assert.match(mapReading, /setPhotoStatus\("loading"\)/);
   assert.match(mapReading, /Previous photo/);
   assert.match(mapReading, /Next photo/);
   assert.match(mapReading, /randomLostTravelMessage/);
@@ -319,7 +321,9 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(css, /\.field-map-memory \{[^}]*width: min\(480px/);
   assert.match(css, /\.field-map-memory \{[^}]*background-color: #ded2ad/);
   assert.match(css, /animation: fieldMapMemoryIn/);
-  assert.match(css, /\.field-map-photo-stage > img \{[^}]*max-width: 100%/);
+  assert.match(css, /\.field-map-memory\.is-photo-ready \{[^}]*--photo-card-width/);
+  assert.match(css, /\.field-map-photo-stage\.is-ready \{[^}]*aspect-ratio: var\(--photo-aspect\)/);
+  assert.match(css, /\.field-map-photo-stage:not\(\.is-ready\) > img \{[^}]*position: absolute/);
   assert.match(photoGuide, /不需要修改代码/);
   assert.match(nycGuide, /new-york-city/);
   assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);

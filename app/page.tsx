@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
@@ -184,6 +184,7 @@ type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 type FieldRecordItem=Exclude<FieldItem,"travelMap">;
 const fieldItems=fieldCaseContent.items as Record<FieldRecordItem,FieldRecord>;
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
+type TravelPhotoLayout={aspectRatio:number;cardWidth:number};
 const lostTravelMessages=[
   "FILM LOST IN THE ADVENTURE",
   "POSTCARD NEVER MADE IT HOME",
@@ -208,6 +209,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photoStatus,setPhotoStatus]=useState<TravelPhotoStatus>("idle");
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
+  const [photoLayout,setPhotoLayout]=useState<TravelPhotoLayout|null>(null);
   const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
@@ -230,15 +232,37 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   },[]);
 
   useEffect(()=>{
-    if(!selectedPin){setPhotoStatus("idle");setPhotos([]);return;}
+    if(!selectedPin){setPhotoStatus("idle");setPhotos([]);setPhotoLayout(null);return;}
     setPhotoStatus("loading");
     setPhotos([]);
     setPhotoIndex(0);
+    setPhotoLayout(null);
     setLostMessage(randomLostTravelMessage());
     const nextPhotos=travelPhotosForPin(selectedPin);
     setPhotos(nextPhotos);
-    setPhotoStatus(nextPhotos.length>0?"ready":"lost");
+    if(nextPhotos.length===0)setPhotoStatus("lost");
   },[selectedPin]);
+
+  const movePhoto=useCallback((offset:number)=>{
+    if(photos.length<2)return;
+    setPhotoStatus("loading");
+    setPhotoLayout(null);
+    setPhotoIndex((current)=>(current+offset+photos.length)%photos.length);
+  },[photos.length]);
+
+  const finishPhotoLoad=(image:HTMLImageElement)=>{
+    const aspectRatio=image.naturalWidth/image.naturalHeight||1;
+    const reading=image.closest<HTMLElement>(".field-map-reading");
+    const viewportHeight=window.visualViewport?.height??window.innerHeight;
+    const readingHeight=reading?.clientHeight??viewportHeight;
+    const readingWidth=reading?.clientWidth??window.innerWidth;
+    const maxCardHeight=Math.max(320,Math.min(readingHeight-116,viewportHeight-104));
+    const maxPhotoHeight=Math.max(180,Math.min(500,maxCardHeight-170));
+    const maxPhotoWidth=Math.max(160,Math.min(448,readingWidth-80));
+    const photoWidth=Math.min(maxPhotoWidth,maxPhotoHeight*aspectRatio);
+    setPhotoLayout({aspectRatio,cardWidth:Math.ceil(photoWidth+32)});
+    setPhotoStatus("ready");
+  };
 
   useEffect(()=>{
     if(!selectedPin)return;
@@ -251,12 +275,12 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
         if(first&&last&&event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
         else if(first&&last&&!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
       }
-      if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowLeft")setPhotoIndex((current)=>(current-1+photos.length)%photos.length);
-      if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowRight")setPhotoIndex((current)=>(current+1)%photos.length);
+      if(photoStatus==="ready"&&event.key==="ArrowLeft")movePhoto(-1);
+      if(photoStatus==="ready"&&event.key==="ArrowRight")movePhoto(1);
     };
     window.addEventListener("keydown",onKeyDown,true);
     return ()=>window.removeEventListener("keydown",onKeyDown,true);
-  },[photoStatus,photos.length,selectedPin]);
+  },[movePhoto,photoStatus,selectedPin]);
 
   useEffect(()=>{
     let frame=0;
@@ -370,16 +394,16 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
-      {selectedPin&&<aside className="field-map-memory" role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
+      {selectedPin&&<aside className={`field-map-memory${photoStatus==="ready"&&photoLayout?" is-photo-ready":""}`} style={photoLayout?{"--photo-aspect":photoLayout.aspectRatio,"--photo-card-width":`${photoLayout.cardWidth}px`} as CSSProperties:undefined} role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
         <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
         <div className={`field-map-photo-stage is-${photoStatus}`}>
           {photoStatus==="loading"&&<div className="field-map-photo-message"><i/><strong>DEVELOPING FILM...</strong></div>}
           {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong></div>}
-          {photoStatus==="ready"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onError={()=>{setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
+          {photoStatus!=="lost"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onLoad={(event)=>finishPhotoLoad(event.currentTarget)} onError={()=>{setPhotoLayout(null);setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
         </div>
         {photoStatus==="ready"&&photos[photoIndex]&&<footer>
           <div><strong aria-live="polite">{String(photoIndex+1).padStart(2,"0")} / {String(photos.length).padStart(2,"0")}</strong><span>{photos[photoIndex].caption||"TRAVEL MEMORY"}</span></div>
-          {photos.length>1&&<nav aria-label="Photo controls"><button type="button" aria-label="Previous photo" onClick={()=>setPhotoIndex((current)=>(current-1+photos.length)%photos.length)}>←</button><button type="button" aria-label="Next photo" onClick={()=>setPhotoIndex((current)=>(current+1)%photos.length)}>→</button></nav>}
+          {photos.length>1&&<nav aria-label="Photo controls"><button type="button" aria-label="Previous photo" onClick={()=>movePhoto(-1)}>←</button><button type="button" aria-label="Next photo" onClick={()=>movePhoto(1)}>→</button></nav>}
         </footer>}
       </aside>}
     </div>
