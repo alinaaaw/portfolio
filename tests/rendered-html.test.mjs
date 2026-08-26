@@ -139,6 +139,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /makeBook\(book,index,-\.94\+index\*\.63,\.43,true,false\)/);
   assert.match(closeups, /mediaBasket=true/);
   assert.match(closeups, /filmBasket\.add\(group\)/);
+  assert.match(closeups, /const x=2\.05,y=\.54,z=-\.36\+index\*\.065/);
+  assert.doesNotMatch(closeups, /const x=\.34\+index\*\.3/);
   assert.match(closeups, /roundedBox\(8\.25,2\.95,\.22/);
   assert.match(closeups, /books:\{position:\[0,2\.05,9\.4\],target:\[0,1\.62,0\]/);
   assert.match(closeups, /buildDrawer/);

@@ -184,17 +184,17 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.32,2.28,1.12],[-.625,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));shelf.add(seriesHit);hits.push(seriesHit);
 
   const filmBasket=new THREE.Group();filmBasket.userData.mediaBasket=true;
-  const basketBase=roundedBox(3.76,.1,1.18,0x3d4844,.035,.38,.58);basketBase.position.set(2.04,.47,.04);
-  const basketFront=roundedBox(3.76,.09,.08,0x59645f,.025,.32,.62);basketFront.position.set(2.04,.95,.67);
-  const basketBack=basketFront.clone();basketBack.position.z=-.54;
-  const basketSideL=roundedBox(.09,.55,1.2,0x59645f,.025,.34,.6);basketSideL.position.set(.18,.72,.05);
-  const basketSideR=basketSideL.clone();basketSideR.position.x=3.9;
+  const basketBase=roundedBox(1.02,.1,1.2,0x3d4844,.035,.38,.58);basketBase.position.set(2.05,.47,.02);
+  const basketFront=roundedBox(1.02,.09,.08,0x59645f,.025,.32,.62);basketFront.position.set(2.05,.95,.64);
+  const basketBack=basketFront.clone();basketBack.position.z=-.58;
+  const basketSideL=roundedBox(.09,.55,1.2,0x59645f,.025,.34,.6);basketSideL.position.set(1.54,.72,.03);
+  const basketSideR=basketSideL.clone();basketSideR.position.x=2.56;
   filmBasket.add(basketBase,basketFront,basketBack,basketSideL,basketSideR);
-  for(let index=0;index<7;index+=1){const slat=roundedBox(.055,.46,.07,0x46534e,.018,.34,.62);slat.position.set(.3+index*.58,.72,.67);filmBasket.add(slat);}
+  for(let index=0;index<3;index+=1){const slat=roundedBox(.055,.46,.07,0x46534e,.018,.34,.62);slat.position.set(1.72+index*.33,.72,.64);filmBasket.add(slat);}
 
   const filmColors=[0x70c9c0,0xb94e3e,0xd1f45c,0xcaa65a,0x8072a2,0x5da19b];
   movies.forEach((movie,index)=>{
-    const x=.34+index*.3,y=.54,z=.02+index*.012;
+    const x=2.05,y=.54,z=-.36+index*.065;
     const group=new THREE.Group();
     const disc=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.018,48),mat(0xd9d5c5,.19,.82));disc.rotation.x=Math.PI/2;disc.position.set(0,.43,.045);disc.castShadow=true;
     const colorRing=new THREE.Mesh(new THREE.RingGeometry(.18,.252,48),mat(filmColors[index%filmColors.length],.24,.55));colorRing.position.set(0,.43,.058);
@@ -208,7 +208,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     const bottomEdge=topEdge.clone();bottomEdge.position.y=.04;
     const latch=roundedBox(.075,.035,.07,0xb8c9c4,.009,.24,.12);latch.position.set(.32,.43,.108);
     group.add(disc,colorRing,label,hub,centerHole,clearCase,hinge,topEdge,bottomEdge,latch);
-    group.position.set(x,y,z);group.rotation.z=(index%3-1)*.008;filmBasket.add(group);
+    group.position.set(x,y,z);filmBasket.add(group);
     const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.2],[x,y+.43,z+.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;filmBasket.add(hit);hits.push(hit);
   });
   shelf.add(filmBasket);
