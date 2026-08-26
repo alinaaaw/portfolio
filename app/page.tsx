@@ -208,7 +208,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photoStatus,setPhotoStatus]=useState<TravelPhotoStatus>("idle");
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
-  const [lostMessage,setLostMessage]=useState(lostTravelMessages[0]);
+  const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
     const canvas=canvasRef.current;
