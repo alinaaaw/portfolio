@@ -400,7 +400,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
         <header><div><small>{selectedPin.country} · FIELD FILE</small><h2>{selectedPin.name}</h2></div><button aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
         <div className="field-map-photo-stage">
           {photoStatus==="loading"&&<div className="field-map-photo-message"><i/><strong>DEVELOPING FILM...</strong></div>}
-          {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong><small>Add this city&apos;s folder when the evidence turns up.</small></div>}
+          {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong></div>}
           {photoStatus==="ready"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onError={()=>{setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
         </div>
         {photoStatus==="ready"&&photos[photoIndex]&&<footer>
