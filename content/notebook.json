@@ -18,7 +18,7 @@
     "margin": {
       "meta": "COURSE ALLOCATION / METHOD EVALUATION",
       "title": "No allocation method led every criterion.",
-      "lead": "The dossier compares three approaches for capacity-constrained electives.",
+      "lead": "The project compares three approaches for capacity-constrained electives.",
       "steps": ["First-Come-First-Serve · lowest CPU time", "Random Ticket · randomized, less predictable outcome", "Probabilistic + Maximum Weight · strongest reported satisfaction", "Checked · satisfaction mean and standard deviation · completion · capacity violations"],
       "reverseMeta": "DESIGN DECISION / FINAL PIPELINE",
       "reverseTitle": "The tradeoffs shaped the mechanism.",

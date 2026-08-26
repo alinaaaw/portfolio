@@ -330,30 +330,33 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
   const marginHit=hitBox("margin",notebookContent.itemLabels.margin,[3.02,.5,3.72],[1.53,.7,0],[right,comparisonSheet,...comparisonBars]);
   scene.add(researchHit,marginHit); hits.push(researchHit,marginHit);
 
-  // A recognisable angle-poise lamp replaces the ambiguous cylinder that used
-  // to sit here. Its head extends beyond the right edge of the close-up so the
-  // lamp reads as surrounding desk context, not another centred exhibit.
+  // Match the room-view lamp exactly, scaled with the notebook (the close-up
+  // pages are roughly twice the room-view dimensions). The shared -2.15 angle
+  // makes the arm lean over the page in both views; the close framing crops the
+  // upper lamp naturally.
   const lamp=new THREE.Group();
-  lamp.position.set(3.95,.27,-1.28);
-  lamp.rotation.y=-.48;
-  const lampBase=cylinder(.43,.1,0x26312e,32); lampBase.position.y=.05;
-  const baseCap=cylinder(.23,.035,palette.steel,24); baseCap.position.y=.12;
-  const switchButton=roundedBox(.13,.045,.1,palette.red,.025,.45,.18); switchButton.position.set(.14,.16,.02);
-  const lowerJoint=cylinder(.11,.2,palette.steel,20); lowerJoint.position.set(0,.28,0); lowerJoint.rotation.x=Math.PI/2;
-  const lowerArms=[-.065,.065].map((offset)=>{const arm=cylinder(.035,1.18,0x56635e,14);arm.position.set(0,.86,offset);return arm;});
-  const elbow=cylinder(.12,.22,palette.steel,22); elbow.position.set(0,1.46,0); elbow.rotation.x=Math.PI/2;
-  const upperAngle=-.82;
-  const upperLength=1.28;
+  lamp.position.set(2.7,.31,-2.6);
+  lamp.rotation.y=-2.15;
+  lamp.scale.setScalar(2);
+  const lampBase=cylinder(.34,.09,0x26312e,32); lampBase.position.y=.045;
+  const baseCap=cylinder(.21,.035,palette.steel,28); baseCap.position.y=.105;
+  const switchButton=box(.13,.045,.09,palette.red,.46,.18); switchButton.position.set(.13,.14,.03);
+  const lowerJoint=cylinder(.11,.18,palette.steel,24); lowerJoint.position.set(0,.24,0); lowerJoint.rotation.x=Math.PI/2;
+  const lowerArms=[-.075,.075].map((offset)=>{const arm=cylinder(.035,1.02,0x56635e,14);arm.position.set(0,.76,offset);return arm;});
+  const elbow=cylinder(.12,.22,palette.steel,24); elbow.position.set(0,1.29,0); elbow.rotation.x=Math.PI/2;
+  const upperAngle=-.88;
+  const upperLength=1.15;
   const upperX=Math.sin(-upperAngle)*upperLength;
   const upperY=Math.cos(upperAngle)*upperLength;
-  const upperArms=[-.06,.06].map((offset)=>{const arm=cylinder(.034,upperLength,0x56635e,14);arm.position.set(upperX/2,1.46+upperY/2,offset);arm.rotation.z=upperAngle;return arm;});
-  const headJoint=cylinder(.13,.23,palette.steel,22); headJoint.position.set(upperX,1.46+upperY,0); headJoint.rotation.x=Math.PI/2;
-  const lampHead=new THREE.Group(); lampHead.position.set(upperX+.02,1.46+upperY-.03,0); lampHead.rotation.z=-.34;
-  const shade=new THREE.Mesh(new THREE.CylinderGeometry(.2,.46,.44,28,1,true),mat(0x304943,.3,.48)); shade.position.y=-.25;
-  const shadeRim=new THREE.Mesh(new THREE.TorusGeometry(.46,.022,8,36),mat(palette.steel,.3,.68)); shadeRim.position.y=-.47; shadeRim.rotation.x=Math.PI/2;
-  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.1,14,10),mat(0xffd09b,.25,.02,0xffbb72,1.1)); bulb.position.y=-.5;
-  const lampGlow=new THREE.PointLight(0xffbf7d,4.5,4.5,1.8); lampGlow.position.set(0,-.55,.05);
-  lampHead.add(shade,shadeRim,bulb,lampGlow);
+  const upperArms=[-.065,.065].map((offset)=>{const arm=cylinder(.034,upperLength,0x56635e,14);arm.position.set(upperX/2,1.29+upperY/2,offset);arm.rotation.z=upperAngle;return arm;});
+  const headJoint=cylinder(.13,.24,palette.steel,24); headJoint.position.set(upperX,1.29+upperY,0); headJoint.rotation.x=Math.PI/2;
+  const lampHead=new THREE.Group(); lampHead.position.set(upperX+.03,1.29+upperY-.02,0); lampHead.rotation.z=-.3;
+  const shade=new THREE.Mesh(new THREE.CylinderGeometry(.22,.48,.46,32,1,true),mat(0x334b45,.3,.48)); shade.position.y=-.27;
+  const reflector=cylinder(.35,.025,0xd6c8a9,32); reflector.position.y=-.5;
+  const shadeRim=new THREE.Mesh(new THREE.TorusGeometry(.48,.022,8,40),mat(palette.steel,.28,.72)); shadeRim.position.y=-.5; shadeRim.rotation.x=Math.PI/2;
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),mat(0xffc98c,.25,.02,0xffb96a,1.2)); bulb.position.y=-.56;
+  const lampGlow=new THREE.PointLight(0xffbf7d,8,5.5,1.8); lampGlow.position.set(0,-.62,.04);
+  lampHead.add(shade,reflector,shadeRim,bulb,lampGlow);
   lamp.add(lampBase,baseCap,switchButton,lowerJoint,...lowerArms,elbow,...upperArms,headJoint,lampHead);
   scene.add(lamp);
 }
@@ -445,7 +448,7 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
   books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
-  notebook:{position:[-.35,5.7,5.7],target:[-.45,.45,0],hint:notebookContent.sceneHint},
+  notebook:{position:[-.35,5.7,5.7],target:[-.45,1.1,0],hint:notebookContent.sceneHint},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
   fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},

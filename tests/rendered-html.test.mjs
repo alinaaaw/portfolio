@@ -181,8 +181,11 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /const comparisonSheet=roundedBox/);
   assert.match(closeups, /\[right,comparisonSheet,\.\.\.comparisonBars\]/);
   assert.match(closeups, /const lamp=new THREE\.Group\(\)/);
-  assert.match(closeups, /lamp\.position\.set\(3\.95/);
-  assert.match(closeups, /lampHead\.add\(shade,shadeRim,bulb,lampGlow\)/);
+  assert.match(closeups, /lamp\.position\.set\(2\.7,\.31,-2\.6\)/);
+  assert.match(closeups, /lamp\.rotation\.y=-2\.15/);
+  assert.match(closeups, /lamp\.scale\.setScalar\(2\)/);
+  assert.match(closeups, /lampHead\.add\(shade,reflector,shadeRim,bulb,lampGlow\)/);
+  assert.match(closeups, /notebook:\{position:\[-\.35,5\.7,5\.7\],target:\[-\.45,1\.1,0\]/);
   assert.match(notebookScene, /model-detail notebook-detail/);
   assert.doesNotMatch(notebookScene, /setReverse|notebook-turn-control/);
   assert.match(notebook, /CLICK THE LEFT OR RIGHT PAGE TO OPEN A NOTE/);
@@ -190,6 +193,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(notebook, /First-Come-First-Serve/);
   assert.match(notebook, /Random Ticket/);
   assert.match(notebook, /Probabilistic \+ Maximum Weight/);
+  assert.doesNotMatch(notebook, /dossier/i);
   assert.doesNotMatch(notebook, /TURN IT OVER|TURN THE PAGE|TURN BACK/);
   assert.match(css, /\.model-detail \.notebook-closeup \{[^}]*aspect-ratio: \.79/);
   assert.match(css, /\.model-detail \.notebook-closeup \{[^}]*width: min\(630px,86vw/);
