@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
@@ -184,7 +184,6 @@ type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 type FieldRecordItem=Exclude<FieldItem,"travelMap">;
 const fieldItems=fieldCaseContent.items as Record<FieldRecordItem,FieldRecord>;
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
-type TravelPhotoLayout={sourceAspect:number;frameAspect:number;frameWidth:number};
 const lostTravelMessages=[
   "FILM LOST IN THE ADVENTURE",
   "POSTCARD NEVER MADE IT HOME",
@@ -203,8 +202,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const pointersRef=useRef(new Map<number,{x:number;y:number}>());
   const gestureRef=useRef<{center:{x:number;y:number};distance:number}|null>(null);
   const pressRef=useRef<{id:number;x:number;y:number;moved:boolean}|null>(null);
-  const photoAspectCacheRef=useRef(new Map<string,number>());
-  const photoPreloadRef=useRef(new Map<string,Promise<number>>());
+  const photoPreloadRef=useRef(new Map<string,Promise<void>>());
   const photoImageCacheRef=useRef(new Map<string,HTMLImageElement>());
   const decodedPhotoSrcRef=useRef(new Set<string>());
   const activePhotoSrcRef=useRef<string|null>(null);
@@ -217,7 +215,6 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photoStatus,setPhotoStatus]=useState<TravelPhotoStatus>("idle");
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
-  const [photoLayout,setPhotoLayout]=useState<TravelPhotoLayout|null>(null);
   const [navigationPending,setNavigationPending]=useState(false);
   const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
@@ -248,11 +245,10 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     setCamera({...FIELD_CASE_MAP_VIEWS[view]});
   },[closeTravelPhotos]);
 
-  const preloadPhotoAspect=useCallback((photo:TravelPhoto)=>{
+  const preloadTravelPhoto=useCallback((photo:TravelPhoto)=>{
     const pending=photoPreloadRef.current.get(photo.src);
     if(pending)return pending;
-    const cachedAspect=photoAspectCacheRef.current.get(photo.src);
-    if(cachedAspect&&decodedPhotoSrcRef.current.has(photo.src))return Promise.resolve(cachedAspect);
+    if(decodedPhotoSrcRef.current.has(photo.src)&&photoImageCacheRef.current.has(photo.src))return Promise.resolve();
     const retained=photoImageCacheRef.current.get(photo.src);
     const retainedFailed=Boolean(retained&&retained.complete&&retained.src&&retained.naturalWidth===0);
     const image=!retained||retainedFailed?new Image():retained;
@@ -260,16 +256,13 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       image.decoding="async";
       photoImageCacheRef.current.set(photo.src,image);
     }
-    const rawPromise=new Promise<number>((resolve,reject)=>{
+    const rawPromise=new Promise<void>((resolve,reject)=>{
       const clearHandlers=()=>{image.onload=null;image.onerror=null;};
       const finish=()=>{
         clearHandlers();
         void (async ()=>{
-          const aspect=image.naturalWidth/image.naturalHeight;
-          if(!Number.isFinite(aspect)||aspect<=0)throw new Error(`Invalid photo dimensions: ${photo.src}`);
-          photoAspectCacheRef.current.set(photo.src,aspect);
+          if(image.naturalWidth<=0||image.naturalHeight<=0)throw new Error(`Invalid photo dimensions: ${photo.src}`);
           try{await image.decode();decodedPhotoSrcRef.current.add(photo.src);}catch{}
-          return aspect;
         })().then(resolve,reject);
       };
       image.onload=finish;
@@ -285,7 +278,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   useEffect(()=>{
     const uniquePhotos=new Map<string,TravelPhoto>();
     FIELD_CASE_TRAVEL_PINS.forEach((pin)=>travelPhotosForPin(pin).forEach((photo)=>uniquePhotos.set(photo.src,photo)));
-    const warmups=Array.from(uniquePhotos.values(),(photo)=>preloadPhotoAspect(photo).catch(()=>undefined));
+    const warmups=Array.from(uniquePhotos.values(),(photo)=>preloadTravelPhoto(photo).catch(()=>undefined));
     void Promise.all(warmups);
     return ()=>{
       selectionRequestRef.current+=1;
@@ -294,21 +287,9 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       photoImageCacheRef.current.forEach((image)=>{image.onload=null;image.onerror=null;});
       photoImageCacheRef.current.clear();
       photoPreloadRef.current.clear();
-      photoAspectCacheRef.current.clear();
       decodedPhotoSrcRef.current.clear();
     };
-  },[preloadPhotoAspect]);
-
-  const layoutForAspect=useCallback((sourceAspect:number):TravelPhotoLayout=>{
-    const reading=canvasRef.current?.closest<HTMLElement>(".field-map-reading");
-    const viewportHeight=window.visualViewport?.height??window.innerHeight;
-    const readingHeight=reading?.clientHeight??viewportHeight;
-    const readingWidth=reading?.clientWidth??window.innerWidth;
-    const maxCardHeight=Math.max(320,Math.min(readingHeight-116,viewportHeight-104));
-    const maxFrameHeight=Math.max(180,Math.min(500,maxCardHeight-170));
-    const maxFrameWidth=Math.max(160,Math.min(448,readingWidth-80));
-    return {sourceAspect,frameAspect:sourceAspect,frameWidth:Math.min(maxFrameWidth,maxFrameHeight*sourceAspect)};
-  },[]);
+  },[preloadTravelPhoto]);
 
   const openTravelPhotos=useCallback(async (pin:FieldCaseTravelPin)=>{
     const requestId=++selectionRequestRef.current;
@@ -318,23 +299,23 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     const nextPhotos=travelPhotosForPin(pin);
     const nextLostMessage=randomLostTravelMessage();
     if(nextPhotos.length===0){
-      setPhotos([]);setPhotoIndex(0);setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});
+      setPhotos([]);setPhotoIndex(0);
       setLostMessage(nextLostMessage);setPhotoStatus("lost");setSelectedPin(pin);
       navigationLockedRef.current=false;setNavigationPending(false);return;
     }
     try{
-      const aspect=await preloadPhotoAspect(nextPhotos[0]);
+      await preloadTravelPhoto(nextPhotos[0]);
       if(selectionRequestRef.current!==requestId)return;
-      setPhotos(nextPhotos);setPhotoIndex(0);setPhotoLayout(layoutForAspect(aspect));
+      setPhotos(nextPhotos);setPhotoIndex(0);
       setLostMessage(nextLostMessage);setPhotoStatus(decodedPhotoSrcRef.current.has(nextPhotos[0].src)?"ready":"loading");setSelectedPin(pin);
       navigationLockedRef.current=false;setNavigationPending(false);
     }catch{
       if(selectionRequestRef.current!==requestId)return;
-      setPhotos(nextPhotos);setPhotoIndex(0);setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});
+      setPhotos(nextPhotos);setPhotoIndex(0);
       setLostMessage(nextLostMessage);setPhotoStatus("lost");setSelectedPin(pin);
       navigationLockedRef.current=false;setNavigationPending(false);
     }
-  },[layoutForAspect,preloadPhotoAspect]);
+  },[preloadTravelPhoto]);
 
   const movePhoto=useCallback(async (offset:number)=>{
     if(photos.length<2||navigationLockedRef.current||navigationPending||photoStatus==="loading")return;
@@ -343,18 +324,18 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     const nextPhoto=photos[nextIndex];
     navigationLockedRef.current=true;setNavigationPending(true);
     try{
-      const aspect=await preloadPhotoAspect(nextPhoto);
+      await preloadTravelPhoto(nextPhoto);
       if(navigationRequestRef.current!==requestId)return;
-      setPhotoLayout(layoutForAspect(aspect));setPhotoIndex(nextIndex);
+      setPhotoIndex(nextIndex);
       setPhotoStatus(decodedPhotoSrcRef.current.has(nextPhoto.src)?"ready":"loading");
     }catch{
       if(navigationRequestRef.current!==requestId)return;
-      setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});setPhotoIndex(nextIndex);
+      setPhotoIndex(nextIndex);
       setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");
     }finally{
       if(navigationRequestRef.current===requestId){navigationLockedRef.current=false;setNavigationPending(false);}
     }
-  },[layoutForAspect,navigationPending,photoIndex,photos,photoStatus,preloadPhotoAspect]);
+  },[navigationPending,photoIndex,photos,photoStatus,preloadTravelPhoto]);
 
   const finishPhotoLoad=useCallback(async (image:HTMLImageElement,expectedSrc:string)=>{
     try{await image.decode();}catch{}
@@ -497,7 +478,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
-      {selectedPin&&<aside className="field-map-memory" style={photoLayout?{"--photo-aspect":photoLayout.frameAspect,"--photo-frame-width":`${Math.ceil(photoLayout.frameWidth)}px`} as CSSProperties:undefined} role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
+      {selectedPin&&<aside className="field-map-memory" role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
         <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={closeTravelPhotos}>×</button></header>
         <div className={`field-map-photo-stage is-${photoStatus}`} aria-busy={photoStatus==="loading"}>
           {currentPhoto&&photoStatus!=="lost"&&<img key={currentPhoto.src} src={currentPhoto.src} alt={currentPhoto.alt} decoding="async" onLoad={(event)=>{void finishPhotoLoad(event.currentTarget,currentPhoto.src);}} onError={()=>{if(activePhotoSrcRef.current!==currentPhoto.src)return;decodedPhotoSrcRef.current.delete(currentPhoto.src);setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
