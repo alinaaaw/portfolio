@@ -6,6 +6,8 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
+import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
+import type { TravelPhoto } from "./_components/travelPhotoLibrary";
 import {
   board as boardContent,
   books as booksContent,
@@ -202,7 +204,6 @@ function BoardScene({onClose}:{onClose:()=>void}) {
 
 type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
-type TravelPhoto={src:string;alt:string;caption:string};
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
 const lostTravelMessages=[
   "FILM LOST IN THE ADVENTURE",
@@ -213,20 +214,6 @@ const lostTravelMessages=[
 ] as const;
 
 function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.random()*lostTravelMessages.length)];}
-
-function readTravelPhotos(value:unknown,pin:FieldCaseTravelPin):TravelPhoto[]{
-  if(!value||typeof value!=="object"||!("photos" in value)||!Array.isArray(value.photos))return [];
-  return value.photos.flatMap((entry)=>{
-    const item=typeof entry==="string"?{file:entry}:entry;
-    if(!item||typeof item!=="object"||!("file" in item)||typeof item.file!=="string")return [];
-    const file=item.file.trim();
-    if(!file||file.startsWith("/")||file.includes("..")||/^[a-z]+:/i.test(file))return [];
-    const src=`/travel-map-photos/${encodeURIComponent(pin.photoFolder)}/${file.split("/").map(encodeURIComponent).join("/")}`;
-    const alt="alt" in item&&typeof item.alt==="string"?item.alt:`${pin.name} travel memory`;
-    const caption="caption" in item&&typeof item.caption==="string"?item.caption:"";
-    return [{src,alt,caption}];
-  });
-}
 
 function FieldMapReading({onClose}:{onClose:()=>void}) {
   const canvasRef=useRef<HTMLCanvasElement>(null);
@@ -263,21 +250,13 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
   useEffect(()=>{
     if(!selectedPin){setPhotoStatus("idle");setPhotos([]);return;}
-    const controller=new AbortController();
     setPhotoStatus("loading");
     setPhotos([]);
     setPhotoIndex(0);
     setLostMessage(randomLostTravelMessage());
-    fetch(`/travel-map-photos/${encodeURIComponent(selectedPin.photoFolder)}/manifest.json`,{signal:controller.signal,cache:"no-store"})
-      .then((response)=>{if(!response.ok)throw new Error("missing travel photo folder");return response.json();})
-      .then((manifest)=>{
-        const nextPhotos=readTravelPhotos(manifest,selectedPin);
-        if(nextPhotos.length===0)throw new Error("empty travel photo folder");
-        setPhotos(nextPhotos);
-        setPhotoStatus("ready");
-      })
-      .catch((error)=>{if(error instanceof DOMException&&error.name==="AbortError")return;setPhotoStatus("lost");});
-    return ()=>controller.abort();
+    const nextPhotos=travelPhotosForPin(selectedPin);
+    setPhotos(nextPhotos);
+    setPhotoStatus(nextPhotos.length>0?"ready":"lost");
   },[selectedPin]);
 
   useEffect(()=>{

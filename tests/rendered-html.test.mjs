@@ -156,10 +156,11 @@ test("3D room and layered object exploration remain connected", async () => {
 test("field case map uses real country geometry instead of hand-drawn continents", async () => {
   const { readFile } = await import("node:fs/promises");
   const mapSource = await readFile(new URL("../app/_components/fieldCaseMap.ts", import.meta.url), "utf8");
+  const photoLibrary = await readFile(new URL("../app/_components/travelPhotoLibrary.ts", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
-  const photoGuide = await readFile(new URL("../public/travel-map-photos/README.md", import.meta.url), "utf8");
-  const photoTemplate = JSON.parse(await readFile(new URL("../public/travel-map-photos/_template/manifest.json", import.meta.url), "utf8"));
+  const photoGuide = await readFile(new URL("../app/_assets/travel-map-photos/README.md", import.meta.url), "utf8");
+  const nycGuide = await readFile(new URL("../app/_assets/travel-map-photos/new-york-city/ADD-PHOTOS-HERE.md", import.meta.url), "utf8");
   const countries = JSON.parse(await readFile(new URL("../app/_components/worldCountries110m.json", import.meta.url), "utf8"));
   assert.ok(countries.length >= 170, "the map should retain Natural Earth country coverage");
   assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
@@ -189,15 +190,18 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapReading, /onWheel/);
   assert.match(mapReading, /setPointerCapture/);
   assert.match(mapReading, /field-map-views/);
-  assert.match(mapReading, /travel-map-photos/);
-  assert.match(mapReading, /manifest\.json/);
+  assert.match(mapReading, /travelPhotosForPin/);
   assert.match(mapReading, /field-map-memory/);
   assert.match(mapReading, /Previous photo/);
   assert.match(mapReading, /Next photo/);
   assert.match(mapReading, /randomLostTravelMessage/);
+  assert.match(photoLibrary, /import\.meta\.glob/);
+  assert.match(photoLibrary, /photoFolder/);
+  assert.match(photoLibrary, /localeCompare/);
+  assert.doesNotMatch(page, /manifest\.json/);
   assert.match(css, /\.field-map-memory/);
-  assert.match(photoGuide, /manifest\.json/);
-  assert.equal(photoTemplate.photos[0].file, "01.jpg");
+  assert.match(photoGuide, /不需要修改代码/);
+  assert.match(nycGuide, /new-york-city/);
   assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);
   assert.doesNotMatch(mapSource, /landMasses/);
 });
