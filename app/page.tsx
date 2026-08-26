@@ -13,6 +13,7 @@ import {
   fieldCase as fieldCaseContent,
   intro as introContent,
   notebook as notebookContent,
+  references as referencesContent,
   room as roomContent,
   site as siteContent,
 } from "@/content";
@@ -28,9 +29,10 @@ const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
 });
 
 type ProjectFileId = "map" | "allocation" | "emg";
-type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship";
+type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references";
 type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 type WindowPosition = { x:number; y:number };
+type ReferenceFilter = "all" | ProjectFileId;
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
 
@@ -38,9 +40,11 @@ const zoneInfo = roomContent.zones as Record<ZoneId,{ index:string; label:string
 
 const projectFiles = (["map","allocation","emg"] as const).map((id) => ({id,...computerContent.projects[id]}));
 
-const shelfBooks = booksContent.books;
-
-type ShelfBook = (typeof shelfBooks)[number];
+type ShelfBook = {id:string;index:string;title:string;meta:string;citation:string;summary:string;excerptLabel:string;quoted:boolean;excerpt:string;annotation:string;provenance:string;url:string};
+type ProjectReference = ShelfBook & {project:ProjectFileId};
+const shelfBooks = booksContent.books as ShelfBook[];
+const projectReferences = referencesContent.references as ProjectReference[];
+const referenceGroups = referencesContent.groups as {id:ReferenceFilter;label:string}[];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
 type DrawerArtifact = {meta:string;title:string|null;copy:string;facts:{label:string;value:string}[];note:string};
 type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];reverseMeta:string;reverseTitle:string|null;reverseCopy:string;note:string};
@@ -130,6 +134,7 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={booksContent.ariaLabel} onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>{zoneInfo.books.index}</span><strong>{booksContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
       <ZoneCloseup3D zone="books" onSelect={(item) => { const book=shelfBooks[Number(item)]; if(book){setSelected(book);setReverse(false);} }} />
+      {shelfBooks.length===0&&<article className="collection-empty-state shelf-empty-state"><small>{booksContent.emptyState.meta}</small><h2>{booksContent.emptyState.title}</h2><p>{booksContent.emptyState.copy}</p><em>{booksContent.emptyState.note}</em></article>}
       {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
         <div className={`physical-book ${reverse?"reverse":""}`} onMouseDown={(event) => event.stopPropagation()}>
           <div className="book-pages">
@@ -197,7 +202,8 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
   const item=selected?fieldItems[selected]:null;
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={fieldCaseContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.fieldcase.index}</span><strong>{fieldCaseContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-    <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(["internship","target","ticket","draft"].includes(value))setSelected(value as FieldItem);}}/>
+      <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(value in fieldItems)setSelected(value as FieldItem);}}/>
+    {Object.keys(fieldItems).length===0&&<article className="collection-empty-state field-empty-state"><small>{fieldCaseContent.emptyState.meta}</small><h2>{fieldCaseContent.emptyState.title}</h2><p>{fieldCaseContent.emptyState.copy}</p><em>{fieldCaseContent.emptyState.note}</em></article>}
     {item&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
   </section></div>;
 }
@@ -239,6 +245,7 @@ export default function VersionThree() {
   const [selectedComputerFile,setSelectedComputerFile] = useState<ComputerFile|null>(null);
   const [computerWindows,setComputerWindows] = useState<ComputerWindowId[]>([]);
   const [windowPositions,setWindowPositions] = useState<Partial<Record<ComputerWindowId,WindowPosition>>>({});
+  const [referenceFilter,setReferenceFilter] = useState<ReferenceFilter>("all");
   const [bulletin,setBulletin] = useState(false);
   const [faxOpen,setFaxOpen] = useState(false);
   const [faxPrinted,setFaxPrinted] = useState(false);
@@ -275,7 +282,14 @@ export default function VersionThree() {
       setSelectedComputerFile(null);
       return;
     }
+    if(file==="references")setReferenceFilter("all");
     focusComputerWindow(file);
+    setSelectedComputerFile(null);
+  };
+
+  const openReferences = (filter:ReferenceFilter) => {
+    setReferenceFilter(filter);
+    focusComputerWindow("references");
     setSelectedComputerFile(null);
   };
 
@@ -286,6 +300,7 @@ export default function VersionThree() {
   const computerWindowPosition=(windowId:ComputerWindowId)=>windowPositions[windowId]??{x:0,y:0};
   const solved = discovered.length===zoneOrder.length;
   const status = roomContent.status.messages[discovered.length];
+  const visibleReferences = referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
 
   return (
     <main className={`room-shell ${entered?"room-entered":""}`}>
@@ -344,13 +359,14 @@ export default function VersionThree() {
           <div className="monitor-bezel">
             <header className="os-bar"><span>{computerContent.topBar.title}</span><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
-              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("readme")}>{computerContent.sidebar.readme}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
+              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("readme")}>{computerContent.sidebar.readme}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
               <main className="os-workspace">
                 <div className="desktop-icons">
                   <button className={selectedComputerFile==="readme"?"selected":""} onClick={() => setSelectedComputerFile("readme")} onDoubleClick={() => openComputerFile("readme")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("readme"); }}><i className="file-icon" /><span>{computerContent.desktop.icons.readme}</span></button>
                   <button className={selectedComputerFile==="lablog"?"selected":""} onClick={() => setSelectedComputerFile("lablog")} onDoubleClick={() => openComputerFile("lablog")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("lablog"); }}><i className="file-icon log-file-icon" /><span>{computerContent.desktop.icons.labLog}</span></button>
                   <button className={selectedComputerFile==="projects"?"selected":""} onClick={() => setSelectedComputerFile("projects")} onDoubleClick={() => openComputerFile("projects")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("projects"); }}><i className="folder-icon" /><span>{computerContent.desktop.icons.projects}</span></button>
                   <button className={selectedComputerFile==="experience"?"selected":""} onClick={() => setSelectedComputerFile("experience")} onDoubleClick={() => openComputerFile("experience")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("experience"); }}><i className="folder-icon" /><span>{computerContent.desktop.icons.experience}</span></button>
+                  <button className={selectedComputerFile==="references"?"selected":""} onClick={() => setSelectedComputerFile("references")} onDoubleClick={() => openComputerFile("references")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("references"); }}><i className="file-icon web-file-icon" /><span>{computerContent.desktop.icons.references}</span></button>
                   <div className="desktop-welcome"><small>{computerContent.desktop.welcome.eyebrow}</small><h2>{computerContent.desktop.welcome.title}</h2><p>{computerContent.desktop.welcome.description}</p></div>
                 </div>
 
@@ -367,8 +383,17 @@ export default function VersionThree() {
                 </DraggableComputerWindow>}
 
                 {projectFiles.map((file)=>showComputerWindow(file.id)&&<DraggableComputerWindow key={file.id} id={file.id} className="project-window" position={computerWindowPosition(file.id)} zIndex={computerWindowZ(file.id)} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={file.name} header={<><span>{file.name}</span><button onClick={() => closeComputerWindow(file.id)}>{siteContent.shared.minimize}</button></>}>
-                  <div className="os-window-content project-file-content"><small>{file.meta}</small><h2>{file.title}</h2><p className="project-lead">{file.copy}</p><div className="project-facts">{file.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><dl className="project-brief">{file.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><button className="run-file">{computerContent.projectsFolder.verified}</button></div>
+                  <div className="os-window-content project-file-content"><small>{file.meta}</small><h2>{file.title}</h2><p className="project-lead">{file.copy}</p><div className="project-facts">{file.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><dl className="project-brief">{file.details.map((detail)=><div key={detail.label}><dt>{detail.label}</dt><dd>{detail.copy}</dd></div>)}</dl><div className="project-file-actions"><button className="project-reference-link" onClick={()=>openReferences(file.id)}>{referencesContent.browser.projectLink}</button><button className="run-file">{computerContent.projectsFolder.verified}</button></div></div>
                 </DraggableComputerWindow>)}
+
+                {showComputerWindow("references")&&<DraggableComputerWindow id="references" className="reference-browser-window" position={computerWindowPosition("references")} zIndex={computerWindowZ("references")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={referencesContent.browser.ariaLabel} header={<><span>{referencesContent.browser.filename}</span><button onClick={() => closeComputerWindow("references")}>{siteContent.shared.minimize}</button></>}>
+                  <div className="os-window-content reference-browser-content">
+                    <div className="reference-browser-bar"><span aria-hidden="true">● ● ●</span><div>{referencesContent.browser.address}</div></div>
+                    <header className="reference-site-header"><small>{referencesContent.browser.meta}</small><h2>{referencesContent.browser.title}</h2><p>{referencesContent.browser.intro}</p></header>
+                    <nav className="reference-site-nav" aria-label="Filter project references">{referenceGroups.map((group)=><button className={referenceFilter===group.id?"active":""} key={group.id} onClick={()=>setReferenceFilter(group.id)}>{group.label}</button>)}</nav>
+                    <section className="reference-site-list">{visibleReferences.map((reference)=><article key={reference.id}><small>{reference.meta}</small><h3>{reference.title}</h3><p className="reference-citation">{reference.citation}</p><p>{reference.summary}</p><blockquote>{reference.annotation}</blockquote><div><span>{reference.provenance}</span><a href={reference.url} target="_blank" rel="noreferrer">{referencesContent.browser.openSource}</a></div></article>)}</section>
+                  </div>
+                </DraggableComputerWindow>}
 
                 {showComputerWindow("experience")&&<DraggableComputerWindow id="experience" className="experience-window" position={computerWindowPosition("experience")} zIndex={computerWindowZ("experience")} onMove={moveComputerWindow} onFocus={focusComputerWindow} ariaLabel={computerContent.experience.folderTitle} header={<><span>{computerContent.experience.folderTitle}</span><button onClick={() => closeComputerWindow("experience")}>{siteContent.shared.minimize}</button></>}>
                   <div className="os-window-content"><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("research");}}><span>{computerContent.experience.research.listMeta}</span><strong>{computerContent.experience.research.organization}</strong><small>{computerContent.experience.research.date}</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("internship");}}><span>{computerContent.experience.internship.listMeta}</span><strong>{computerContent.experience.internship.organization}</strong><small>{computerContent.experience.internship.date}</small></button></div>

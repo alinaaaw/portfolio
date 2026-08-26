@@ -1,104 +1,25 @@
 {
-  "ariaLabel": "Bookshelf close-up",
-  "header": "REFERENCE SHELF / SELECT A SOURCE",
-  "sceneHint": "ONE SHELF · SIX WORKING REFERENCES",
+  "ariaLabel": "Personal bookshelf close-up",
+  "header": "PERSONAL SHELF / CATALOG IN PROGRESS",
+  "sceneHint": "BOOKS · FILMS · PERSONAL NOTES",
+  "emptyState": {
+    "meta": "PERSONAL CATALOG / NOT YET FILED",
+    "title": "Books and films will live here.",
+    "copy": "Project references have moved to REFERENCES.web on the computer. This shelf is reserved for books I have read, films I have watched, and the notes worth keeping from them.",
+    "note": "Entries will be added after the first titles and personal annotations are selected."
+  },
   "page": {
-    "reference": "MARGIN / WHY IT MATTERS",
-    "tab": "SOURCE NOTE",
-    "frontMeta": "ANNOTATION / CROSS-REFERENCE",
-    "backMeta": "READING NOTE / CONTINUED",
-    "backCopy": "The source supplies context. The project evidence remains in the files, prototypes, and results elsewhere in the lab.",
+    "reference": "MARGIN / PERSONAL NOTE",
+    "tab": "READING NOTE",
+    "frontMeta": "CATALOG ENTRY",
+    "backMeta": "PERSONAL NOTE / CONTINUED",
+    "backCopy": "A personal response belongs here, not a generic summary.",
     "turn": "TURN PAGE →",
     "turnBack": "← TURN BACK",
-    "turnAria": "Turn to the source annotation",
-    "turnBackAria": "Turn back to the citation",
-    "return": "RETURN SOURCE TO SHELF ×"
+    "turnAria": "Turn to the personal annotation",
+    "turnBackAria": "Turn back to the catalog entry",
+    "return": "RETURN ITEM TO SHELF ×"
   },
-  "spineLabels": ["Probabilistic Serial", "Full Preferences", "Birkhoff", "EMG Normalization", "Urban Health", "EMG Filters"],
-  "books": [
-    {
-      "id": "probabilistic-serial",
-      "index": "01",
-      "title": "A New Solution to the Random Assignment Problem",
-      "meta": "HISTORICAL PROJECT REFERENCE / 2001",
-      "citation": "Anna Bogomolnaia and Hervé Moulin · Journal of Economic Theory 100(2)",
-      "summary": "Introduces Probabilistic Serial as a random-assignment mechanism and makes its trade-offs explicit: ordinal efficiency and envy-freeness improve, while strategy-proofness does not survive.",
-      "excerptLabel": "ABSTRACT / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "PS is envy-free, RP is not; RP is strategy-proof, PS is not.",
-      "annotation": "This reference informed the project’s simultaneous-eating stage and clarified the mechanism-level tradeoffs behind probabilistic assignment.",
-      "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
-      "url": "https://www.sciencedirect.com/science/article/pii/S0022053100927108"
-    },
-    {
-      "id": "full-preferences",
-      "index": "02",
-      "title": "A Solution to the Random Assignment Problem on the Full Preference Domain",
-      "meta": "HISTORICAL PROJECT REFERENCE / 2006",
-      "citation": "Akshay-Kumar Katta and Jay Sethuraman · Journal of Economic Theory 131(1)",
-      "summary": "Extends random assignment beyond strict rankings by allowing indifference between objects, reinterpreting Probabilistic Serial as an iterative network-flow problem.",
-      "excerptLabel": "ABSTRACT / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "Agents are allowed to be indifferent between objects.",
-      "annotation": "This reference extends the project’s theoretical foundation beyond strict preference rankings by considering cases in which participants may be indifferent between options.",
-      "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
-      "url": "https://www.sciencedirect.com/science/article/pii/S0022053105001079"
-    },
-    {
-      "id": "birkhoff",
-      "index": "03",
-      "title": "Three Observations on Linear Algebra",
-      "meta": "HISTORICAL PROJECT REFERENCE / 1946",
-      "citation": "Garrett Birkhoff · Universidad Nacional de Tucumán, Revista A 5",
-      "summary": "The decomposition result behind converting a fractional allocation matrix into a weighted collection of deterministic assignments.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "A probability matrix can describe many possible concrete allocations, not just one final outcome.",
-      "annotation": "In the project, decomposition is the bridge between an abstract fractional result and a lottery over assignments that can actually be issued to students.",
-      "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
-      "url": "https://ndlsearch.ndl.go.jp/books/R100000136-I1570572699525842816"
-    },
-    {
-      "id": "emg-normalization",
-      "index": "04",
-      "title": "How Should We Normalize Electromyograms?",
-      "meta": "CONTEXTUAL REFERENCE / 2010",
-      "citation": "Adrian Burden · Journal of Electromyography and Kinesiology 20(6)",
-      "summary": "Reviews EMG normalization methods and supports maximal voluntary contraction as a useful reference while warning that normalization does not automatically reveal absolute muscle capacity.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "Neither method is guaranteed to reveal maximal activation capacity.",
-      "annotation": "This supports careful language for the EMG device: relative activation inferred from an individual reference, not a direct measurement of mechanical force.",
-      "provenance": "BACKGROUND READING / NOT CLAIMED AS AN ORIGINAL PROJECT SOURCE",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/20702112/"
-    },
-    {
-      "id": "urban-health",
-      "index": "05",
-      "title": "Integrating Health in Urban and Territorial Planning",
-      "meta": "CONTEXTUAL REFERENCE / WHO + UN-HABITAT / 2020",
-      "citation": "World Health Organization and UN-Habitat · Sourcebook",
-      "summary": "Connects planning decisions with transport, housing, food, education, healthcare, environment, well-being, and health equity rather than reducing urban quality of life to one indicator.",
-      "excerptLabel": "SOURCEBOOK / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "The way we plan and build our cities defines our quality of life.",
-      "annotation": "The Shanghai project followed a smaller, local version of this logic: ask residents what matters, then translate nearby services and walking time into something visible.",
-      "provenance": "BACKGROUND READING / NOT CLAIMED AS AN ORIGINAL PROJECT SOURCE",
-      "url": "https://www.who.int/publications/i/item/9789240003170"
-    },
-    {
-      "id": "emg-filters",
-      "index": "06",
-      "title": "EMGFilters Implementation Reference",
-      "meta": "IMPLEMENTATION DEPENDENCY / OYMOTION",
-      "citation": "OYMotion · EMGFilters reference implementation",
-      "summary": "A reusable sample-by-sample filtering component for EMG streams, with configurable anti-hum, low-pass, and high-pass stages.",
-      "excerptLabel": "IMPLEMENTATION NOTE",
-      "quoted": false,
-      "excerpt": "Integrated as a reference component; not presented as original filter design.",
-      "annotation": "The filter is an integrated dependency, not an algorithm authored from scratch for this project. The project work begins with calibration, Kalman filtering, band assignment, and session aggregation.",
-      "provenance": "IMPLEMENTATION DEPENDENCY / ATTRIBUTION REQUIRED",
-      "url": "https://github.com/oymotion/EMGFilters"
-    }
-  ]
+  "spineLabels": ["BOOK NOTES", "FILM NOTES", "READ", "WATCHED", "FAVORITES", "UNFILED"],
+  "books": []
 }

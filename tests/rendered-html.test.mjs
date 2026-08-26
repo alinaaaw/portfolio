@@ -20,7 +20,7 @@ test("server renders a personal laboratory before revealing the mystery", async 
   assert.match(html, /Come in.*lab is.*still awake/is);
   assert.match(html, /ENTER LAB 17/);
   assert.match(html, /Wenrui.*Alina.*Wu/i);
-  assert.match(html, /This is where Alina Wu keeps software, physical prototypes, research notes, and questions about how systems become useful to people/);
+  assert.match(html, /This is where Alina Wu keeps algorithms, physical prototypes, research notes, and questions about how systems become understandable and useful to people/);
   assert.doesNotMatch(html, /missing person/i);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
 });
@@ -28,7 +28,7 @@ test("server renders a personal laboratory before revealing the mystery", async 
 test("source contains six room objects, real work, and a progressive reveal", async () => {
   const { readFile } = await import("node:fs/promises");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const contentFiles = ["site","intro","room","computer","books","drawer","notebook","board","field-case","fax-contact"];
+  const contentFiles = ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"];
   const content = (await Promise.all(contentFiles.map((name) => readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8")))).join("\n");
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"|active!==\\"${zone}\\"|\\"${zone}\\"`));
@@ -46,7 +46,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /os-profile-trigger/);
   assert.match(content, /Quality of Life in Shanghai/);
   assert.match(content, /Automatic and Satisfactory Course Assignment/);
-  assert.match(content, /Muscle Usage.*Behavior Monitor/);
+  assert.match(content, /Monitoring Device for Muscle Usage.*Behavior/);
   assert.match(content, /Social Futures Lab/i);
   assert.match(content, /Thermo Fisher Scientific/i);
   assert.match(content, /User has not checked in/i);
@@ -54,9 +54,8 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /Her computer/);
   assert.doesNotMatch(content, /Why is this appearing on a portfolio computer/);
   assert.doesNotMatch(content, /I am not missing/);
-  assert.match(content, /The reference held\. The fourth band did not/);
-  assert.match(content, /three-second maximum-effort contraction/i);
-  assert.match(content, /adaptive reference/i);
+  assert.match(content, /The first wellbeing prototype is ready for feedback/);
+  assert.match(content, /FEEDBACK IN PROGRESS/);
   assert.match(content, /awu78@uw\.edu/);
   assert.doesNotMatch(content, /hello@example\.com/);
   assert.match(content, /INCOMING FAX/);
@@ -69,7 +68,9 @@ test("source contains six room objects, real work, and a progressive reveal", as
   }
   assert.match(content, /TURN PAGE/);
   assert.match(page, /book-turning-sheet/);
-  assert.match(content, /FIELD CASE \/ OUTSIDE THE LAB/);
+  assert.match(content, /FIELD CASE \/ UNFILED/);
+  assert.match(content, /REFERENCES\.web/);
+  assert.match(content, /Books and films will live here/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
   assert.match(content, /How Should We Normalize Electromyograms/);
   assert.match(page, /artifact-facts/);
@@ -81,7 +82,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
 
 test("editable copy is organized into valid category files", async () => {
   const { readFile } = await import("node:fs/promises");
-  for (const name of ["site","intro","room","computer","books","drawer","notebook","board","field-case","fax-contact"]) {
+  for (const name of ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"]) {
     const source = await readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8");
     assert.doesNotThrow(() => JSON.parse(source), `${name}.json must remain valid JSON`);
   }

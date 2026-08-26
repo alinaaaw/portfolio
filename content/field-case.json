@@ -1,46 +1,14 @@
 {
-  "ariaLabel": "Field case close-up",
-  "header": "FIELD CASE / OUTSIDE THE LAB",
-  "sceneHint": "COMMUNITY WORK · OBSERVATIONS · QUESTIONS CARRIED BACK",
+  "ariaLabel": "Unfiled field case close-up",
+  "header": "FIELD CASE / UNFILED",
+  "sceneHint": "PLACES · OBSERVATIONS · EXPERIENCES",
   "returnItem": "RETURN TO CASE ×",
-  "itemLabels": { "target": "NEIGHBORHOOD MAP", "internship": "STUDY NOTE", "ticket": "COMMUNITY DISPATCH", "draft": "ALLOCATION FIELD NOTES" },
-  "items": {
-    "internship": {
-      "meta": "STUDY NOTE / PEOPLE + SYSTEMS",
-      "title": "The interface is only one part of the system.",
-      "copy": "An expanding interest in how people form expectations, make decisions, and interpret feedback informs the technical work. It is why usability, satisfaction, and understandable outputs recur across otherwise different projects.",
-      "metrics": [],
-      "tags": ["HUMAN-CENTERED DESIGN", "BEHAVIOR + DECISION-MAKING"]
-    },
-    "target": {
-      "meta": "FIELD OBSERVATION / OLDER SHANGHAI NEIGHBORHOODS",
-      "title": null,
-      "copy": "In the early 48-person questionnaire sample, residents reported only moderate familiarity with nearby stores and amenities. That observation motivated a neighborhood-access map organized around nearby facilities and walking time.",
-      "metrics": [
-        { "value": "6.75 / 10", "label": "AVERAGE REPORTED AMENITY AWARENESS" },
-        { "value": "48", "label": "EARLY QUESTIONNAIRE SAMPLE" }
-      ],
-      "tags": ["COMMUNITY RESEARCH", "CIVIC TECH"]
-    },
-    "ticket": {
-      "meta": "COMMUNITY DISPATCH / INFORMATION CAMPAIGNS",
-      "title": null,
-      "copy": "The project extended beyond the map. One intervention addressed food-safety misconceptions about leftovers; another focused on recognizing fraud and protecting property. Some participants later described the anti-fraud lecture as informative and said it clarified information they had been unsure about.",
-      "metrics": [
-        { "value": "60.42%", "label": "REPORTED NO EXPOSURE TO ANTI-FRAUD PUBLICITY" },
-        { "value": "63.16%", "label": "OF THE EXPOSED GROUP SAID IT HAD NOT WORKED FOR THEM" }
-      ],
-      "tags": ["FOOD SAFETY", "ANTI-FRAUD EDUCATION"]
-    },
-    "draft": {
-      "meta": "CHINA THINKS BIG / ALGORITHM TRANSFER",
-      "title": "The mechanism moved beyond course allocation.",
-      "copy": "Presented the project at the National Round of China Thinks Big. Discussions focused on possible applications and the need for real-world preference data. The framework was later deployed for a class-wide parent–teacher meeting. It reduced manual planning, balanced attendance across time slots, and kept adjusted appointments close to parent preferences.",
-      "metrics": [
-        { "value": "30+", "label": "PROFESSORS + PEERS" },
-        { "value": "CLASS-WIDE", "label": "PARENT–TEACHER SCHEDULING PILOT" }
-      ],
-      "tags": ["EXTERNAL DISCUSSION", "RANKED PREFERENCES", "REAL-WORLD DEPLOYMENT"]
-    }
-  }
+  "itemLabels": { "target": "UNFILED PLACE", "internship": "UNFILED NOTE", "ticket": "UNFILED TICKET", "draft": "OPEN ROUTE" },
+  "emptyState": {
+    "meta": "FIELD CASE / NO CURRENT ENTRIES",
+    "title": "Nothing is filed here yet.",
+    "copy": "Project records have returned to their case files. This case is reserved for future observations, places, activities, and field tests that belong outside the workstation.",
+    "note": "New entries will be added only when they have a clear reason to live outside the formal project record."
+  },
+  "items": {}
 }

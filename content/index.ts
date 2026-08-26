@@ -8,6 +8,7 @@ import notebook from "./notebook.json";
 import board from "./board.json";
 import fieldCase from "./field-case.json";
 import faxContact from "./fax-contact.json";
+import references from "./references.json";
 
 export {
   site,
@@ -20,4 +21,5 @@ export {
   board,
   fieldCase,
   faxContact,
+  references,
 };

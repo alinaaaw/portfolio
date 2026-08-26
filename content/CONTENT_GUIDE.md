@@ -7,8 +7,9 @@ All visitor-facing copy is stored in the JSON files in this directory. Edit the 
 - `site.json`: Site title, social description, brand labels, shared buttons, and loading messages.
 - `intro.json`: Cover copy and the opening exploration guide.
 - `room.json`: Room navigation, discovery states, quick index, and the six exploration zones.
-- `computer.json`: User profile, desktop labels, README, Lab Log entries, projects, experience, and system bulletin.
-- `books.json`: Bookshelf labels, all six books, and page-turning interface copy.
+- `computer.json`: User profile, desktop labels, README, Lab Log entries, projects, experience, reference-browser labels, and system bulletin.
+- `references.json`: The project-reference website opened inside the computer, including filters, citations, annotations, provenance, and external links.
+- `books.json`: Personal bookshelf labels, empty state, and future books or films with Alina's own notes.
 - `drawer.json`: Drawer objects, hotspot labels, and expanded document copy.
 - `notebook.json`: Research notebook pages, annotations, and page-turn prompts.
 - `board.json`: Pinned notes, headings, and detail copy.
@@ -30,9 +31,9 @@ Use the computer for clear, structured material that could also appear on a rés
 - **Lab Log:** Dated professional updates written as authentic log entries. These may cover a new role, project milestone, release, lesson, or change in direction.
 - **About:** Do not add a separate About file. Profile, README, and the physical scenes reveal this information more naturally.
 
-### Books — References
+### Books — Personal Reading and Film
 
-Use the bookshelf for books, papers, articles, documentation, and other references that influenced a project or way of thinking. A book entry should explain why the reference mattered, not only summarize it.
+Use the bookshelf for books Alina has read, films she has watched, and her personal response to each work. Do not use it as a project bibliography or fill it with generic summaries. Project papers, sourcebooks, and implementation dependencies belong in `REFERENCES.web` on the computer.
 
 ### Notebook — Process Notes
 
@@ -48,7 +49,7 @@ Use the drawer for tangible traces of making: prototypes, sketches, components, 
 
 ### Field Case — Life Outside the Lab
 
-Use the Field Case for experiences gathered away from the workstation: observations, activities, travel, personal interests, field experiments, and ideas brought back from the outside world. It may also hold future directions when they are connected to lived experience rather than formal project planning.
+Use the Field Case only for experiences gathered away from the workstation: observations, activities, travel, field experiments, and ideas brought back from the outside world. Formal project findings, presentations, deployments, and evaluation metrics belong in their Computer case files or evidence packets. Leave the case unfiled until a suitable personal or field entry is confirmed.
 
 ### Fax — A Continuing Investigation
 
@@ -58,21 +59,22 @@ Use the final fax as a message sent back by Alina from work outside the lab. It 
 
 The scenes intentionally use different data shapes so the website does not reduce every object to the same title-and-paragraph card.
 
-- **Computer projects and experience:** `details` contains labeled case-file sections. Keep each section evidence-specific.
-- **Books:** `citation`, `summary`, `excerpt`, `quoted`, `annotation`, `provenance`, and `url` separate the source from Alina's margin note. Set `quoted` to `true` only for verified verbatim excerpts.
+- **Computer projects and experience:** `details` contains labeled case-file sections. Keep each section evidence-specific. Project pages link to the internal reference browser instead of repeating citations in the case file.
+- **References:** `project`, `citation`, `summary`, `excerpt`, `quoted`, `annotation`, `provenance`, and `url` separate the source from Alina's project note. Set `quoted` to `true` only for verified verbatim excerpts.
+- **Books:** Future entries should identify the work and record a specific personal response. Do not invent entries to fill the six physical shelf slots.
 - **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
 - **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
 - **Board:** Notes deliberately have no separate title. `label` is the handwritten principle, `copy` gives the evidence, and `detail` is the short margin line.
-- **Field Case:** `metrics` highlights field observations and reported figures; `tags` identifies the route or context. `title` may be `null` when a metric should lead the page.
+- **Field Case:** Keep `items` empty until a suitable field entry is confirmed. Its `emptyState` should explain the intended category without promising unbuilt work.
 
-External sources belong on the bookshelf only when they have a stable citation and URL. Use `provenance` to distinguish original project references, implementation dependencies, and contextual background reading.
+External project sources belong in `references.json` only when they have a stable citation and URL. Use `provenance` to distinguish original project references, implementation dependencies, and contextual background reading.
 
 ## Safe editing rules
 
 1. Edit only the text inside quotation marks on the right side of a colon.
 2. Keep field names, braces, brackets, commas, and quotation marks in place.
 3. To include quotation marks inside a sentence, write them as `\"quoted text\"`.
-4. Arrays control display order, including `books`, `notes`, and `status.messages`. Edit their text freely, but avoid removing required fields.
+4. Arrays control display order, including `references`, `books`, `notes`, and `status.messages`. Edit their text freely, but avoid removing required fields.
 5. The `email` field controls both the displayed address and every `mailto:` link, so it only needs to be changed once.
 6. Keys such as `map`, `folder`, and `research` are stable program identifiers. Do not rename them unless the corresponding component logic is also updated.
 

@@ -35,11 +35,12 @@ an off-site research update that resolves the story indirectly.
 - Desk drawer: physical iterations, components, project folders, and field
   materials. The drawer must open and close from the same handle.
 - Research book: project thinking, process notes, diagrams, and margins.
-- Bookshelf: references and influences. The shelf is inspected first, then one
-  book opens into a two-page reading view.
+- Bookshelf: personal books, films, and Alina's own notes. The shelf may remain
+  visibly unfiled until real entries are selected; project references live in
+  the computer's internal reference website.
 - Note board: principles, plans, open questions, and working rules.
-- Field case: life outside the lab, field experiments, future routes, and work
-  in progress.
+- Field case: life outside the lab, observations, activities, and field
+  experiments. Formal project findings and deployments stay in project files.
 - Printer and contact card: the final report and a diegetic contact route. Both
   share the same printer-desk close-up.
 
