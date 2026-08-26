@@ -175,13 +175,13 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.47,.023,.028,series?0xe5c675:0xd7cba9,.75,.01);titleMark.position.set(.04,height*.53-mark*.17,.51);group.add(titleMark);}
     if(book.isReading){const bookmark=box(.15,.58,.035,palette.signal);bookmark.position.set(width*.12,height+.17,.08);group.add(bookmark);}
     group.position.set(x,y,.05);group.rotation.z=(index%3-1)*.018;shelf.add(group);
-    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);shelf.add(hit);hits.push(hit);}
+    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(hit);hits.push(hit);}
     return {group,cover,pages,spine,band};
   };
   books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.62+index*.69,.43));
   const seriesBooks=books.filter((book)=>book.author==="Keigo Higashino");
   const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.94+index*.63,.43,true,false));
-  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.32,2.28,1.12],[-.625,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));shelf.add(seriesHit);hits.push(seriesHit);
+  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.32,2.28,1.12],[-.625,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(seriesHit);hits.push(seriesHit);
 
   const filmBasket=new THREE.Group();filmBasket.userData.mediaBasket=true;
   filmBasket.position.set(1.25,0,.03);filmBasket.rotation.y=Math.PI/2;

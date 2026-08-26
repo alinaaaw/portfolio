@@ -86,11 +86,13 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /editable layout markers|Replace prompts and layout pins/);
   assert.match(content, /REFERENCES\.web/);
   assert.match(content, /PERSONAL SHELF \/ BOOKS \+ FILMS/);
+  assert.match(content, /"openingEnabled": false/);
   assert.match(content, /Whole Brain Living/);
   assert.match(content, /Keigo Higashino Series/);
   assert.match(content, /Journey Under the Midnight Sun/);
   assert.match(content, /Farewell My Concubine/);
   assert.match(page, /series:higashino/);
+  assert.match(page, /if\(!booksContent\.openingEnabled\)return/);
   assert.doesNotMatch(page, /selectedMovie|dvd-case-detail|dvd-zoom/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
   assert.match(content, /How Should We Normalize Electromyograms/);
@@ -134,6 +136,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /MeshPhysicalMaterial/);
   assert.match(closeups, /RoundedBoxGeometry\(\.72,\.86,\.052/);
   assert.match(closeups, /series:higashino/);
+  assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
   assert.match(closeups, /makeBook\(book,index,-\.94\+index\*\.63,\.43,true,false\)/);

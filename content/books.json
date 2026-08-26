@@ -2,6 +2,7 @@
   "ariaLabel": "Personal books and films shelf close-up",
   "header": "PERSONAL SHELF / BOOKS + FILMS",
   "sceneHint": "READING SHELF LEFT / FILM LIBRARY RIGHT",
+  "openingEnabled": false,
   "sections": {"books":"READ / BOOKS","films":"WATCHED / FILMS","series":"KEIGO HIGASHINO / FAVORITE SERIES"},
   "page": {"reference":"PERSONAL CATALOG / SHELF NOTE","tab":"READING NOTE","backMeta":"PERSONAL NOTE / CONTINUED","backCopy":"A shelf entry is a small record of time spent with a story.","turn":"TURN PAGE →","turnBack":"← TURN BACK","turnAria":"Turn to the shelf note","turnBackAria":"Turn back to the catalog entry","return":"RETURN TO SHELF"},
   "series": {"id":"higashino-series","meta":"FAVORITE AUTHOR / TWO CONFIRMED READS","title":"Keigo Higashino Series","copy":"A dedicated, coordinated row for a favorite mystery writer. Open a volume to browse the individual books in this personal series.","open":"OPEN SERIES","return":"CLOSE SERIES"},

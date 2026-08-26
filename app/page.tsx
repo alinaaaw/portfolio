@@ -142,6 +142,7 @@ function BookshelfScene({ onClose }:{ onClose:()=>void }) {
   const [reverse,setReverse] = useState(false);
   const higashinoBooks=shelfBooks.filter((book)=>book.author==="Keigo Higashino");
   const selectShelfItem=(item:string)=>{
+    if(!booksContent.openingEnabled)return;
     const book=shelfBooks.find((entry)=>item===`book:${entry.id}`);
     if(book){setSelected(book);setSeriesOpen(false);setReverse(false);return;}
     if(item==="series:higashino"){setSeriesOpen(true);setSelected(null);}
