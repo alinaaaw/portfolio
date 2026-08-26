@@ -413,12 +413,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .drawer-document-paper { position: relative; box-sizing: border-box; width: min(760px,88vw); overflow: hidden; background-color: #e7ddc2; background-image: repeating-linear-gradient(0deg,transparent 0 31px,rgba(70,105,97,.12) 32px); color: var(--ink); box-shadow: 17px 22px 0 rgba(0,0,0,.35); transform: rotate(-.7deg); animation: documentIn .52s cubic-bezier(.18,.8,.2,1) both; }
 .drawer-document article { box-sizing: border-box; min-width: 0; min-height: min(450px,80vh); max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: clamp(54px,6vw,75px); }
 @keyframes documentIn { from { opacity: 0; transform: scale(.62) rotate(-5deg); } }
-.drawer-document article small { color: #a44235; font: 7px var(--font-mono),monospace; }
+.drawer-document article small { display: block; color: #a44235; font: clamp(9px,1.1vw,11px)/1.55 var(--font-mono),monospace; letter-spacing: .035em; }
 .drawer-document article h2 { margin: 26px 0 22px; font: clamp(30px,4vw,48px)/1.08 "Segoe Print",cursive; }
 .drawer-document article p { color: #515a53; font-size: 13px; line-height: 1.8; }
 .drawer-document article blockquote { margin: 30px 0; padding: 13px 18px; border-left: 2px solid #a44235; font: 18px "Segoe Print",cursive; }
 .paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
-.drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 5px 1px 4px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 7px var(--font-mono),monospace; letter-spacing: .08em; }
+.drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 6px 2px 5px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 9px var(--font-mono),monospace; letter-spacing: .08em; }
 .drawer-document-return:hover, .drawer-document-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
 .artifact-facts { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid rgba(38,55,50,.28); border-left: 1px solid rgba(38,55,50,.28); }
 .artifact-facts > div { min-width: 0; padding: 13px 15px; border-right: 1px solid rgba(38,55,50,.28); border-bottom: 1px solid rgba(38,55,50,.28); }

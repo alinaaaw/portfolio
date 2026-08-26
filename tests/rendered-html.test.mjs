@@ -184,6 +184,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawer, /More even describes the project goal/);
   assert.match(drawer, /do not establish a formal fairness guarantee/);
   assert.doesNotMatch(drawer, /No method led every criterion/);
+  assert.match(css, /\.drawer-document article small \{[^}]*font: clamp\(9px,1\.1vw,11px\)\/1\.55/);
+  assert.match(css, /\.drawer-document-return \{[^}]*font: 9px/);
   assert.match(drawerScene, /const cabinetTop=roundedBox\(4\.25,\.18,3\.55/);
   assert.match(drawerScene, /const bottom=roundedBox\(3\.72,\.14,3\.12/);
   assert.match(drawerScene, /const front=roundedBox\(4\.02,1\.18,\.27/);
