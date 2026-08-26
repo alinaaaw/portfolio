@@ -1,10 +1,9 @@
 {
   "ariaLabel": "Research notebook close-up",
   "header": "RESEARCH BOOK / INSPECT A PAGE",
-  "sceneHint": "CLICK A PAGE · TURN IT OVER FOR THE MARGIN NOTE",
-  "returnItem": "PUT IT BACK ×",
+  "sceneHint": "CLICK THE LEFT OR RIGHT PAGE TO OPEN A NOTE",
+  "returnItem": "PUT IT BACK",
   "itemLabels": { "research": "EMG DECISION LOG", "margin": "RESEARCH QUESTION", "diagram": "ALLOCATION REVISION" },
-  "page": { "turn": "TURN THE PAGE ↷", "turnBack": "TURN BACK ↶" },
   "items": {
     "research": {
       "meta": "EMG DEVICE / DESIGN DECISION / JUL 2025—PRESENT",

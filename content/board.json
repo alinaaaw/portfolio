@@ -3,7 +3,7 @@
   "header": "NOTE BOARD / FOLLOW THE THREADS",
   "sceneHint": "WORKING PRINCIPLES · OPEN QUESTIONS · NEXT TESTS",
   "detailMeta": "PINNED NOTE /",
-  "returnItem": "PIN IT BACK ×",
+  "returnItem": "PIN IT BACK",
   "hitLabels": ["DEVELOP THE SOFTWARE", "CHECK THE CONFOUNDER", "EVALUATE THE DISTRIBUTION", "TEST THE INTERVENTION", "MAKE IT LEGIBLE"],
   "notes": [
     { "status": "NEXT PHASE", "label": "develop the software around the signal", "copy": "The hardware prototype now produces a four-band session summary. The next phase is to improve the data processing, develop the software, and design the UI.", "detail": "Turn a working measurement into a usable system." },

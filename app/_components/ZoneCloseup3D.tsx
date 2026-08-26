@@ -318,11 +318,38 @@ function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
   const photo=box(1.25,.05,.95,0x455d59); photo.position.set(-1.55,.62,.62); photo.rotation.y=-.08; book.add(photo);
   const pen=cylinder(.065,2.7,palette.red,12); pen.rotation.z=Math.PI/2; pen.position.set(.9,.72,1.65); book.add(pen);
   scene.add(book);
-  const researchHit=hitBox("research",notebookContent.itemLabels.research,[2.8,.5,3.5],[-1.55,.7,0],[left]);
+  // The page is the interaction target. The blue diagram remains a sketch on
+  // the paper instead of taking hover away from the page underneath it.
+  const researchHit=hitBox("research",notebookContent.itemLabels.research,[3.02,.5,3.72],[-1.53,.7,0],[left,photo]);
   const marginHit=hitBox("margin",notebookContent.itemLabels.margin,[2.8,.5,3.5],[1.55,.7,0],[right,sticky]);
-  const diagramHit=hitBox("diagram",notebookContent.itemLabels.diagram,[1.5,.65,1.2],[-1.55,.82,.62],[photo]);
-  scene.add(researchHit,marginHit,diagramHit); hits.push(researchHit,marginHit,diagramHit);
-  const mug=cylinder(.45,.78,0x29423c,28); mug.position.set(3.25,.66,-1.6); scene.add(mug);
+  scene.add(researchHit,marginHit); hits.push(researchHit,marginHit);
+
+  // A recognisable angle-poise lamp replaces the ambiguous cylinder that used
+  // to sit here. Its head extends beyond the right edge of the close-up so the
+  // lamp reads as surrounding desk context, not another centred exhibit.
+  const lamp=new THREE.Group();
+  lamp.position.set(3.95,.27,-1.28);
+  lamp.rotation.y=-.48;
+  const lampBase=cylinder(.43,.1,0x26312e,32); lampBase.position.y=.05;
+  const baseCap=cylinder(.23,.035,palette.steel,24); baseCap.position.y=.12;
+  const switchButton=roundedBox(.13,.045,.1,palette.red,.025,.45,.18); switchButton.position.set(.14,.16,.02);
+  const lowerJoint=cylinder(.11,.2,palette.steel,20); lowerJoint.position.set(0,.28,0); lowerJoint.rotation.x=Math.PI/2;
+  const lowerArms=[-.065,.065].map((offset)=>{const arm=cylinder(.035,1.18,0x56635e,14);arm.position.set(0,.86,offset);return arm;});
+  const elbow=cylinder(.12,.22,palette.steel,22); elbow.position.set(0,1.46,0); elbow.rotation.x=Math.PI/2;
+  const upperAngle=-.82;
+  const upperLength=1.28;
+  const upperX=Math.sin(-upperAngle)*upperLength;
+  const upperY=Math.cos(upperAngle)*upperLength;
+  const upperArms=[-.06,.06].map((offset)=>{const arm=cylinder(.034,upperLength,0x56635e,14);arm.position.set(upperX/2,1.46+upperY/2,offset);arm.rotation.z=upperAngle;return arm;});
+  const headJoint=cylinder(.13,.23,palette.steel,22); headJoint.position.set(upperX,1.46+upperY,0); headJoint.rotation.x=Math.PI/2;
+  const lampHead=new THREE.Group(); lampHead.position.set(upperX+.02,1.46+upperY-.03,0); lampHead.rotation.z=-.34;
+  const shade=new THREE.Mesh(new THREE.CylinderGeometry(.2,.46,.44,28,1,true),mat(0x304943,.3,.48)); shade.position.y=-.25;
+  const shadeRim=new THREE.Mesh(new THREE.TorusGeometry(.46,.022,8,36),mat(palette.steel,.3,.68)); shadeRim.position.y=-.47; shadeRim.rotation.x=Math.PI/2;
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.1,14,10),mat(0xffd09b,.25,.02,0xffbb72,1.1)); bulb.position.y=-.5;
+  const lampGlow=new THREE.PointLight(0xffbf7d,4.5,4.5,1.8); lampGlow.position.set(0,-.55,.05);
+  lampHead.add(shade,shadeRim,bulb,lampGlow);
+  lamp.add(lampBase,baseCap,switchButton,lowerJoint,...lowerArms,elbow,...upperArms,headJoint,lampHead);
+  scene.add(lamp);
 }
 
 function buildBoard(scene:THREE.Scene,hits:HitMesh[]) {
@@ -407,7 +434,7 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
   books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
-  notebook:{position:[0,5.7,5.7],target:[0,.45,0],hint:notebookContent.sceneHint},
+  notebook:{position:[-.35,5.7,5.7],target:[-.45,.45,0],hint:notebookContent.sceneHint},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
   fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},
@@ -550,5 +577,5 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
-  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} /><div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
+  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
 }

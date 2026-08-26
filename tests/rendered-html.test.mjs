@@ -123,7 +123,10 @@ test("editable copy is organized into valid category files", async () => {
 test("3D room and layered object exploration remain connected", async () => {
   const game = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/_components/LabGame.tsx", import.meta.url), "utf8"));
   const closeups = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/_components/ZoneCloseup3D.tsx", import.meta.url), "utf8"));
+  const page = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/page.tsx", import.meta.url), "utf8"));
+  const notebook = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../content/notebook.json", import.meta.url), "utf8"));
   const css = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../public/site.css", import.meta.url), "utf8"));
+  const notebookScene = page.match(/function NotebookScene[\s\S]*?const boardNotes/)?.[0] ?? "";
   assert.match(game, /WebGLRenderer/);
   assert.match(game, /cameraPoses/);
   assert.match(game, /Raycaster/);
@@ -158,6 +161,18 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /monitorScreen/);
   assert.match(closeups, /roundedBox\(3\.45,2\.15,\.28/);
   assert.match(closeups, /buildNotebook/);
+  assert.match(closeups, /const researchHit=hitBox\([^\n]+\[left,photo\]\)/);
+  assert.doesNotMatch(closeups, /const diagramHit=/);
+  assert.match(closeups, /const lamp=new THREE\.Group\(\)/);
+  assert.match(closeups, /lamp\.position\.set\(3\.95/);
+  assert.match(closeups, /lampHead\.add\(shade,shadeRim,bulb,lampGlow\)/);
+  assert.match(notebookScene, /model-detail notebook-detail/);
+  assert.doesNotMatch(notebookScene, /setReverse|notebook-turn-control/);
+  assert.match(notebook, /CLICK THE LEFT OR RIGHT PAGE TO OPEN A NOTE/);
+  assert.doesNotMatch(notebook, /TURN IT OVER|TURN THE PAGE|TURN BACK/);
+  assert.match(css, /\.model-detail \.notebook-closeup \{[^}]*aspect-ratio: \.79/);
+  assert.match(css, /\.notebook-closeup \{[^}]*background-color: #f1e8c9/);
+  assert.doesNotMatch(css, /\.notebook-closeup\.turned|\.notebook-turn-control|\.notebook-pipeline/);
   assert.match(closeups, /buildBoard/);
   assert.match(closeups, /buildFieldCase/);
   assert.match(closeups, /buildPrinter/);

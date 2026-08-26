@@ -4,7 +4,7 @@
   "sceneHint": "PHYSICAL EVIDENCE · OPEN A PACKET",
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
-  "returnItem": "PUT IT BACK ×",
+  "returnItem": "PUT IT BACK",
   "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALGORITHM COMPARISON NOTES", "components": "PROTOTYPE COMPONENTS" },
   "items": {
     "folder": {

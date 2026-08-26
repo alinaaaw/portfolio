@@ -18,7 +18,7 @@
         "signature": "Sending the next version after the feedback round. — Alina",
         "status": "STATUS / INTERACTIVE PROTOTYPE · FEEDBACK IN PROGRESS",
       "reply": "SEND A REPLY →",
-      "return": "RETURN TO PRINTER ×"
+      "return": "RETURN TO PRINTER"
     }
   },
   "contact": {
@@ -31,6 +31,6 @@
     "headline": ["Let's continue", "the conversation."],
     "role": "Computer Science · University of Washington",
     "email": "awu78@uw.edu",
-    "return": "RETURN CARD TO DESK ×"
+    "return": "RETURN CARD TO DESK"
   }
 }

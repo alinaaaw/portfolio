@@ -184,18 +184,16 @@ function DrawerScene({ onClose,faxPrinted }:{ onClose:()=>void;faxPrinted:boolea
   </div>;
 }
 
-type NotebookItem = "research"|"margin"|"diagram";
+type NotebookItem = "research"|"margin";
 
 function NotebookScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<NotebookItem|null>(null);
-  const [reverse,setReverse]=useState(false);
   const pages=notebookContent.items as Record<NotebookItem,NotebookPage>;
   const page=selected?pages[selected]:null;
-  const reverseSteps=selected==="research"&&page?.reverseCopy.includes(" → ")?page.reverseCopy.split(" → "):null;
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={notebookContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.notebook.index}</span><strong>{notebookContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-    <ZoneCloseup3D zone="notebook" onSelect={(item)=>{if(["research","margin","diagram"].includes(item)){setSelected(item as NotebookItem);setReverse(false);}}}/>
-    {page&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className={`notebook-closeup ${reverse?"turned":""}`} onMouseDown={(event)=>event.stopPropagation()}><div className="notebook-scroll"><small>{reverse?page.reverseMeta:page.meta}</small>{(reverse?page.reverseTitle:page.title)&&<h2>{reverse?page.reverseTitle:page.title}</h2>}{reverse?<>{reverseSteps?<div className="notebook-pipeline" aria-label={page.reverseCopy}>{reverseSteps.map((step,index)=><span className="notebook-pipeline-step" key={step}><mark>{step}</mark>{index<reverseSteps.length-1&&<b aria-hidden="true">→</b>}</span>)}</div>:<p className="notebook-reverse-copy">{page.reverseCopy}</p>}<blockquote>{page.note}</blockquote></>:<><p className="notebook-lead">{page.lead}</p><ol className="notebook-process">{page.steps.map((step)=><li key={step}>{step}</li>)}</ol></>}</div><button className="notebook-turn-control" onClick={()=>setReverse((value)=>!value)}>{reverse?notebookContent.page.turnBack:notebookContent.page.turn}</button><button className="paper-return-control" onClick={()=>setSelected(null)}>{notebookContent.returnItem}</button></article></div>}
+    <ZoneCloseup3D zone="notebook" onSelect={(item)=>{if(["research","margin"].includes(item))setSelected(item as NotebookItem);}}/>
+    {page&&<div className="model-detail notebook-detail" onMouseDown={()=>setSelected(null)}><article className="notebook-closeup" aria-labelledby="notebook-detail-title" onMouseDown={(event)=>event.stopPropagation()}><div className="notebook-scroll"><small>{page.meta}</small>{page.title&&<h2 id="notebook-detail-title">{page.title}</h2>}<p className="notebook-lead">{page.lead}</p><ol className="notebook-process">{page.steps.map((step)=><li key={step}>{step}</li>)}</ol><section className="notebook-secondary" aria-label={page.reverseMeta}><small>{page.reverseMeta}</small>{page.reverseTitle&&<h3>{page.reverseTitle}</h3>}<p>{page.reverseCopy}</p></section><blockquote>{page.note}</blockquote></div><button type="button" className="paper-return-control" aria-label="Close notebook page" onClick={()=>setSelected(null)}>{notebookContent.returnItem}</button></article></div>}
   </section></div>;
 }
 
