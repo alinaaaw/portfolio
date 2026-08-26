@@ -298,6 +298,25 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-views button.active { border-color: var(--signal); color: var(--signal); }
 .field-map-zoom button { font-size: 17px; }
 .field-map-return { position: absolute; z-index: 3; top: 14px; right: 14px; font-size: 17px; }
+.field-map-memory { position: absolute; z-index: 5; inset: clamp(54px,8%,76px) clamp(24px,8%,96px); display: grid; grid-template-rows: auto 1fr auto; min-width: 0; overflow: hidden; border: 1px solid rgba(231,221,194,.6); background: #111a17; color: var(--paper); box-shadow: 15px 19px 0 rgba(28,21,15,.42); animation: documentIn .32s cubic-bezier(.18,.8,.2,1) both; }
+.field-map-memory > header { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 0 14px 0 20px; border-bottom: 1px solid rgba(231,221,194,.22); background: #18231f; }
+.field-map-memory > header small { display: block; margin-bottom: 3px; color: #9da99f; font: 6px var(--font-mono),monospace; letter-spacing: .12em; }
+.field-map-memory > header h2 { margin: 0; color: #f0e6c9; font: 16px/1.1 var(--font-mono),monospace; letter-spacing: -.035em; }
+.field-map-memory > header button, .field-map-memory footer button { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(231,221,194,.3); background: transparent; color: var(--paper); cursor: pointer; font: 16px var(--font-mono),monospace; }
+.field-map-photo-stage { position: relative; min-height: 0; overflow: hidden; background: radial-gradient(circle at center,#29352f 0,#111815 72%); }
+.field-map-photo-stage::after { position: absolute; inset: 8px; border: 1px solid rgba(231,221,194,.12); content: ""; pointer-events: none; }
+.field-map-photo-stage > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.field-map-photo-message { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 28px; color: #c9d0c9; text-align: center; }
+.field-map-photo-message i { width: 22px; height: 22px; border: 2px solid rgba(231,221,194,.2); border-top-color: var(--signal); border-radius: 50%; animation: spin .8s linear infinite; }
+.field-map-photo-message span { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid #a04b3d; border-radius: 50%; color: #bd5c4c; font: 28px "Segoe Print",cursive; transform: rotate(-8deg); }
+.field-map-photo-message strong { max-width: 420px; font: 10px/1.6 var(--font-mono),monospace; letter-spacing: .12em; }
+.field-map-photo-message small { max-width: 360px; color: #7f8c84; font: 7px/1.6 var(--font-mono),monospace; }
+.field-map-memory > footer { display: flex; align-items: center; justify-content: space-between; min-height: 56px; gap: 18px; padding: 7px 13px 7px 20px; border-top: 1px solid rgba(231,221,194,.22); background: #18231f; }
+.field-map-memory > footer div { display: flex; min-width: 0; align-items: baseline; gap: 16px; }
+.field-map-memory > footer strong, .field-map-memory > footer span { font: 7px var(--font-mono),monospace; }
+.field-map-memory > footer strong { flex: none; color: var(--signal); }
+.field-map-memory > footer span { overflow: hidden; color: #aeb8b0; text-overflow: ellipsis; white-space: nowrap; }
+.field-map-memory > footer nav { display: flex; flex: none; gap: 6px; }
 .evidence-card.note-card { max-width: 590px; min-height: 400px; background-color: #e9dfa8; transform: rotate(1.2deg); }
 .evidence-card small { color: #a44235; font: 7px var(--font-mono),monospace; }
 .evidence-card h2 { margin: 30px 0 24px; font: clamp(35px,5vw,61px)/1.04 "Segoe Print",cursive; letter-spacing: -.045em; }
@@ -612,6 +631,11 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .field-map-views { top: 10px; left: 10px; }
   .field-map-return { top: 10px; right: 10px; }
   .field-map-zoom { right: 10px; bottom: 10px; }
+  .field-map-memory { inset: 64px 10px 12px; box-shadow: 7px 9px 0 rgba(28,21,15,.35); }
+  .field-map-memory > header { min-height: 52px; padding-left: 14px; }
+  .field-map-memory > header h2 { font-size: 13px; }
+  .field-map-memory > footer { min-height: 50px; padding-left: 14px; }
+  .field-map-memory > footer div { gap: 9px; }
   .object-view { width: 100%; height: 100svh; max-height: none; border: 0; }
   .object-view > header { padding: 0 14px; }
   .drawer-tray, .case-inventory { grid-template-columns: 1fr 1fr 1fr; padding: 18px 10px; }

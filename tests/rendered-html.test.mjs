@@ -157,6 +157,9 @@ test("field case map uses real country geometry instead of hand-drawn continents
   const { readFile } = await import("node:fs/promises");
   const mapSource = await readFile(new URL("../app/_components/fieldCaseMap.ts", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
+  const photoGuide = await readFile(new URL("../public/travel-map-photos/README.md", import.meta.url), "utf8");
+  const photoTemplate = JSON.parse(await readFile(new URL("../public/travel-map-photos/_template/manifest.json", import.meta.url), "utf8"));
   const countries = JSON.parse(await readFile(new URL("../app/_components/worldCountries110m.json", import.meta.url), "utf8"));
   assert.ok(countries.length >= 170, "the map should retain Natural Earth country coverage");
   assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
@@ -166,12 +169,14 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapSource, /FIELD_CASE_MAP_VIEWS/);
   assert.match(mapSource, /worldGroup/);
   assert.match(mapSource, /camera\.zoom<2\.25/);
-  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo", "Beijing", "Macau", "Qingdao", "Dalian", "Beihai", "Nanjing", "Suzhou", "Yixing", "Lijiang"]) {
+  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo", "Beijing", "Macau", "Qingdao", "Dalian", "Beihai", "Lijiang"]) {
     assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
-  assert.equal([...mapSource.matchAll(/\{name:"/g)].length, 24);
-  assert.equal([...mapSource.matchAll(/country:"/g)].length, 24);
-  assert.equal([...mapSource.matchAll(/region:"asia"/g)].length, 16);
+  assert.doesNotMatch(mapSource, /name:"(?:Nanjing|Suzhou|Yixing)"/);
+  assert.equal([...mapSource.matchAll(/\{name:"/g)].length, 21);
+  assert.equal([...mapSource.matchAll(/country:"/g)].length, 21);
+  assert.equal([...mapSource.matchAll(/photoFolder:"/g)].length, 21);
+  assert.equal([...mapSource.matchAll(/region:"asia"/g)].length, 13);
   const worldGroups = [...mapSource.matchAll(/worldGroup:"([^"]+)"/g)].map((match) => match[1]);
   assert.equal(new Set(worldGroups).size, 19);
   assert.match(mapSource, /name:"Seattle"[^\n]+worldGroup:"seattle"/);
@@ -184,6 +189,15 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapReading, /onWheel/);
   assert.match(mapReading, /setPointerCapture/);
   assert.match(mapReading, /field-map-views/);
+  assert.match(mapReading, /travel-map-photos/);
+  assert.match(mapReading, /manifest\.json/);
+  assert.match(mapReading, /field-map-memory/);
+  assert.match(mapReading, /Previous photo/);
+  assert.match(mapReading, /Next photo/);
+  assert.match(mapReading, /randomLostTravelMessage/);
+  assert.match(css, /\.field-map-memory/);
+  assert.match(photoGuide, /manifest\.json/);
+  assert.equal(photoTemplate.photos[0].file, "01.jpg");
   assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);
   assert.doesNotMatch(mapSource, /landMasses/);
 });

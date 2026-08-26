@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS } from "./_components/fieldCaseMap";
-import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView } from "./_components/fieldCaseMap";
+import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -202,6 +202,31 @@ function BoardScene({onClose}:{onClose:()=>void}) {
 
 type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
+type TravelPhoto={src:string;alt:string;caption:string};
+type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
+const lostTravelMessages=[
+  "FILM LOST IN THE ADVENTURE",
+  "POSTCARD NEVER MADE IT HOME",
+  "CAMERA ROLL WANDERED OFF",
+  "MEMORY STILL OFF THE RECORD",
+  "EVIDENCE LOST SOMEWHERE EN ROUTE",
+] as const;
+
+function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.random()*lostTravelMessages.length)];}
+
+function readTravelPhotos(value:unknown,pin:FieldCaseTravelPin):TravelPhoto[]{
+  if(!value||typeof value!=="object"||!("photos" in value)||!Array.isArray(value.photos))return [];
+  return value.photos.flatMap((entry)=>{
+    const item=typeof entry==="string"?{file:entry}:entry;
+    if(!item||typeof item!=="object"||!("file" in item)||typeof item.file!=="string")return [];
+    const file=item.file.trim();
+    if(!file||file.startsWith("/")||file.includes("..")||/^[a-z]+:/i.test(file))return [];
+    const src=`/travel-map-photos/${encodeURIComponent(pin.photoFolder)}/${file.split("/").map(encodeURIComponent).join("/")}`;
+    const alt="alt" in item&&typeof item.alt==="string"?item.alt:`${pin.name} travel memory`;
+    const caption="caption" in item&&typeof item.caption==="string"?item.caption:"";
+    return [{src,alt,caption}];
+  });
+}
 
 function FieldMapReading({onClose}:{onClose:()=>void}) {
   const canvasRef=useRef<HTMLCanvasElement>(null);
@@ -211,6 +236,11 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const pressRef=useRef<{id:number;x:number;y:number;moved:boolean}|null>(null);
   const [camera,setCamera]=useState<FieldCaseMapCamera>({...FIELD_CASE_MAP_VIEWS.world});
   const [activeView,setActiveView]=useState<FieldCaseMapView>("world");
+  const [selectedPin,setSelectedPin]=useState<FieldCaseTravelPin|null>(null);
+  const [photoStatus,setPhotoStatus]=useState<TravelPhotoStatus>("idle");
+  const [photos,setPhotos]=useState<TravelPhoto[]>([]);
+  const [photoIndex,setPhotoIndex]=useState(0);
+  const [lostMessage,setLostMessage]=useState(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
     const canvas=canvasRef.current;
@@ -226,9 +256,40 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   },[]);
 
   const chooseView=useCallback((view:FieldCaseMapView)=>{
+    setSelectedPin(null);
     setActiveView(view);
     setCamera({...FIELD_CASE_MAP_VIEWS[view]});
   },[]);
+
+  useEffect(()=>{
+    if(!selectedPin){setPhotoStatus("idle");setPhotos([]);return;}
+    const controller=new AbortController();
+    setPhotoStatus("loading");
+    setPhotos([]);
+    setPhotoIndex(0);
+    setLostMessage(randomLostTravelMessage());
+    fetch(`/travel-map-photos/${encodeURIComponent(selectedPin.photoFolder)}/manifest.json`,{signal:controller.signal,cache:"no-store"})
+      .then((response)=>{if(!response.ok)throw new Error("missing travel photo folder");return response.json();})
+      .then((manifest)=>{
+        const nextPhotos=readTravelPhotos(manifest,selectedPin);
+        if(nextPhotos.length===0)throw new Error("empty travel photo folder");
+        setPhotos(nextPhotos);
+        setPhotoStatus("ready");
+      })
+      .catch((error)=>{if(error instanceof DOMException&&error.name==="AbortError")return;setPhotoStatus("lost");});
+    return ()=>controller.abort();
+  },[selectedPin]);
+
+  useEffect(()=>{
+    if(!selectedPin)return;
+    const onKeyDown=(event:KeyboardEvent)=>{
+      if(event.key==="Escape")setSelectedPin(null);
+      if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowLeft")setPhotoIndex((current)=>(current-1+photos.length)%photos.length);
+      if(photoStatus==="ready"&&photos.length>1&&event.key==="ArrowRight")setPhotoIndex((current)=>(current+1)%photos.length);
+    };
+    window.addEventListener("keydown",onKeyDown);
+    return ()=>window.removeEventListener("keydown",onKeyDown);
+  },[photoStatus,photos.length,selectedPin]);
 
   const canvasPoint=useCallback((clientX:number,clientY:number)=>{
     const canvas=canvasRef.current;
@@ -324,7 +385,8 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     else if(pointersRef.current.size===0)pressRef.current=null;
     if(!cancelled&&press?.id===event.pointerId&&!press.moved){
       const hit=pinHitsRef.current.find((candidate)=>Math.hypot(candidate.x-point.x,candidate.y-point.y)<=candidate.radius);
-      if(hit&&camera.zoom<2.25)chooseView(hit.targetView);
+      if(hit?.count&&hit.count>1&&camera.zoom<2.25)chooseView(hit.targetView);
+      else if(hit?.pins.length===1)setSelectedPin(hit.pins[0]);
     }
   };
 
@@ -334,6 +396,18 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
+      {selectedPin&&<aside className="field-map-memory" aria-label={`${selectedPin.name} travel photos`}>
+        <header><div><small>{selectedPin.country} · FIELD FILE</small><h2>{selectedPin.name}</h2></div><button aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
+        <div className="field-map-photo-stage">
+          {photoStatus==="loading"&&<div className="field-map-photo-message"><i/><strong>DEVELOPING FILM...</strong></div>}
+          {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong><small>Add this city&apos;s folder when the evidence turns up.</small></div>}
+          {photoStatus==="ready"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onError={()=>{setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
+        </div>
+        {photoStatus==="ready"&&photos[photoIndex]&&<footer>
+          <div><strong>{String(photoIndex+1).padStart(2,"0")} / {String(photos.length).padStart(2,"0")}</strong><span>{photos[photoIndex].caption||"FIELD MEMORY"}</span></div>
+          {photos.length>1&&<nav aria-label="Photo controls"><button aria-label="Previous photo" onClick={()=>setPhotoIndex((current)=>(current-1+photos.length)%photos.length)}>←</button><button aria-label="Next photo" onClick={()=>setPhotoIndex((current)=>(current+1)%photos.length)}>→</button></nav>}
+        </footer>}
+      </aside>}
     </div>
   </article>;
 }
