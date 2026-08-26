@@ -10,12 +10,16 @@
 
 支持：JPG、JPEG、PNG、WebP、GIF、AVIF。手机拍摄的 HEIC/HEIF 请先转换成 JPG 或 WebP。
 
-照片按照文件名自然排序，推荐使用：
+照片按照文件名自然排序。序号完全是可选的，只在你想手动控制展示顺序时使用。以下两种写法都会被自动识别：
 
 ```text
 01-times-square.jpg
 02-central-park.jpg
 03-brooklyn-bridge.webp
+
+times-square.jpg
+central-park.jpg
+brooklyn-bridge.webp
 ```
 
 文件名会自动变成照片下方的标题，例如 `02-central-park.jpg` 会显示为 `central park`。

@@ -183,7 +183,7 @@ test("field case map uses real country geometry instead of hand-drawn continents
   const css = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
   const photoGuide = await readFile(new URL("../app/_assets/travel-map-photos/README.md", import.meta.url), "utf8");
   const nycGuide = await readFile(new URL("../app/_assets/travel-map-photos/new-york-city/ADD-PHOTOS-HERE.md", import.meta.url), "utf8");
-  const expectedPhotoCounts = {chongqing:5,kyoto:3,"los-angeles":6,"new-york-city":2,"san-francisco":4,seattle:4,tokyo:2,xian:5};
+  const expectedPhotoCounts = {chongqing:5,kyoto:2,"los-angeles":6,"new-york-city":2,"san-francisco":4,seattle:4,tokyo:2,xian:5};
   for (const [folder,count] of Object.entries(expectedPhotoCounts)) {
     const entries = await readdir(new URL(`../app/_assets/travel-map-photos/${folder}/`, import.meta.url), {withFileTypes:true});
     assert.equal(entries.filter((entry) => entry.isFile() && /\.(?:jpe?g|png|webp|gif|avif)$/i.test(entry.name)).length, count, `${folder} photo count`);
