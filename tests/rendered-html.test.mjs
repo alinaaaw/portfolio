@@ -176,6 +176,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /monitorScreen/);
   assert.match(closeups, /roundedBox\(3\.45,2\.15,\.28/);
   assert.match(closeups, /buildNotebook/);
+  assert.match(closeups, /const table=box\(8,\.35,6\.8,palette\.woodLight/);
+  assert.match(closeups, /const matBoard=box\(6\.9,\.06,5\.4,0x213a35/);
   assert.match(closeups, /const researchHit=hitBox\([^\n]+\[left,photo\]\)/);
   assert.doesNotMatch(closeups, /const diagramHit=/);
   assert.match(closeups, /const comparisonSheet=roundedBox/);

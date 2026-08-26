@@ -304,9 +304,9 @@ function buildContact(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
 }
 
 function buildNotebook(scene:THREE.Scene,hits:HitMesh[]) {
-  const table=box(8,.35,5.5,palette.woodLight,.9,.02); table.position.y=.05; scene.add(table);
-  const matBoard=box(6.9,.06,4.6,0x213a35,.95,.02); matBoard.position.y=.27; scene.add(matBoard);
-  for(let index=0;index<10;index+=1){ const grid=box(.015,.015,4.35,0x496960); grid.position.set(-3.1+index*.68,.315,0); scene.add(grid); }
+  const table=box(8,.35,6.8,palette.woodLight,.9,.02); table.position.y=.05; scene.add(table);
+  const matBoard=box(6.9,.06,5.4,0x213a35,.95,.02); matBoard.position.y=.27; scene.add(matBoard);
+  for(let index=0;index<10;index+=1){ const grid=box(.015,.015,5,0x496960); grid.position.set(-3.1+index*.68,.315,0); scene.add(grid); }
   const book=new THREE.Group();
   const left=roundedBox(3.05,.12,3.85,palette.paper,.06,.94,.01); left.position.set(-1.53,.48,0); left.rotation.y=-.025;
   const right=roundedBox(3.05,.12,3.85,0xe8ddc1,.06,.94,.01); right.position.set(1.53,.48,0); right.rotation.y=.025;
