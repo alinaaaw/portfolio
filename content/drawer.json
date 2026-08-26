@@ -5,7 +5,7 @@
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK",
-  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALGORITHM COMPARISON NOTES", "components": "PROTOTYPE COMPONENTS" },
+  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALGORITHM REVISION NOTES", "components": "PROTOTYPE COMPONENTS" },
   "items": {
     "folder": {
       "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
@@ -44,16 +44,16 @@
       "note": "The hardware prototype is assembled and operational. Software behavior, data analysis, and the user interface still require further development."
     },
     "envelope": {
-      "meta": "COURSE ALLOCATION / METHOD EVALUATION",
-      "title": "No method led every criterion.",
-      "copy": "Compared First-Come-First-Serve, Random Ticket, and probabilistic assignment with maximum-weight realization. FCFS required the least CPU time. Random Ticket made the final outcome harder to predict. The probabilistic approach produced the strongest reported satisfaction result.",
+      "meta": "COURSE ALLOCATION / RESIDUAL RULE / VERSION 01 → VERSION 02",
+      "title": "A random residual rule could push probability toward lower-ranked courses.",
+      "copy": "When course capacity and student assignment capacity remained after the main fractional allocation, Version 1 distributed the residual pieces by randomly choosing among the remaining courses. That could add unnecessary probability mass to lower-ranked choices. Version 2 instead balanced remaining course capacity against remaining student capacity, with the project design goal of producing a more even probability matrix.",
       "facts": [
-        { "label": "AUTOMATION", "value": "FCFS · lowest CPU time" },
-        { "label": "FAIRNESS", "value": "Random Ticket · randomized realization" },
-        { "label": "SATISFACTION", "value": "Probabilistic + Maximum Weight" },
-        { "label": "EVALUATION", "value": "satisfaction mean + standard deviation · assignment completion · capacity violations" }
+        { "label": "VERSION 01", "value": "random selection among courses with remaining capacity" },
+        { "label": "OBSERVED RISK", "value": "unnecessary probability mass on lower-ranked courses" },
+        { "label": "VERSION 02", "value": "balance remaining course capacity with remaining student capacity" },
+        { "label": "DESIGN GOAL", "value": "reduce low-preference pieces · make the residual distribution more even" }
       ],
-      "note": "These tradeoffs motivated a mechanism that balanced limited course capacity across automation, efficiency, fairness, and overall student satisfaction. Fairness is presented here as an original project criterion, not as a formally proven guarantee."
+      "note": "This was an algorithm-design iteration, not only a code cleanup. More even describes the project goal; the available materials do not establish a formal fairness guarantee."
     }
   }
 }

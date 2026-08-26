@@ -265,17 +265,18 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   tray.position.set(-1,.05,-.36);
   workspace.add(tray);
 
-  buildPrinterModel(workspace,[2.25,2.32,-.45],.62,faxPrinted);
-  addContactCard(workspace,[3.52,2.39,1.15],-.12,undefined,.48);
-  const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(-1.2,3.47,-1.25);workspace.add(monitor);
-  const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(-1.2,3.47,-1.09);workspace.add(monitorScreen);
+  buildPrinterModel(workspace,[2.75,2.32,.35],.76,faxPrinted);
+  addContactCard(workspace,[-3.65,2.39,1.65],.06,undefined,.6);
+  const monitorAssembly=new THREE.Group();monitorAssembly.position.set(-1.2,2.35,-1.25);monitorAssembly.scale.setScalar(1.3);workspace.add(monitorAssembly);
+  const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(0,1.12,0);monitorAssembly.add(monitor);
+  const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(0,1.12,.16);monitorAssembly.add(monitorScreen);
   const monitorMaterial=monitorScreen.material as THREE.MeshStandardMaterial;monitorMaterial.emissive.setHex(palette.cyan);monitorMaterial.emissiveIntensity=.72;
-  for(let row=0;row<9;row+=1){const length=.55+((row*7)%9)*.18;const line=box(length,.018,.014,row%3===0?palette.signal:palette.cyan,.45,.15);line.position.set(-2.55+length/2,4.08-row*.15,-1.065);const lineMaterial=line.material as THREE.MeshStandardMaterial;lineMaterial.emissive.setHex(row%3===0?palette.signal:palette.cyan);lineMaterial.emissiveIntensity=1.05;workspace.add(line);}
-  const monitorStem=roundedBox(.2,.9,.28,palette.metal,.05,.35,.7);monitorStem.position.set(-1.2,2.7,-1.25);workspace.add(monitorStem);
-  const monitorBase=roundedBox(1.25,.08,.68,palette.metal,.05,.38,.62);monitorBase.position.set(-1.2,2.4,-.95);workspace.add(monitorBase);
-  const keyboard=roundedBox(2.7,.1,.87,0x202725,.055,.5,.45);keyboard.position.set(-1.15,2.4,.58);keyboard.rotation.x=-.035;workspace.add(keyboard);
-  for(let row=0;row<4;row+=1){for(let column=0;column<12;column+=1){const key=roundedBox(.14,.025,.1,column===11?0x8a6b52:0x68716c,.02,.42,.34);key.position.set(-2.03+column*.16,2.465,.32+row*.14);workspace.add(key);}}
-  const mouse=roundedBox(.35,.13,.52,0x303936,.1,.34,.4);mouse.position.set(.62,2.46,.58);workspace.add(mouse);
+  for(let row=0;row<9;row+=1){const length=.55+((row*7)%9)*.18;const line=box(length,.018,.014,row%3===0?palette.signal:palette.cyan,.45,.15);line.position.set(-1.35+length/2,1.73-row*.15,.185);const lineMaterial=line.material as THREE.MeshStandardMaterial;lineMaterial.emissive.setHex(row%3===0?palette.signal:palette.cyan);lineMaterial.emissiveIntensity=1.05;monitorAssembly.add(line);}
+  const monitorStem=roundedBox(.2,.9,.28,palette.metal,.05,.35,.7);monitorStem.position.set(0,.35,0);monitorAssembly.add(monitorStem);
+  const monitorBase=roundedBox(1.25,.08,.68,palette.metal,.05,.38,.62);monitorBase.position.set(0,.05,.3);monitorAssembly.add(monitorBase);
+  const keyboard=roundedBox(2.7,.1,.87,0x202725,.055,.5,.45);keyboard.position.set(.05,.05,1.83);keyboard.rotation.x=-.035;monitorAssembly.add(keyboard);
+  for(let row=0;row<4;row+=1){for(let column=0;column<12;column+=1){const key=roundedBox(.14,.025,.1,column===11?0x8a6b52:0x68716c,.02,.42,.34);key.position.set(-.83+column*.16,.115,1.57+row*.14);monitorAssembly.add(key);}}
+  const mouse=roundedBox(.35,.13,.52,0x303936,.1,.34,.4);mouse.position.set(1.82,.11,1.83);monitorAssembly.add(mouse);
   const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); workspace.add(mug);
   const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); workspace.add(lampBase);
   const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); workspace.add(lampStem);
