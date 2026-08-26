@@ -176,13 +176,18 @@ test("3D room and layered object exploration remain connected", async () => {
 });
 
 test("field case map uses real country geometry instead of hand-drawn continents", async () => {
-  const { readFile } = await import("node:fs/promises");
+  const { readFile, readdir } = await import("node:fs/promises");
   const mapSource = await readFile(new URL("../app/_components/fieldCaseMap.ts", import.meta.url), "utf8");
   const photoLibrary = await readFile(new URL("../app/_components/travelPhotoLibrary.ts", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const css = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
   const photoGuide = await readFile(new URL("../app/_assets/travel-map-photos/README.md", import.meta.url), "utf8");
   const nycGuide = await readFile(new URL("../app/_assets/travel-map-photos/new-york-city/ADD-PHOTOS-HERE.md", import.meta.url), "utf8");
+  const expectedPhotoCounts = {chongqing:5,kyoto:3,"los-angeles":6,"new-york-city":2,"san-francisco":4,seattle:4,tokyo:2,xian:5};
+  for (const [folder,count] of Object.entries(expectedPhotoCounts)) {
+    const entries = await readdir(new URL(`../app/_assets/travel-map-photos/${folder}/`, import.meta.url), {withFileTypes:true});
+    assert.equal(entries.filter((entry) => entry.isFile() && /\.(?:jpe?g|png|webp|gif|avif)$/i.test(entry.name)).length, count, `${folder} photo count`);
+  }
   const countries = JSON.parse(await readFile(new URL("../app/_components/worldCountries110m.json", import.meta.url), "utf8"));
   assert.ok(countries.length >= 170, "the map should retain Natural Earth country coverage");
   assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
@@ -192,7 +197,7 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapSource, /FIELD_CASE_MAP_VIEWS/);
   assert.match(mapSource, /worldGroup/);
   assert.match(mapSource, /camera\.zoom<2\.25/);
-  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo", "Beijing", "Macau", "Qingdao", "Dalian", "Beihai", "Lijiang"]) {
+  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Kyoto", "Tokyo", "Beijing", "Macau", "Qingdao", "Dalian", "Beihai", "Lijiang"]) {
     assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.doesNotMatch(mapSource, /name:"(?:Nanjing|Suzhou|Yixing)"/);
@@ -206,7 +211,8 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapSource, /name:"Los Angeles"[^\n]+worldGroup:"southern-california"/);
   assert.match(mapSource, /name:"San Diego"[^\n]+worldGroup:"southern-california"/);
   assert.match(mapSource, /name:"Busan"[^\n]+country:"South Korea"[^\n]+worldGroup:"busan"/);
-  assert.match(mapSource, /name:"Osaka"[^\n]+country:"Japan"[^\n]+worldGroup:"osaka"/);
+  assert.match(mapSource, /name:"Kyoto"[^\n]+country:"Japan"[^\n]+worldGroup:"kyoto"/);
+  assert.doesNotMatch(mapSource, /name:"Osaka"|photoFolder:"osaka"/);
   assert.doesNotMatch(mapSource, /japan-korea|usa-west/);
   const mapReading = page.match(/function FieldMapReading[\s\S]*?\n}\n\nfunction FieldCaseScene/)?.[0] ?? "";
   assert.match(mapReading, /onWheel/);

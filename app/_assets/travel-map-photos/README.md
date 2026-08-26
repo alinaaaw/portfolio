@@ -35,7 +35,7 @@
 - `chongqing`
 - `xian`
 - `shanghai`
-- `osaka`
+- `kyoto`
 - `tokyo`
 - `beijing`
 - `macau`

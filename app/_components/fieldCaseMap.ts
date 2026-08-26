@@ -11,7 +11,7 @@ type CountryFeature = {c:number;g:CountryGeometry|null};
 export type FieldCaseMapView = "world"|"usa"|"asia";
 export type FieldCaseMapCamera = {centerLon:number;centerLat:number;zoom:number};
 type FieldCaseCountry = "United States"|"China"|"Japan"|"South Korea"|"Thailand";
-type FieldCaseWorldGroup = "seattle"|"san-francisco"|"southern-california"|"mid-atlantic"|"boston"|"florida"|"busan"|"bangkok"|"chongqing"|"xian"|"east-china"|"osaka"|"tokyo"|"beijing"|"macau"|"qingdao"|"dalian"|"beihai"|"lijiang";
+type FieldCaseWorldGroup = "seattle"|"san-francisco"|"southern-california"|"mid-atlantic"|"boston"|"florida"|"busan"|"bangkok"|"chongqing"|"xian"|"east-china"|"kyoto"|"tokyo"|"beijing"|"macau"|"qingdao"|"dalian"|"beihai"|"lijiang";
 export type FieldCaseTravelPin = {name:string;coordinate:Coordinate;country:FieldCaseCountry;region:Exclude<FieldCaseMapView,"world">;worldGroup:FieldCaseWorldGroup;photoFolder:string};
 export type FieldCaseMapPinHit = {id:string;x:number;y:number;radius:number;count:number;pins:readonly FieldCaseTravelPin[];targetView:Exclude<FieldCaseMapView,"world">};
 
@@ -35,7 +35,7 @@ export const FIELD_CASE_TRAVEL_PINS:readonly FieldCaseTravelPin[] = [
   {name:"Chongqing",coordinate:[106.5516,29.563],country:"China",region:"asia",worldGroup:"chongqing",photoFolder:"chongqing"},
   {name:"Xi'an",coordinate:[108.9398,34.3416],country:"China",region:"asia",worldGroup:"xian",photoFolder:"xian"},
   {name:"Shanghai",coordinate:[121.4737,31.2304],country:"China",region:"asia",worldGroup:"east-china",photoFolder:"shanghai"},
-  {name:"Osaka",coordinate:[135.5023,34.6937],country:"Japan",region:"asia",worldGroup:"osaka",photoFolder:"osaka"},
+  {name:"Kyoto",coordinate:[135.7681,35.0116],country:"Japan",region:"asia",worldGroup:"kyoto",photoFolder:"kyoto"},
   {name:"Tokyo",coordinate:[139.6917,35.6895],country:"Japan",region:"asia",worldGroup:"tokyo",photoFolder:"tokyo"},
   {name:"Beijing",coordinate:[116.4074,39.9042],country:"China",region:"asia",worldGroup:"beijing",photoFolder:"beijing"},
   {name:"Macau",coordinate:[113.5439,22.1987],country:"China",region:"asia",worldGroup:"macau",photoFolder:"macau"},
