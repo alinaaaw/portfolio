@@ -54,9 +54,9 @@ const pins=groups.map((group)=>{
   const coordinate=[group.reduce((sum,pin)=>sum+pin.coordinate[0],0)/group.length,group.reduce((sum,pin)=>sum+pin.coordinate[1],0)/group.length];
   const [x,y]=project(coordinate);
   if(x<0||x>width||y<0||y>height)return "";
-  const radius=group.length>1?11:5.4;
-  const count=group.length>1?`<text x="${x}" y="${y-radius*1.6+4}" fill="#fff8da" font-family="monospace" font-size="12" font-weight="700" text-anchor="middle">${group.length}</text>`:`<circle cx="${x-1.6}" cy="${y-radius*1.95}" r="1.3" fill="#fff8da"/>`;
-  return `<g><line x1="${x}" y1="${y}" x2="${x}" y2="${y-radius*1.4}" stroke="#873b31" stroke-width="2.5"/><circle cx="${x}" cy="${y-radius*1.65}" r="${radius}" fill="#b94e3e"/>${count}</g>`;
+  const radius=5.4;
+  const glint=`<circle cx="${x-1.6}" cy="${y-radius*1.95}" r="1.3" fill="#fff8da"/>`;
+  return `<g><line x1="${x}" y1="${y}" x2="${x}" y2="${y-radius*1.4}" stroke="#873b31" stroke-width="2.5"/><circle cx="${x}" cy="${y-radius*1.65}" r="${radius}" fill="#b94e3e"/>${glint}</g>`;
 }).join("");
 
 const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">

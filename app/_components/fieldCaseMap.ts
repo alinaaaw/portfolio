@@ -249,7 +249,6 @@ function drawViewportPin(
   x:number,
   y:number,
   radius:number,
-  count:number,
 ) {
   context.fillStyle="rgba(26,43,39,.28)";
   context.beginPath();context.ellipse(x+radius*.3,y+radius*.18,radius*.7,radius*.28,0,0,Math.PI*2);context.fill();
@@ -258,16 +257,8 @@ function drawViewportPin(
   context.beginPath();context.moveTo(x,y);context.lineTo(x,y-radius*1.4);context.stroke();
   context.fillStyle="#b94e3e";
   context.beginPath();context.arc(x,y-radius*1.65,radius,0,Math.PI*2);context.fill();
-  if(count>1){
-    context.fillStyle="#fff8da";
-    context.font=`700 ${Math.round(radius*1.15)}px monospace`;
-    context.textAlign="center";
-    context.textBaseline="middle";
-    context.fillText(String(count),x,y-radius*1.6);
-  }else{
-    context.fillStyle="rgba(255,248,218,.86)";
-    context.beginPath();context.arc(x-radius*.32,y-radius*1.95,radius*.24,0,Math.PI*2);context.fill();
-  }
+  context.fillStyle="rgba(255,248,218,.86)";
+  context.beginPath();context.arc(x-radius*.32,y-radius*1.95,radius*.24,0,Math.PI*2);context.fill();
 }
 
 export function drawFieldCaseMapViewport(
@@ -315,8 +306,8 @@ export function drawFieldCaseMapViewport(
     const coordinate=meanCoordinate(pins);
     const {x,y}=projectViewport(coordinate,width,height,camera,true);
     if(x<0||x>width||y<0||y>height)return;
-    const radius=pins.length>1?Math.max(9,width/125):Math.max(4.5,width/260);
-    drawViewportPin(context,x,y,radius,pins.length);
+    const radius=Math.max(4.5,width/260);
+    drawViewportPin(context,x,y,radius);
     hits.push({
       id:pins[0].worldGroup,
       x,y,
