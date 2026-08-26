@@ -166,9 +166,12 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapSource, /FIELD_CASE_MAP_VIEWS/);
   assert.match(mapSource, /worldGroup/);
   assert.match(mapSource, /camera\.zoom<2\.25/);
-  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo"]) {
+  for (const place of ["Seattle", "San Francisco", "Los Angeles", "San Diego", "New York City", "Philadelphia", "Boston", "Orlando", "Busan", "Bangkok", "Chongqing", "Xi'an", "Shanghai", "Osaka", "Tokyo", "Beijing", "Macau", "Qingdao", "Dalian", "Beihai", "Nanjing", "Suzhou", "Yixing", "Lijiang"]) {
     assert.match(mapSource, new RegExp(place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+  assert.equal([...mapSource.matchAll(/\{name:"/g)].length, 24);
+  assert.equal([...mapSource.matchAll(/region:"asia"/g)].length, 16);
+  assert.equal([...mapSource.matchAll(/worldGroup:"china"/g)].length, 12);
   const mapReading = page.match(/function FieldMapReading[\s\S]*?\n}\n\nfunction FieldCaseScene/)?.[0] ?? "";
   assert.match(mapReading, /onWheel/);
   assert.match(mapReading, /setPointerCapture/);

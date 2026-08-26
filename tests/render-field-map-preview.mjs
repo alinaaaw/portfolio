@@ -47,6 +47,7 @@ const travelPins=[
   {coordinate:[-122.3321,47.6062],group:"usa-west"},{coordinate:[-122.4194,37.7749],group:"usa-west"},{coordinate:[-118.2437,34.0522],group:"usa-west"},{coordinate:[-117.1611,32.7157],group:"usa-west"},
   {coordinate:[-74.006,40.7128],group:"usa-northeast"},{coordinate:[-75.1652,39.9526],group:"usa-northeast"},{coordinate:[-71.0589,42.3601],group:"usa-northeast"},{coordinate:[-81.3792,28.5383],group:"florida"},
   {coordinate:[129.0756,35.1796],group:"japan-korea"},{coordinate:[100.5018,13.7563],group:"thailand"},{coordinate:[106.5516,29.563],group:"china"},{coordinate:[108.9398,34.3416],group:"china"},{coordinate:[121.4737,31.2304],group:"china"},{coordinate:[135.5023,34.6937],group:"japan-korea"},{coordinate:[139.6917,35.6895],group:"japan-korea"},
+  {coordinate:[116.4074,39.9042],group:"china"},{coordinate:[113.5439,22.1987],group:"china"},{coordinate:[120.3826,36.0671],group:"china"},{coordinate:[121.6147,38.914],group:"china"},{coordinate:[109.1202,21.4813],group:"china"},{coordinate:[118.7969,32.0603],group:"china"},{coordinate:[120.5853,31.2989],group:"china"},{coordinate:[119.8233,31.3406],group:"china"},{coordinate:[100.233,26.8721],group:"china"},
 ];
 const groups=view==="world"?Array.from(travelPins.reduce((map,pin)=>map.set(pin.group,[...(map.get(pin.group)??[]),pin]),new Map()).values()):travelPins.map((pin)=>[pin]);
 const pins=groups.map((group)=>{

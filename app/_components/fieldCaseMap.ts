@@ -36,6 +36,15 @@ export const FIELD_CASE_TRAVEL_PINS:readonly FieldCaseTravelPin[] = [
   {name:"Shanghai",coordinate:[121.4737,31.2304],region:"asia",worldGroup:"china"},
   {name:"Osaka",coordinate:[135.5023,34.6937],region:"asia",worldGroup:"japan-korea"},
   {name:"Tokyo",coordinate:[139.6917,35.6895],region:"asia",worldGroup:"japan-korea"},
+  {name:"Beijing",coordinate:[116.4074,39.9042],region:"asia",worldGroup:"china"},
+  {name:"Macau",coordinate:[113.5439,22.1987],region:"asia",worldGroup:"china"},
+  {name:"Qingdao",coordinate:[120.3826,36.0671],region:"asia",worldGroup:"china"},
+  {name:"Dalian",coordinate:[121.6147,38.914],region:"asia",worldGroup:"china"},
+  {name:"Beihai",coordinate:[109.1202,21.4813],region:"asia",worldGroup:"china"},
+  {name:"Nanjing",coordinate:[118.7969,32.0603],region:"asia",worldGroup:"china"},
+  {name:"Suzhou",coordinate:[120.5853,31.2989],region:"asia",worldGroup:"china"},
+  {name:"Yixing",coordinate:[119.8233,31.3406],region:"asia",worldGroup:"china"},
+  {name:"Lijiang",coordinate:[100.233,26.8721],region:"asia",worldGroup:"china"},
 ];
 
 // Natural Earth 1:110m Admin-0 Countries, reduced to geometry and MAPCOLOR7.
