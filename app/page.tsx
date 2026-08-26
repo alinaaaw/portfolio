@@ -205,6 +205,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const pressRef=useRef<{id:number;x:number;y:number;moved:boolean}|null>(null);
   const photoAspectCacheRef=useRef(new Map<string,number>());
   const photoPreloadRef=useRef(new Map<string,Promise<number>>());
+  const photoImageCacheRef=useRef(new Map<string,HTMLImageElement>());
   const decodedPhotoSrcRef=useRef(new Set<string>());
   const activePhotoSrcRef=useRef<string|null>(null);
   const selectionRequestRef=useRef(0);
@@ -248,23 +249,35 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   },[closeTravelPhotos]);
 
   const preloadPhotoAspect=useCallback((photo:TravelPhoto)=>{
-    const cached=photoAspectCacheRef.current.get(photo.src);
-    if(cached)return Promise.resolve(cached);
     const pending=photoPreloadRef.current.get(photo.src);
     if(pending)return pending;
-    const promise=new Promise<number>((resolve,reject)=>{
-      const image=new Image();
+    const cachedAspect=photoAspectCacheRef.current.get(photo.src);
+    if(cachedAspect&&decodedPhotoSrcRef.current.has(photo.src))return Promise.resolve(cachedAspect);
+    const retained=photoImageCacheRef.current.get(photo.src);
+    const retainedFailed=Boolean(retained&&retained.complete&&retained.src&&retained.naturalWidth===0);
+    const image=!retained||retainedFailed?new Image():retained;
+    if(!retained||retainedFailed){
       image.decoding="async";
-      image.onload=()=>{
-        const aspect=image.naturalWidth/image.naturalHeight;
-        if(!Number.isFinite(aspect)||aspect<=0){reject(new Error(`Invalid photo dimensions: ${photo.src}`));return;}
-        photoAspectCacheRef.current.set(photo.src,aspect);
-        void image.decode().then(()=>decodedPhotoSrcRef.current.add(photo.src)).catch(()=>undefined);
-        resolve(aspect);
+      photoImageCacheRef.current.set(photo.src,image);
+    }
+    const rawPromise=new Promise<number>((resolve,reject)=>{
+      const clearHandlers=()=>{image.onload=null;image.onerror=null;};
+      const finish=()=>{
+        clearHandlers();
+        void (async ()=>{
+          const aspect=image.naturalWidth/image.naturalHeight;
+          if(!Number.isFinite(aspect)||aspect<=0)throw new Error(`Invalid photo dimensions: ${photo.src}`);
+          photoAspectCacheRef.current.set(photo.src,aspect);
+          try{await image.decode();decodedPhotoSrcRef.current.add(photo.src);}catch{}
+          return aspect;
+        })().then(resolve,reject);
       };
-      image.onerror=()=>reject(new Error(`Unable to preload: ${photo.src}`));
-      image.src=photo.src;
-    }).finally(()=>photoPreloadRef.current.delete(photo.src));
+      image.onload=finish;
+      image.onerror=()=>{clearHandlers();decodedPhotoSrcRef.current.delete(photo.src);reject(new Error(`Unable to preload: ${photo.src}`));};
+      if(image.complete&&image.naturalWidth>0)finish();
+      else image.src=photo.src;
+    });
+    const promise=rawPromise.finally(()=>photoPreloadRef.current.delete(photo.src));
     photoPreloadRef.current.set(photo.src,promise);
     return promise;
   },[]);
@@ -272,7 +285,18 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   useEffect(()=>{
     const uniquePhotos=new Map<string,TravelPhoto>();
     FIELD_CASE_TRAVEL_PINS.forEach((pin)=>travelPhotosForPin(pin).forEach((photo)=>uniquePhotos.set(photo.src,photo)));
-    uniquePhotos.forEach((photo)=>{void preloadPhotoAspect(photo).catch(()=>undefined);});
+    const warmups=Array.from(uniquePhotos.values(),(photo)=>preloadPhotoAspect(photo).catch(()=>undefined));
+    void Promise.all(warmups);
+    return ()=>{
+      selectionRequestRef.current+=1;
+      navigationRequestRef.current+=1;
+      navigationLockedRef.current=false;
+      photoImageCacheRef.current.forEach((image)=>{image.onload=null;image.onerror=null;});
+      photoImageCacheRef.current.clear();
+      photoPreloadRef.current.clear();
+      photoAspectCacheRef.current.clear();
+      decodedPhotoSrcRef.current.clear();
+    };
   },[preloadPhotoAspect]);
 
   const layoutForAspect=useCallback((sourceAspect:number):TravelPhotoLayout=>{
