@@ -299,8 +299,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-views button.active { border-color: var(--signal); color: var(--signal); }
 .field-map-zoom button { font-size: 17px; }
 .field-map-return { position: absolute; z-index: 3; top: 14px; right: 14px; font-size: 17px; }
-.field-map-memory { position: absolute; z-index: 5; top: 50%; left: 50%; box-sizing: border-box; width: min(480px,calc(100% - 48px)); max-height: calc(100% - 116px); display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-width: 0; padding: 15px 15px 12px; overflow: visible; border: 1px solid #7b503f; background-color: #ded2ad; background-image: repeating-linear-gradient(0deg,rgba(73,59,40,.025) 0 1px,transparent 1px 5px); color: #293d37; box-shadow: 10px 14px 0 rgba(70,50,31,.24),0 24px 42px rgba(31,25,17,.28); transform: translate(-50%,-50%) rotate(-.55deg); transform-origin: center; animation: fieldMapMemoryIn .32s cubic-bezier(.18,.8,.2,1) both; isolation: isolate; }
-.field-map-memory.is-photo-ready { width: min(var(--photo-card-width),calc(100% - 48px)); }
+.field-map-memory { position: absolute; z-index: 5; top: 50%; left: 50%; box-sizing: border-box; width: min(calc(var(--photo-frame-width,448px) + 32px),calc(100% - 48px)); max-height: calc(100% - 116px); display: grid; grid-template-rows: auto auto auto; min-width: 0; padding: 15px 15px 12px; overflow: visible; border: 1px solid #7b503f; background-color: #ded2ad; background-image: repeating-linear-gradient(0deg,rgba(73,59,40,.025) 0 1px,transparent 1px 5px); color: #293d37; box-shadow: 10px 14px 0 rgba(70,50,31,.24),0 24px 42px rgba(31,25,17,.28); transform: translate(-50%,-50%) rotate(-.55deg); transform-origin: center; animation: fieldMapMemoryIn .32s cubic-bezier(.18,.8,.2,1) both; isolation: isolate; }
 @keyframes fieldMapMemoryIn { from { opacity: 0; } }
 .field-map-memory::before, .field-map-memory::after { position: absolute; z-index: 2; top: -8px; width: 58px; height: 17px; background: rgba(226,211,166,.8); box-shadow: 0 1px 2px rgba(72,56,35,.16); content: ""; pointer-events: none; }
 .field-map-memory::before { left: 28px; transform: rotate(-5deg); }
@@ -310,14 +309,14 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-memory > header h2 { margin: 0; color: #2f453e; font: 24px/1 "Segoe Print",cursive; letter-spacing: -.04em; }
 .field-map-memory > header button, .field-map-memory footer button { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 1px solid #8b4b3e; border-radius: 50%; background: rgba(246,237,211,.72); color: #7b3f35; box-shadow: 2px 3px 0 rgba(83,60,38,.15); cursor: pointer; font: 17px var(--font-mono),monospace; }
 .field-map-memory > header button:hover, .field-map-memory > header button:focus-visible, .field-map-memory footer button:hover, .field-map-memory footer button:focus-visible { background: #8b4b3e; color: #f4ecd4; transform: translateY(-1px); }
-.field-map-photo-stage { position: relative; display: grid; place-items: center; min-height: 0; margin: 13px 0 11px; padding: 8px; overflow: hidden; border: 1px solid rgba(83,78,59,.34); background: #f2ead3; box-shadow: inset 0 0 0 5px rgba(255,251,236,.68),3px 5px 0 rgba(73,55,36,.13); }
-.field-map-photo-stage.is-idle, .field-map-photo-stage.is-loading, .field-map-photo-stage.is-lost { height: min(390px,48svh); min-height: min(390px,48svh); }
-.field-map-photo-stage.is-ready { aspect-ratio: var(--photo-aspect); padding: 0; }
+.field-map-photo-stage { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: var(--photo-aspect,1.5); min-height: 0; margin: 13px 0 11px; padding: 0; overflow: hidden; border: 1px solid rgba(83,78,59,.34); background: #f2ead3; box-shadow: inset 0 0 0 5px rgba(255,251,236,.68),3px 5px 0 rgba(73,55,36,.13); }
 .field-map-photo-stage::after { display: none; }
-.field-map-photo-stage:not(.is-ready) > img { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.field-map-photo-stage.is-ready > img { display: block; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; }
-.field-map-photo-message { position: static; min-height: min(350px,44svh); display: grid; place-content: center; justify-items: center; gap: 14px; padding: 28px; color: #4f6259; text-align: center; }
-.field-map-photo-message i { width: 22px; height: 22px; border: 2px solid rgba(73,59,40,.18); border-top-color: #8b4439; border-radius: 50%; animation: spin .8s linear infinite; }
+.field-map-photo-stage > img { display: block; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; filter: none; opacity: 1; transition: filter .28s ease,opacity .28s ease; }
+.field-map-photo-stage.is-loading > img { filter: blur(8px) brightness(.58) saturate(.75); opacity: .7; }
+.field-map-photo-loading, .field-map-photo-message { position: absolute; z-index: 2; inset: 0; display: grid; place-items: center; min-height: 0; padding: 24px; color: #4f6259; text-align: center; }
+.field-map-photo-loading { background: rgba(67,61,43,.14); pointer-events: none; }
+.field-map-photo-loading i { width: 30px; height: 30px; border: 2px solid rgba(246,237,211,.4); border-top-color: #8b4439; border-radius: 50%; box-shadow: 0 2px 8px rgba(45,33,24,.18); animation: spin .8s linear infinite; }
+.field-map-photo-message.lost { align-content: center; justify-items: center; gap: 14px; background: #f2ead3; }
 .field-map-photo-message span { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid #a04b3d; border-radius: 50%; color: #bd5c4c; font: 28px "Segoe Print",cursive; transform: rotate(-8deg); }
 .field-map-photo-message strong { max-width: 310px; color: #6f463b; font: 10px/1.6 var(--font-mono),monospace; letter-spacing: .12em; }
 .field-map-photo-message small { max-width: 310px; color: #6d796f; font: 7px/1.6 var(--font-mono),monospace; }
@@ -327,6 +326,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-memory > footer strong { flex: none; color: #91473a; }
 .field-map-memory > footer span { overflow: hidden; color: #52645b; text-overflow: ellipsis; white-space: nowrap; }
 .field-map-memory > footer nav { display: flex; flex: none; gap: 7px; }
+.field-map-memory footer button:disabled { opacity: .42; cursor: wait; }
 .evidence-card.note-card { width: min(450px,86vw); min-height: 330px; max-width: none; padding: clamp(38px,5vw,54px); border: 1px solid rgba(117,91,45,.4); background-color: #eadb96; background-image: repeating-linear-gradient(0deg,rgba(78,70,45,.025) 0 1px,transparent 1px 5px); box-shadow: 9px 12px 0 rgba(0,0,0,.3),0 22px 42px rgba(0,0,0,.25); transform: rotate(1.2deg); }
 .evidence-card.note-card::before { position: absolute; top: 14px; left: 50%; width: 12px; height: 12px; border-radius: 50%; background: #a44235; box-shadow: 1px 2px 0 rgba(67,41,27,.35); content: ""; transform: translateX(-50%); }
 .evidence-card small { color: #a44235; font: 7px var(--font-mono),monospace; }
@@ -667,13 +667,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .field-map-views { top: 10px; left: 10px; }
   .field-map-return { top: 10px; right: 10px; }
   .field-map-zoom { right: 10px; bottom: 10px; }
-  .field-map-memory { top: 52%; left: 50%; width: min(480px,calc(100% - 28px)); max-height: calc(100svh - 104px); padding: 12px 12px 10px; box-shadow: 6px 8px 0 rgba(70,50,31,.22); transform: translate(-50%,-50%) rotate(-.25deg); }
-  .field-map-memory.is-photo-ready { width: min(var(--photo-card-width),calc(100% - 28px)); }
+  .field-map-memory { top: 52%; left: 50%; width: min(calc(var(--photo-frame-width,448px) + 26px),calc(100% - 28px)); max-height: calc(100svh - 104px); padding: 12px 12px 10px; box-shadow: 6px 8px 0 rgba(70,50,31,.22); transform: translate(-50%,-50%) rotate(-.25deg); }
   .field-map-memory > header { min-height: 52px; padding-left: 3px; }
   .field-map-memory > header h2 { font-size: 20px; }
-  .field-map-photo-stage { margin: 10px 0 8px; padding: 6px; }
-  .field-map-photo-stage.is-ready > img { max-height: none; }
-  .field-map-photo-stage.is-idle, .field-map-photo-stage.is-loading, .field-map-photo-stage.is-lost { min-height: min(330px,calc(100svh - 245px)); }
+  .field-map-photo-stage { margin: 10px 0 8px; padding: 0; }
   .field-map-memory > footer { min-height: 50px; padding-left: 3px; }
   .field-map-memory > footer div { gap: 9px; }
   .object-view { width: 100%; height: 100svh; max-height: none; border: 0; }

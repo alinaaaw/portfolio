@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
-import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS } from "./_components/fieldCaseMap";
+import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
 import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
 import type { TravelPhoto } from "./_components/travelPhotoLibrary";
@@ -184,7 +184,7 @@ type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 type FieldRecordItem=Exclude<FieldItem,"travelMap">;
 const fieldItems=fieldCaseContent.items as Record<FieldRecordItem,FieldRecord>;
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
-type TravelPhotoLayout={aspectRatio:number;cardWidth:number};
+type TravelPhotoLayout={sourceAspect:number;frameAspect:number;frameWidth:number};
 const lostTravelMessages=[
   "FILM LOST IN THE ADVENTURE",
   "POSTCARD NEVER MADE IT HOME",
@@ -203,6 +203,12 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const pointersRef=useRef(new Map<number,{x:number;y:number}>());
   const gestureRef=useRef<{center:{x:number;y:number};distance:number}|null>(null);
   const pressRef=useRef<{id:number;x:number;y:number;moved:boolean}|null>(null);
+  const photoAspectCacheRef=useRef(new Map<string,number>());
+  const photoPreloadRef=useRef(new Map<string,Promise<number>>());
+  const activePhotoSrcRef=useRef<string|null>(null);
+  const selectionRequestRef=useRef(0);
+  const navigationRequestRef=useRef(0);
+  const navigationLockedRef=useRef(false);
   const [camera,setCamera]=useState<FieldCaseMapCamera>({...FIELD_CASE_MAP_VIEWS.world});
   const [activeView,setActiveView]=useState<FieldCaseMapView>("world");
   const [selectedPin,setSelectedPin]=useState<FieldCaseTravelPin|null>(null);
@@ -210,6 +216,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
   const [photoLayout,setPhotoLayout]=useState<TravelPhotoLayout|null>(null);
+  const [navigationPending,setNavigationPending]=useState(false);
   const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
@@ -225,49 +232,119 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     };
   },[]);
 
-  const chooseView=useCallback((view:FieldCaseMapView)=>{
+  const closeTravelPhotos=useCallback(()=>{
+    selectionRequestRef.current+=1;
+    navigationRequestRef.current+=1;
+    navigationLockedRef.current=false;
+    setNavigationPending(false);
     setSelectedPin(null);
+  },[]);
+
+  const chooseView=useCallback((view:FieldCaseMapView)=>{
+    closeTravelPhotos();
     setActiveView(view);
     setCamera({...FIELD_CASE_MAP_VIEWS[view]});
+  },[closeTravelPhotos]);
+
+  const preloadPhotoAspect=useCallback((photo:TravelPhoto)=>{
+    const cached=photoAspectCacheRef.current.get(photo.src);
+    if(cached)return Promise.resolve(cached);
+    const pending=photoPreloadRef.current.get(photo.src);
+    if(pending)return pending;
+    const promise=new Promise<number>((resolve,reject)=>{
+      const image=new Image();
+      image.decoding="async";
+      image.onload=()=>{
+        const aspect=image.naturalWidth/image.naturalHeight;
+        if(!Number.isFinite(aspect)||aspect<=0){reject(new Error(`Invalid photo dimensions: ${photo.src}`));return;}
+        photoAspectCacheRef.current.set(photo.src,aspect);
+        void image.decode().catch(()=>undefined);
+        resolve(aspect);
+      };
+      image.onerror=()=>reject(new Error(`Unable to preload: ${photo.src}`));
+      image.src=photo.src;
+    }).finally(()=>photoPreloadRef.current.delete(photo.src));
+    photoPreloadRef.current.set(photo.src,promise);
+    return promise;
   },[]);
 
   useEffect(()=>{
-    if(!selectedPin){setPhotoStatus("idle");setPhotos([]);setPhotoLayout(null);return;}
-    setPhotoStatus("loading");
-    setPhotos([]);
-    setPhotoIndex(0);
-    setPhotoLayout(null);
-    setLostMessage(randomLostTravelMessage());
-    const nextPhotos=travelPhotosForPin(selectedPin);
-    setPhotos(nextPhotos);
-    if(nextPhotos.length===0)setPhotoStatus("lost");
-  },[selectedPin]);
+    const uniquePhotos=new Map<string,TravelPhoto>();
+    FIELD_CASE_TRAVEL_PINS.forEach((pin)=>travelPhotosForPin(pin).forEach((photo)=>uniquePhotos.set(photo.src,photo)));
+    uniquePhotos.forEach((photo)=>{void preloadPhotoAspect(photo).catch(()=>undefined);});
+  },[preloadPhotoAspect]);
 
-  const movePhoto=useCallback((offset:number)=>{
-    if(photos.length<2)return;
-    setPhotoStatus("loading");
-    setPhotoLayout(null);
-    setPhotoIndex((current)=>(current+offset+photos.length)%photos.length);
-  },[photos.length]);
-
-  const finishPhotoLoad=(image:HTMLImageElement)=>{
-    const aspectRatio=image.naturalWidth/image.naturalHeight||1;
-    const reading=image.closest<HTMLElement>(".field-map-reading");
+  const layoutForAspect=useCallback((sourceAspect:number):TravelPhotoLayout=>{
+    const reading=canvasRef.current?.closest<HTMLElement>(".field-map-reading");
     const viewportHeight=window.visualViewport?.height??window.innerHeight;
     const readingHeight=reading?.clientHeight??viewportHeight;
     const readingWidth=reading?.clientWidth??window.innerWidth;
     const maxCardHeight=Math.max(320,Math.min(readingHeight-116,viewportHeight-104));
-    const maxPhotoHeight=Math.max(180,Math.min(500,maxCardHeight-170));
-    const maxPhotoWidth=Math.max(160,Math.min(448,readingWidth-80));
-    const photoWidth=Math.min(maxPhotoWidth,maxPhotoHeight*aspectRatio);
-    setPhotoLayout({aspectRatio,cardWidth:Math.ceil(photoWidth+32)});
-    setPhotoStatus("ready");
-  };
+    const maxFrameHeight=Math.max(180,Math.min(500,maxCardHeight-170));
+    const maxFrameWidth=Math.max(160,Math.min(448,readingWidth-80));
+    return {sourceAspect,frameAspect:sourceAspect,frameWidth:Math.min(maxFrameWidth,maxFrameHeight*sourceAspect)};
+  },[]);
+
+  const openTravelPhotos=useCallback(async (pin:FieldCaseTravelPin)=>{
+    const requestId=++selectionRequestRef.current;
+    navigationRequestRef.current+=1;
+    navigationLockedRef.current=true;
+    setNavigationPending(true);
+    const nextPhotos=travelPhotosForPin(pin);
+    const nextLostMessage=randomLostTravelMessage();
+    if(nextPhotos.length===0){
+      setPhotos([]);setPhotoIndex(0);setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});
+      setLostMessage(nextLostMessage);setPhotoStatus("lost");setSelectedPin(pin);
+      navigationLockedRef.current=false;setNavigationPending(false);return;
+    }
+    try{
+      const aspect=await preloadPhotoAspect(nextPhotos[0]);
+      if(selectionRequestRef.current!==requestId)return;
+      setPhotos(nextPhotos);setPhotoIndex(0);setPhotoLayout(layoutForAspect(aspect));
+      setLostMessage(nextLostMessage);setPhotoStatus("loading");setSelectedPin(pin);
+      navigationLockedRef.current=false;setNavigationPending(false);
+    }catch{
+      if(selectionRequestRef.current!==requestId)return;
+      setPhotos(nextPhotos);setPhotoIndex(0);setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});
+      setLostMessage(nextLostMessage);setPhotoStatus("lost");setSelectedPin(pin);
+      navigationLockedRef.current=false;setNavigationPending(false);
+    }
+  },[layoutForAspect,preloadPhotoAspect]);
+
+  const movePhoto=useCallback(async (offset:number)=>{
+    if(photos.length<2||navigationLockedRef.current||navigationPending||photoStatus==="loading")return;
+    const requestId=++navigationRequestRef.current;
+    const nextIndex=(photoIndex+offset+photos.length)%photos.length;
+    const nextPhoto=photos[nextIndex];
+    navigationLockedRef.current=true;setNavigationPending(true);
+    try{
+      const aspect=await preloadPhotoAspect(nextPhoto);
+      if(navigationRequestRef.current!==requestId)return;
+      setPhotoLayout(layoutForAspect(aspect));setPhotoIndex(nextIndex);setPhotoStatus("loading");
+    }catch{
+      if(navigationRequestRef.current!==requestId)return;
+      setPhotoLayout({sourceAspect:3/2,frameAspect:3/2,frameWidth:448});setPhotoIndex(nextIndex);
+      setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");
+    }finally{
+      if(navigationRequestRef.current===requestId){navigationLockedRef.current=false;setNavigationPending(false);}
+    }
+  },[layoutForAspect,navigationPending,photoIndex,photos,photoStatus,preloadPhotoAspect]);
+
+  const finishPhotoLoad=useCallback(async (image:HTMLImageElement,expectedSrc:string)=>{
+    try{await image.decode();}catch{}
+    if(activePhotoSrcRef.current!==expectedSrc||!image.isConnected)return;
+    if(image.naturalWidth>0)setPhotoStatus("ready");
+    else{setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}
+  },[]);
+
+  const currentPhoto=photos[photoIndex]??null;
+  const canMovePhoto=photos.length>1&&!navigationPending&&photoStatus!=="loading";
+  activePhotoSrcRef.current=currentPhoto?.src??null;
 
   useEffect(()=>{
     if(!selectedPin)return;
     const onKeyDown=(event:KeyboardEvent)=>{
-      if(event.key==="Escape"){event.preventDefault();event.stopImmediatePropagation();setSelectedPin(null);return;}
+      if(event.key==="Escape"){event.preventDefault();event.stopImmediatePropagation();closeTravelPhotos();return;}
       if(event.key==="Tab"){
         const dialog=photoCloseRef.current?.closest<HTMLElement>(".field-map-memory");
         const controls=dialog?Array.from(dialog.querySelectorAll<HTMLButtonElement>("button:not([disabled])")):[];
@@ -275,12 +352,12 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
         if(first&&last&&event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
         else if(first&&last&&!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
       }
-      if(photoStatus==="ready"&&event.key==="ArrowLeft")movePhoto(-1);
-      if(photoStatus==="ready"&&event.key==="ArrowRight")movePhoto(1);
+      if(canMovePhoto&&event.key==="ArrowLeft")void movePhoto(-1);
+      if(canMovePhoto&&event.key==="ArrowRight")void movePhoto(1);
     };
     window.addEventListener("keydown",onKeyDown,true);
     return ()=>window.removeEventListener("keydown",onKeyDown,true);
-  },[movePhoto,photoStatus,selectedPin]);
+  },[canMovePhoto,closeTravelPhotos,movePhoto,selectedPin]);
 
   useEffect(()=>{
     let frame=0;
@@ -384,7 +461,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     if(!cancelled&&press?.id===event.pointerId&&!press.moved){
       const hit=pinHitsRef.current.find((candidate)=>Math.hypot(candidate.x-point.x,candidate.y-point.y)<=candidate.radius);
       if(hit?.count&&hit.count>1&&camera.zoom<2.25)chooseView(hit.targetView);
-      else if(hit?.pins.length===1)setSelectedPin(hit.pins[0]);
+      else if(hit?.pins.length===1)void openTravelPhotos(hit.pins[0]);
     }
   };
 
@@ -394,17 +471,17 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
-      {selectedPin&&<aside className={`field-map-memory${photoStatus==="ready"&&photoLayout?" is-photo-ready":""}`} style={photoLayout?{"--photo-aspect":photoLayout.aspectRatio,"--photo-card-width":`${photoLayout.cardWidth}px`} as CSSProperties:undefined} role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
-        <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={()=>setSelectedPin(null)}>×</button></header>
-        <div className={`field-map-photo-stage is-${photoStatus}`}>
-          {photoStatus==="loading"&&<div className="field-map-photo-message"><i/><strong>DEVELOPING FILM...</strong></div>}
+      {selectedPin&&<aside className="field-map-memory" style={photoLayout?{"--photo-aspect":photoLayout.frameAspect,"--photo-frame-width":`${Math.ceil(photoLayout.frameWidth)}px`} as CSSProperties:undefined} role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
+        <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={closeTravelPhotos}>×</button></header>
+        <div className={`field-map-photo-stage is-${photoStatus}`} aria-busy={photoStatus==="loading"}>
+          {currentPhoto&&photoStatus!=="lost"&&<img key={currentPhoto.src} src={currentPhoto.src} alt={currentPhoto.alt} decoding="async" onLoad={(event)=>{void finishPhotoLoad(event.currentTarget,currentPhoto.src);}} onError={()=>{if(activePhotoSrcRef.current!==currentPhoto.src)return;setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
+          {photoStatus==="loading"&&<div className="field-map-photo-loading" role="status" aria-label="Developing film"><i aria-hidden="true"/></div>}
           {photoStatus==="lost"&&<div className="field-map-photo-message lost"><span>?</span><strong>{lostMessage}</strong></div>}
-          {photoStatus!=="lost"&&photos[photoIndex]&&<img key={photos[photoIndex].src} src={photos[photoIndex].src} alt={photos[photoIndex].alt} onLoad={(event)=>finishPhotoLoad(event.currentTarget)} onError={()=>{setPhotoLayout(null);setLostMessage(randomLostTravelMessage());setPhotoStatus("lost");}}/>}
         </div>
-        {photoStatus==="ready"&&photos[photoIndex]&&<footer>
-          <div><strong aria-live="polite">{String(photoIndex+1).padStart(2,"0")} / {String(photos.length).padStart(2,"0")}</strong><span>{photos[photoIndex].caption||"TRAVEL MEMORY"}</span></div>
-          {photos.length>1&&<nav aria-label="Photo controls"><button type="button" aria-label="Previous photo" onClick={()=>movePhoto(-1)}>←</button><button type="button" aria-label="Next photo" onClick={()=>movePhoto(1)}>→</button></nav>}
-        </footer>}
+        <footer>
+          <div><strong aria-live="polite">{photos.length?`${String(photoIndex+1).padStart(2,"0")} / ${String(photos.length).padStart(2,"0")}`:"00 / 00"}</strong><span>{currentPhoto?.caption||"TRAVEL MEMORY"}</span></div>
+          {photos.length>1&&<nav aria-label="Photo controls"><button type="button" aria-label="Previous photo" disabled={!canMovePhoto} onClick={()=>{void movePhoto(-1);}}>←</button><button type="button" aria-label="Next photo" disabled={!canMovePhoto} onClick={()=>{void movePhoto(1);}}>→</button></nav>}
+        </footer>
       </aside>}
     </div>
   </article>;
