@@ -192,7 +192,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawerScene, /tray\.position\.set\(-1,\.05,-\.36\)/);
   assert.match(drawerScene, /monitorAssembly\.scale\.setScalar\(1\.3\)/);
   assert.match(drawerScene, /buildPrinterModel\(workspace,\[2\.75,2\.32,\.35\],\.76,faxPrinted\)/);
-  assert.match(drawerScene, /addContactCard\(workspace,\[-3\.65,2\.39,1\.65\],\.06,undefined,\.6\)/);
+  assert.match(drawerScene, /addContactCard\(workspace,\[3\.52,2\.39,1\.15\],-\.12,undefined,\.6\)/);
   assert.equal([...drawerScene.matchAll(/addContactCard\(workspace,/g)].length, 1);
   assert.match(closeups, /buildNotebook/);
   assert.match(closeups, /const table=box\(8,\.35,6\.8,palette\.woodLight/);

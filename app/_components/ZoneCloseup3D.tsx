@@ -266,7 +266,7 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   workspace.add(tray);
 
   buildPrinterModel(workspace,[2.75,2.32,.35],.76,faxPrinted);
-  addContactCard(workspace,[-3.65,2.39,1.65],.06,undefined,.6);
+  addContactCard(workspace,[3.52,2.39,1.15],-.12,undefined,.6);
   const monitorAssembly=new THREE.Group();monitorAssembly.position.set(-1.2,2.35,-1.25);monitorAssembly.scale.setScalar(1.3);workspace.add(monitorAssembly);
   const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(0,1.12,0);monitorAssembly.add(monitor);
   const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(0,1.12,.16);monitorAssembly.add(monitorScreen);
