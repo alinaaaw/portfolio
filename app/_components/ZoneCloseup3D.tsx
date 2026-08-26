@@ -219,14 +219,9 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
 function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
   const workspace=new THREE.Group();workspace.userData.drawerWorkspace=true;scene.add(workspace);
-  const drawerCenterX=-1;
-  const mainDrawerCenterX=1.02;
-  const layoutScale=4.25/1.75;
-  const deskWidth=7.4*layoutScale;
-  const deskCenterX=drawerCenterX-mainDrawerCenterX*layoutScale;
-  const desk=roundedBox(deskWidth,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.set(deskCenterX,2.18,0); workspace.add(desk);
-  const frontEdge=roundedBox(deskWidth,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(deskCenterX,2.03,2.26); workspace.add(frontEdge);
-  for(const x of [deskCenterX-deskWidth/2+.63,deskCenterX+deskWidth/2-.63]){
+  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; workspace.add(desk);
+  const frontEdge=roundedBox(9,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(0,2.03,2.26); workspace.add(frontEdge);
+  for(const x of [-4.05,4.05]){
     const leg=roundedBox(.3,2.05,.32,palette.metal,.06,.38,.7); leg.position.set(x,1.02,-1.7); workspace.add(leg);
     const foot=roundedBox(.72,.12,1.25,0x222927,.06,.38,.7); foot.position.set(x,.08,-1.7); workspace.add(foot);
   }
@@ -270,12 +265,9 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   tray.position.set(-1,.05,-.36);
   workspace.add(tray);
 
-  const printerX=drawerCenterX+(2.38-mainDrawerCenterX)*layoutScale;
-  const printerScale=1.65*layoutScale/3.5;
-  buildPrinterModel(workspace,[printerX,2.32,.35],printerScale,faxPrinted);
+  buildPrinterModel(workspace,[2.75,2.32,.35],.76,faxPrinted);
   addContactCard(workspace,[-3.65,2.39,1.65],.06,undefined,.6);
-  const monitorX=drawerCenterX+(-1.35-mainDrawerCenterX)*layoutScale;
-  const monitorAssembly=new THREE.Group();monitorAssembly.position.set(monitorX,2.35,-1.25);monitorAssembly.scale.set(layoutScale,1.3,1.3);workspace.add(monitorAssembly);
+  const monitorAssembly=new THREE.Group();monitorAssembly.position.set(-1.2,2.35,-1.25);monitorAssembly.scale.setScalar(1.3);workspace.add(monitorAssembly);
   const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(0,1.12,0);monitorAssembly.add(monitor);
   const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(0,1.12,.16);monitorAssembly.add(monitorScreen);
   const monitorMaterial=monitorScreen.material as THREE.MeshStandardMaterial;monitorMaterial.emissive.setHex(palette.cyan);monitorMaterial.emissiveIntensity=.72;

@@ -190,14 +190,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawerScene, /const bottom=roundedBox\(3\.72,\.14,3\.12/);
   assert.match(drawerScene, /const front=roundedBox\(4\.02,1\.18,\.27/);
   assert.match(drawerScene, /tray\.position\.set\(-1,\.05,-\.36\)/);
-  assert.match(drawerScene, /const drawerCenterX=-1/);
-  assert.match(drawerScene, /const mainDrawerCenterX=1\.02/);
-  assert.match(drawerScene, /const layoutScale=4\.25\/1\.75/);
-  assert.match(drawerScene, /const monitorX=drawerCenterX\+\(-1\.35-mainDrawerCenterX\)\*layoutScale/);
-  assert.match(drawerScene, /monitorAssembly\.scale\.set\(layoutScale,1\.3,1\.3\)/);
-  assert.match(drawerScene, /const printerX=drawerCenterX\+\(2\.38-mainDrawerCenterX\)\*layoutScale/);
-  assert.match(drawerScene, /const printerScale=1\.65\*layoutScale\/3\.5/);
-  assert.match(drawerScene, /buildPrinterModel\(workspace,\[printerX,2\.32,\.35\],printerScale,faxPrinted\)/);
+  assert.match(drawerScene, /monitorAssembly\.scale\.setScalar\(1\.3\)/);
+  assert.match(drawerScene, /buildPrinterModel\(workspace,\[2\.75,2\.32,\.35\],\.76,faxPrinted\)/);
   assert.match(drawerScene, /addContactCard\(workspace,\[-3\.65,2\.39,1\.65\],\.06,undefined,\.6\)/);
   assert.equal([...drawerScene.matchAll(/addContactCard\(workspace,/g)].length, 1);
   assert.match(closeups, /buildNotebook/);
