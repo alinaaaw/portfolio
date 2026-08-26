@@ -40,14 +40,11 @@ type ReferenceFilter = "all" | ProjectFileId;
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
 
-const zoneInfo = roomContent.zones as Record<ZoneId,{ index:string; label:string; hint:string; log:string; sceneLabel:string }>;
+const zoneInfo = roomContent.zones as Record<ZoneId,{ index:string; label:string; hint:string; sceneLabel:string }>;
 
 const projectFiles = (["map","allocation","emg"] as const).map((id) => ({id,...computerContent.projects[id]}));
 
-type ShelfBook = {id:string;title:string;author:string;meta:string;summary:string;annotation:string;isReading:boolean};
-type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:string;citation:string;summary:string;excerptLabel:string;quoted:boolean;excerpt:string;annotation:string;provenance:string;url:string};
-const shelfBooks = booksContent.books as ShelfBook[];
-const shelfSeries = booksContent.series as {id:string;meta:string;title:string;copy:string;open:string;return:string};
+type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:string;citation:string;summary:string;annotation:string;provenance:string;url:string};
 const projectReferences = referencesContent.references as ProjectReference[];
 const referenceGroups = referencesContent.groups as {id:ReferenceFilter;label:string}[];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
@@ -137,36 +134,10 @@ function useContactCard(autoPickup=false) {
 }
 
 function BookshelfScene({ onClose }:{ onClose:()=>void }) {
-  const [selected,setSelected] = useState<ShelfBook|null>(null);
-  const [seriesOpen,setSeriesOpen] = useState(false);
-  const [reverse,setReverse] = useState(false);
-  const higashinoBooks=shelfBooks.filter((book)=>book.author==="Keigo Higashino");
-  const selectShelfItem=(item:string)=>{
-    if(!booksContent.openingEnabled)return;
-    const book=shelfBooks.find((entry)=>item===`book:${entry.id}`);
-    if(book){setSelected(book);setSeriesOpen(false);setReverse(false);return;}
-    if(item==="series:higashino"){setSeriesOpen(true);setSelected(null);}
-  };
   return <div className="modal-layer tactile-layer bookshelf-layer" onMouseDown={onClose}>
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={booksContent.ariaLabel} onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>{zoneInfo.books.index}</span><strong>{booksContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-      <ZoneCloseup3D zone="books" onSelect={selectShelfItem} />
-      {seriesOpen&&<div className="series-zoom" onMouseDown={()=>setSeriesOpen(false)}><article className="series-catalog" onMouseDown={(event)=>event.stopPropagation()}><header><div><small>{shelfSeries.meta}</small><h2>{shelfSeries.title}</h2></div><button onClick={()=>setSeriesOpen(false)}>{shelfSeries.return}</button></header><p>{shelfSeries.copy}</p><div className="series-spread">{higashinoBooks.map((book,index)=><button key={book.id} className={`series-volume volume-${index+1}`} onClick={()=>{setSelected(book);setSeriesOpen(false);setReverse(false);}}><span>{book.meta}</span><strong>{book.title}</strong><small>{book.author}</small><b>OPEN VOLUME</b></button>)}</div></article></div>}
-      {selected&&<div className="book-zoom" onMouseDown={() => setSelected(null)}>
-        <div className={`physical-book ${reverse?"reverse":""}${selected.isReading?" is-reading":""}`} onMouseDown={(event) => event.stopPropagation()}>
-          <div className="book-pages">
-            <article className="book-page book-page-left"><small>{selected.meta}</small><h2>{selected.title}</h2><p className="book-citation">{selected.author}</p><p>{selected.summary}</p>{selected.isReading&&<span className="current-reading-mark">CURRENTLY READING</span>}</article>
-            <article className="book-page book-page-right book-page-under"><small>{booksContent.page.reference}</small><p className="book-annotation">{selected.annotation}</p><small className="book-excerpt-label">SHELF STATUS</small><blockquote>{selected.isReading?"Bookmark in place: this volume is currently open.":"Read and filed in the personal library."}</blockquote><span className="book-provenance">{selected.author==="Keigo Higashino"?"KEIGO HIGASHINO / FAVORITE AUTHOR SERIES":"PERSONAL READING SHELF"}</span></article>
-            <div className="book-turning-sheet" aria-hidden="true">
-              <div className="turn-face turn-front book-page"><span className="sticky-tab">{selected.isReading?"BOOKMARK":"READING NOTE"}</span><small>SHELF STATUS</small><blockquote>{selected.isReading?"Currently reading.":"Read and filed in the personal library."}</blockquote></div>
-              <div className="turn-face turn-back book-page"><small>{booksContent.page.backMeta}</small><p className="book-annotation">{selected.annotation}</p><p>{booksContent.page.backCopy}</p></div>
-            </div>
-            <div className="book-spine" />
-          </div>
-          <button className="book-page-control" onClick={() => setReverse((value) => !value)} aria-label={reverse?booksContent.page.turnBackAria:booksContent.page.turnAria}>{reverse?booksContent.page.turnBack:booksContent.page.turn}</button>
-          <button className="close-book" onClick={() => setSelected(null)}>{booksContent.page.return}</button>
-        </div>
-      </div>}
+      <ZoneCloseup3D zone="books" onSelect={()=>undefined} />
     </section>
   </div>;
 }
@@ -210,7 +181,8 @@ function BoardScene({onClose}:{onClose:()=>void}) {
 }
 
 type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
-const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
+type FieldRecordItem=Exclude<FieldItem,"travelMap">;
+const fieldItems=fieldCaseContent.items as Record<FieldRecordItem,FieldRecord>;
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";
 const lostTravelMessages=[
   "FILM LOST IN THE ADVENTURE",
@@ -416,13 +388,12 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
 function FieldCaseScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<FieldItem|null>(null);
-  const item=selected?fieldItems[selected]:null;
+  const item=selected&&selected!=="travelMap"?fieldItems[selected]:null;
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={fieldCaseContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.fieldcase.index}</span><strong>{fieldCaseContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
-      <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(value in fieldItems)setSelected(value as FieldItem);}}/>
-    {Object.keys(fieldItems).length===0&&<article className="collection-empty-state field-empty-state"><small>{fieldCaseContent.emptyState.meta}</small><h2>{fieldCaseContent.emptyState.title}</h2><p>{fieldCaseContent.emptyState.copy}</p><em>{fieldCaseContent.emptyState.note}</em></article>}
-    {item&&selected==="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><FieldMapReading onClose={()=>setSelected(null)}/></div>}
-    {item&&selected!=="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
+      <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(value==="travelMap"||value in fieldItems)setSelected(value as FieldItem);}}/>
+    {selected==="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><FieldMapReading onClose={()=>setSelected(null)}/></div>}
+    {item&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
   </section></div>;
 }
 

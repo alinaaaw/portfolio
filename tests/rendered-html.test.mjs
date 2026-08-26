@@ -77,8 +77,8 @@ test("source contains six room objects, real work, and a progressive reveal", as
   for (const zone of ["drawer", "books", "notebook", "board", "fieldcase", "printer", "contact"]) {
     assert.match(page, new RegExp(`ZoneCloseup3D zone=\\"${zone}\\"`));
   }
-  assert.match(content, /TURN PAGE/);
-  assert.match(page, /book-turning-sheet/);
+  assert.doesNotMatch(content, /TURN PAGE/);
+  assert.doesNotMatch(page, /book-turning-sheet/);
   assert.match(content, /FIELD CASE \/ LIFE OUTSIDE THE LAB/);
   assert.match(content, /WORLD MAP \/ TRAVEL PINS/);
   assert.match(page, /field-map-reading/);
@@ -105,11 +105,11 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /Whole Brain Living/);
   assert.match(content, /To Live/);
   assert.match(content, /Cries in the Drizzle/);
-  assert.match(content, /Keigo Higashino Series/);
+  assert.match(content, /Keigo Higashino/);
   assert.match(content, /Journey Under the Midnight Sun/);
   assert.match(content, /Farewell My Concubine/);
-  assert.match(page, /series:higashino/);
-  assert.match(page, /if\(!booksContent\.openingEnabled\)return/);
+  assert.doesNotMatch(page, /series:higashino/);
+  assert.doesNotMatch(page, /if\(!booksContent\.openingEnabled\)return/);
   assert.doesNotMatch(page, /selectedMovie|dvd-case-detail|dvd-zoom/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
   assert.match(content, /Simultaneously Achieving Ex-Ante and Ex-Post Fairness/);

@@ -3,7 +3,6 @@
     "filename": "REFERENCES.web",
     "ariaLabel": "Project reference index",
     "title": "Project Reference Index",
-    "address": "alina.local/references",
     "meta": "LOCAL REFERENCE SITE / PROJECT CONTEXT",
     "intro": "Notes on papers, sourcebooks, and implementation dependencies connected to the projects. These sources provide context; the project evidence remains in the code, prototypes, and results.",
     "openSource": "OPEN ORIGINAL SOURCE ↗",
@@ -23,9 +22,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 2001",
       "citation": "Anna Bogomolnaia and Hervé Moulin · Journal of Economic Theory 100(2)",
       "summary": "Introduces Probabilistic Serial as a random-assignment mechanism and makes its trade-offs explicit: ordinal efficiency and envy-freeness improve, while strategy-proofness does not survive.",
-      "excerptLabel": "ABSTRACT / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "PS is envy-free, RP is not; RP is strategy-proof, PS is not.",
       "annotation": "This reference informed the project's simultaneous-eating stage and clarified the mechanism-level tradeoffs behind probabilistic assignment.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://www.sciencedirect.com/science/article/pii/S0022053100927108"
@@ -37,9 +33,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 2006",
       "citation": "Akshay-Kumar Katta and Jay Sethuraman · Journal of Economic Theory 131(1)",
       "summary": "Extends random assignment beyond strict rankings by allowing indifference between objects, reinterpreting Probabilistic Serial as an iterative network-flow problem.",
-      "excerptLabel": "ABSTRACT / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "Agents are allowed to be indifferent between objects.",
       "annotation": "This reference extends the project's theoretical foundation beyond strict preference rankings by considering cases in which participants may be indifferent between options.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://www.sciencedirect.com/science/article/pii/S0022053105001079"
@@ -51,9 +44,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / WINE 2020",
       "citation": "Haris Aziz · Web and Internet Economics, LNCS 12495 · pp. 341–355",
       "summary": "Connects fairness before a lottery is resolved with fairness in the deterministic allocations produced afterward, including an implementation of the Probabilistic Serial outcome through ex-post EF1 allocations.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "A probabilistic allocation can be evaluated both before the lottery and after a concrete assignment is selected.",
       "annotation": "This reference supplied part of the original project's fairness lineage. It does not establish that the implementation reproduced the paper's complete formal mechanism.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://link.springer.com/chapter/10.1007/978-3-030-64946-3_24"
@@ -65,9 +55,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 2022",
       "citation": "Haris Aziz and Florian Brandl · Games and Economic Behavior 135 · pp. 168–187",
       "summary": "Develops an eating-rule mechanism for probabilistic allocation under broad feasibility constraints, with attention to constrained efficiency and equal treatment.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "Eating-rule ideas can be extended to allocation settings with explicit feasibility constraints.",
       "annotation": "This source contextualized the project's simultaneous-eating approach and its possible extension to constrained allocation; it is retained as historical background rather than an implementation claim.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://www.sciencedirect.com/science/article/pii/S0899825622001014"
@@ -79,9 +66,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 1998",
       "citation": "Atila Abdulkadiroğlu and Tayfun Sönmez · Econometrica 66(3) · pp. 689–701",
       "summary": "Studies Random Serial Dictatorship in house-allocation problems and provides an alternative random-assignment lineage against which probabilistic mechanisms can be considered.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "Random priority produces a concrete assignment through a randomly ordered sequence of choices.",
       "annotation": "The original presentation used this reference as an alternative random-assignment mechanism. The current code should not be described as implementing the paper's full model without further evidence.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://doi.org/10.2307/2998580"
@@ -93,9 +77,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 1946",
       "citation": "Garrett Birkhoff · Universidad Nacional de Tucumán, Revista A 5",
       "summary": "The decomposition result behind converting a fractional allocation matrix into a weighted collection of deterministic assignments.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "A probability matrix can describe many possible concrete allocations, not just one final outcome.",
       "annotation": "In the project, decomposition is the bridge between an abstract fractional result and a lottery over assignments that can actually be issued to students.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://ndlsearch.ndl.go.jp/books/R100000136-I1570572699525842816"
@@ -107,9 +88,6 @@
       "meta": "HISTORICAL PROJECT REFERENCE / 1986",
       "citation": "László Lovász and Michael D. Plummer · Annals of Discrete Mathematics 29 · North-Holland",
       "summary": "A foundational treatment of matching, network flows, matching algorithms, and the linear-programming structures that support assignment problems.",
-      "excerptLabel": "WORKING SUMMARY",
-      "quoted": false,
-      "excerpt": "Matching theory provides the combinatorial language connecting agents, available objects, feasibility, and concrete assignments.",
       "annotation": "This book belongs to the original project's mathematical foundation. It supports the assignment and decomposition context without implying that every algorithm in the volume was implemented.",
       "provenance": "USED IN THE ORIGINAL COURSE-ALLOCATION PRESENTATION",
       "url": "https://shop.elsevier.com/books/matching-theory/plummer/978-0-444-87916-5"
@@ -121,9 +99,6 @@
       "meta": "TECHNICAL APPLICATION NOTE / 2017",
       "citation": "Sylvain Colliard-Piraud · STMicroelectronics Application Note AN4995",
       "summary": "Explains a surface-EMG acquisition chain from three skin electrodes through differential amplification, rectification, low-pass filtering, and a comparator or microcontroller input.",
-      "excerptLabel": "SIGNAL-CHAIN NOTE",
-      "quoted": false,
-      "excerpt": "Surface EMG begins as a small differential signal that must be conditioned before a microcontroller can interpret muscle activity.",
       "annotation": "This reference supports the project's sensing and conditioning context. Its example circuit is background material, not a claim that the wearable reproduces the complete ST design.",
       "provenance": "USER-SUPPLIED TECHNICAL REFERENCE",
       "url": "https://www.st.com/resource/en/application_note/an4995-using-an-electromyogram-technique-to-detect-muscle-activity-stmicroelectronics.pdf"
@@ -135,9 +110,6 @@
       "meta": "CONTEXTUAL REFERENCE / WHO + UN-HABITAT / 2020",
       "citation": "World Health Organization and UN-Habitat · Sourcebook",
       "summary": "Connects planning decisions with transport, housing, food, education, healthcare, environment, well-being, and health equity rather than reducing urban quality of life to one indicator.",
-      "excerptLabel": "SOURCEBOOK / SHORT EXCERPT",
-      "quoted": true,
-      "excerpt": "The way we plan and build our cities defines our quality of life.",
       "annotation": "The Shanghai project followed a smaller, local version of this logic: ask residents what matters, then translate nearby services and walking time into something visible.",
       "provenance": "BACKGROUND READING / NOT CLAIMED AS AN ORIGINAL PROJECT SOURCE",
       "url": "https://www.who.int/publications/i/item/9789240003170"
@@ -149,9 +121,6 @@
       "meta": "PEER-REVIEWED TUTORIAL / 2024",
       "citation": "Silvia Muceli and Roberto Merletti · Journal of Electromyography and Kinesiology 79 · 102937",
       "summary": "Reviews time- and frequency-domain descriptions of surface EMG, including sampling, filtering, spectra, stationarity, epoch selection, coherence, and fatigue indices.",
-      "excerptLabel": "ANALYSIS NOTE",
-      "quoted": false,
-      "excerpt": "Filtering and sampling choices shape which frequency-domain features can be interpreted from a surface-EMG signal.",
       "annotation": "This reference complements the hardware-oriented application note with analysis guardrails. It informs future signal interpretation without claiming that the current prototype already performs frequency-based fatigue analysis.",
       "provenance": "USER-SUPPLIED PEER-REVIEWED REFERENCE",
       "url": "https://www.sciencedirect.com/science/article/pii/S1050641124000816"

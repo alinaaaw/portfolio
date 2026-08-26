@@ -16,7 +16,6 @@
   "shared": {
     "returnToRoom": "RETURN TO ROOM ×",
     "close": "×",
-    "minimize": "—",
     "arrow": "→"
   }
 }

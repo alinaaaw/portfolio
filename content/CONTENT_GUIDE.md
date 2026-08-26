@@ -60,8 +60,8 @@ Use the final fax as a message sent back by Alina from work outside the lab. It 
 The scenes intentionally use different data shapes so the website does not reduce every object to the same title-and-paragraph card.
 
 - **Computer projects and experience:** `details` contains labeled case-file sections. Keep each section evidence-specific. Project pages link to the internal reference browser instead of repeating citations in the case file.
-- **References:** `project`, `citation`, `summary`, `excerpt`, `quoted`, `annotation`, `provenance`, and `url` separate the source from Alina's project note. Set `quoted` to `true` only for verified verbatim excerpts.
-- **Books:** Future entries should identify the work and record a specific personal response. Do not invent entries to fill the six physical shelf slots.
+- **References:** `project`, `citation`, `summary`, `annotation`, `provenance`, and `url` separate the source from Alina's project note.
+- **Books:** `title` supplies the hover label, `author` groups the dedicated author row, and `isReading` controls the bookmark. Detailed notes are not stored until open-book interaction is enabled.
 - **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
 - **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
 - **Board:** Notes deliberately have no separate title. `label` is the handwritten principle, `copy` gives the evidence, and `detail` is the short margin line.

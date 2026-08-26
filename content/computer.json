@@ -1,11 +1,10 @@
 {
   "ariaLabel": "Alina's computer desktop",
   "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
-  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "readme": "README.TXT", "labLog": "LAB LOG", "location": "LAB-17 / LOCAL" },
+  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "labLog": "LAB LOG", "location": "LAB-17 / LOCAL" },
   "profile": {
     "triggerAria": "Open Alina Wu's profile",
     "windowTitle": "USER PROFILE / ALINA.WU",
-    "closeAria": "Close user profile",
     "status": "LOCAL USER / AWAY",
     "name": "Alina Wu",
     "fullName": "Wenrui Wu",
@@ -57,7 +56,7 @@
       }
     ]
   },
-  "projectsFolder": { "title": "PROJECTS / 3 ITEMS", "back": "← PROJECTS", "verified": "CASE FILE / VERIFIED" },
+  "projectsFolder": { "title": "PROJECTS / 3 ITEMS", "verified": "CASE FILE / VERIFIED" },
   "projects": {
     "map": {
       "name": "shanghai-map.case",
@@ -65,7 +64,6 @@
       "title": "Quality of Life in Shanghai",
       "copy": "Led an eight-person mixed-methods study of quality of life in older Shanghai neighborhoods. Translated the findings into a neighborhood-access map and community information campaigns.",
       "facts": ["SEP 2023—MAY 2024", "MIXED-METHODS STUDY", "8-PERSON TEAM"],
-      "referenceIds": ["urban-health"],
       "details": [
         { "label": "FIELD RESEARCH", "copy": "Collected and analyzed 20+ questionnaires and interviews. The mixed-methods study examined neighborhood services, safety, and everyday information needs." },
         { "label": "REPORTED FINDING", "copy": "An early 48-person questionnaire sample reported an average amenity-awareness score of 6.75 out of 10. This finding helped motivate the neighborhood-access map." },
@@ -79,7 +77,6 @@
       "title": "Automatic and Satisfactory Course Assignment",
       "copy": "Independently designed and implemented a Python course-allocation system for capacity-constrained electives. The system uses ranked preferences to improve overall student satisfaction.",
       "facts": ["JAN 2024—MAR 2025", "4 EVALUATION CRITERIA", "2 ALLOCATION CONTEXTS"],
-      "referenceIds": ["probabilistic-serial", "full-preferences", "ex-ante-ex-post-fairness", "vigilant-eating", "random-serial-dictatorship", "birkhoff", "matching-theory"],
       "details": [
         { "label": "ALLOCATION METHOD", "copy": "Generated a fractional allocation through Simultaneous Eating. Birkhoff decomposition then converted it into possible final assignments." },
         { "label": "SYSTEM STRUCTURE", "copy": "Separated preference generation, fractional allocation, deterministic realization, and evaluation into distinct Python stages." },
@@ -94,7 +91,6 @@
       "title": "Monitoring Device for Muscle Usage & Behavior",
       "copy": "A wearable EMG device that measures relative target-muscle activation during exercise and summarizes each session across four intensity bands.",
       "facts": ["3-SECOND CALIBRATION", "4 RELATIVE EMG BANDS", "CAD + ESP32 + BLUETOOTH"],
-      "referenceIds": ["emg-signal-chain", "emg-frequency-analysis"],
       "details": [
         { "label": "DESIGN DECISION", "copy": "Selected EMG over angular-displacement sensing for its ability to capture subtle muscle activity that was difficult to infer from visible surface movement." },
         { "label": "CURRENT CHAIN", "copy": "A three-second calibration establishes an individual reference. The firmware filters and squares the EMG signal, then applies Kalman filtering. Each sample is assigned to one of four relative bands and included in the session summary." },
@@ -105,7 +101,6 @@
   },
   "experience": {
     "folderTitle": "EXPERIENCE / 2 ITEMS",
-    "back": "← EXPERIENCE",
     "research": {
       "listMeta": "01 / RESEARCH",
       "organization": "UW Social Futures Lab",

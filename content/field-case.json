@@ -9,20 +9,7 @@
     "archery": "ARCHERY KIT / SPORT PRACTICE",
     "targetSports": "TARGET SPORTS / SAFETY FIRST"
   },
-  "emptyState": {
-    "meta": "FIELD CASE / READY TO FILE",
-    "title": "Personal entries can be added here.",
-    "copy": "This case is reserved for confirmed places, photographs, activities, and observations from life outside the workstation.",
-    "note": "Add only details you want to share publicly."
-  },
   "items": {
-    "travelMap": {
-      "meta": "FIELD CASE / TRAVEL MAP",
-      "title": "Places explored",
-      "copy": "A record of cities I have explored across the United States and Asia—anchors for photographs, food, days out, and memories I may add over time.",
-      "metrics": [],
-      "tags": ["21 cities", "United States", "East Asia", "Southeast Asia"]
-    },
     "photos": {
       "meta": "FIELD CASE / PHOTO STACK",
       "title": "Frames from life outside work",
