@@ -23,7 +23,7 @@ type Props = {
   contactCardRaised?: boolean;
 };
 
-type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; visuals?: THREE.Mesh[] } };
+type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; visuals?: THREE.Mesh[] } };
 
 const palette = {
   void: 0x07100f,
@@ -156,34 +156,53 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
   const sideR = sideL.clone(); sideR.position.x=4.18;
   const base=roundedBox(8.7,.28,1.78,palette.woodLight,.08,.82,.04);base.position.set(0,.25,0);
   const top=roundedBox(8.7,.24,1.78,palette.wood,.08,.84,.03);top.position.set(0,4.72,0);
+  const divider=roundedBox(.18,4.35,1.5,0x422f23,.055,.8,.03);divider.position.set(-.02,2.52,0);
   const frontLip=roundedBox(8.55,.16,.16,0x4a3225,.045,.78,.04);frontLip.position.set(0,.4,.82);
-  shelf.add(back,sideL,sideR,base,top,frontLip);
-  const colors=[0x28504a,0x854b3d,0xb29145,0x33473f,0xd0c4a5,0x334d65];
-  const labels=booksContent.spineLabels;
-  for (let index=0;index<6;index+=1) {
+  shelf.add(back,sideL,sideR,base,top,divider,frontLip);
+
+  const books=booksContent.books as {id:string;title:string;author:string;isReading:boolean}[];
+  const movies=booksContent.movies as {id:string;title:string}[];
+  const bookColors=[0x30584f,0x894a3c,0xb28e46,0x355066];
+  const makeBook=(book:{id:string;title:string;author:string;isReading:boolean},index:number,x:number,y:number,series=false,selectable=true)=>{
     const group=new THREE.Group();
-    const height=3.42+(index%3)*.22;
-    const width=.92+(index%2)*.12;
-    const cover=roundedBox(width,height,1.04,colors[index],.065,.7,.02);
-    cover.position.y=height/2;
-    const pages=roundedBox(width-.16,height-.16,.78,0xd7cba9,.045,.93,.01);
-    pages.position.set(.035,height/2,-.08);
-    const spine=roundedBox(.16,height-.12,1.08,colors[index],.05,.68,.02);spine.position.set(-width*.42,height/2,.01);
-    const band=box(width+.025,.07,1.08,index===2?palette.signal:0xbba980,.7,.02);
-    band.position.set(0,height*.72,.01);
+    const height=series?2.02:1.94+(index%2)*.12;
+    const width=series ? .58 : .68;
+    const color=series?0x402946:bookColors[index%bookColors.length];
+    const cover=roundedBox(width,height,.92,color,.055,.67,.02);cover.position.y=height/2;
+    const pages=roundedBox(width-.12,height-.13,.71,palette.paper,.035,.94,.01);pages.position.set(.028,height/2,-.075);
+    const spine=roundedBox(.13,height-.08,.98,color,.035,.68,.02);spine.position.set(-width*.42,height/2,.02);
+    const band=box(width+.015,series ? .105 : .07,.99,series?0xcaa65a:(book.isReading?palette.signal:0xbba980),.7,.02);band.position.set(0,height*(series ? .72 : .7),.02);
     group.add(cover,pages,spine,band);
-    for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.5,.025,.035,index===4?0x33443f:0xd7cba9,.75,.01);titleMark.position.set(.08,height*.56-mark*.18,.55);group.add(titleMark);}
-    if(index===1||index===3||index===5){
-      const bookmark=box(.14,.52,.03,index===3?palette.signal:palette.red);
-      bookmark.position.set(width*.2,height+.2,.08);
-      group.add(bookmark);
-    }
-    group.position.set(-3.15+index*1.27,.43,.05);
-    group.rotation.z=[-.025,.015,-.018,.028,-.012,.022][index];
-    shelf.add(group);
-    const hit=hitBox(String(index),labels[index],[width+.22,height+.28,1.28],[group.position.x,.43+height/2,.05],[cover,pages,spine,band]);
-    shelf.add(hit); hits.push(hit);
-  }
+    for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.47,.023,.028,series?0xe5c675:0xd7cba9,.75,.01);titleMark.position.set(.04,height*.53-mark*.17,.51);group.add(titleMark);}
+    if(book.isReading){const bookmark=box(.15,.58,.035,palette.signal);bookmark.position.set(width*.12,height+.17,.08);group.add(bookmark);}
+    group.position.set(x,y,.05);group.rotation.z=(index%3-1)*.018;shelf.add(group);
+    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);shelf.add(hit);hits.push(hit);}
+    return {group,cover,pages,spine,band};
+  };
+  books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.62+index*.69,.43));
+  const seriesBooks=books.filter((book)=>book.author==="Keigo Higashino");
+  const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.94+index*.63,.43,true,false));
+  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[1.32,2.28,1.12],[-.625,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));shelf.add(seriesHit);hits.push(seriesHit);
+
+  const filmColors=[0x70c9c0,0xb94e3e,0xd1f45c,0xcaa65a,0x8072a2,0x5da19b];
+  movies.forEach((movie,index)=>{
+    const x=.34+index*.3,y=.45,z=.02+index*.012;
+    const group=new THREE.Group();
+    const disc=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.018,48),mat(0xd9d5c5,.19,.82));disc.rotation.x=Math.PI/2;disc.position.set(0,.43,.045);disc.castShadow=true;
+    const colorRing=new THREE.Mesh(new THREE.RingGeometry(.18,.252,48),mat(filmColors[index%filmColors.length],.24,.55));colorRing.position.set(0,.43,.058);
+    const label=new THREE.Mesh(new THREE.CircleGeometry(.115,32),mat(index%2?0x243a36:0x334f4a,.46,.16));label.position.set(0,.43,.061);
+    const hub=new THREE.Mesh(new THREE.RingGeometry(.032,.062,24),mat(0xe2dcc8,.16,.74));hub.position.set(0,.43,.064);
+    const centerHole=new THREE.Mesh(new THREE.CircleGeometry(.031,24),mat(palette.void,.72,.08));centerHole.position.set(0,.43,.066);
+    const clearMaterial=new THREE.MeshPhysicalMaterial({color:0xe8f3ee,transparent:true,opacity:.3,transmission:.62,roughness:.13,metalness:0,thickness:.04,depthWrite:false});
+    const clearCase=new THREE.Mesh(new RoundedBoxGeometry(.72,.86,.052,4,.018),clearMaterial);clearCase.position.set(0,.43,.09);clearCase.castShadow=true;
+    const hinge=roundedBox(.038,.77,.062,0xcad9d4,.012,.26,.12);hinge.position.set(-.32,.43,.105);
+    const topEdge=roundedBox(.65,.025,.065,0xdce7e2,.009,.24,.1);topEdge.position.set(.01,.82,.105);
+    const bottomEdge=topEdge.clone();bottomEdge.position.y=.04;
+    const latch=roundedBox(.075,.035,.07,0xb8c9c4,.009,.24,.12);latch.position.set(.32,.43,.108);
+    group.add(disc,colorRing,label,hub,centerHole,clearCase,hinge,topEdge,bottomEdge,latch);
+    group.position.set(x,y,z);group.rotation.z=(index%3-1)*.012;shelf.add(group);
+    const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.2],[x,y+.43,z+.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;shelf.add(hit);hits.push(hit);
+  });
   scene.add(shelf);
 }
 
@@ -475,10 +494,10 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     };
     const pointerMove=(event:PointerEvent)=>{
       if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX+delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
-      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current)labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.label??view.hint;} canvas.style.cursor=next?"pointer":"grab";
+      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current)labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.label??view.hint;} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item)selectRef.current(item);}canvas.style.cursor=hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item&&!hit?.userData.hoverOnly)selectRef.current(item);}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);

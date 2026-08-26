@@ -1,25 +1,30 @@
 {
-  "ariaLabel": "Personal bookshelf close-up",
-  "header": "PERSONAL SHELF / CATALOG IN PROGRESS",
-  "sceneHint": "BOOKS · FILMS · PERSONAL NOTES",
-  "emptyState": {
-    "meta": "PERSONAL CATALOG / NOT YET FILED",
-    "title": "Books and films will live here.",
-    "copy": "Project references have moved to REFERENCES.web on the computer. This shelf is reserved for books I have read, films I have watched, and the notes worth keeping from them.",
-    "note": "Entries will be added after the first titles and personal annotations are selected."
-  },
-  "page": {
-    "reference": "MARGIN / PERSONAL NOTE",
-    "tab": "READING NOTE",
-    "frontMeta": "CATALOG ENTRY",
-    "backMeta": "PERSONAL NOTE / CONTINUED",
-    "backCopy": "A personal response belongs here, not a generic summary.",
-    "turn": "TURN PAGE →",
-    "turnBack": "← TURN BACK",
-    "turnAria": "Turn to the personal annotation",
-    "turnBackAria": "Turn back to the catalog entry",
-    "return": "RETURN ITEM TO SHELF ×"
-  },
-  "spineLabels": ["BOOK NOTES", "FILM NOTES", "READ", "WATCHED", "FAVORITES", "UNFILED"],
-  "books": []
+  "ariaLabel": "Personal books and films shelf close-up",
+  "header": "PERSONAL SHELF / BOOKS + FILMS",
+  "sceneHint": "READING SHELF LEFT / FILM LIBRARY RIGHT",
+  "sections": {"books":"READ / BOOKS","films":"WATCHED / FILMS","series":"KEIGO HIGASHINO / FAVORITE SERIES"},
+  "page": {"reference":"PERSONAL CATALOG / SHELF NOTE","tab":"READING NOTE","backMeta":"PERSONAL NOTE / CONTINUED","backCopy":"A shelf entry is a small record of time spent with a story.","turn":"TURN PAGE →","turnBack":"← TURN BACK","turnAria":"Turn to the shelf note","turnBackAria":"Turn back to the catalog entry","return":"RETURN TO SHELF"},
+  "series": {"id":"higashino-series","meta":"FAVORITE AUTHOR / TWO CONFIRMED READS","title":"Keigo Higashino Series","copy":"A dedicated, coordinated row for a favorite mystery writer. Open a volume to browse the individual books in this personal series.","open":"OPEN SERIES","return":"CLOSE SERIES"},
+  "books": [
+    {"id":"mockingbird","title":"To Kill a Mockingbird","author":"Harper Lee","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
+    {"id":"frankenstein","title":"Frankenstein","author":"Mary Shelley","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
+    {"id":"power-of-now","title":"The Power of Now","author":"Eckhart Tolle","meta":"READ / BOOK","summary":"A personal reading-shelf entry.","annotation":"Read and kept on the shelf.","isReading":false},
+    {"id":"whole-brain-living","title":"Whole Brain Living","author":"Jill Bolte Taylor","meta":"CURRENTLY READING / BOOKMARKED","summary":"The book currently in progress on this shelf.","annotation":"The signal-green bookmark marks the current read.","isReading":true},
+    {"id":"malice","title":"Malice","author":"Keigo Higashino","meta":"READ / KEIGO HIGASHINO SERIES","summary":"A confirmed read from a favorite author series.","annotation":"Filed in the dedicated Keigo Higashino row.","isReading":false},
+    {"id":"journey-under-midnight-sun","title":"Journey Under the Midnight Sun","author":"Keigo Higashino","meta":"READ / KEIGO HIGASHINO SERIES","summary":"A confirmed read from a favorite author series.","annotation":"Filed in the dedicated Keigo Higashino row.","isReading":false}
+  ],
+  "movies": [
+    {"id":"inception","title":"Inception","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"tenet","title":"Tenet","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"spider-man","title":"Spider-Man","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"shawshank-redemption","title":"The Shawshank Redemption","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"pride-and-prejudice","title":"Pride & Prejudice","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"manchester-by-the-sea","title":"Manchester by the Sea","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"f1","title":"F1","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"farewell-my-concubine","title":"Farewell My Concubine","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"interstellar","title":"Interstellar","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"witness-for-the-prosecution","title":"Witness for the Prosecution","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"green-book","title":"Green Book","meta":"WATCHED / FILM","note":"Personal film-library entry."},
+    {"id":"la-la-land","title":"La La Land","meta":"WATCHED / FILM","note":"Personal film-library entry."}
+  ]
 }

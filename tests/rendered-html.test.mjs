@@ -85,7 +85,13 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /drawFieldCaseMapViewport/);
   assert.doesNotMatch(content, /editable layout markers|Replace prompts and layout pins/);
   assert.match(content, /REFERENCES\.web/);
-  assert.match(content, /Books and films will live here/);
+  assert.match(content, /PERSONAL SHELF \/ BOOKS \+ FILMS/);
+  assert.match(content, /Whole Brain Living/);
+  assert.match(content, /Keigo Higashino Series/);
+  assert.match(content, /Journey Under the Midnight Sun/);
+  assert.match(content, /Farewell My Concubine/);
+  assert.match(page, /series:higashino/);
+  assert.doesNotMatch(page, /selectedMovie|dvd-case-detail|dvd-zoom/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
   assert.match(content, /How Should We Normalize Electromyograms/);
   assert.match(page, /artifact-facts/);
@@ -122,6 +128,14 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(game, /drawer: \[-3\.53, \.84, -5\.38\]/);
   assert.match(closeups, /WebGLRenderer/);
   assert.match(closeups, /buildBooks/);
+  assert.match(closeups, /movie:\$\{movie\.id\}/);
+  assert.match(closeups, /hoverOnly=true/);
+  assert.match(closeups, /CylinderGeometry\(\.27,\.27,\.018,48\)/);
+  assert.match(closeups, /MeshPhysicalMaterial/);
+  assert.match(closeups, /RoundedBoxGeometry\(\.72,\.86,\.052/);
+  assert.match(closeups, /series:higashino/);
+  assert.doesNotMatch(closeups, /const bookShelf=/);
+  assert.match(closeups, /makeBook\(book,index,-\.94\+index\*\.63,\.43,true,false\)/);
   assert.match(closeups, /buildDrawer/);
   assert.match(closeups, /monitorScreen/);
   assert.match(closeups, /roundedBox\(3\.45,2\.15,\.28/);
@@ -141,7 +155,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /if\(showFax\)/);
   assert.match(closeups, /onFaxPrinted/);
   assert.match(closeups, /fieldCaseContent\.itemLabels\.target/);
-  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
+  for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "series-catalog", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
   assert.match(css, /@media \(max-width: 620px\)/);
