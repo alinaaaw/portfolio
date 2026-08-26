@@ -97,7 +97,12 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /if\(!booksContent\.openingEnabled\)return/);
   assert.doesNotMatch(page, /selectedMovie|dvd-case-detail|dvd-zoom/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
-  assert.match(content, /How Should We Normalize Electromyograms/);
+  assert.match(content, /Simultaneously Achieving Ex-Ante and Ex-Post Fairness/);
+  assert.match(content, /The Vigilant Eating Rule/);
+  assert.match(content, /Random Serial Dictatorship and the Core/);
+  assert.match(content, /Matching Theory/);
+  assert.match(content, /Using an Electromyogram Technique to Detect Muscle Activity/);
+  assert.match(content, /Frequency Analysis of the Surface EMG Signal: Best Practices/);
   assert.match(page, /artifact-facts/);
   assert.match(page, /notebook-process/);
   assert.match(page, /field-metrics/);

@@ -79,7 +79,7 @@
       "title": "Automatic and Satisfactory Course Assignment",
       "copy": "Independently designed and implemented a Python course-allocation system for capacity-constrained electives. The system uses ranked preferences to improve overall student satisfaction.",
       "facts": ["JAN 2024—MAR 2025", "4 EVALUATION CRITERIA", "2 ALLOCATION CONTEXTS"],
-      "referenceIds": ["probabilistic-serial", "full-preferences", "birkhoff"],
+      "referenceIds": ["probabilistic-serial", "full-preferences", "ex-ante-ex-post-fairness", "vigilant-eating", "random-serial-dictatorship", "birkhoff", "matching-theory"],
       "details": [
         { "label": "ALLOCATION METHOD", "copy": "Generated a fractional allocation through Simultaneous Eating. Birkhoff decomposition then converted it into possible final assignments." },
         { "label": "SYSTEM STRUCTURE", "copy": "Separated preference generation, fractional allocation, deterministic realization, and evaluation into distinct Python stages." },
@@ -94,7 +94,7 @@
       "title": "Monitoring Device for Muscle Usage & Behavior",
       "copy": "A wearable EMG device that measures relative target-muscle activation during exercise and summarizes each session across four intensity bands.",
       "facts": ["3-SECOND CALIBRATION", "4 RELATIVE EMG BANDS", "CAD + ESP32 + BLUETOOTH"],
-      "referenceIds": ["emg-normalization", "emg-filters"],
+      "referenceIds": ["emg-signal-chain", "emg-frequency-analysis"],
       "details": [
         { "label": "DESIGN DECISION", "copy": "Selected EMG over angular-displacement sensing for its ability to capture subtle muscle activity that was difficult to infer from visible surface movement." },
         { "label": "CURRENT CHAIN", "copy": "A three-second calibration establishes an individual reference. The firmware filters and squares the EMG signal, then applies Kalman filtering. Each sample is assigned to one of four relative bands and included in the session summary." },
