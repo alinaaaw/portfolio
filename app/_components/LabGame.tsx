@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { room } from "@/content";
+import { createFieldCaseWorldMapTexture, FIELD_CASE_LAYOUT_PINS, pinPosition } from "./fieldCaseMap";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
@@ -472,40 +473,52 @@ function buildBoard(scene: THREE.Scene) {
 
 function buildFieldCase(scene: THREE.Scene) {
   const group = new THREE.Group();
-  const base = box(3.4,.72,2.15,0x4e402f,.68,.12);
-  base.position.y = .46;
-  const lid = box(3.4,.17,2.15,0x71583d);
-  lid.position.set(0,1.52,-.9);
+  const cartTopY=.58;
+  const cartSurfaceY=.7;
+  const caseSurfaceY=1.45;
+  const mapPaperY=caseSurfaceY+.02;
+  const mapBoardY=mapPaperY-.035;
+  // One continuous work surface runs beneath both the target and the map.
+  const base = box(4.8,.72,2.15,0x4e402f,.68,.12);
+  base.position.set(0,1.09,0);
+  const lid = box(2.5,.17,2.15,0x71583d);
+  lid.position.set(-1.05,2.14,-.9);
   lid.rotation.x = -1.08;
   group.add(base,lid);
-  const target = box(1.42,.025,1.42,palette.paper,.96,.01);
-  target.position.set(-.85,1.02,.05);
+  const target = box(1.05,.025,1.05,palette.paper,.96,.01);
+  target.position.set(-1.48,caseSurfaceY+.015,-.15);
   group.add(target);
-  ([[.53,.41,0x507b78],[.4,.28,0xcab65b],[.27,.14,palette.red]] as const).forEach(([outer,inner,color]) => {
+  ([[.41,.33,0x507b78],[.31,.22,0xcab65b],[.2,.09,palette.red]] as const).forEach(([outer,inner,color]) => {
     const ring = new THREE.Mesh(new THREE.RingGeometry(inner,outer,40),material(color));
     ring.rotation.x = -Math.PI/2;
-    ring.position.set(-.85,1.04,.05);
+    ring.position.set(-1.48,caseSurfaceY+.035,-.15);
     group.add(ring);
   });
-  const ticket = box(1.15,.035,.58,0xcbbb82);
-  ticket.position.set(.9,1.02,.1);
-  ticket.rotation.y = -.16;
-  group.add(ticket);
-  const card = box(1.15,.035,.72,0xd8d0b9);
-  card.position.set(.82,1.05,-.58);
-  card.rotation.y = .12;
-  group.add(card);
+  const photo=box(.72,.035,.52,0xd8d0b9,.96,.01);photo.position.set(-.55,caseSurfaceY+.025,-.43);photo.rotation.y=.12;group.add(photo);
+  const photoImage=box(.55,.018,.3,0x365f65,.88,.01);photoImage.position.set(-.55,caseSurfaceY+.05,-.48);photoImage.rotation.y=.12;group.add(photoImage);
+  const photoTwo=box(.68,.035,.5,0xcfc39f,.96,.01);photoTwo.position.set(-.48,caseSurfaceY+.02,.08);photoTwo.rotation.y=-.1;group.add(photoTwo);
+  const photoTwoImage=box(.52,.018,.28,0x765641,.88,.01);photoTwoImage.position.set(-.48,caseSurfaceY+.045,.03);photoTwoImage.rotation.y=-.1;group.add(photoTwoImage);
+  const safetyTab=box(.24,.07,.34,0x5f392e,.7,.08);safetyTab.position.set(-.63,caseSurfaceY+.07,.4);safetyTab.rotation.y=.12;group.add(safetyTab);
   for(let index=0;index<3;index+=1){
-    const task=box(.46,.025,.52,[0xd7cba9,0xb8d5cc,palette.signal][index]);
-    task.position.set(.52+index*.5,1.04,.62);
-    task.rotation.y=-.08+index*.06;
-    group.add(task);
+    const arrow=cylinder(.018,1.55,index===0?0xb47b4d:0xb8d5cc,8);arrow.rotation.z=Math.PI/2;arrow.position.set(-1.05,caseSurfaceY+.07,.52+index*.14);group.add(arrow);
+    const fletching=box(.17,.025,.08,index===1?palette.signal:palette.red);fletching.position.set(-1.72,caseSurfaceY+.08,.52+index*.14);group.add(fletching);
   }
-  group.children.forEach((item) => { item.position.y += .62; });
-  const cartTop = box(3.75,.16,2.5,0x303a36,.38,.62);
-  cartTop.position.y = .58;
+  const cartTop = box(4.8,.16,2.5,0x303a36,.38,.62);
+  cartTop.position.y = cartTopY;
   group.add(cartTop);
-  for (const x of [-1.55,1.55]) {
+  const cartInset=box(4.55,.04,2.25,0x1c2c28,.9,.05);cartInset.position.y=cartSurfaceY-.02;group.add(cartInset);
+  const mapCenterX=1.25,mapCenterZ=-.2,mapWidth=1.8,mapDepth=1;
+  const mapBoard=box(1.98,.06,1.16,0x6b553a,.82,.05);mapBoard.position.set(mapCenterX,mapBoardY,mapCenterZ);group.add(mapBoard);
+  const mapTexture=createFieldCaseWorldMapTexture(512);
+  const worldMap=new THREE.Mesh(new THREE.PlaneGeometry(mapWidth,mapDepth),new THREE.MeshStandardMaterial({map:mapTexture,roughness:.9,metalness:0}));
+  worldMap.rotation.x=-Math.PI/2;worldMap.position.set(mapCenterX,mapPaperY,mapCenterZ);worldMap.userData.fieldCaseTexture=mapTexture;group.add(worldMap);
+  FIELD_CASE_LAYOUT_PINS.forEach((coordinate,index)=>{
+    const [x,z]=pinPosition(coordinate,mapCenterX,mapCenterZ,mapWidth,mapDepth);
+    const pin=cylinder(.024,.13,index===1?palette.signal:palette.red,8);pin.position.set(x,mapPaperY+.07,z);group.add(pin);
+  });
+  const compassRing=new THREE.Mesh(new THREE.RingGeometry(.055,.08,18),material(0x7b503f,.76,.02));compassRing.rotation.x=-Math.PI/2;compassRing.position.set(1.94,mapPaperY+.01,.19);group.add(compassRing);
+  const mapClip=cylinder(.05,.36,palette.steel,12);mapClip.rotation.z=Math.PI/2;mapClip.position.set(mapCenterX,mapPaperY+.035,-.72);group.add(mapClip);
+  for (const x of [-2.05,2.05]) {
     for (const z of [-.9,.9]) {
       const leg = box(.11,.55,.11,0x58625e,.32,.75);
       leg.position.set(x,.28,z);
@@ -864,6 +877,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
         if (object instanceof THREE.Mesh) {
           object.geometry.dispose();
           const materials = Array.isArray(object.material)?object.material:[object.material];
+          if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();
           materials.forEach((item) => item.dispose());
         }
         if (object instanceof THREE.Sprite) object.material.map?.dispose();

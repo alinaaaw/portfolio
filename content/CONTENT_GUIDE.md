@@ -49,7 +49,7 @@ Use the drawer for tangible traces of making: prototypes, sketches, components, 
 
 ### Field Case — Life Outside the Lab
 
-Use the Field Case only for experiences gathered away from the workstation: observations, activities, travel, field experiments, and ideas brought back from the outside world. Formal project findings, presentations, deployments, and evaluation metrics belong in their Computer case files or evidence packets. Leave the case unfiled until a suitable personal or field entry is confirmed.
+Use the Field Case only for experiences gathered away from the workstation: observations, activities, travel, photographs, and ideas brought back from the outside world. Formal project findings, presentations, deployments, and evaluation metrics belong in their Computer case files or evidence packets. The current travel, photography, archery, and target-sport entries are content prompts; replace them with confirmed personal details rather than inventing destinations or achievements.
 
 ### Fax — A Continuing Investigation
 
@@ -65,7 +65,7 @@ The scenes intentionally use different data shapes so the website does not reduc
 - **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
 - **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
 - **Board:** Notes deliberately have no separate title. `label` is the handwritten principle, `copy` gives the evidence, and `detail` is the short margin line.
-- **Field Case:** Keep `items` empty until a suitable field entry is confirmed. Its `emptyState` should explain the intended category without promising unbuilt work.
+- **Field Case:** `items` controls the four clickable personal-interest objects. Keep the travel pins and copy explicitly editable until destinations, photographs, and personal stories are confirmed.
 
 External project sources belong in `references.json` only when they have a stable citation and URL. Use `provenance` to distinguish original project references, implementation dependencies, and contextual background reading.
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { createFieldCaseWorldMapTexture, FIELD_CASE_LAYOUT_PINS, pinPosition } from "./fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -327,28 +328,51 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   const base=roundedBox(4.75,.62,3.2,0x3b3327,.16,.62,.18); base.position.set(-1.85,.67,-.25);
   const lid=roundedBox(4.75,.2,3.2,0x604b35,.13,.62,.16); lid.position.set(-1.85,2.25,-1.55); lid.rotation.x=-1.03;
   caseGroup.add(base,lid);
-  const target=roundedBox(1.95,.035,1.95,palette.paper,.035,.97,.01);target.position.set(-2.75,1.02,-.22);target.rotation.y=-.05;caseGroup.add(target);
+  const target=roundedBox(1.72,.035,1.72,palette.paper,.035,.97,.01);target.position.set(-3.05,1.02,-.35);target.rotation.y=-.05;caseGroup.add(target);
   const targetRings=[[.73,.61,0x2d3a37],[.59,.45,0xd7c868],[.43,.28,palette.red],[.26,.08,0x4b7770]] as const;
-  targetRings.forEach(([outer,inner,color])=>{const ring=new THREE.Mesh(new THREE.RingGeometry(inner,outer,40),mat(color,.78,.02));ring.rotation.x=-Math.PI/2;ring.position.set(-2.75,1.05,-.22);ring.rotation.z=-.05;caseGroup.add(ring);});
-  for(const [x,z] of [[-2.86,-.3],[-2.61,-.14],[-2.72,-.38]] as const){const hole=new THREE.Mesh(new THREE.CircleGeometry(.035,12),mat(0x171b19,.9,.02));hole.rotation.x=-Math.PI/2;hole.position.set(x,1.057,z);caseGroup.add(hole);}
-  const card=roundedBox(1.45,.055,.9,0xd8d0b9,.035); card.position.set(-.62,1.02,-.72); card.rotation.y=.1; caseGroup.add(card);
-  const ticket=roundedBox(1.55,.055,.74,0xcbbb82,.035); ticket.position.set(-.58,1.02,.48); ticket.rotation.y=-.12; caseGroup.add(ticket);
-  const strap=cylinder(.055,2.4,palette.red,12);strap.rotation.z=Math.PI/2;strap.position.set(-1.72,1.12,.92);caseGroup.add(strap);
+  targetRings.forEach(([outer,inner,color])=>{const ring=new THREE.Mesh(new THREE.RingGeometry(inner,outer,40),mat(color,.78,.02));ring.rotation.x=-Math.PI/2;ring.position.set(-3.05,1.05,-.35);ring.rotation.z=-.05;caseGroup.add(ring);});
+  const safetyTab=roundedBox(.42,.08,.58,0x5f392e,.12,.7,.08);safetyTab.position.set(-1.63,1.08,-.58);safetyTab.rotation.y=.12;caseGroup.add(safetyTab);
+  for(const x of [-1.72,-1.54]){const rivet=cylinder(.026,.025,palette.steel,12);rivet.position.set(x,1.13,-.58);caseGroup.add(rivet);}
+  const safetyLabel=roundedBox(.62,.025,.16,palette.signal,.025,.84,.01);safetyLabel.position.set(-3.05,1.065,-1.04);safetyLabel.rotation.y=-.05;caseGroup.add(safetyLabel);
+  const photoCards:THREE.Mesh[]=[];
+  [[-.75,-.54,.1],[-.52,.25,-.1]].forEach(([x,z,angle],index)=>{
+    const photo=roundedBox(1.28,.045,.92,index===0?0xe4dcc6:0xd4c9a8,.035,.96,.01);photo.position.set(x,1.03,z);photo.rotation.y=angle;caseGroup.add(photo);photoCards.push(photo);
+    const image=roundedBox(.98,.018,.57,index===0?0x365f65:0x765641,.025,.85,.01);image.position.set(x,1.064,z-.1);image.rotation.y=angle;caseGroup.add(image);
+    const horizon=box(.7,.012,.025,index===0?palette.cyan:0xd7bd73,.8,.01);horizon.position.set(x,1.078,z-.1);horizon.rotation.y=angle;caseGroup.add(horizon);
+    const sun=new THREE.Mesh(new THREE.CircleGeometry(.07,16),mat(index===0?0xd6c66c:0xd8a66d,.76,.01));sun.rotation.x=-Math.PI/2;sun.position.set(x+.27,1.082,z-.22);caseGroup.add(sun);
+    const caption=box(.55,.012,.018,0x6b766e,.82,.01);caption.position.set(x,1.066,z+.34);caption.rotation.y=angle;caseGroup.add(caption);
+  });
+  const arrows:THREE.Mesh[]=[];
+  for(let index=0;index<3;index+=1){
+    const shaft=cylinder(.025,2.15,index===1?0xb8d5cc:0xb47b4d,10);shaft.rotation.z=Math.PI/2;shaft.position.set(-1.8,1.12,.72+index*.17);shaft.rotation.y=-.04+index*.035;caseGroup.add(shaft);arrows.push(shaft);
+    const fletching=box(.22,.035,.11,index===1?palette.signal:palette.red,.7,.02);fletching.position.set(-2.72,1.13,.72+index*.17);fletching.rotation.y=-.04+index*.035;caseGroup.add(fletching);
+    const safeCap=cylinder(.038,.08,palette.steel,10);safeCap.rotation.z=Math.PI/2;safeCap.position.set(-.68,1.12,.72+index*.17);caseGroup.add(safeCap);
+  }
+  const arrowWrap=roundedBox(.26,.055,.58,0x6a4434,.035,.72,.05);arrowWrap.position.set(-1.72,1.15,.89);arrowWrap.rotation.y=.015;caseGroup.add(arrowWrap);
   scene.add(caseGroup);
-  const planBoard=roundedBox(3.25,.1,4.65,0x2b4b43,.1,.86,.05);planBoard.position.set(2.55,.37,0);scene.add(planBoard);
-  const columns=[{x:1.65,color:0xe2d8bd},{x:2.55,color:0xc8d8cf},{x:3.45,color:0xd9b18e}];
-  const drafts:THREE.Mesh[]=[];
-  columns.forEach((column,index)=>{const label=roundedBox(.72,.035,.45,column.color,.03,.94,.01);label.position.set(column.x,.45,-1.78);scene.add(label);for(let row=0;row<3;row+=1){const task=roundedBox(.72,.035,.72,row===2&&index===2?palette.signal:palette.paperDark,.035,.94,.01);task.position.set(column.x,.46,-.9+row*.92);task.rotation.y=(index-1)*.025;scene.add(task);for(let mark=0;mark<3;mark+=1){const line=box(.44-mark*.06,.014,.018,mark===0?palette.red:0x63746d);line.position.set(column.x,.49,-1.08+row*.92+mark*.13);scene.add(line);}drafts.push(task);}});
-  const route=roundedBox(2.75,.04,.72,0xb9aa7f,.035,.95,.01);route.position.set(2.55,.46,1.72);scene.add(route);
-  const routeLine=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(1.5,.5,1.78),new THREE.Vector3(2.15,.51,1.55),new THREE.Vector3(2.85,.51,1.83),new THREE.Vector3(3.55,.51,1.58)]),24,.025,7,false),mat(palette.red,.5,.04));scene.add(routeLine);
+  const mapCenterX=2.52,mapCenterZ=-.5,mapWidth=3.55,mapDepth=1.95;
+  const mapBoard=roundedBox(3.82,.1,2.22,0x6b553a,.08,.78,.08);mapBoard.position.set(mapCenterX,.38,mapCenterZ);scene.add(mapBoard);
+  const mapTexture=createFieldCaseWorldMapTexture();
+  const worldMap=new THREE.Mesh(new THREE.PlaneGeometry(mapWidth,mapDepth),new THREE.MeshStandardMaterial({map:mapTexture,roughness:.9,metalness:0}));
+  worldMap.rotation.x=-Math.PI/2;worldMap.position.set(mapCenterX,.445,mapCenterZ);worldMap.receiveShadow=true;worldMap.userData.fieldCaseTexture=mapTexture;scene.add(worldMap);
+  for(const x of [mapCenterX-mapWidth*.47,mapCenterX+mapWidth*.47]){for(const z of [mapCenterZ-mapDepth*.44,mapCenterZ+mapDepth*.44]){const corner=roundedBox(.22,.035,.13,palette.steel,.025,.4,.55);corner.position.set(x,.47,z);scene.add(corner);}}
+  FIELD_CASE_LAYOUT_PINS.forEach((coordinate,index)=>{
+    const [x,z]=pinPosition(coordinate,mapCenterX,mapCenterZ,mapWidth,mapDepth);
+    const foot=new THREE.Mesh(new THREE.RingGeometry(.045,.068,16),mat(index===1?palette.signal:palette.red,.62,.04));foot.rotation.x=-Math.PI/2;foot.position.set(x,.458,z);scene.add(foot);
+    const stem=cylinder(.022,.16,index===1?palette.signal:palette.red,10);stem.position.set(x,.54,z);scene.add(stem);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.075,12,8),mat(index===1?palette.signal:palette.red,.55,.06));head.position.set(x,.66,z);head.castShadow=true;scene.add(head);
+    const glint=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),mat(0xf2e9c9,.4,.02));glint.position.set(x-.025,.692,z+.025);scene.add(glint);
+  });
+  const compassRing=new THREE.Mesh(new THREE.RingGeometry(.12,.17,24),mat(0x7b503f,.76,.02));compassRing.rotation.x=-Math.PI/2;compassRing.position.set(3.93,.465,.26);scene.add(compassRing);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["target",fieldCaseContent.itemLabels.target,target,[2.18,.55,2.18],[-2.75,1.2,-.22]],
-    ["internship",fieldCaseContent.itemLabels.internship,card,[1.7,.5,1.12],[-.62,1.17,-.72]],
-    ["ticket",fieldCaseContent.itemLabels.ticket,ticket,[1.8,.5,1.02],[-.58,1.17,.48]],
-    ["draft",fieldCaseContent.itemLabels.draft,drafts[4],[3.35,.55,4.75],[2.55,.67,0]],
+    ["targetSports",fieldCaseContent.itemLabels.targetSports,target,[1.95,.55,1.95],[-3.05,1.2,-.35]],
+    ["photos",fieldCaseContent.itemLabels.photos,photoCards[0],[1.75,.55,2.05],[-.62,1.18,-.1]],
+    ["archery",fieldCaseContent.itemLabels.archery,arrows[1],[2.55,.5,.7],[-1.8,1.25,.9]],
+    ["travelMap",fieldCaseContent.itemLabels.travelMap,worldMap,[3.75,.55,2.18],[mapCenterX,.67,mapCenterZ]],
   ];
   items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual]); scene.add(hit); hits.push(hit); });
-  const clip=cylinder(.12,.85,palette.steel,18);clip.rotation.z=Math.PI/2;clip.position.set(2.55,.53,-2.05);scene.add(clip);
+  const mapClip=cylinder(.1,.72,palette.steel,18);mapClip.rotation.z=Math.PI/2;mapClip.position.set(mapCenterX,.53,-1.59);scene.add(mapClip);
+  for(const x of [mapCenterX-.3,mapCenterX+.3]){const mount=cylinder(.07,.13,0x4e5954,14);mount.position.set(x,.48,-1.59);scene.add(mount);}
 }
 
 const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
@@ -494,7 +518,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
     };frame=requestAnimationFrame(tick);
-    return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
+    return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
   return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} /><div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;

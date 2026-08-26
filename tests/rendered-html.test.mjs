@@ -68,7 +68,10 @@ test("source contains six room objects, real work, and a progressive reveal", as
   }
   assert.match(content, /TURN PAGE/);
   assert.match(page, /book-turning-sheet/);
-  assert.match(content, /FIELD CASE \/ UNFILED/);
+  assert.match(content, /FIELD CASE \/ LIFE OUTSIDE THE LAB/);
+  assert.match(content, /WORLD MAP \/ TRAVEL PINS/);
+  assert.match(page, /field-map-reading/);
+  assert.match(page, /drawFieldCaseWorldMap/);
   assert.match(content, /REFERENCES\.web/);
   assert.match(content, /Books and films will live here/);
   assert.match(content, /A New Solution to the Random Assignment Problem/);
@@ -133,4 +136,15 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /contactCardPickup/);
   assert.match(css, /contactCardReturn/);
+});
+
+test("field case map uses real country geometry instead of hand-drawn continents", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const mapSource = await readFile(new URL("../app/_components/fieldCaseMap.ts", import.meta.url), "utf8");
+  const countries = JSON.parse(await readFile(new URL("../app/_components/worldCountries110m.json", import.meta.url), "utf8"));
+  assert.ok(countries.length >= 170, "the map should retain Natural Earth country coverage");
+  assert.ok(countries.every((country) => country.g?.type === "Polygon" || country.g?.type === "MultiPolygon"));
+  assert.match(mapSource, /fill\("evenodd"\)/);
+  assert.match(mapSource, /\[-width,0,width\]/);
+  assert.doesNotMatch(mapSource, /landMasses/);
 });

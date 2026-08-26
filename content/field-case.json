@@ -1,14 +1,48 @@
 {
-  "ariaLabel": "Unfiled field case close-up",
-  "header": "FIELD CASE / UNFILED",
-  "sceneHint": "PLACES · OBSERVATIONS · EXPERIENCES",
+  "ariaLabel": "Travel and interests field case close-up",
+  "header": "FIELD CASE / LIFE OUTSIDE THE LAB",
+  "sceneHint": "MAP · PHOTOS · ARCHERY · TARGET SPORTS",
   "returnItem": "RETURN TO CASE ×",
-  "itemLabels": { "target": "UNFILED PLACE", "internship": "UNFILED NOTE", "ticket": "UNFILED TICKET", "draft": "OPEN ROUTE" },
-  "emptyState": {
-    "meta": "FIELD CASE / NO CURRENT ENTRIES",
-    "title": "Nothing is filed here yet.",
-    "copy": "Project records have returned to their case files. This case is reserved for future observations, places, activities, and field tests that belong outside the workstation.",
-    "note": "New entries will be added only when they have a clear reason to live outside the formal project record."
+  "itemLabels": {
+    "travelMap": "WORLD MAP / TRAVEL PINS",
+    "photos": "TRAVEL AND EVERYDAY PHOTOS",
+    "archery": "ARCHERY KIT / SPORT PRACTICE",
+    "targetSports": "TARGET SPORTS / SAFETY FIRST"
   },
-  "items": {}
+  "emptyState": {
+    "meta": "FIELD CASE / READY TO FILE",
+    "title": "Personal entries can be added here.",
+    "copy": "This case is reserved for confirmed places, photographs, activities, and observations from life outside the workstation.",
+    "note": "Replace prompts and layout pins only with details you want to share publicly."
+  },
+  "items": {
+    "travelMap": {
+      "meta": "FIELD CASE / TRAVEL MAP",
+      "title": "Places explored",
+      "copy": "A world map prepared for personal travel pins and short memories from days away. The visible pins are editable layout markers, not claims about specific destinations; replace them with confirmed places when ready.",
+      "metrics": [],
+      "tags": ["world map", "travel pins", "places explored", "editable"]
+    },
+    "photos": {
+      "meta": "FIELD CASE / PHOTO STACK",
+      "title": "Frames from life outside work",
+      "copy": "A home for selected photographs from trips, days out, people, food, and small moments worth keeping. Add only images and captions you are comfortable sharing publicly.",
+      "metrics": [],
+      "tags": ["photography", "travel", "days out", "personal archive"]
+    },
+    "archery": {
+      "meta": "FIELD CASE / ARCHERY",
+      "title": "Archery",
+      "copy": "A placeholder for the personal side of archery: practice-day photographs, what makes the activity enjoyable, and any confirmed stories you choose to share. The model uses arrows and a protective finger tab to keep the scene in a clear sporting context.",
+      "metrics": [],
+      "tags": ["archery", "sport", "practice", "safety"]
+    },
+    "targetSports": {
+      "meta": "FIELD CASE / TARGET SPORTS",
+      "title": "Target sports",
+      "copy": "A safety-first space for target-sport interests and practice-day memories, represented by target paper and safety cues rather than a weapon model. Add specific experiences only after confirming the details.",
+      "metrics": [],
+      "tags": ["target sports", "focus", "practice", "safety first"]
+    }
+  }
 }

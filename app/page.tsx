@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
+import { drawFieldCaseWorldMap } from "./_components/fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -194,8 +195,22 @@ function BoardScene({onClose}:{onClose:()=>void}) {
   </section></div>;
 }
 
-type FieldItem="internship"|"target"|"ticket"|"draft";
+type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
 const fieldItems=fieldCaseContent.items as Record<FieldItem,FieldRecord>;
+
+function FieldMapReading({item,onClose}:{item:FieldRecord;onClose:()=>void}) {
+  const canvasRef=useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{
+    const canvas=canvasRef.current;
+    if(canvas)drawFieldCaseWorldMap(canvas,1400,true);
+  },[]);
+  return <article className="field-map-reading" onMouseDown={(event)=>event.stopPropagation()}>
+    <header><small>{item.meta}</small><h2>{item.title}</h2><span>LAYOUT PINS / REPLACE WITH CONFIRMED PLACES</span></header>
+    <div className="field-map-sheet"><canvas ref={canvasRef} aria-label="World map with editable travel layout pins" /></div>
+    <footer><p>{item.copy}</p><div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div></footer>
+    <button onClick={onClose}>{fieldCaseContent.returnItem}</button>
+  </article>;
+}
 
 function FieldCaseScene({onClose}:{onClose:()=>void}) {
   const [selected,setSelected]=useState<FieldItem|null>(null);
@@ -204,7 +219,8 @@ function FieldCaseScene({onClose}:{onClose:()=>void}) {
     <header><div><span>{zoneInfo.fieldcase.index}</span><strong>{fieldCaseContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
       <ZoneCloseup3D zone="fieldcase" onSelect={(value)=>{if(value in fieldItems)setSelected(value as FieldItem);}}/>
     {Object.keys(fieldItems).length===0&&<article className="collection-empty-state field-empty-state"><small>{fieldCaseContent.emptyState.meta}</small><h2>{fieldCaseContent.emptyState.title}</h2><p>{fieldCaseContent.emptyState.copy}</p><em>{fieldCaseContent.emptyState.note}</em></article>}
-    {item&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
+    {item&&selected==="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><FieldMapReading item={item} onClose={()=>setSelected(null)}/></div>}
+    {item&&selected!=="travelMap"&&<div className="model-detail field-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card field-card" onMouseDown={(event)=>event.stopPropagation()}><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.metrics.length>0&&<div className="field-metrics">{item.metrics.map((metric)=><div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}</div>}<div className="object-tags">{item.tags.map((tag)=><span key={tag}>{tag}</span>)}</div><button onClick={()=>setSelected(null)}>{fieldCaseContent.returnItem}</button></article></div>}
   </section></div>;
 }
 
