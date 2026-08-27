@@ -120,6 +120,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(content, /Frequency Analysis of the Surface EMG Signal: Best Practices/);
   assert.match(page, /artifact-facts/);
   assert.match(page, /notebook-process/);
+  assert.match(page, /experience-skills/);
   assert.match(page, /field-metrics/);
   assert.match(content, /CONTACT CARD BESIDE PRINTER/);
   assert.match(page, /fax-reading/);

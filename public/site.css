@@ -201,11 +201,15 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .project-lead { font-size: 14px !important; }
 .project-facts { display: flex; flex-wrap: wrap; gap: 7px; margin: 28px 0; }
 .project-facts span, .object-tags span { padding: 7px 9px; border: 1px solid #788078; font: 6px var(--font-mono), monospace; }
+.project-facts span { font-size: 8px; }
 .project-brief, .experience-brief { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid rgba(38,55,50,.28); border-left: 1px solid rgba(38,55,50,.28); }
 .project-brief > div, .experience-brief > div { min-width: 0; padding: 16px; border-right: 1px solid rgba(38,55,50,.28); border-bottom: 1px solid rgba(38,55,50,.28); }
 .project-brief dt, .experience-brief dt { margin-bottom: 8px; color: #a44235; font: 7px var(--font-mono),monospace; }
 .project-brief dd, .experience-brief dd { margin: 0; color: #46504b; font-size: 11px; line-height: 1.65; }
-.experience-file-content > blockquote { margin-top: 24px; }
+.project-file-content > small { font-size: 8px; }
+.experience-file-content > small { font-size: 8px; }
+.experience-skills { display: flex; flex-wrap: wrap; gap: 7px; margin: 22px 0 0; }
+.experience-skills span { padding: 7px 9px; border: 1px solid #788078; color: #34423d; font: 9px var(--font-mono),monospace; }
 .run-file { padding: 12px 14px; background: var(--ink); color: var(--signal); font: 7px var(--font-mono), monospace; }
 .project-file-actions { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
 .project-reference-link { padding: 12px 14px; border: 1px solid #7b827b; background: transparent; color: #8f342b; cursor: pointer; font: 7px var(--font-mono),monospace; }
@@ -252,7 +256,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .profile-details p { margin: 13px 0 0; color: #38443f; font-size: 13px; line-height: 1.72; }
 .profile-location strong { display: block; margin-top: 10px; font-size: 18px; }
 .profile-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
-.profile-tags span { padding: 7px 9px; border: 1px solid #778079; color: #34423d; font: 6px var(--font-mono),monospace; }
+.profile-tags span { padding: 7px 9px; border: 1px solid #778079; color: #34423d; font: 7px var(--font-mono),monospace; }
 .profile-details a { display: inline-flex; gap: 18px; margin-top: 10px; color: #9d392e; font: 9px var(--font-mono),monospace; }
 .profile-details a:hover { color: var(--ink); }
 

@@ -111,7 +111,7 @@
       "copy": "Preparing participant survey data for ongoing research on case similarity, perceived relevance, and principle agreement.",
       "quote": "PYTHON / PANDAS / R / DATA TRANSFORMATION / REGRESSION",
       "details": [
-        { "label": "DATA PIPELINE", "copy": "Parsed comma-separated principle labels from survey responses. Counted and normalized each principle within its row, then assembled ordered vectors across the dataset." },
+        { "label": "DATA PIPELINE", "copy": "Parsed principle labels from survey responses. Counted and normalized each principle within its row, then assembled ordered vectors across the dataset." },
         { "label": "RESEARCH WORKFLOW", "copy": "Used Python and pandas to prepare the data. Continued the analysis through spreadsheet formulas and linear models in R." },
         { "label": "PRELIMINARY ANALYSIS", "copy": "Tested whether principle frequency predicted agreement. The current models did not detect a relationship for the principles examined." },
         { "label": "CONTRIBUTION", "copy": "Developed the data-transformation workflow and contributed to empirical analysis using the lab's existing ethical-principle taxonomy." }
@@ -128,7 +128,7 @@
       "quote": "YOLO26 / RGB-D / ROS2 / AGENTIC ENGINEERING / SOFTWARE TESTING",
       "details": [
         { "label": "ROBOTIC TUBE HANDLING", "copy": "Developed a four-class YOLO26 perception pipeline for automated tube handling. Integrated RGB-D target localization with ROS2 chassis and robot-arm workflows for pickup and placement." },
-        { "label": "F1 / 3500Dx", "copy": "Executed black-box dynamic workflow test cases for F1 on the 3500Dx instrument. Clarified expected behavior and product workflows when test cases required additional context." },
+        { "label": "F1 / 3500Dx", "copy": "Executing black-box dynamic workflow test cases for the 3500Dx data collection software. Clarify expected behavior and software workflows when test cases require additional context." },
         { "label": "QANTIS", "copy": "Analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
         { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
       ]
