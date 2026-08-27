@@ -1,6 +1,6 @@
 # Portfolio Launch TODO
 
-目标：把 Lab 17 整理成唯一的正式作品集，发布到 GitHub `main`，移除旧的版本编号身份，完成一轮 3D 改进，最后通过 Cloudflare 发布到 `alinawu.com`。
+目标：把 Lab 17 整理成唯一的正式作品集，发布到 GitHub `main`，移除旧的版本编号身份，先以 `0.8.0` 在 Cloudflare 和 `alinawu.com` 对外开放，再完成 3D 与发布系统改进，最终在同一域名发布稳定版 `1.0.0`。
 
 ## 项目链接
 
@@ -25,7 +25,7 @@
 - [ ] 在 `main` 验证成功并创建可恢复的备份前，不删除旧分支、worktree 或历史文件。
 - [ ] 不把 API Key、Cloudflare Token 或其他 secret 提交到 GitHub。
 - [ ] GitHub push、合并到 `main` 和正式发布是三个不同动作；普通 push 不更新 `alinawu.com`。
-- [ ] 只有准备正式发布时才修改 release 版本号、创建 Git tag 和发布 GitHub Release。
+- [ ] 只有准备对外提供一份有明确身份的新版本时才修改版本号；`0.8.0` 早期公开版不冒充稳定 release，正式稳定版本再创建 Git tag 和 GitHub Release。
 - [ ] 第一次正式发布不等待 CMS、AI Bot 或 analytics；这些按照 backend roadmap 后续实现。
 
 ## 持续 Commit / Push 规则
@@ -109,24 +109,25 @@
 
 完成标准：GitHub `main` 是唯一的正式网站源代码，可以从干净环境成功构建，并且旧工作分支在确认不再需要后得到安全清理。
 
-## Phase 3.5：发布 Cloudflare 外部预览版 `0.8.0`
+## Phase 3.5：在 `alinawu.com` 对外发布 `0.8.0`
 
-这一阶段提前让外部用户访问网站，但它仍是未完成的 preview，不是 `alinawu.com` 的正式 production release。使用独立的 `*.workers.dev` Preview URL，不创建稳定版 GitHub Release，也不绑定正式域名。
+这一阶段提前让外部用户通过正式根域名访问网站，但 `0.8.0` 仍是尚在继续改进的早期公开版本，不是稳定版 `1.0.0`。不创建 `preview.alinawu.com`；网站只在内部版本位置显示当前版本号，外部访问地址从这一阶段开始始终保持为 `https://alinawu.com`。
 
 - [ ] 确认 `main` 已完成 Phase 1–3，并且 `package.json` 与 `package-lock.json` 都显示 `0.8.0`。
-- [ ] 在网站低调但可见的位置标注 `v0.8.0 Preview` 或 `Work in progress`，让测试用户知道内容和交互仍可能变化。
+- [ ] 在 Computer 的 System Bulletin、Version History 或其他低调位置显示 `Portfolio System v0.8.0`，不额外创建醒目的 Preview 页面或不同访问入口。
 - [ ] 从干净的 `main` 安装依赖、运行测试和 production build；再次检查 repository 与 bundle 中没有 secret、私有 dossier、公司机密或不应公开的个人资料。
-- [ ] 在 Cloudflare Workers 创建或连接 Alina Portfolio Worker，并在配置中明确启用 `workers_dev` 与 `preview_urls`，不要依赖不同 Wrangler 版本的默认值。
-- [ ] 使用 Cloudflare Worker version upload 创建新版本，不把它推广到 production traffic；为 `0.8.0` 设置稳定、易识别的 preview alias，例如 `v0-8`。
-- [ ] 记录 Preview URL、Git commit SHA、Cloudflare version ID、上传日期和 `0.8.0` 简要说明，确保之后能确认外部用户看到的是哪一份代码。
-- [ ] 决定访问范围：需要任何拿到链接的人都能进入时保持 public preview；只邀请指定测试者时，使用 Cloudflare Access 的 email allowlist 与 One-time PIN。
-- [ ] 为 preview 页面设置 `noindex, nofollow`，避免未完成版本进入搜索引擎；正式 `1.0.0` 发布前再移除。
+- [ ] 在 Cloudflare 中确认已经拥有并管理 `alinawu.com` 的 active zone，然后创建或连接 Alina Portfolio Worker。
+- [ ] 将 Worker Custom Domain 绑定到 `alinawu.com`；让 Cloudflare 创建对应 DNS 记录和 HTTPS certificate。
+- [ ] 将 `www.alinawu.com` 永久重定向到 `alinawu.com`，确保对外只有一个 canonical 地址。
+- [ ] 把经过验收的 `0.8.0` Worker version 明确部署到 custom domain traffic；仅上传 version 不会改变 `alinawu.com`，必须由 Alina 手动确认 deployment。
+- [ ] 记录 `https://alinawu.com`、Git commit SHA、Cloudflare version/deployment ID、发布日期和 `0.8.0` 简要说明，确保之后能确认域名正在运行哪一份代码。
+- [ ] 决定 `0.8.0` 是否暂时设置 `noindex, nofollow`；如果设置，必须在正式 `1.0.0` 发布时移除。无论是否索引，网站内都只显示正常版本号。
 - [ ] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
-- [ ] 使用真实 Preview URL 检查桌面端、手机端、核心探索路线、所有外部链接、404 和资源加载失败状态。
-- [ ] 普通 push 到 `main` 不自动更新这个外部 Preview URL；只有 Alina 确认一批修改已经可供测试后，才手动上传并移动 preview alias。
+- [ ] 使用真实 `https://alinawu.com` 检查 HTTPS、桌面端、手机端、核心探索路线、所有外部链接、404 和资源加载失败状态。
+- [ ] 普通 push 到 `main` 不自动更新 `alinawu.com`；只有 Alina 确认一批修改已经可对外显示后，才手动创建新的 Cloudflare deployment。
 - [ ] `0.8.0` 期间的多次外部测试由 Cloudflare version ID 与 Git commit 区分，不为了每次反馈修复反复增加产品版本号。
 
-完成标准：外部用户可以通过独立 Cloudflare Preview URL 访问标明为 `0.8.0 Preview` 的网站；`alinawu.com` 和 production traffic 均未改变，后续更新仍由 Alina 手动决定。
+完成标准：外部用户访问 `https://alinawu.com` 可以看到内部标注为 `0.8.0` 的网站；没有 `preview.alinawu.com`，普通 push 不会更新域名，后续 deployment 仍由 Alina 手动决定。
 
 ## Phase 4：建立版本编号和手动发布制度
 
@@ -142,10 +143,10 @@
 | `MINOR` | 向后兼容的重要新增 | 新项目、新场景、新内容类型、一轮明显的 3D 升级或新的访客功能 | `1.1.3` → `1.2.0` |
 | `PATCH` | 修复和小幅改进 | 错字、链接、手机布局、点击区域、性能、无障碍或小型视觉修复 | `1.2.0` → `1.2.1` |
 
-- [ ] 当前可运行的网站以及 Phase 3.5 的第一轮外部 Preview 使用 `0.8.0`；普通 commit 和测试反馈修复不反复增加这个号码。
+- [ ] 当前可运行的网站以及 Phase 3.5 的第一轮早期公开版本使用 `0.8.0`；普通 commit 和测试反馈修复不反复增加这个号码。
 - [ ] 3D 改进和正式发布结构基本完成、准备进行更完整的 beta 验收时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
 - [ ] 文字、3D 和发布流程全部完成，网站达到“如果没有阻塞问题就可以正式上线”的状态时使用 `1.0.0-rc.1`；如果发现问题，依次使用 `rc.2`、`rc.3`。
-- [ ] 第一次绑定 `alinawu.com` 的公开稳定版设为 `1.0.0`。
+- [ ] 将 `alinawu.com` 从早期公开版本升级为第一个公开稳定版时设为 `1.0.0`；域名保持不变，只更新经过验收的网站版本。
 - [ ] 将新增项目、场景或明显 3D 升级作为 `MINOR` 发布，例如 `1.1.0`。
 - [ ] 将只包含修复的版本作为 `PATCH` 发布，例如 `1.1.1`。
 - [ ] 如果 AI Guide 变成网站的核心探索和问答方式，将其作为 `2.0.0`；如果只是可选的小功能，则可以作为 `1.x.0`。
@@ -449,21 +450,21 @@ Release date:
 - [ ] 在新 branch 修复问题，发布新的 `PATCH` 版本，例如从 `1.2.0` 修复为 `1.2.1`。
 - [ ] 不直接修改已经发布的 `1.2.0` 来伪装成同一个版本。
 
-完成标准：普通 push 和 `main` 合并都不会更新 `alinawu.com`；只有 Alina 发布 GitHub Release 并通过 production approval 后，正式网站才会变化。
+完成标准：Phase 3.5 的首次 `0.8.0` 由 Alina 明确手动部署；发布工作流建立后，普通 push 和 `main` 合并都不会更新 `alinawu.com`，后续稳定版本只有在 Alina 发布 GitHub Release 并通过 production approval 后才会变化。
 
-## Phase 5：完善 Cloudflare 预览自动化
+## Phase 5：完善 Cloudflare 测试与发布自动化
 
-这一阶段在 Phase 3.5 的手动 `0.8.0` 外部预览基础上，建立可重复的长期 preview 流程；仍不绑定 `alinawu.com` 作为正式域名。
+这一阶段在 `alinawu.com` 已运行 `0.8.0` 的基础上，建立可重复的测试流程。后续候选修改继续使用独立 `*.workers.dev` Preview URL 验证，只有手动批准的 deployment 才能更新根域名。
 
 - [ ] 复核 Phase 3.5 创建或连接的 Alina Portfolio Worker，确认配置与当前 vinext/Worker 项目一致。
 - [ ] 以 GitHub Actions 作为 production release controller，不允许 Cloudflare 在每次 `main` push 后自动推广新版本。
 - [ ] 如果保留 Cloudflare 原生 Git 集成，将 push 的 deploy command 设置为只上传 version，不自动切换 production traffic。
-- [ ] 将 Phase 3.5 的手动上传整理成 `preview.yml`，继续生成独立的 `*.workers.dev` versioned URL，并按需要更新 `staging` 或版本 alias。
+- [ ] 建立 `preview.yml`，为后续候选修改生成独立的 `*.workers.dev` versioned URL，并按需要更新 `staging` 或版本 alias；这些地址只用于内部验收，不作为对外主网址。
 - [ ] 确认普通 push 只产生 CI 结果；只有明确触发 preview workflow 时才产生新的 Cloudflare preview version。
 - [ ] 预览失败时优先检查 GitHub Actions 的构建与上传日志；Cloudflare Preview URL 当前不支持 Workers Logs、`wrangler tail` 或 Logpush，不能把这些日志能力作为排错前提。
-- [ ] 暂时不绑定自定义域名；如果预览内容不适合公开，使用 Cloudflare Access 或关闭公开预览。
+- [ ] `alinawu.com` 始终保留最后一次由 Alina 手动批准的 deployment；未通过验收的 Preview version 不得切换到根域名。
 
-完成标准：`main` 可以稳定生成可访问的 Cloudflare 预览站点，但 `alinawu.com` 尚未切换到它。
+完成标准：候选修改可以在独立 Cloudflare Preview URL 验证，而 `alinawu.com` 继续运行最后一个手动批准的公开版本。
 
 ## Phase 6：改进 3D 建模和探索体验
 
@@ -532,13 +533,12 @@ Release date:
 
 ## Phase 8：Cloudflare 正式发布
 
-这是绑定自定义域名的时间点：文字、正式 `main`、旧名称清理、3D 改进和发布检查全部完成之后。
+这一阶段不再更换网址，而是把已经运行 `0.8.x`/beta 的 `alinawu.com` 正式升级为稳定版 `1.0.0`。
 
-- [ ] 在 Cloudflare 中确认已经拥有并管理 `alinawu.com` 的 zone。
-- [ ] 将 Worker Custom Domain 绑定到 `alinawu.com`。
-- [ ] 决定 `www.alinawu.com` 是同时提供访问，还是永久重定向到 `alinawu.com`。
+- [ ] 复核 Phase 3.5 已完成的 `alinawu.com` Custom Domain、HTTPS certificate 和 `www` → root redirect。
 - [ ] 创建第一个正式 tag `v1.0.0` 和 Draft GitHub Release，完成最终 preview 验收。
 - [ ] 由 Alina 点击 **Publish release**，让 release workflow 部署 `v1.0.0`。
+- [ ] 将网站内部版本显示更新为 `1.0.0`，移除 `0.8.0` 阶段可能启用的 `noindex, nofollow`，并确认 canonical 与 Open Graph URL 都使用 `https://alinawu.com`。
 - [ ] 验证 HTTPS、根域名、`www`、社交预览和移动端访问。
 - [ ] 发布后进行一次 smoke test，并观察首日错误与性能情况。
 - [ ] 保留上一版 deployment，出现严重问题时可以快速回退。
@@ -627,6 +627,6 @@ Release date:
 → alinawu.com 更新
 ```
 
-不要启用“每次 push 到 `main` 就运行 `wrangler deploy`”的配置。普通开发只做 CI，预览只上传独立 version，正式 deployment 只由发布 GitHub Release 触发。
+不要启用“每次 push 到 `main` 就运行 `wrangler deploy`”的配置。Phase 3.5 的首次 `0.8.0` 由 Alina 手动确认 deployment；此后普通开发只做 CI，候选修改只上传独立 preview version，稳定版本的 production deployment 只由发布 GitHub Release 触发。
 
 不建议把 GitHub Pages 作为最终托管方式。当前项目已经使用 Cloudflare Worker 兼容架构，未来的 AI API、secret、analytics 和 CMS 也需要服务器能力；继续使用 Cloudflare 可以避免之后再次迁移托管平台。
