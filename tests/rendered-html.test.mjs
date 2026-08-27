@@ -314,7 +314,7 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapSource, /name:"Kyoto"[^\n]+country:"Japan"[^\n]+worldGroup:"kyoto"/);
   assert.doesNotMatch(mapSource, /name:"Osaka"|photoFolder:"osaka"/);
   assert.doesNotMatch(mapSource, /japan-korea|usa-west/);
-  const mapReading = page.match(/function FieldMapReading[\s\S]*?\n}\n\nfunction FieldCaseScene/)?.[0] ?? "";
+  const mapReading = page.match(/function FieldMapReading[\s\S]*?\r?\n}\r?\n\r?\nfunction FieldCaseScene/)?.[0] ?? "";
   assert.match(mapReading, /onWheel/);
   assert.match(mapReading, /setPointerCapture/);
   assert.match(mapReading, /field-map-views/);
