@@ -430,6 +430,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
 .drawer-document-return, .fax-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 6px 2px 5px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 9px var(--font-mono),monospace; letter-spacing: .08em; }
 .drawer-document-return:hover, .drawer-document-return:focus-visible, .fax-return:hover, .fax-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
+.fax-return { padding: 6px 8px 5px; border: 1px solid rgba(164,66,53,.48); background: transparent; }
+.fax-return:hover, .fax-return:focus-visible { border-color: #a44235; background: rgba(164,66,53,.08); }
 .artifact-media { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 26px 0 30px; }
 .artifact-media figure { min-width: 0; margin: 0; padding: 7px; border: 1px solid rgba(38,55,50,.28); background: rgba(248,244,230,.64); box-shadow: 4px 5px 0 rgba(44,36,27,.12); }
 .artifact-media img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f2f0e9; filter: saturate(.82) contrast(.96); }
