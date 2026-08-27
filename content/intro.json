@@ -1,0 +1,19 @@
+{
+  "eyebrow": "PERSONAL WORKSPACE / AFTER HOURS",
+  "headline": ["Come in.", "The lab is", "still awake."],
+  "description": "This is where Alina Wu keeps algorithms, physical prototypes, research notes, and questions about how systems become understandable and useful to people. Look around. Most objects lead back to a decision.",
+  "enterButton": "ENTER LAB 17",
+  "identity": {
+    "name": "WENRUI (ALINA) WU",
+    "role": "Computer Science / University of Washington"
+  },
+  "guide": {
+    "title": "GUEST ACCESS / HOW TO EXPLORE",
+    "steps": [
+      { "number": "01", "title": "LOOK AROUND", "detail": "MOVE CURSOR / DRAG" },
+      { "number": "02", "title": "FIND A SIGNAL", "detail": "HOVER AN OBJECT" },
+      { "number": "03", "title": "ENTER A VIEW", "detail": "CLICK TO MOVE CLOSER" }
+    ],
+    "note": "Nothing is arranged in résumé order."
+  }
+}

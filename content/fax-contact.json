@@ -1,0 +1,36 @@
+{
+  "printer": {
+    "ariaLabel": "Lab printer close-up",
+    "headerCode": "TX",
+    "header": "PRINTER / UPDATE",
+    "sceneHint": "INCOMING PROTOTYPE REPORT · PRINTING",
+    "printing": "INCOMING PROTOTYPE REPORT · PRINTING",
+    "ready": "PROTOTYPE REPORT READY · CLICK THE PAPER",
+    "paperHitLabel": "READ PRINTED PROTOTYPE REPORT",
+    "report": {
+      "meta": "PROTOTYPE REPORT / SOURCE: AW / FEEDBACK ROUND 01",
+        "title": "The first wellbeing prototype is ready for feedback.",
+      "paragraphs": [
+          "The first interactive prototype is working. It guides users through a short reflection: list what is on their mind, place each concern in time, identify the emotion, and decide what can be acted on now.",
+          "Concerns that cannot be changed immediately move into a release exercise. The session closes with any concrete actions the user chose to carry forward.",
+          "The concept draws from EDUC 215 and independent reading on wellbeing. Feedback from professors and teaching staff will guide revisions to the prompts, emotional pacing, exit paths, and safety boundaries."
+      ],
+        "signature": "Sending the next version after the feedback round. — Alina",
+        "status": "STATUS / INTERACTIVE PROTOTYPE · FEEDBACK IN PROGRESS",
+      "reply": "SEND A REPLY →",
+      "return": "RETURN TO PRINTER"
+    }
+  },
+  "contact": {
+    "ariaLabel": "Contact card beside the lab printer",
+    "headerCode": "CT",
+    "header": "CONTACT / DETAILS",
+    "sceneHint": "CONTACT CARD BESIDE PRINTER · CLICK TO PICK UP",
+    "hitLabel": "OPEN CONTACT CARD",
+    "name": "WENRUI “ALINA” WU",
+    "headline": ["Let's continue", "the conversation."],
+    "role": "Computer Science · University of Washington",
+    "email": "awu78@uw.edu",
+    "return": "RETURN CARD TO DESK"
+  }
+}

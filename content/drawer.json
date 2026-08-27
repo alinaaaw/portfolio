@@ -1,0 +1,64 @@
+{
+  "ariaLabel": "Desk drawer close-up",
+  "header": "DESK DRAWER / PULL TO OPEN",
+  "sceneHint": "PHYSICAL EVIDENCE · OPEN A PACKET",
+  "handleLabel": "PULL THE METAL HANDLE",
+  "closeHandleLabel": "PUSH THE DRAWER CLOSED",
+  "returnItem": "PUT IT BACK",
+  "itemLabels": { "folder": "COMMUNITY RESEARCH PACKET", "notebook": "ROBOTICS TEST PACKET", "envelope": "ALGORITHM REVISION NOTES", "components": "PROTOTYPE COMPONENTS" },
+  "items": {
+    "folder": {
+      "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
+      "title": "The research led to a deliberately simple, walking-first map.",
+      "copy": "Walking was the most commonly selected travel mode, while 43 valid software responses exposed barriers around operating time, interface clarity, and feature overload. I used those findings to define a restrained website for middle-aged and older residents: one clear walking comfort-zone map with relevant facilities marked, without extra functions or complex navigation. The wider study also informed community materials on food safety and fraud prevention.",
+      "facts": [
+        { "label": "TRAVEL MODES", "value": "walk 68.75% · bus/subway 47.92% · bike 37.5% · car 25% · taxi 18.75%" },
+        { "label": "SOFTWARE RESPONSES", "value": "43 valid entries · 46.51% said time-consuming · 44.19% said it helped clearly" },
+        { "label": "USABILITY FRICTION", "value": "32.56% unclear guidance/interface · 32.56% too many features · 23.26% needed help" },
+        { "label": "DESIGN RESPONSE", "value": "one focused webpage · 5 / 10 / 15-minute walking comfort zones · clearly marked facilities · no unnecessary features" }
+      ],
+      "note": "The percentages come from multi-select questionnaire summaries, so categories are not expected to total 100%. The map's simplicity was an intentional accessibility decision: it kept the task narrow and legible for middle-aged and older residents instead of reproducing the complexity reported in the survey."
+    },
+    "notebook": {
+      "meta": "THERMO FISHER / ROBOTIC TUBE HANDLING / TEST PACKET",
+      "title": "Three model iterations for a four-class perception-to-action workflow.",
+      "copy": "A working packet of robot-camera captures, Roboflow exports, training runs, held-out comparisons, and saved real-hardware workflow frames. It traces the detector from three classes to four and the system from perception-only tests to verified pickup and placement.",
+      "facts": [
+        { "label": "DATASET V3", "value": "203 images · 4,729 instances · 4 classes" },
+        { "label": "HELD-OUT TEST", "value": "15 images · 0.977 precision · 0.974 recall · 0.926 mAP50–95" },
+        { "label": "SYSTEM TESTING", "value": "≈98% reported workflow success" },
+        { "label": "PROCESS RECORD", "value": "155 raw captures · 1,358 saved frames" }
+      ],
+      "note": "Remaining unsuccessful runs involved intermittent camera or hardware faults. Recovery tooling restores operation, but the root cause remains unresolved."
+    },
+    "components": {
+      "meta": "EMG DEVICE / CAD + HARDWARE ITERATION / REV. CURRENT",
+      "title": "The enclosure was modeled around the real electronics.",
+      "copy": "After building and soldering the signal path, the enclosure was developed in Fusion 360 around the ESP32 boards, battery, switch, charging access, fasteners, and internal clearances. The two CAD views document both the rounded wearable shell and the constrained component layout inside it.",
+      "images": [
+        { "asset": "emg-enclosure-interior", "alt": "Fusion 360 interior view of the EMG enclosure showing the circuit boards, battery space, screw posts, and wall openings", "caption": "INTERIOR CAD · board placement, battery clearance, screw posts, and access openings" },
+        { "asset": "emg-enclosure-exterior", "alt": "Fusion 360 exterior view of the rounded EMG wearable enclosure with its lid seam and side clip", "caption": "EXTERIOR CAD · rounded shell, separate lid, enclosure seam, and wearable clip" }
+      ],
+      "facts": [
+        { "label": "CAD RECORD", "value": "Fusion 360 exterior + interior assembly views" },
+        { "label": "INTERNAL LAYOUT", "value": "ESP32 boards · battery · screw bosses · component clearances" },
+        { "label": "ENCLOSURE FEATURES", "value": "separate body + lid · rounded shell · wearable side clip" },
+        { "label": "USER ACCESS", "value": "power switch opening · charging port" },
+        { "label": "CURRENT STATE", "value": "working hardware prototype" }
+      ],
+      "note": "The CAD screenshots record the enclosure design rather than a photorealistic render. The hardware prototype is assembled and operational; software behavior, data analysis, and the user interface still require further development."
+    },
+    "envelope": {
+      "meta": "COURSE ALLOCATION / RESIDUAL RULE / VERSION 01 → VERSION 02",
+      "title": "A random residual rule could push probability toward lower-ranked courses.",
+      "copy": "When course capacity and student assignment capacity remained after the main fractional allocation, Version 1 distributed the residual pieces by randomly choosing among the remaining courses. That could add unnecessary probability mass to lower-ranked choices. Version 2 instead balanced remaining course capacity against remaining student capacity, with the project design goal of producing a more even probability matrix.",
+      "facts": [
+        { "label": "VERSION 01", "value": "random selection among courses with remaining capacity" },
+        { "label": "OBSERVED RISK", "value": "unnecessary probability mass on lower-ranked courses" },
+        { "label": "VERSION 02", "value": "balance remaining course capacity with remaining student capacity" },
+        { "label": "DESIGN GOAL", "value": "reduce low-preference pieces · make the residual distribution more even" }
+      ],
+      "note": "This was an algorithm-design iteration, not only a code cleanup. More even describes the project goal; the available materials do not establish a formal fairness guarantee."
+    }
+  }
+}

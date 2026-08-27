@@ -1,0 +1,139 @@
+{
+  "ariaLabel": "Alina's computer desktop",
+  "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
+  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "labLog": "LAB LOG", "location": "LAB-17 / LOCAL" },
+  "profile": {
+    "triggerAria": "Open Alina Wu's profile",
+    "windowTitle": "USER PROFILE / ALINA.WU",
+    "status": "LOCAL USER / AWAY",
+    "name": "Alina Wu",
+    "fullName": "Wenrui Wu",
+    "role": "Computer Science / University of Washington",
+    "locationLabel": "BASE",
+    "location": "Seattle, Washington",
+    "summaryLabel": "PROFILE",
+    "summary": "Computer science student focused on human-centered design and software development. Interested in how people understand and use technology.",
+    "focusLabel": "CURRENT FOCUS",
+    "focus": ["HUMAN-CENTERED DESIGN", "SOFTWARE DEVELOPMENT", "COMPUTER VISION & ROBOTICS"],
+    "contactLabel": "CONTACT",
+    "email": "awu78@uw.edu"
+  },
+  "desktop": {
+    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES.web" },
+    "welcome": { "eyebrow": "WELCOME / GUEST", "title": "Alina", "description": "Computer Science at the University of Washington. Work across software and physical systems, with recurring attention to how people form expectations, make decisions, and interpret feedback." }
+  },
+  "readme": {
+    "filename": "README.txt",
+    "meta": "WORKSTATION FILE / SHARED NOTES",
+    "title": "WORKSPACE NOTES",
+    "paragraphs": [
+      "Read before reorganizing the lab. PROJECTS holds finished work. Working notes and unfinished ideas stay where they were last used.",
+      "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, project sources in REFERENCES.web, physical iterations in the drawer, and open questions on the board. The bookshelf is reserved for personal reading and film notes.",
+      "Keep the unfinished parts in place. I may still need them. If I am away, leave comments beside the relevant material."
+    ]
+  },
+  "labLog": {
+    "filename": "LAB_LOG.md",
+    "meta": "LAB LOG / 2 ENTRIES",
+    "entries": [
+      {
+        "date": "FEB 2026",
+        "type": "NEW PROGRAM",
+        "title": "Entering the Allen School",
+        "body": [
+          "I'm excited to share that I will be joining the Paul G. Allen School of Computer Science & Engineering at the University of Washington next quarter.",
+          "I will officially become a computer science student and continue building toward work in human-centered design and software development."
+        ]
+      },
+      {
+        "date": "JUN 2026",
+        "type": "NEW ROLE",
+        "title": "Joining Thermo Fisher Scientific",
+        "body": [
+          "I'm happy to share that I am joining Thermo Fisher Scientific as a Software Engineering Intern in Shanghai.",
+          "I will contribute to YOLO26-based vision for robot-assisted tube handling, 3500Dx localization testing, and QANTIS workflow analysis."
+        ]
+      }
+    ]
+  },
+  "projectsFolder": { "title": "PROJECTS / 3 ITEMS", "verified": "CASE FILE / VERIFIED" },
+  "projects": {
+    "map": {
+      "name": "shanghai-map.case",
+      "meta": "CIVIC-TECH CASE / HTML · CSS · JAVASCRIPT",
+      "title": "Quality of Life in Shanghai",
+      "copy": "Led an eight-person mixed-methods study of quality of life in older Shanghai neighborhoods. Translated the findings into a neighborhood-access map and community information campaigns.",
+      "facts": ["SEP 2023—MAY 2024", "MIXED-METHODS STUDY", "8-PERSON TEAM"],
+      "details": [
+        { "label": "FIELD RESEARCH", "copy": "Collected and analyzed 20+ questionnaires and interviews. The mixed-methods study examined neighborhood services, safety, and everyday information needs." },
+        { "label": "REPORTED FINDING", "copy": "An early 48-person questionnaire sample reported an average amenity-awareness score of 6.75 out of 10. This finding helped motivate the neighborhood-access map." },
+        { "label": "INTERACTIVE MAP", "copy": "Built a fixed-map prototype in HTML, CSS, and JavaScript. It organized nearby facilities by category and 5-, 10-, and 15-minute walking zones, with an early point-detail interaction." },
+        { "label": "COMMUNITY INTERVENTIONS", "copy": "Developed a food-safety poster addressing leftover-related misconceptions and an anti-fraud lecture for older residents. The presentation reported that 60.42% of respondents had not encountered anti-fraud publicity. Among those who had, 63.16% said it had not worked for them. Some participants later described the lecture as informative and clarifying." }
+      ]
+    },
+    "allocation": {
+      "name": "course-allocation.py",
+      "meta": "ALGORITHM CASE / PYTHON · NUMPY",
+      "title": "Automatic and Satisfactory Course Assignment",
+      "copy": "Independently designed and implemented a Python course-allocation system for capacity-constrained electives. The system uses ranked preferences to improve overall student satisfaction.",
+      "facts": ["JAN 2024—MAR 2025", "4 EVALUATION CRITERIA", "2 ALLOCATION CONTEXTS"],
+      "details": [
+        { "label": "ALLOCATION METHOD", "copy": "Generated a fractional allocation through Simultaneous Eating. Birkhoff decomposition then converted it into possible final assignments." },
+        { "label": "SYSTEM STRUCTURE", "copy": "Separated preference generation, fractional allocation, deterministic realization, and evaluation into distinct Python stages." },
+        { "label": "REPORTED EVALUATION", "copy": "Tested the mechanism across 1,000 simulations with synthetically generated preferences and course capacities. The original presentation reported approximately 70% top-two and 92% top-three assignments." },
+        { "label": "EXTERNAL DISCUSSION", "copy": "Presented the project to 30+ professors and peers at the National Round of China Thinks Big. Discussions focused on possible applications and the need for real-world preference data." },
+        { "label": "LIVE DEPLOYMENT", "copy": "Adapted the framework for a class-wide parent–teacher meeting. The scheduler reduced manual planning, balanced attendance across time slots, and kept adjusted appointments close to parent preferences." }
+      ]
+    },
+    "emg": {
+      "name": "emg-monitor.device",
+      "meta": "WEARABLE SENSING / ARDUINO · C/C++ · FUSION",
+      "title": "Monitoring Device for Muscle Usage & Behavior",
+      "copy": "A wearable EMG device that measures relative target-muscle activation during exercise and summarizes each session across four intensity bands.",
+      "facts": ["3-SECOND CALIBRATION", "4 RELATIVE EMG BANDS", "CAD + ESP32 + BLUETOOTH"],
+      "details": [
+        { "label": "DESIGN DECISION", "copy": "Selected EMG over angular-displacement sensing for its ability to capture subtle muscle activity that was difficult to infer from visible surface movement." },
+        { "label": "CURRENT CHAIN", "copy": "A three-second calibration establishes an individual reference. The firmware filters and squares the EMG signal, then applies Kalman filtering. Each sample is assigned to one of four relative bands and included in the session summary." },
+        { "label": "PHYSICAL EVIDENCE", "copy": "Designed a two-part wearable enclosure in Fusion and AutoCAD for placement on the arm or leg. Its internal layout reserves compact spaces for the electronics, switch, and charging port." },
+        { "label": "CURRENT LIMIT", "copy": "The hardware prototype is operational. The software, data-analysis layer, and user interface remain in development." }
+      ]
+    }
+  },
+  "experience": {
+    "folderTitle": "EXPERIENCE / 2 ITEMS",
+    "research": {
+      "listMeta": "01 / RESEARCH",
+      "organization": "UW Social Futures Lab",
+      "date": "APR 2026 — PRESENT",
+      "filename": "SOCIAL_FUTURES_LAB.md",
+      "meta": "UNDERGRADUATE RESEARCH / UW",
+      "title": "Quantitative Analysis of Ethical-Case Survey Data",
+      "copy": "Preparing participant survey data for ongoing research on case similarity, perceived relevance, and principle agreement.",
+      "quote": "PYTHON / PANDAS / R / DATA TRANSFORMATION / REGRESSION",
+      "details": [
+        { "label": "DATA PIPELINE", "copy": "Parsed principle labels from survey responses. Counted and normalized each principle within its row, then assembled ordered vectors across the dataset." },
+        { "label": "RESEARCH WORKFLOW", "copy": "Used Python and pandas to prepare the data. Continued the analysis through spreadsheet formulas and linear models in R." },
+        { "label": "PRELIMINARY ANALYSIS", "copy": "Tested whether principle frequency predicted agreement. The current models did not detect a relationship for the principles examined." },
+        { "label": "CONTRIBUTION", "copy": "Developed the data-transformation workflow and contributed to empirical analysis using the lab's existing ethical-principle taxonomy." }
+      ]
+    },
+    "internship": {
+      "listMeta": "02 / INTERNSHIP",
+      "organization": "Thermo Fisher Scientific",
+      "date": "JUN 2026 — PRESENT",
+      "filename": "THERMO_FISHER.log",
+      "meta": "SOFTWARE ENGINEERING INTERNSHIP / SHANGHAI",
+      "title": "Software Engineering Internship",
+      "copy": "Work across robotic laboratory automation, localized scientific-software validation, workflow analysis for interface redesign, and technical onboarding.",
+      "quote": "YOLO26 / RGB-D / ROS2 / AGENTIC ENGINEERING / SOFTWARE TESTING",
+      "details": [
+        { "label": "ROBOTIC TUBE HANDLING", "copy": "Developed a four-class YOLO26 perception pipeline for automated tube handling. Integrated RGB-D target localization with ROS2 chassis and robot-arm workflows for pickup and placement." },
+        { "label": "F1 / 3500Dx", "copy": "Currently executing black-box dynamic workflow test cases for the 3500Dx data-collection software。 Clarifying expected behavior and workflows when cases require additional context." },
+        { "label": "QANTIS", "copy": "Analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
+        { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
+      ]
+    }
+  },
+  "bulletin": { "header": "LAB BULLETIN", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
+  "taskbar": { "files": "LOCAL FILES", "unread": "1 UNREAD BULLETIN", "clear": "NO NEW ALERTS" }
+}

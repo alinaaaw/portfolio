@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "title": "Alina Wu — Lab 17 Interactive Portfolio",
+    "description": "An interactive portfolio of Alina Wu's work in human-centered software, physical computing, algorithms, research, and laboratory automation.",
+    "ogAlt": "A late-night evidence desk inside Alina's interactive laboratory"
+  },
+  "brand": {
+    "name": "ALINA.WU",
+    "lab": "/ LAB 17",
+    "initials": "AW"
+  },
+  "loading": {
+    "lab": "PREPARING LAB 17",
+    "closeup": "FOCUSING LOCAL VIEW"
+  },
+  "shared": {
+    "returnToRoom": "RETURN TO ROOM ×",
+    "close": "×",
+    "arrow": "→",
+    "comingSoon": "COMING SOON"
+  }
+}

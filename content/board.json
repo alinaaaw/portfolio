@@ -1,0 +1,17 @@
+{
+  "ariaLabel": "Lab 17 launch board close-up",
+  "header": "LAB 17 / PINNED TODO",
+  "sceneHint": "SMALL NOTES · ACTIVE IDEAS · NEXT BUILDS",
+  "detailMeta": "PINNED TODO /",
+  "returnItem": "PIN IT BACK",
+  "hitLabels": ["EMG / MODEL VIEWER", "AI GUIDE / ASK", "PROJECTS / MEDIA", "ROOM / PROGRESS", "VERSION / HISTORY", "3D / POLISH", "MOBILE / CONTROLS"],
+  "notes": [
+    { "status": "NOW / EMG", "label": "turn the EMG model into an explorable exhibit", "copy": "Prepare a web-ready model, useful viewpoints, and a clear fallback so the prototype can be understood without slowing down the room.", "detail": "Show how it is assembled, not only what it looks like." },
+    { "status": "FEATURE / AI GUIDE", "label": "add a guide who knows the room", "copy": "Let visitors ask about the projects, objects, and decisions already inside Lab 17 without leaving the experience.", "detail": "A guide to the room—not a general chatbot." },
+    { "status": "FEATURE / PROJECT MEDIA", "label": "open richer project evidence", "copy": "Give project windows a focused viewer for images, diagrams, prototypes, and selected process material.", "detail": "More to inspect, without turning the desktop into a file dump." },
+    { "status": "FEATURE / EXPLORATION", "label": "show what has been discovered", "copy": "Add a quiet room-progress view with optional hints for visitors who want help finding the remaining objects.", "detail": "Guidance when wanted; exploration when not." },
+    { "status": "COMPUTER / NEW APP", "label": "add a visual Version History", "copy": "Create a small computer app that shows how Lab 17 changes over time through clear, visitor-facing update cards.", "detail": "Make the portfolio itself part of the design story." },
+    { "status": "UPGRADE / 3D", "label": "make every object feel more physical", "copy": "Refine scale, framing, lighting, hover feedback, and object movement throughout the room.", "detail": "Keep the atmosphere; improve the response." },
+    { "status": "UPGRADE / MOBILE", "label": "design touch controls for the room", "copy": "Tune close-ups, drag gestures, tap targets, and compact windows so the full experience works naturally on smaller screens.", "detail": "The mobile room should feel designed, not reduced." }
+  ]
+}

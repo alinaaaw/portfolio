@@ -1,28 +1,37 @@
-# Alina Portfolio Design Lab
+# Alina Portfolio / Lab 17
 
-This repository explores two portfolio concepts in parallel. The default
-`main` branch intentionally contains no website implementation.
+Lab 17 is Alina Wu's interactive portfolio: a lightweight 3D workspace where
+visitors explore projects, research, experience, and personal notes through
+six connected stations.
 
-## Active design branches
+## Open locally
 
-| Branch | Direction | Character |
-| --- | --- | --- |
-| `version1-design` | Personal Workbench | Editorial, warm, structured, with projects, notes, and travel |
-| `version2-design` | Focus Field | Spatial, animated, and built around focus, signals, and discovery |
+Double-click `START-WEBSITE.cmd`. Keep the command window open while viewing
+the site, and press `Ctrl + C` when finished.
 
-Each design branch contains its own complete app, styles, assets, configuration,
-tests, and local launcher. Changes to one design do not alter the other.
+## What is here
 
-## Switch designs locally
+- An explorable 3D laboratory room with direct and keyboard-accessible routes.
+- Project evidence, research notes, and experience records maintained in
+  `content/*.json`.
+- A gradual fieldwork narrative that supports the portfolio without replacing
+  its factual content.
 
-```powershell
-git switch version1-design
-git switch version2-design
+## Main files
+
+```text
+app/page.tsx              Portfolio narrative and project files
+app/_components/LabGame.tsx  Three.js room, object hitboxes, and camera transitions
+app/_components/ZoneCloseup3D.tsx  Five interactive Three.js object close-ups
+app/layout.tsx            Metadata and page shell
+public/site.css           Complete visual design and responsive behavior
+public/og.png             Social preview for Lab 17
+DESIGN.md                 Canonical design and interaction rules
+TODO.md                   Launch plan and acceptance checklist
 ```
 
-The files shown in this folder change automatically when you switch branches.
-Commit work on the corresponding design branch so you can return to any earlier
-state through Git history.
+## Before a release
 
-Once a final direction is chosen, it can be merged into `main` and used as the
-published portfolio.
+Run the production build and automated tests, then follow the release checks in
+`TODO.md`. Keep factual portfolio copy in `content/` and follow
+`content/CONTENT_GUIDE.md` when updating it.

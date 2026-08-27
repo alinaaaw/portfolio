@@ -1,0 +1,29 @@
+{
+  "ariaLabel": "Research notebook close-up",
+  "header": "RESEARCH BOOK / INSPECT A PAGE",
+  "sceneHint": "CLICK THE LEFT OR RIGHT PAGE TO OPEN A NOTE",
+  "returnItem": "PUT IT BACK",
+  "itemLabels": { "research": "EMG DECISION LOG", "margin": "ALGORITHM COMPARISON" },
+  "items": {
+    "research": {
+      "meta": "EMG DEVICE / DESIGN DECISION / JUL 2025—PRESENT",
+      "title": "Exercise form does not always reveal target-muscle recruitment.",
+      "lead": "The first design question was not how to display EMG. It was which signal could show whether the intended muscle was actually active during an exercise.",
+      "steps": ["Candidate A · physiological activity through surface EMG", "Candidate B · angular displacement through visible contraction", "Decision · select EMG after subtle contraction proved unreliable to observe geometrically"],
+      "reverseMeta": "CURRENT FIRMWARE / MEASUREMENT CHAIN",
+      "reverseTitle": null,
+      "reverseCopy": "3-second individual calibration → filtering → squared signal → Kalman filtering → four relative-intensity bands → sample counts → session percentages.",
+      "note": "The current result is a distribution of recorded samples across four relative EMG bands—an approximation of time distribution under stable sampling, not an automated coaching recommendation."
+    },
+    "margin": {
+      "meta": "COURSE ALLOCATION / METHOD EVALUATION",
+      "title": "No allocation method led every criterion.",
+      "lead": "The project compares three approaches for capacity-constrained electives.",
+      "steps": ["First-Come-First-Serve · lowest CPU time", "Random Ticket · randomized, less predictable outcome", "Probabilistic + Maximum Weight · strongest reported satisfaction", "Checked · satisfaction mean and standard deviation · completion · capacity violations"],
+      "reverseMeta": "DESIGN DECISION / FINAL PIPELINE",
+      "reverseTitle": "The tradeoffs shaped the mechanism.",
+      "reverseCopy": "The final system used Simultaneous Eating for a fractional allocation, then maximum-weight realization and decomposition for concrete assignments.",
+      "note": "Fairness was an original project criterion, not a formally proven guarantee."
+    }
+  }
+}

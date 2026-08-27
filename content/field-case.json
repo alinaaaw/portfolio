@@ -1,0 +1,36 @@
+{
+  "ariaLabel": "Travel and interests field case close-up",
+  "header": "FIELD CASE / LIFE OUTSIDE THE LAB",
+  "sceneHint": "HOVER OVER AN ITEM / PERSONAL NOTES IN PROGRESS",
+  "personalDetailsOpeningEnabled": false,
+  "returnItem": "RETURN TO CASE",
+  "itemLabels": {
+    "travelMap": "WORLD MAP / PLACES VISITED",
+    "recipes": "RECIPE CARDS / COOKING + BAKING",
+    "archery": "ARCHERY / FORM + FOCUS",
+    "laserShooting": "LASER SHOOTING / HIGH SCHOOL TEAM"
+  },
+  "items": {
+    "recipes": {
+      "meta": "FIELD CASE / RECIPE CARDS",
+      "title": "Recipes worth making again",
+      "copy": "A growing collection of dishes and bakes worth returning to, with notes on what changed between attempts and what finally worked.",
+      "metrics": [],
+      "tags": ["cooking", "baking", "recipes", "experimentation"]
+    },
+    "archery": {
+      "meta": "FIELD CASE / ARCHERY",
+      "title": "A repeatable sequence",
+      "copy": "Archery turns posture, breathing, and release into one coordinated sequence. The challenge is to keep that sequence steady while learning from each round.",
+      "metrics": [],
+      "tags": ["archery", "form", "focus", "consistency"]
+    },
+    "laserShooting": {
+      "meta": "FIELD CASE / LASER SHOOTING",
+      "title": "Laser shooting",
+      "copy": "Trained as a member of the high school laser shooting team, where precision depended on steady posture, controlled breathing, and repeatable technique.",
+      "metrics": [],
+      "tags": ["laser shooting", "school team", "precision", "consistency"]
+    }
+  }
+}
