@@ -308,7 +308,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-memory > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 54px; padding: 2px 2px 11px 5px; border-bottom: 1px dashed rgba(81,91,76,.48); background: transparent; }
 .field-map-memory > header > div { min-width: 0; overflow: hidden; }
 .field-map-memory > header small { display: block; margin-bottom: 4px; color: #8b4439; font: 7px var(--font-mono),monospace; letter-spacing: .13em; }
-.field-map-memory > header h2 { margin: 0; color: #2f453e; font: 24px/1 "Segoe Print",cursive; letter-spacing: -.04em; }
+.field-map-memory > header h2 { margin: 0; color: #2f453e; font: 24px/1.2 "Segoe Print",cursive; letter-spacing: -.04em; }
 .field-map-memory > header small, .field-map-memory > header h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .field-map-memory > header button, .field-map-memory footer button { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 1px solid #8b4b3e; border-radius: 50%; background: rgba(246,237,211,.72); color: #7b3f35; box-shadow: 2px 3px 0 rgba(83,60,38,.15); cursor: pointer; font: 17px var(--font-mono),monospace; }
 .field-map-memory > header button:hover, .field-map-memory > header button:focus-visible, .field-map-memory footer button:hover, .field-map-memory footer button:focus-visible { background: #8b4b3e; color: #f4ecd4; transform: translateY(-1px); }

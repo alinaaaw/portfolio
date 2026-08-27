@@ -340,6 +340,7 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(css, /\.field-map-memory \{[^}]*background-color: #ded2ad/);
   assert.match(css, /animation: fieldMapMemoryIn/);
   assert.match(css, /\.field-map-memory > header, \.field-map-photo-stage, \.field-map-memory > footer \{[^}]*min-width: 0[^}]*max-width: 100%/);
+  assert.match(css, /\.field-map-memory > header h2 \{[^}]*font: 24px\/1\.2 "Segoe Print",cursive/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*display: flex/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*width: auto[^}]*height: auto/);
   assert.match(css, /\.field-map-photo-stage \{[^}]*padding: 0/);
