@@ -1,8 +1,8 @@
 # New York City photos
 
-NYC 对应的文件夹名就是：`new-york-city`
+The folder name for New York City is `new-york-city`.
 
-直接把照片放在这个文件夹里即可，例如：
+Place photos directly in this folder, for example:
 
 ```text
 new-york-city/
@@ -11,4 +11,4 @@ new-york-city/
   03-brooklyn-bridge.webp
 ```
 
-不需要修改代码，不需要填写照片数量，也不需要 `manifest.json`。网站重新构建时会自动读取这里所有支持的图片。
+You do not need to modify any code, enter a photo count, or create a `manifest.json` file. When the website is rebuilt, it automatically loads every supported image in this folder.
