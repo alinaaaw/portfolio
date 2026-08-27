@@ -60,7 +60,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .intro-text { max-width: 610px; margin: 0; color: #b8bcb3; font-size: 13px; line-height: 1.75; }
 .intro-copy > button { margin: 29px 0 25px; padding: 15px 18px; border: 1px solid var(--signal); background: var(--signal); color: var(--ink); cursor: pointer; font: 700 8px var(--font-mono), monospace; letter-spacing: .08em; box-shadow: 7px 7px 0 rgba(0,0,0,.28); }
 .intro-copy > button span { margin-left: 28px; }
-.intro-identity { display: flex; flex-direction: column; gap: 5px; color: #727c76; font: 7px var(--font-mono), monospace; }
+.intro-identity { display: flex; flex-direction: column; gap: 5px; color: #727c76; font: 9px/1.4 var(--font-mono), monospace; }
 .intro-identity span { color: var(--paper); }
 .intro-guide { align-self: end; margin: 0 0 4vh -14px; padding-left: 14px; border-top: 1px solid var(--line); background: rgba(7,16,15,.65); backdrop-filter: blur(8px); }
 .intro-guide > span { display: block; padding: 14px 0; border-bottom: 1px solid var(--line); }
