@@ -209,7 +209,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .project-file-content > small { font-size: 8px; }
 .experience-file-content > small { font-size: 8px; }
 .experience-skills { display: flex; flex-wrap: wrap; gap: 7px; margin: 22px 0 0; }
-.experience-skills span { padding: 7px 9px; border: 1px solid #788078; color: #34423d; font: 9px var(--font-mono),monospace; }
+.experience-skills span { padding: 7px 9px; border: 1px solid #788078; color: #34423d; font: 8px var(--font-mono),monospace; }
 .run-file { padding: 12px 14px; background: var(--ink); color: var(--signal); font: 7px var(--font-mono), monospace; }
 .project-file-actions { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
 .project-reference-link { padding: 12px 14px; border: 1px solid #7b827b; background: transparent; color: #8f342b; cursor: pointer; font: 7px var(--font-mono),monospace; }
