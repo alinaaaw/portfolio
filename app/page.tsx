@@ -180,7 +180,7 @@ function BoardScene({onClose}:{onClose:()=>void}) {
   </section></div>;
 }
 
-type FieldItem="travelMap"|"photos"|"archery"|"targetSports";
+type FieldItem="travelMap"|"archery"|"targetSports";
 type FieldRecordItem=Exclude<FieldItem,"travelMap">;
 const fieldItems=fieldCaseContent.items as Record<FieldRecordItem,FieldRecord>;
 type TravelPhotoStatus="idle"|"loading"|"ready"|"lost";

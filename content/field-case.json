@@ -1,22 +1,14 @@
 {
   "ariaLabel": "Travel and interests field case close-up",
   "header": "FIELD CASE / LIFE OUTSIDE THE LAB",
-  "sceneHint": "MAP · PHOTOS · ARCHERY · TARGET SPORTS",
+  "sceneHint": "MAP · ARCHERY · TARGET SPORTS",
   "returnItem": "RETURN TO CASE",
   "itemLabels": {
     "travelMap": "WORLD MAP / TRAVEL PINS",
-    "photos": "TRAVEL AND EVERYDAY PHOTOS",
     "archery": "ARCHERY KIT / SPORT PRACTICE",
     "targetSports": "TARGET SPORTS / SAFETY FIRST"
   },
   "items": {
-    "photos": {
-      "meta": "FIELD CASE / PHOTO STACK",
-      "title": "Frames from life outside work",
-      "copy": "A home for selected photographs from trips, days out, people, food, and small moments worth keeping. Add only images and captions you are comfortable sharing publicly.",
-      "metrics": [],
-      "tags": ["photography", "travel", "days out", "personal archive"]
-    },
     "archery": {
       "meta": "FIELD CASE / ARCHERY",
       "title": "Archery",
