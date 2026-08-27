@@ -36,8 +36,8 @@
       "title": "The enclosure was modeled around the real electronics.",
       "copy": "After building and soldering the signal path, the enclosure was developed in Fusion 360 around the ESP32 boards, battery, switch, charging access, fasteners, and internal clearances. The two CAD views document both the rounded wearable shell and the constrained component layout inside it.",
       "images": [
-        { "src": "/archive/emg-enclosure-interior.png", "alt": "Fusion 360 interior view of the EMG enclosure showing the circuit boards, battery space, screw posts, and wall openings", "caption": "INTERIOR CAD · board placement, battery clearance, screw posts, and access openings" },
-        { "src": "/archive/emg-enclosure-exterior.png", "alt": "Fusion 360 exterior view of the rounded EMG wearable enclosure with its lid seam and side clip", "caption": "EXTERIOR CAD · rounded shell, separate lid, enclosure seam, and wearable clip" }
+        { "asset": "emg-enclosure-interior", "alt": "Fusion 360 interior view of the EMG enclosure showing the circuit boards, battery space, screw posts, and wall openings", "caption": "INTERIOR CAD · board placement, battery clearance, screw posts, and access openings" },
+        { "asset": "emg-enclosure-exterior", "alt": "Fusion 360 exterior view of the rounded EMG wearable enclosure with its lid seam and side clip", "caption": "EXTERIOR CAD · rounded shell, separate lid, enclosure seam, and wearable clip" }
       ],
       "facts": [
         { "label": "CAD RECORD", "value": "Fusion 360 exterior + interior assembly views" },

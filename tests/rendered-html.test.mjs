@@ -145,6 +145,7 @@ test("3D room and layered object exploration remain connected", async () => {
   const closeups = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/_components/ZoneCloseup3D.tsx", import.meta.url), "utf8"));
   const page = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/page.tsx", import.meta.url), "utf8"));
   const drawer = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../content/drawer.json", import.meta.url), "utf8"));
+  const drawerMedia = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../app/_components/drawerArtifactMedia.ts", import.meta.url), "utf8"));
   const notebook = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../content/notebook.json", import.meta.url), "utf8"));
   const css = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../public/site.css", import.meta.url), "utf8"));
   const drawerScene = closeups.match(/function buildDrawer[\s\S]*?function buildPrinterDesk/)?.[0] ?? "";
@@ -195,8 +196,11 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawer, /walk 68\.75% · bus\/subway 47\.92% · bike 37\.5%/);
   assert.match(drawer, /43 valid entries · 46\.51% said time-consuming · 44\.19% said it helped clearly/);
   assert.match(drawer, /32\.56% unclear guidance\/interface · 32\.56% too many features/);
-  assert.match(drawer, /\/archive\/emg-enclosure-interior\.png/);
-  assert.match(drawer, /\/archive\/emg-enclosure-exterior\.png/);
+  assert.match(drawer, /"asset": "emg-enclosure-interior"/);
+  assert.match(drawer, /"asset": "emg-enclosure-exterior"/);
+  assert.doesNotMatch(drawer, /\/archive\//);
+  assert.match(drawerMedia, /\.\.\/_assets\/drawer\/\*/);
+  assert.match(page, /drawerArtifactMedia\[image\.asset\]/);
   assert.match(page, /className="artifact-media"/);
   assert.match(css, /\.artifact-media \{[^}]*grid-template-columns: repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css, /\.drawer-document article small \{[^}]*font: clamp\(9px,1\.1vw,11px\)\/1\.55/);

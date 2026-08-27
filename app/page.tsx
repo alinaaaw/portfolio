@@ -6,6 +6,7 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
+import { drawerArtifactMedia } from "./_components/drawerArtifactMedia";
 import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
 import type { TravelPhoto } from "./_components/travelPhotoLibrary";
 import {
@@ -48,7 +49,7 @@ type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:strin
 const projectReferences = referencesContent.references as ProjectReference[];
 const referenceGroups = referencesContent.groups as {id:ReferenceFilter;label:string}[];
 type DrawerFile = "folder" | "notebook" | "components" | "envelope";
-type DrawerArtifact = {meta:string;title:string|null;copy:string;images?:{src:string;alt:string;caption:string}[];facts:{label:string;value:string}[];note:string};
+type DrawerArtifact = {meta:string;title:string|null;copy:string;images?:{asset:string;alt:string;caption:string}[];facts:{label:string;value:string}[];note:string};
 type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];reverseMeta:string;reverseTitle:string|null;reverseCopy:string;note:string};
 type FieldRecord = {meta:string;title:string|null;copy:string;metrics:{value:string;label:string}[];tags:string[]};
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
@@ -150,7 +151,7 @@ function DrawerScene({ onClose,faxPrinted }:{ onClose:()=>void;faxPrinted:boolea
     <section className="tactile-scene" role="dialog" aria-modal="true" aria-label={drawerContent.ariaLabel} onMouseDown={(event) => event.stopPropagation()}>
       <header><div><span>{zoneInfo.drawer.index}</span><strong>{drawerContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
       <ZoneCloseup3D zone="drawer" faxPrinted={faxPrinted} onSelect={(item) => { if(["folder","notebook","components","envelope"].includes(item))setSelected(item as DrawerFile); }} />
-      {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><div className="drawer-document-paper" onMouseDown={(event) => event.stopPropagation()}><button className="drawer-document-return" onClick={() => setSelected(null)}>{drawerContent.returnItem}</button><article><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.images&&<div className="artifact-media">{item.images.map((image)=><figure key={image.src}><img src={image.src} alt={image.alt}/><figcaption>{image.caption}</figcaption></figure>)}</div>}<dl className="artifact-facts">{item.facts.map((fact)=><div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl><blockquote>{item.note}</blockquote></article></div></div>}
+      {item&&<div className={`drawer-document document-${selected}`} onMouseDown={() => setSelected(null)}><div className="drawer-document-paper" onMouseDown={(event) => event.stopPropagation()}><button className="drawer-document-return" onClick={() => setSelected(null)}>{drawerContent.returnItem}</button><article><small>{item.meta}</small>{item.title&&<h2>{item.title}</h2>}<p>{item.copy}</p>{item.images&&<div className="artifact-media">{item.images.map((image)=><figure key={image.asset}><img src={drawerArtifactMedia[image.asset]} alt={image.alt}/><figcaption>{image.caption}</figcaption></figure>)}</div>}<dl className="artifact-facts">{item.facts.map((fact)=><div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl><blockquote>{item.note}</blockquote></article></div></div>}
     </section>
   </div>;
 }
