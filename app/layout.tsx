@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Noto_Sans_SC, Space_Mono } from "next/font/google";
 import { site } from "@/content";
+import "../public/site.css";
 
 const sans = Noto_Sans_SC({
   variable: "--font-sans",
@@ -41,7 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head><link rel="stylesheet" href="/site.css" /></head>
       <body className={`${sans.variable} ${mono.variable}`}>{children}</body>
     </html>
   );

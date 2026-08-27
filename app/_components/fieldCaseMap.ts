@@ -197,7 +197,9 @@ function traceViewportRing(
 ) {
   let previousX:number|undefined;
   ring.forEach((coordinate,index)=>{
-    let {x,y}=projectViewport(coordinate,width,height,camera);
+    const projected=projectViewport(coordinate,width,height,camera);
+    let x=projected.x;
+    const y=projected.y;
     if(previousX!==undefined){
       while(x-previousX>worldPixelWidth/2)x-=worldPixelWidth;
       while(previousX-x>worldPixelWidth/2)x+=worldPixelWidth;

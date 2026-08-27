@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- Native images preserve imported Vite asset URLs and the custom travel-photo preload/decode lifecycle. */
+
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
@@ -277,6 +279,9 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   },[]);
 
   useEffect(()=>{
+    const photoImageCache=photoImageCacheRef.current;
+    const photoPreloads=photoPreloadRef.current;
+    const decodedPhotoSrcs=decodedPhotoSrcRef.current;
     const uniquePhotos=new Map<string,TravelPhoto>();
     FIELD_CASE_TRAVEL_PINS.forEach((pin)=>travelPhotosForPin(pin).forEach((photo)=>uniquePhotos.set(photo.src,photo)));
     const warmups=Array.from(uniquePhotos.values(),(photo)=>preloadTravelPhoto(photo).catch(()=>undefined));
@@ -285,10 +290,10 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       selectionRequestRef.current+=1;
       navigationRequestRef.current+=1;
       navigationLockedRef.current=false;
-      photoImageCacheRef.current.forEach((image)=>{image.onload=null;image.onerror=null;});
-      photoImageCacheRef.current.clear();
-      photoPreloadRef.current.clear();
-      decodedPhotoSrcRef.current.clear();
+      photoImageCache.forEach((image)=>{image.onload=null;image.onerror=null;});
+      photoImageCache.clear();
+      photoPreloads.clear();
+      decodedPhotoSrcs.clear();
     };
   },[preloadTravelPhoto]);
 
@@ -347,7 +352,10 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
   const currentPhoto=photos[photoIndex]??null;
   const canMovePhoto=photos.length>1&&!navigationPending&&photoStatus!=="loading";
-  activePhotoSrcRef.current=currentPhoto?.src??null;
+
+  useEffect(()=>{
+    activePhotoSrcRef.current=currentPhoto?.src??null;
+  },[currentPhoto]);
 
   useEffect(()=>{
     if(!selectedPin)return;

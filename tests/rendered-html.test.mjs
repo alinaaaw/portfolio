@@ -341,9 +341,9 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.match(mapReading, /await image\.decode\(\)/);
   assert.doesNotMatch(mapReading, /void image\.decode\(\)/);
   assert.match(mapReading, /Promise\.all\(warmups\)/);
-  assert.match(mapReading, /photoImageCacheRef\.current\.forEach/);
-  assert.match(mapReading, /photoImageCacheRef\.current\.clear\(\)/);
-  assert.match(mapReading, /decodedPhotoSrcRef\.current\.clear\(\)/);
+  assert.match(mapReading, /photoImageCache\.forEach/);
+  assert.match(mapReading, /photoImageCache\.clear\(\)/);
+  assert.match(mapReading, /decodedPhotoSrcs\.clear\(\)/);
   assert.match(mapReading, /image\.onload=null/);
   assert.match(mapReading, /image\.onerror=null/);
   assert.doesNotMatch(mapReading, /TravelPhotoLayout|photoLayout|layoutForAspect/);
