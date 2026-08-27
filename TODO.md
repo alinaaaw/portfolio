@@ -115,10 +115,10 @@
 - [x] 确认 `main` 已完成 Phase 1–3，并且 `package.json` 与 `package-lock.json` 都显示 `0.8.0`。
 - [x] 在 Computer 的 System Bulletin、Version History 或其他低调位置显示 `Portfolio System v0.8.0`，不额外创建醒目的 Preview 页面或不同访问入口。
 - [x] 从干净的 `main` 安装依赖、运行测试和 production build；再次检查 repository 与 bundle 中没有 secret、私有 dossier、公司机密或不应公开的个人资料。
-- [ ] 在 Cloudflare 中确认已经拥有并管理 `alinawu.com` 的 active zone，然后创建或连接 Alina Portfolio Worker。
-- [ ] 将 Worker Custom Domain 绑定到 `alinawu.com`；让 Cloudflare 创建对应 DNS 记录和 HTTPS certificate。
-- [ ] 将 `www.alinawu.com` 永久重定向到 `alinawu.com`，确保对外只有一个 canonical 地址。
-- [ ] 把经过验收的 `0.8.0` Worker version 明确部署到 custom domain traffic；仅上传 version 不会改变 `alinawu.com`，必须由 Alina 手动确认 deployment。
+- [x] 在 Cloudflare 中确认已经拥有并管理 `alinawu.com` 的 active zone，然后创建或连接 Alina Portfolio Worker。
+- [x] 将 Worker Custom Domain 绑定到 `alinawu.com`；让 Cloudflare 创建对应 DNS 记录和 HTTPS certificate。
+- [x] 将 `www.alinawu.com` 永久重定向到 `alinawu.com`，确保对外只有一个 canonical 地址。
+- [x] 把经过验收的 `0.8.0` Worker version 明确部署到 custom domain traffic；仅上传 version 不会改变 `alinawu.com`，必须由 Alina 手动确认 deployment。
 - [ ] 记录 `https://alinawu.com`、Git commit SHA、Cloudflare version/deployment ID、发布日期和 `0.8.0` 简要说明，确保之后能确认域名正在运行哪一份代码。
 - [x] 决定 `0.8.0` 是否暂时设置 `noindex, nofollow`；如果设置，必须在正式 `1.0.0` 发布时移除。无论是否索引，网站内都只显示正常版本号。
 - [x] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
@@ -287,9 +287,9 @@ Improved mobile hotspots and camera transitions.
 
 #### `.github/workflows/ci.yml`
 
-- [ ] 在 Pull Request 和 `main` push 时运行。
-- [ ] 执行依赖安装、lint、自动测试和 production build。
-- [ ] 不使用生产 Cloudflare secret，不更新正式 Worker，也不修改 `alinawu.com`。
+- [x] 在 Pull Request 和 `main` push 时运行。
+- [x] 执行依赖安装、lint、自动测试和 production build。
+- [x] 不使用生产 Cloudflare secret，不更新正式 Worker，也不修改 `alinawu.com`。
 - [ ] 将 CI 通过设为合并 Pull Request 前的必要条件。
 
 #### `.github/workflows/preview.yml`
@@ -303,11 +303,11 @@ Improved mobile hotspots and camera transitions.
 
 #### `.github/workflows/release.yml`
 
-- [ ] 只响应 GitHub Release 的 `published` 事件，不响应普通 branch push。
-- [ ] 确认 release tag 来自 `main` 上已验收的 commit。
-- [ ] 检查 Git tag `vX.Y.Z` 与 `package.json` 的 `X.Y.Z` 完全一致，不一致就停止部署。
-- [ ] 重新执行依赖安装、测试和 production build，不能直接信任较早的本地 build。
-- [ ] 只有全部检查通过后才部署到 Cloudflare production。
+- [x] 只响应 GitHub Release 的 `published` 事件，不响应普通 branch push。
+- [x] 确认 release tag 来自 `main` 上已验收的 commit。
+- [x] 检查 Git tag `vX.Y.Z` 与 `package.json` 的 `X.Y.Z` 完全一致，不一致就停止部署。
+- [x] 重新执行依赖安装、测试和 production build，不能直接信任较早的本地 build。
+- [x] 只有全部检查通过后才部署到 Cloudflare production。
 - [ ] 部署完成后自动执行根域名和关键静态资源 smoke test。
 - [ ] 记录 Git commit、Git tag、Cloudflare deployment 和发布时间之间的对应关系。
 
@@ -315,8 +315,8 @@ Improved mobile hotspots and camera transitions.
 
 - [ ] 在 GitHub 创建名为 `production` 的 Environment，只有 release workflow 可以使用。
 - [ ] 可选：为 `production` Environment 开启人工 approval，形成点击 Publish Release 之后的第二次确认。
-- [ ] 将最小权限的 Cloudflare API Token 和 Account ID 存在 GitHub Actions secrets 或受保护的 Environment secrets 中。
-- [ ] 不在 workflow 文件、README、日志输出或 Git remote URL 中写入 token。
+- [x] 将最小权限的 Cloudflare API Token 和 Account ID 存在 GitHub Actions secrets 或受保护的 Environment secrets 中。
+- [x] 不在 workflow 文件、README、日志输出或 Git remote URL 中写入 token。
 - [ ] `OPENAI_API_KEY` 继续作为 Cloudflare runtime secret 管理，不因为网站部署而放进前端 bundle。
 - [ ] 定期轮换部署 token；删除不再使用的 token 和 workflow 权限。
 
