@@ -65,7 +65,7 @@ The scenes intentionally use different data shapes so the website does not reduc
 - **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
 - **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
 - **Board:** Notes deliberately have no separate title. `label` is the handwritten principle, `copy` gives the evidence, and `detail` is the short margin line.
-- **Field Case:** `items` controls the four clickable personal-interest objects. Keep the travel pins and copy explicitly editable until destinations, photographs, and personal stories are confirmed.
+- **Field Case:** `items` preserves the four personal-interest detail records. While `openingEnabled` is `false`, the objects expose only their hover labels; change it to `true` to restore the existing detail routes after the personal stories are ready.
 
 External project sources belong in `references.json` only when they have a stable citation and URL. Use `provenance` to distinguish original project references, implementation dependencies, and contextual background reading.
 

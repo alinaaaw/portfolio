@@ -1,13 +1,14 @@
 {
   "ariaLabel": "Travel and interests field case close-up",
   "header": "FIELD CASE / LIFE OUTSIDE THE LAB",
-  "sceneHint": "MAP · POSTCARDS · ARCHERY · TARGET SPORTS",
+  "sceneHint": "HOVER OVER AN ITEM / FIELD NOTES IN PROGRESS",
+  "openingEnabled": false,
   "returnItem": "RETURN TO CASE",
   "itemLabels": {
-    "travelMap": "WORLD MAP / TRAVEL PINS",
-    "postcards": "POSTCARDS / FIELD NOTES",
-    "archery": "ARCHERY KIT / SPORT PRACTICE",
-    "targetSports": "TARGET SPORTS / SAFETY FIRST"
+    "travelMap": "WORLD MAP / PLACES VISITED",
+    "postcards": "POSTCARDS / NOTES FROM THE ROAD",
+    "archery": "ARCHERY / FORM + FOCUS",
+    "targetSports": "TARGET SPORTS / PRECISION + SAFETY"
   },
   "items": {
     "postcards": {

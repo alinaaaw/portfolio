@@ -165,6 +165,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /RoundedBoxGeometry\(\.72,\.86,\.052/);
   assert.match(closeups, /series:higashino/);
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
+  assert.match(closeups, /hoverOnly=!fieldCaseContent\.openingEnabled/);
+  assert.match(closeups, /when these close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
   assert.match(closeups, /makeBook\(book,index,-\.35\+index\*\.42,\.43,true,false\)/);

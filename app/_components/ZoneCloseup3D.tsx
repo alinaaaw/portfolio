@@ -441,7 +441,14 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
     ["archery",fieldCaseContent.itemLabels.archery,arrows[1],[2.55,.5,.7],[-1.8,1.25,.9]],
     ["travelMap",fieldCaseContent.itemLabels.travelMap,worldMap,[3.75,.55,2.18],[mapCenterX,.67,mapCenterZ]],
   ];
-  items.forEach(([item,label,visual,size,position])=>{ const hit=hitBox(item,label,size,position,[visual]); scene.add(hit); hits.push(hit); });
+  items.forEach(([item,label,visual,size,position])=>{
+    const hit=hitBox(item,label,size,position,[visual]);
+    // Keep the models and detail routes intact. Set openingEnabled to true in
+    // content/field-case.json when these close-ups are ready to reopen.
+    hit.userData.hoverOnly=!fieldCaseContent.openingEnabled;
+    scene.add(hit);
+    hits.push(hit);
+  });
   const mapClip=cylinder(.1,.72,palette.steel,18);mapClip.rotation.z=Math.PI/2;mapClip.position.set(mapCenterX,.53,-1.59);scene.add(mapClip);
   for(const x of [mapCenterX-.3,mapCenterX+.3]){const mount=cylinder(.07,.13,0x4e5954,14);mount.position.set(x,.48,-1.59);scene.add(mount);}
 }
