@@ -430,6 +430,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
 .drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 6px 2px 5px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 9px var(--font-mono),monospace; letter-spacing: .08em; }
 .drawer-document-return:hover, .drawer-document-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
+.artifact-media { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 26px 0 30px; }
+.artifact-media figure { min-width: 0; margin: 0; padding: 7px; border: 1px solid rgba(38,55,50,.28); background: rgba(248,244,230,.64); box-shadow: 4px 5px 0 rgba(44,36,27,.12); }
+.artifact-media img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f2f0e9; filter: saturate(.82) contrast(.96); }
+.artifact-media figcaption { margin-top: 8px; color: #5f5146; font: 7px/1.5 var(--font-mono),monospace; letter-spacing: .035em; }
 .artifact-facts { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid rgba(38,55,50,.28); border-left: 1px solid rgba(38,55,50,.28); }
 .artifact-facts > div { min-width: 0; padding: 13px 15px; border-right: 1px solid rgba(38,55,50,.28); border-bottom: 1px solid rgba(38,55,50,.28); }
 .artifact-facts dt { color: #a44235; font: 6px var(--font-mono),monospace; }
@@ -667,7 +671,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .drawer-front { right: 1%; left: 1%; }
   .drawer-document { padding: 18px; }
   .drawer-document article { min-height: min(450px,calc(100svh - 112px)); max-height: calc(100svh - 112px); padding: 56px 28px 44px; }
-  .artifact-facts, .field-metrics { grid-template-columns: 1fr; }
+  .artifact-media, .artifact-facts, .field-metrics { grid-template-columns: 1fr; }
   .object-layer, .fax-layer { padding: 0; }
   .field-detail { padding: 0; }
   .field-map-reading { width: 100%; height: calc(100svh - 58px); max-height: none; border: 0; box-shadow: none; transform: none; }

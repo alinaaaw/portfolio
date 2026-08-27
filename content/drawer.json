@@ -9,15 +9,15 @@
   "items": {
     "folder": {
       "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
-      "title": "From resident research to a map, a poster, and a community lecture.",
-      "copy": "Questionnaire summaries and presentation pages sit beside three responses developed from the study. A printed map draft organizes nearby facilities by walking time. A food-safety poster addresses misconceptions about leftovers, while anti-fraud lecture notes translate survey gaps into practical guidance for older residents.",
+      "title": "The survey turned everyday mobility and software friction into practical responses.",
+      "copy": "Two multi-select summaries make the field packet more concrete. Walking was the most commonly selected travel mode, while the software responses showed a mixed picture: many residents found the tools helpful, but time, interface clarity, and feature overload remained visible barriers. Those findings informed a walking-time facility map and community materials on food safety and fraud prevention.",
       "facts": [
-        { "label": "RESEARCH RECORD", "value": "questionnaire summaries · presentation pages" },
-        { "label": "MAP DRAFT", "value": "facility markers · category filters · 5 / 10 / 15-minute walking zones" },
-        { "label": "FOOD-SAFETY POSTER", "value": "leftover-related health risks · misconception correction · community distribution" },
-        { "label": "ANTI-FRAUD LECTURE", "value": "fraud recognition · property protection · qualitative resident feedback" }
+        { "label": "TRAVEL MODES", "value": "walk 68.75% · bus/subway 47.92% · bike 37.5% · car 25% · taxi 18.75%" },
+        { "label": "SOFTWARE RESPONSES", "value": "43 valid entries · 46.51% said time-consuming · 44.19% said it helped clearly" },
+        { "label": "USABILITY FRICTION", "value": "32.56% unclear guidance/interface · 32.56% too many features · 23.26% needed help" },
+        { "label": "RESEARCH OUTPUTS", "value": "5 / 10 / 15-minute facility map · food-safety poster · anti-fraud lecture" }
       ],
-      "note": "The packet preserves two kinds of response to the same research: a digital tool for finding nearby services and community materials for information gaps identified during the study."
+      "note": "The percentages come from multi-select questionnaire summaries, so categories are not expected to total 100%. The packet connects those aggregate findings to both a digital map and community-facing materials."
     },
     "notebook": {
       "meta": "THERMO FISHER / ROBOTIC TUBE HANDLING / TEST PACKET",
@@ -32,16 +32,21 @@
       "note": "Remaining unsuccessful runs involved intermittent camera or hardware faults. Recovery tooling restores operation, but the root cause remains unresolved."
     },
     "components": {
-      "meta": "EMG DEVICE / HARDWARE ITERATION / REV. CURRENT",
-      "title": "The enclosure had to shrink around the electronics.",
-      "copy": "Built and soldered the signal path, then arranged the ESP32 boards and battery inside a compact wearable enclosure. The body and lid reserve openings for the power switch and charging port so the device can be operated and recharged while assembled.",
+      "meta": "EMG DEVICE / CAD + HARDWARE ITERATION / REV. CURRENT",
+      "title": "The enclosure was modeled around the real electronics.",
+      "copy": "After building and soldering the signal path, the enclosure was developed in Fusion 360 around the ESP32 boards, battery, switch, charging access, fasteners, and internal clearances. The two CAD views document both the rounded wearable shell and the constrained component layout inside it.",
+      "images": [
+        { "src": "/archive/emg-enclosure-interior.png", "alt": "Fusion 360 interior view of the EMG enclosure showing the circuit boards, battery space, screw posts, and wall openings", "caption": "INTERIOR CAD · board placement, battery clearance, screw posts, and access openings" },
+        { "src": "/archive/emg-enclosure-exterior.png", "alt": "Fusion 360 exterior view of the rounded EMG wearable enclosure with its lid seam and side clip", "caption": "EXTERIOR CAD · rounded shell, separate lid, enclosure seam, and wearable clip" }
+      ],
       "facts": [
-        { "label": "ENCLOSURE", "value": "separate body + lid" },
-        { "label": "INTERNAL SPACE", "value": "ESP32 boards · battery · component clearances" },
-        { "label": "USER ACCESS", "value": "switch opening · charging port" },
+        { "label": "CAD RECORD", "value": "Fusion 360 exterior + interior assembly views" },
+        { "label": "INTERNAL LAYOUT", "value": "ESP32 boards · battery · screw bosses · component clearances" },
+        { "label": "ENCLOSURE FEATURES", "value": "separate body + lid · rounded shell · wearable side clip" },
+        { "label": "USER ACCESS", "value": "power switch opening · charging port" },
         { "label": "CURRENT STATE", "value": "working hardware prototype" }
       ],
-      "note": "The hardware prototype is assembled and operational. Software behavior, data analysis, and the user interface still require further development."
+      "note": "The CAD screenshots record the enclosure design rather than a photorealistic render. The hardware prototype is assembled and operational; software behavior, data analysis, and the user interface still require further development."
     },
     "envelope": {
       "meta": "COURSE ALLOCATION / RESIDUAL RULE / VERSION 01 → VERSION 02",

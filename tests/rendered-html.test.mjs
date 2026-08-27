@@ -192,6 +192,13 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawer, /More even describes the project goal/);
   assert.match(drawer, /do not establish a formal fairness guarantee/);
   assert.doesNotMatch(drawer, /No method led every criterion/);
+  assert.match(drawer, /walk 68\.75% · bus\/subway 47\.92% · bike 37\.5%/);
+  assert.match(drawer, /43 valid entries · 46\.51% said time-consuming · 44\.19% said it helped clearly/);
+  assert.match(drawer, /32\.56% unclear guidance\/interface · 32\.56% too many features/);
+  assert.match(drawer, /\/archive\/emg-enclosure-interior\.png/);
+  assert.match(drawer, /\/archive\/emg-enclosure-exterior\.png/);
+  assert.match(page, /className="artifact-media"/);
+  assert.match(css, /\.artifact-media \{[^}]*grid-template-columns: repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css, /\.drawer-document article small \{[^}]*font: clamp\(9px,1\.1vw,11px\)\/1\.55/);
   assert.match(css, /\.drawer-document-return \{[^}]*font: 9px/);
   assert.match(drawerScene, /const cabinetTop=roundedBox\(4\.25,\.18,3\.55/);
