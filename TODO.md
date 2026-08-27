@@ -6,7 +6,6 @@
 
 - GitHub 仓库：[alinaaaw/portfolio](https://github.com/alinaaaw/portfolio)
 - GitHub `main`：[查看 main](https://github.com/alinaaaw/portfolio/tree/main)
-- 当前设计分支与 `main` 的比较：[查看差异并准备 Pull Request](https://github.com/alinaaaw/portfolio/compare/main...version3-design?expand=1)
 - GitHub 构建状态：[Actions](https://github.com/alinaaaw/portfolio/actions)
 - Cloudflare 控制台：[Workers & Pages](https://dash.cloudflare.com/)
 - Cloudflare Git 集成：[Workers Builds 文档](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/)
@@ -40,7 +39,7 @@
 - [ ] 迁移到 `main` 后，日常修改优先在短期 feature branch 完成并 push，再通过 Pull Request 合并；除非明确决定，否则不直接在 `main` 开发。
 - [ ] 普通 commit 或 push 不修改 release 版本号，不创建 GitHub Release，也不触发 Cloudflare production deployment。
 - [ ] 只有确认要正式发布时，才按照 Phase 4 升级版本号、填写版本概要、创建 tag 和发布 GitHub Release。
-- [ ] 永远不提交 `.env`、API Key、Cloudflare Token、私有 dossier、`node_modules`、临时日志或不应公开的原始资料。
+- [ ] 永远不提交 `.env`、API Key、Cloudflare Token、超出已确认仓库访问范围的 dossier、`node_modules`、临时日志或不应公开的原始资料。
 
 ## Phase 1：改进全部文字内容
 
@@ -84,7 +83,7 @@
 
 这里的目标是移除名称和维护结构中的旧版本身份，不是丢失 Git 历史。
 
-- [x] 拉取 GitHub 最新状态并比较 `main` 与当前设计分支，先处理可能的冲突和其他 worktree 中仍需保留的工作。
+- [x] 拉取 GitHub 最新状态并比较 `main` 与当前工作分支，先处理可能的冲突和其他 worktree 中仍需保留的工作。
 - [x] 在开始清理前创建一个中性命名的备份 tag，记录当前可恢复状态，但不要继续把旧版本编号当作产品名称。
 - [x] 将 `package.json` 和 `package-lock.json` 中的项目名改为中性的 `alina-portfolio`；清理旧设计编号时将当前开发基线重置为 `0.8.0`。
 - [x] 重写 README，使其只介绍 Alina Portfolio / Lab 17，不再介绍某个设计版本或专用分支。
@@ -99,11 +98,11 @@
 ## Phase 3：把正式网站放到 GitHub `main`
 
 - [x] 最后比较 `main` 与已经完成 Phase 2 清理的工作分支，确认 Pull Request 只包含准备正式保留的内容。
-- [x] 确认仓库没有 `.env`、API Key、Cloudflare Token、私有 dossier 或不应公开的文件。
-- [ ] 通过 Pull Request 将经过内容验收和旧名称清理的网站合并到 `main`。
-- [ ] 确认 GitHub 默认分支仍为 `main`，README 首页展示的是 Alina Portfolio / Lab 17 正式网站。
-- [ ] 在全新的本地目录或干净环境中从 `main` 安装依赖、运行测试并完成 production build。
-- [ ] 确认 `main` 的 commit、构建结果和 Phase 2 验收过的工作分支一致。
+- [x] 确认仓库没有 `.env`、API Key、Cloudflare Token，且 dossier 与其他材料均符合已确认的 private-repository 访问范围。
+- [x] 通过 Pull Request 将经过内容验收和旧名称清理的网站合并到 `main`。
+- [x] 确认 GitHub 默认分支仍为 `main`，README 首页展示的是 Alina Portfolio / Lab 17 正式网站。
+- [x] 在全新的本地目录或干净环境中从 `main` 安装依赖、运行测试并完成 production build。
+- [x] 确认 `main` 的 commit、构建结果和 Phase 2 验收过的工作分支一致。
 - [ ] `main` 验证成功后，再删除不需要的远程设计分支、本地分支和对应 worktree；删除前单独确认精确目标。
 - [ ] 完成合并与分支清理后更新本 TODO，移除为了执行迁移而暂时保留的旧名称、分支和比较链接。
 
