@@ -428,8 +428,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .drawer-document article p { color: #515a53; font-size: 13px; line-height: 1.8; }
 .drawer-document article blockquote { margin: 30px 0; padding: 13px 18px; border-left: 2px solid #a44235; font: 18px "Segoe Print",cursive; }
 .paper-return-control:hover, .paper-return-control:focus-visible { background: #35443f; color: var(--signal); }
-.drawer-document-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 6px 2px 5px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 9px var(--font-mono),monospace; letter-spacing: .08em; }
-.drawer-document-return:hover, .drawer-document-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
+.drawer-document-return, .fax-return { position: absolute; z-index: 2; top: 19px; right: 22px; padding: 6px 2px 5px; border: 0; border-bottom: 1px solid rgba(164,66,53,.42); background: #e7ddc2; color: #875047; cursor: pointer; font: 9px var(--font-mono),monospace; letter-spacing: .08em; }
+.drawer-document-return:hover, .drawer-document-return:focus-visible, .fax-return:hover, .fax-return:focus-visible { border-bottom-color: #a44235; color: #a44235; }
 .artifact-media { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 26px 0 30px; }
 .artifact-media figure { min-width: 0; margin: 0; padding: 7px; border: 1px solid rgba(38,55,50,.28); background: rgba(248,244,230,.64); box-shadow: 4px 5px 0 rgba(44,36,27,.12); }
 .artifact-media img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f2f0e9; filter: saturate(.82) contrast(.96); }
@@ -542,7 +542,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .fax-reading-scroll { box-sizing: border-box; height: 100%; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 60px 55px 70px; }
 .news-popup > header button { display: grid; min-width: 28px; min-height: 28px; margin-right: -6px; place-items: center; font-size: 14px; line-height: 1; }
 @keyframes faxReadingIn { from { opacity: 0; transform: scale(.68) translateY(18%); } to { opacity: 1; transform: scale(1) translateY(0); } }
-.fax-return { position: absolute; right: 18px; bottom: 18px; padding: 10px 12px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .printer-layer .tactile-scene > header strong { color: var(--signal); }
 .contact-reading { position: absolute; z-index: 24; inset: 58px 0 0; display: grid; place-items: center; padding: 35px; background: radial-gradient(circle,rgba(34,45,41,.48),rgba(2,6,5,.86)); backdrop-filter: blur(7px); animation: contactBackdropIn .56s ease both; }
 .contact-card-detail { position: relative; width: min(620px,82vw); min-height: 330px; padding: clamp(38px,5vw,58px); border-left: 9px solid var(--red); border-radius: 5px; background-color: #e7dec8; background-image: linear-gradient(110deg,rgba(255,255,255,.45),transparent 42%),repeating-linear-gradient(0deg,rgba(40,50,45,.025) 0 1px,transparent 1px 5px); color: var(--ink); box-shadow: 16px 20px 0 rgba(0,0,0,.35); transform-origin: 84% 88%; animation: contactCardPickup .62s cubic-bezier(.16,.84,.24,1) both; will-change: transform,opacity; }
