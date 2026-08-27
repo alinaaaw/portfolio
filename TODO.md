@@ -629,3 +629,14 @@ Release date:
 不要启用“每次 push 到 `main` 就运行 `wrangler deploy`”的配置。Phase 3.5 的首次 `0.8.0` 由 Alina 手动确认 deployment；此后普通开发只做 CI，候选修改只上传独立 preview version，稳定版本的 production deployment 只由发布 GitHub Release 触发。
 
 不建议把 GitHub Pages 作为最终托管方式。当前项目已经使用 Cloudflare Worker 兼容架构，未来的 AI API、secret、analytics 和 CMS 也需要服务器能力；继续使用 Cloudflare 可以避免之后再次迁移托管平台。
+
+## 仓库公开前：dossier 历史清理
+
+在任何将 GitHub repository 改为 public、转移给非受限协作者，或接入不应读取私有资料的构建服务之前，完成以下事项：
+
+- [ ] 在公开前将 `Wenrui_Wu_Portfolio_Source_Dossier.md` 迁至仓库外的私有位置，并确认当前 `main`、所有工作分支和发布产物都不包含它。
+- [ ] 盘点所有仍包含 dossier 的 Git refs、tags、Pull Requests、forks 和本地 clone；其中包括历史恢复 tag，不能仅删除当前文件。
+- [ ] 在独立镜像/备份完成后，使用 `git filter-repo --sensitive-data-removal --invert-paths --path Wenrui_Wu_Portfolio_Source_Dossier.md` 从所有需要公开的历史中清除；事前列出将被改写的 refs 并由 Alina 单独确认。
+- [ ] 强制更新经确认的远端 refs 后，让所有保留的本地 clone 重新克隆或按清理流程处理，防止旧历史重新推回。
+- [ ] 如果 dossier 曾经被公开或被 fork，按 GitHub 的敏感数据清除流程评估是否需要联系 GitHub Support；不要将普通删除视为历史清除。
+- [ ] 在公开前重新审计 repository、tag、release assets、Cloudflare build input 与最终 bundle，确认 dossier 不可访问。

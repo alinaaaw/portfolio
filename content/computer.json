@@ -134,6 +134,6 @@
       ]
     }
   },
-  "bulletin": { "header": "LAB BULLETIN", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
+  "bulletin": { "header": "LAB BULLETIN · PORTFOLIO SYSTEM v0.8.0", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
   "taskbar": { "files": "LOCAL FILES", "unread": "1 UNREAD BULLETIN", "clear": "NO NEW ALERTS" }
 }

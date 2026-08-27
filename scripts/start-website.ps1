@@ -4,13 +4,13 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $nodeDirectory = Join-Path $projectRoot ".runtime\node-v22.14.0-win-x64"
 $npmCommand = Join-Path $nodeDirectory "npm.cmd"
 $devCommand = Join-Path $projectRoot "node_modules\.bin\vinext.cmd"
-$siteUrl = "http://127.0.0.1:3000/?v=version1"
+$siteUrl = "http://127.0.0.1:3000/"
 
 try {
   $existingSite = Invoke-WebRequest -Uri $siteUrl -UseBasicParsing -TimeoutSec 2
   if ($existingSite.StatusCode -eq 200) {
     Start-Process $siteUrl
-    Write-Host "Alina Portfolio Version 1 is already running."
+    Write-Host "Alina Portfolio is already running."
     exit 0
   }
 } catch {
@@ -39,7 +39,7 @@ Start-Process powershell.exe `
   -WindowStyle Hidden
 
 Write-Host ""
-Write-Host "ALINA PORTFOLIO - VERSION 1"
+Write-Host "ALINA PORTFOLIO"
 Write-Host "The browser will open automatically."
 Write-Host "Keep this window open while viewing the site."
 Write-Host "Press Ctrl+C when you are finished."
