@@ -80,7 +80,9 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /TURN PAGE/);
   assert.doesNotMatch(page, /book-turning-sheet/);
   assert.match(content, /FIELD CASE \/ LIFE OUTSIDE THE LAB/);
-  assert.match(content, /WORLD MAP \/ TRAVEL PINS/);
+  assert.match(content, /WORLD MAP \/ PLACES VISITED/);
+  assert.match(content, /RECIPE CARDS \/ COOKING \+ BAKING/);
+  assert.match(content, /LASER SHOOTING \/ HIGH SCHOOL TEAM/);
   assert.match(page, /field-map-reading/);
   assert.match(page, /drawFieldCaseMapViewport/);
   assert.doesNotMatch(content, /editable layout markers|Replace prompts and layout pins/);

@@ -405,9 +405,9 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   const safetyTab=roundedBox(.42,.08,.58,0x5f392e,.12,.7,.08);safetyTab.position.set(-1.63,1.08,-.58);safetyTab.rotation.y=.12;caseGroup.add(safetyTab);
   for(const x of [-1.72,-1.54]){const rivet=cylinder(.026,.025,palette.steel,12);rivet.position.set(x,1.13,-.58);caseGroup.add(rivet);}
   const safetyLabel=roundedBox(.62,.025,.16,palette.signal,.025,.84,.01);safetyLabel.position.set(-3.05,1.065,-1.04);safetyLabel.rotation.y=-.05;caseGroup.add(safetyLabel);
-  const postcardCards:THREE.Mesh[]=[];
+  const recipeCards:THREE.Mesh[]=[];
   [[-.75,-.54,.1],[-.52,.25,-.1]].forEach(([x,z,angle],index)=>{
-    const postcard=roundedBox(1.28,.045,.92,index===0?0xe4dcc6:0xd4c9a8,.035,.96,.01);postcard.position.set(x,1.03,z);postcard.rotation.y=angle;caseGroup.add(postcard);postcardCards.push(postcard);
+    const recipeCard=roundedBox(1.28,.045,.92,index===0?0xe4dcc6:0xd4c9a8,.035,.96,.01);recipeCard.position.set(x,1.03,z);recipeCard.rotation.y=angle;caseGroup.add(recipeCard);recipeCards.push(recipeCard);
     const image=roundedBox(.98,.018,.57,index===0?0x365f65:0x765641,.025,.85,.01);image.position.set(x,1.064,z-.1);image.rotation.y=angle;caseGroup.add(image);
     const horizon=box(.7,.012,.025,index===0?palette.cyan:0xd7bd73,.8,.01);horizon.position.set(x,1.078,z-.1);horizon.rotation.y=angle;caseGroup.add(horizon);
     const sun=new THREE.Mesh(new THREE.CircleGeometry(.07,16),mat(index===0?0xd6c66c:0xd8a66d,.76,.01));sun.rotation.x=-Math.PI/2;sun.position.set(x+.27,1.082,z-.22);caseGroup.add(sun);
@@ -436,8 +436,8 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   });
   const compassRing=new THREE.Mesh(new THREE.RingGeometry(.12,.17,24),mat(0x7b503f,.76,.02));compassRing.rotation.x=-Math.PI/2;compassRing.position.set(3.93,.465,.26);scene.add(compassRing);
   const items:[string,string,THREE.Mesh,[number,number,number],[number,number,number]][]=[
-    ["targetSports",fieldCaseContent.itemLabels.targetSports,target,[1.95,.55,1.95],[-3.05,1.2,-.35]],
-    ["postcards",fieldCaseContent.itemLabels.postcards,postcardCards[0],[1.75,.55,2.05],[-.62,1.18,-.1]],
+    ["laserShooting",fieldCaseContent.itemLabels.laserShooting,target,[1.95,.55,1.95],[-3.05,1.2,-.35]],
+    ["recipes",fieldCaseContent.itemLabels.recipes,recipeCards[0],[1.75,.55,2.05],[-.62,1.18,-.1]],
     ["archery",fieldCaseContent.itemLabels.archery,arrows[1],[2.55,.5,.7],[-1.8,1.25,.9]],
     ["travelMap",fieldCaseContent.itemLabels.travelMap,worldMap,[3.75,.55,2.18],[mapCenterX,.67,mapCenterZ]],
   ];

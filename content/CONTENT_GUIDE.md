@@ -49,7 +49,7 @@ Use the drawer for tangible traces of making: prototypes, sketches, components, 
 
 ### Field Case — Life Outside the Lab
 
-Use the Field Case only for experiences gathered away from the workstation: observations, activities, travel, photographs, and ideas brought back from the outside world. Formal project findings, presentations, deployments, and evaluation metrics belong in their Computer case files or evidence packets. The current travel, photography, archery, and target-sport entries are content prompts; replace them with confirmed personal details rather than inventing destinations or achievements.
+Use the Field Case only for experiences gathered away from the workstation: observations, activities, travel, photographs, and ideas brought back from the outside world. Formal project findings, presentations, deployments, and evaluation metrics belong in their Computer case files or evidence packets. The current entries cover confirmed travel, cooking and baking, archery, and laser-shooting interests. Do not invent specific achievements or personal stories that have not been confirmed.
 
 ### Fax — A Continuing Investigation
 
