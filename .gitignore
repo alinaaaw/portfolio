@@ -45,3 +45,6 @@ next-env.d.ts
 /.npm-cache/
 /node-v22.14.0-win-x64.zip
 /checkpoints/*.zip
+
+# Private portfolio source material kept only on this computer
+/Wenrui_Wu_Portfolio_Source_Dossier.md
