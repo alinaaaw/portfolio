@@ -98,8 +98,8 @@
 
 ## Phase 3：把正式网站放到 GitHub `main`
 
-- [ ] 最后比较 `main` 与已经完成 Phase 2 清理的工作分支，确认 Pull Request 只包含准备正式保留的内容。
-- [ ] 确认仓库没有 `.env`、API Key、Cloudflare Token、私有 dossier 或不应公开的文件。
+- [x] 最后比较 `main` 与已经完成 Phase 2 清理的工作分支，确认 Pull Request 只包含准备正式保留的内容。
+- [x] 确认仓库没有 `.env`、API Key、Cloudflare Token、私有 dossier 或不应公开的文件。
 - [ ] 通过 Pull Request 将经过内容验收和旧名称清理的网站合并到 `main`。
 - [ ] 确认 GitHub 默认分支仍为 `main`，README 首页展示的是 Alina Portfolio / Lab 17 正式网站。
 - [ ] 在全新的本地目录或干净环境中从 `main` 安装依赖、运行测试并完成 production build。
