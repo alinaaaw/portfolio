@@ -1,16 +1,16 @@
 # Travel map photos
 
-这里只需要放照片，不需要修改代码，也不需要创建 `manifest.json`。
+Only photos belong here. You do not need to modify any code or create a `manifest.json` file.
 
-## 添加照片
+## Adding photos
 
-1. 找到或新建对应的城市文件夹。
-2. 直接把照片放进文件夹。
-3. 提交并重新构建网站；系统会自动识别城市、照片顺序和照片总数。
+1. Find or create the folder for the relevant city.
+2. Place the photos directly in that folder.
+3. Commit the files and rebuild the website. The system automatically detects the city, photo order, and total photo count.
 
-支持：JPG、JPEG、PNG、WebP、GIF、AVIF。手机拍摄的 HEIC/HEIF 请先转换成 JPG 或 WebP。
+Supported formats: JPG, JPEG, PNG, WebP, GIF, and AVIF. Convert HEIC or HEIF photos from a phone to JPG or WebP first.
 
-照片按照文件名自然排序。序号完全是可选的，只在你想手动控制展示顺序时使用。以下两种写法都会被自动识别：
+Photos are sorted naturally by filename. Number prefixes are optional and are only needed when you want to control the display order manually. Both of the following naming styles are detected automatically:
 
 ```text
 01-times-square.jpg
@@ -22,9 +22,9 @@ central-park.jpg
 brooklyn-bridge.webp
 ```
 
-文件名会自动变成照片下方的标题，例如 `02-central-park.jpg` 会显示为 `central park`。
+The filename automatically becomes the caption below the photo. For example, `02-central-park.jpg` is displayed as `central park`.
 
-## 城市文件夹名
+## City folder names
 
 - `seattle`
 - `san-francisco`
@@ -48,4 +48,4 @@ brooklyn-bridge.webp
 - `beihai`
 - `lijiang`
 
-没有照片的城市会继续显示随机的旅行遗失文案。
+Cities without photos continue to display a randomized lost-travel message.
