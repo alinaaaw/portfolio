@@ -634,7 +634,7 @@ export default function VersionThree() {
       <header className="room-nav">
         <button className="room-brand" onClick={() => setIndexOpen(true)}>{siteContent.brand.name} <span>{siteContent.brand.lab}</span></button>
         <nav><button onClick={() => setIndexOpen(true)}>{roomContent.navigation.index}</button><button onClick={() => setContactOpen(true)}>{roomContent.navigation.contact}</button></nav>
-        <div className="room-count"><i /> {String(discovered.length).padStart(2,"0")}{roomContent.navigation.foundSuffix}</div>
+        <div className="room-system"><span className="room-version">{siteContent.brand.version}</span><div className="room-count"><i /> {String(discovered.length).padStart(2,"0")}{roomContent.navigation.foundSuffix}</div></div>
       </header>
 
       <section className="room-viewport" aria-label={roomContent.ariaLabel}>
@@ -684,7 +684,7 @@ export default function VersionThree() {
       {active==="computer"&&(
         <div className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
-            <header className="os-bar"><span>{computerContent.topBar.title}</span><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
+            <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
               <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
               <main className="os-workspace">
