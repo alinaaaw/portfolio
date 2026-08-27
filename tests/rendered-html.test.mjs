@@ -196,6 +196,9 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(drawer, /walk 68\.75% · bus\/subway 47\.92% · bike 37\.5%/);
   assert.match(drawer, /43 valid entries · 46\.51% said time-consuming · 44\.19% said it helped clearly/);
   assert.match(drawer, /32\.56% unclear guidance\/interface · 32\.56% too many features/);
+  assert.match(drawer, /one clear walking comfort-zone map with relevant facilities marked, without extra functions or complex navigation/);
+  assert.match(drawer, /middle-aged and older residents/);
+  assert.match(drawer, /one focused webpage · 5 \/ 10 \/ 15-minute walking comfort zones · clearly marked facilities · no unnecessary features/);
   assert.match(drawer, /"asset": "emg-enclosure-interior"/);
   assert.match(drawer, /"asset": "emg-enclosure-exterior"/);
   assert.doesNotMatch(drawer, /\/archive\//);

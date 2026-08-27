@@ -9,15 +9,15 @@
   "items": {
     "folder": {
       "meta": "SHANGHAI QOL / FIELD PACKET / 2023—2024",
-      "title": "The survey turned everyday mobility and software friction into practical responses.",
-      "copy": "Two multi-select summaries make the field packet more concrete. Walking was the most commonly selected travel mode, while the software responses showed a mixed picture: many residents found the tools helpful, but time, interface clarity, and feature overload remained visible barriers. Those findings informed a walking-time facility map and community materials on food safety and fraud prevention.",
+      "title": "The research led to a deliberately simple, walking-first map.",
+      "copy": "Walking was the most commonly selected travel mode, while 43 valid software responses exposed barriers around operating time, interface clarity, and feature overload. I used those findings to define a restrained website for middle-aged and older residents: one clear walking comfort-zone map with relevant facilities marked, without extra functions or complex navigation. The wider study also informed community materials on food safety and fraud prevention.",
       "facts": [
         { "label": "TRAVEL MODES", "value": "walk 68.75% · bus/subway 47.92% · bike 37.5% · car 25% · taxi 18.75%" },
         { "label": "SOFTWARE RESPONSES", "value": "43 valid entries · 46.51% said time-consuming · 44.19% said it helped clearly" },
         { "label": "USABILITY FRICTION", "value": "32.56% unclear guidance/interface · 32.56% too many features · 23.26% needed help" },
-        { "label": "RESEARCH OUTPUTS", "value": "5 / 10 / 15-minute facility map · food-safety poster · anti-fraud lecture" }
+        { "label": "DESIGN RESPONSE", "value": "one focused webpage · 5 / 10 / 15-minute walking comfort zones · clearly marked facilities · no unnecessary features" }
       ],
-      "note": "The percentages come from multi-select questionnaire summaries, so categories are not expected to total 100%. The packet connects those aggregate findings to both a digital map and community-facing materials."
+      "note": "The percentages come from multi-select questionnaire summaries, so categories are not expected to total 100%. The map's simplicity was an intentional accessibility decision: it kept the task narrow and legible for middle-aged and older residents instead of reproducing the complexity reported in the survey."
     },
     "notebook": {
       "meta": "THERMO FISHER / ROBOTIC TUBE HANDLING / TEST PACKET",
