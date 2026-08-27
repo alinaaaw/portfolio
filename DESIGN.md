@@ -1,4 +1,4 @@
-# ALINA.WU - VERSION 3 DESIGN SYSTEM
+# ALINA PORTFOLIO — LAB 17 DESIGN SYSTEM
 
 This document is the implementation specification for Lab 17. Values below are
 the current source of truth unless a component explicitly defines a local
@@ -11,6 +11,12 @@ Lab 17 is a personal portfolio presented as a lightweight 3D workspace. The
 visitor explores one coherent room, inspects six stations, and gradually finds
 evidence that Alina is working away from the lab. The portfolio must read as a
 real workspace first and a mystery second.
+
+The environment is a late-night creative laboratory: deep ink, warm paper,
+signal lime, evidence red, and muted cyan combine editorial case-file detail
+with tactile physical evidence. Real projects and experiences remain the
+primary evidence. The fieldwork narrative is inviting, intelligent, and safe;
+it must never imply danger or replace the portfolio's factual content.
 
 The opening must not announce a disappearance. The computer bulletin introduces
 the absence later. After all six stations are discovered, the printer produces

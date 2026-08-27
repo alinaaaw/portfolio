@@ -1,30 +1,37 @@
-# Alina Portfolio — Version 3
+# Alina Portfolio / Lab 17
 
-This branch contains the **Lab 17** interactive 3D portfolio direction.
+Lab 17 is Alina Wu's interactive portfolio: a lightweight 3D workspace where
+visitors explore projects, research, experience, and personal notes through
+six connected stations.
 
 ## Open locally
 
 Double-click `START-WEBSITE.cmd`. Keep the command window open while viewing
 the site, and press `Ctrl + C` when finished.
 
-## Branch purpose
+## What is here
 
-- Branch: `version3-design`
-- Design: explorable 3D laboratory room with a gradual mystery
-- Status: active and independently editable
-- Versions 1 and 2 are maintained separately.
+- An explorable 3D laboratory room with direct and keyboard-accessible routes.
+- Project evidence, research notes, and experience records maintained in
+  `content/*.json`.
+- A gradual fieldwork narrative that supports the portfolio without replacing
+  its factual content.
 
 ## Main files
 
 ```text
-app/page.tsx              Portfolio narrative and recovered project files
+app/page.tsx              Portfolio narrative and project files
 app/_components/LabGame.tsx  Three.js room, object hitboxes, and camera transitions
 app/_components/ZoneCloseup3D.tsx  Five interactive Three.js object close-ups
 app/layout.tsx            Metadata and page shell
 public/site.css           Complete visual design and responsive behavior
-public/og.png             Social preview made for Case File 03
+public/og.png             Social preview for Lab 17
 DESIGN.md                 Canonical design and interaction rules
-VERSION-3.md              Concept notes
+TODO.md                   Launch plan and acceptance checklist
 ```
 
-Commit each meaningful change to this branch so earlier states remain available.
+## Before a release
+
+Run the production build and automated tests, then follow the release checks in
+`TODO.md`. Keep factual portfolio copy in `content/` and follow
+`content/CONTENT_GUIDE.md` when updating it.
