@@ -107,8 +107,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .quick-list button:hover { background: rgba(209,244,92,.06); }
 .quick-list button > span { color: var(--signal); font: 8px var(--font-mono), monospace; }
 .quick-list button div { display: flex; flex-direction: column; gap: 5px; }
-.quick-list small { color: #727d76; font: normal 7px/1.35 var(--font-mono), monospace; }
-.quick-list i { color: #727d76; font: normal 7px var(--font-mono), monospace; }
+.quick-list small { color: #727d76; font: normal 8px/1.35 var(--font-mono), monospace; }
+.quick-list i { color: #727d76; font: normal 9px var(--font-mono), monospace; }
 .quick-list strong { font-size: 12px; }
 .quick-list i { color: var(--cyan); }
 
