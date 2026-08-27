@@ -16,6 +16,7 @@
   "shared": {
     "returnToRoom": "RETURN TO ROOM ×",
     "close": "×",
-    "arrow": "→"
+    "arrow": "→",
+    "comingSoon": "COMING SOON"
   }
 }

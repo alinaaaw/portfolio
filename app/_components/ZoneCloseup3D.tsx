@@ -11,6 +11,7 @@ import {
   faxContact,
   fieldCase as fieldCaseContent,
   notebook as notebookContent,
+  site as siteContent,
 } from "@/content";
 
 export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
@@ -554,7 +555,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     };
     const pointerMove=(event:PointerEvent)=>{
       if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX+delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
-      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current)labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.label??view.hint;} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
+      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current){const label=hovered?.userData.label;labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??view.hint;}} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
     const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item&&!hit?.userData.hoverOnly)selectRef.current(item);}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};

@@ -105,6 +105,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /BOARD \/ PRINCIPLES/);
   assert.match(content, /"openingEnabled": false/);
   assert.match(content, /"personalDetailsOpeningEnabled": false/);
+  assert.match(content, /"comingSoon": "COMING SOON"/);
   assert.match(content, /Whole Brain Living/);
   assert.match(content, /To Live/);
   assert.match(content, /Cries in the Drizzle/);
@@ -169,6 +170,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /series:higashino/);
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
   assert.match(closeups, /item!=="travelMap"&&!fieldCaseContent\.personalDetailsOpeningEnabled/);
+  assert.match(closeups, /siteContent\.shared\.comingSoon/);
   assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
