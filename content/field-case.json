@@ -1,27 +1,35 @@
 {
   "ariaLabel": "Travel and interests field case close-up",
   "header": "FIELD CASE / LIFE OUTSIDE THE LAB",
-  "sceneHint": "MAP · ARCHERY · TARGET SPORTS",
+  "sceneHint": "MAP · POSTCARDS · ARCHERY · TARGET SPORTS",
   "returnItem": "RETURN TO CASE",
   "itemLabels": {
     "travelMap": "WORLD MAP / TRAVEL PINS",
+    "postcards": "POSTCARDS / FIELD NOTES",
     "archery": "ARCHERY KIT / SPORT PRACTICE",
     "targetSports": "TARGET SPORTS / SAFETY FIRST"
   },
   "items": {
+    "postcards": {
+      "meta": "FIELD CASE / POSTCARDS",
+      "title": "What stayed after the trip",
+      "copy": "The map records where. These cards hold what stayed: a detail, a surprise, or a short note from the journey. Together, they add a more personal layer than a list of destinations.",
+      "metrics": [],
+      "tags": ["field notes", "travel", "observations", "memories"]
+    },
     "archery": {
       "meta": "FIELD CASE / ARCHERY",
-      "title": "Archery",
-      "copy": "A placeholder for the personal side of archery: practice-day photographs, what makes the activity enjoyable, and any confirmed stories you choose to share. The model uses arrows and a protective finger tab to keep the scene in a clear sporting context.",
+      "title": "A repeatable sequence",
+      "copy": "Archery turns posture, breathing, and release into one coordinated sequence. The challenge is to keep that sequence steady while learning from each round.",
       "metrics": [],
-      "tags": ["archery", "sport", "practice", "safety"]
+      "tags": ["archery", "form", "focus", "consistency"]
     },
     "targetSports": {
       "meta": "FIELD CASE / TARGET SPORTS",
-      "title": "Target sports",
-      "copy": "A safety-first space for target-sport interests and practice-day memories, represented by target paper and safety cues rather than a weapon model. Add specific experiences only after confirming the details.",
+      "title": "Precision under controlled conditions",
+      "copy": "Target sports combine concentration with strict safety discipline. The appeal lies in controlled practice: reducing variation and producing a consistent result.",
       "metrics": [],
-      "tags": ["target sports", "focus", "practice", "safety first"]
+      "tags": ["target sports", "precision", "discipline", "safety"]
     }
   }
 }
