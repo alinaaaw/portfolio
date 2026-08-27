@@ -93,21 +93,22 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 
 .modal-layer, .computer-view { position: fixed; z-index: 40; inset: 0; }
 .modal-layer { display: flex; align-items: center; justify-content: flex-end; background: rgba(2,7,6,.72); backdrop-filter: blur(12px); }
-.quick-index { width: min(540px,100%); height: 100%; overflow-y: auto; border-left: 1px solid var(--line); background: #0e1715; box-shadow: -30px 0 80px var(--shadow); }
+.quick-index { display: grid; grid-template-rows: 62px auto minmax(0,1fr); width: min(540px,100%); height: 100%; overflow: hidden; border-left: 1px solid var(--line); background: #0e1715; box-shadow: -30px 0 80px var(--shadow); }
 .quick-index > header, .object-view > header, .fax-machine > header { display: flex; align-items: center; justify-content: space-between; min-height: 62px; padding: 0 24px; border-bottom: 1px solid var(--line); font: 7px var(--font-mono), monospace; }
 .quick-index > header div, .object-view > header div { display: flex; gap: 17px; }
 .quick-index > header span, .object-view > header span { color: var(--cyan); }
 .quick-index header button, .object-view > header button, .fax-machine > header button { padding: 8px; background: transparent; color: var(--paper); cursor: pointer; font: 17px var(--font-mono), monospace; }
-.quick-index > section { padding: 55px 38px 40px; }
+.quick-index > section { padding: clamp(26px,4.5vh,38px) 38px clamp(18px,3vh,26px); }
 .quick-index > section small { color: var(--red); font: 7px var(--font-mono), monospace; }
 .quick-index h2 { margin: 17px 0 22px; color: var(--paper-bright); font-size: 48px; line-height: .96; letter-spacing: -.055em; }
 .quick-index > section p { max-width: 390px; color: #929a94; font-size: 12px; line-height: 1.7; }
-.quick-list { border-top: 1px solid var(--line); }
-.quick-list button { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 20px 24px; border-bottom: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; text-align: left; }
+.quick-list { display: grid; grid-template-rows: repeat(6,minmax(0,1fr)); min-height: 0; border-top: 1px solid var(--line); }
+.quick-list button { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 10px; min-height: 0; width: 100%; padding: clamp(9px,1.6vh,15px) 24px; border-bottom: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; text-align: left; }
 .quick-list button:hover { background: rgba(209,244,92,.06); }
 .quick-list button > span { color: var(--signal); font: 8px var(--font-mono), monospace; }
 .quick-list button div { display: flex; flex-direction: column; gap: 5px; }
-.quick-list small, .quick-list i { color: #727d76; font: normal 6px var(--font-mono), monospace; }
+.quick-list small { color: #727d76; font: normal 7px/1.35 var(--font-mono), monospace; }
+.quick-list i { color: #727d76; font: normal 6px var(--font-mono), monospace; }
 .quick-list strong { font-size: 12px; }
 .quick-list i { color: var(--cyan); }
 
@@ -596,9 +597,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .explore-dock button { justify-content: center; padding: 11px 5px; }
   .explore-dock i { display: none; }
   .fax-alert { left: 12px; right: 12px; bottom: 90px; text-align: center; }
-  .quick-index > section { padding: 40px 24px 28px; }
+  .quick-index > section { padding: clamp(22px,4vh,30px) 24px 18px; }
   .quick-index h2 { font-size: 42px; }
-  .quick-list button { padding: 18px 16px; }
+  .quick-list button { padding: 9px 16px; }
   .computer-view { padding: 0; }
   .monitor-bezel { width: 100vw; height: 100svh; padding: 0; border: 0; border-radius: 0; }
   .os-bar { grid-template-columns: 1fr auto; height: 46px; }
