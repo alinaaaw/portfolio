@@ -443,9 +443,10 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   ];
   items.forEach(([item,label,visual,size,position])=>{
     const hit=hitBox(item,label,size,position,[visual]);
-    // Keep the models and detail routes intact. Set openingEnabled to true in
-    // content/field-case.json when these close-ups are ready to reopen.
-    hit.userData.hoverOnly=!fieldCaseContent.openingEnabled;
+    // The travel map remains interactive. Keep the other models and detail
+    // routes intact, then set personalDetailsOpeningEnabled to true in
+    // content/field-case.json when those personal close-ups are ready to reopen.
+    hit.userData.hoverOnly=item!=="travelMap"&&!fieldCaseContent.personalDetailsOpeningEnabled;
     scene.add(hit);
     hits.push(hit);
   });

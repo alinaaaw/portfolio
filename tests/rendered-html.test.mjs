@@ -104,6 +104,7 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.doesNotMatch(content, /make the workflow legible before changing it/);
   assert.doesNotMatch(content, /BOARD \/ PRINCIPLES/);
   assert.match(content, /"openingEnabled": false/);
+  assert.match(content, /"personalDetailsOpeningEnabled": false/);
   assert.match(content, /Whole Brain Living/);
   assert.match(content, /To Live/);
   assert.match(content, /Cries in the Drizzle/);
@@ -167,8 +168,8 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /RoundedBoxGeometry\(\.72,\.86,\.052/);
   assert.match(closeups, /series:higashino/);
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
-  assert.match(closeups, /hoverOnly=!fieldCaseContent\.openingEnabled/);
-  assert.match(closeups, /when these close-ups are ready to reopen/);
+  assert.match(closeups, /item!=="travelMap"&&!fieldCaseContent\.personalDetailsOpeningEnabled/);
+  assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
   assert.match(closeups, /makeBook\(book,index,-\.35\+index\*\.42,\.43,true,false\)/);
