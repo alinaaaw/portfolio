@@ -310,7 +310,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .field-map-memory::after { right: 31px; transform: rotate(4deg); }
 .field-map-memory > header, .field-map-photo-stage, .field-map-memory > footer { min-width: 0; max-width: 100%; }
 .field-map-memory > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 54px; padding: 7px 2px 6px 5px; border-bottom: 1px dashed rgba(81,91,76,.48); background: transparent; }
-.field-map-memory > header > div { min-width: 0; overflow: hidden; }
+.field-map-memory > header > div { min-width: 0; overflow: hidden; transform: translateY(2px); }
 .field-map-memory > header small { display: block; margin-bottom: 4px; color: #8b4439; font: 7px var(--font-mono),monospace; letter-spacing: .13em; }
 .field-map-memory > header h2 { margin: 0; padding-bottom: 5px; color: #2f453e; font: 24px/1 "Segoe Print",cursive; letter-spacing: -.04em; }
 .field-map-memory > header small, .field-map-memory > header h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
