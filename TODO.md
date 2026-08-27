@@ -123,7 +123,7 @@
 - [x] 决定 `0.8.0` 是否暂时设置 `noindex, nofollow`；如果设置，必须在正式 `1.0.0` 发布时移除。无论是否索引，网站内都只显示正常版本号。
 - [x] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
 - [ ] 使用真实 `https://alinawu.com` 检查 HTTPS、桌面端、手机端、核心探索路线、所有外部链接、404 和资源加载失败状态。
-- [ ] 普通 push 到 `main` 不自动更新 `alinawu.com`；只有 Alina 确认一批修改已经可对外显示后，才手动创建新的 Cloudflare deployment。
+- [x] 普通 push 到 `main` 不自动更新 `alinawu.com`；只有 Alina 确认一批修改已经可对外显示后，才手动创建新的 Cloudflare deployment。
 - [ ] `0.8.0` 期间的多次外部测试由 Cloudflare version ID 与 Git commit 区分，不为了每次反馈修复反复增加产品版本号。
 
 完成标准：外部用户访问 `https://alinawu.com` 可以看到内部标注为 `0.8.0` 的网站；没有 `preview.alinawu.com`，普通 push 不会更新域名，后续 deployment 仍由 Alina 手动决定。
