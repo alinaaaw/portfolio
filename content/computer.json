@@ -128,7 +128,7 @@
       "quote": "YOLO26 / RGB-D / ROS2 / AGENTIC ENGINEERING / SOFTWARE TESTING",
       "details": [
         { "label": "ROBOTIC TUBE HANDLING", "copy": "Developed a four-class YOLO26 perception pipeline for automated tube handling. Integrated RGB-D target localization with ROS2 chassis and robot-arm workflows for pickup and placement." },
-        { "label": "F1 / 3500Dx", "copy": "Executing black-box dynamic workflow test cases for the 3500Dx data collection software. Clarify expected behavior and software workflows when test cases require additional context." },
+        { "label": "F1 / 3500Dx", "copy": "Currently executing black-box dynamic workflow test cases for the 3500Dx data-collection software。 Clarifying expected behavior and workflows when cases require additional context." },
         { "label": "QANTIS", "copy": "Analyzed WinTrace, the previous EDXRF software. Documented page transitions and interaction paths in Miro to support the redesign." },
         { "label": "INTERN ONBOARDING", "copy": "Onboarded a new intern to the testing environment. Set up the virtual machine, provided software training, resolved setup issues, and supported the transition to independent testing." }
       ]

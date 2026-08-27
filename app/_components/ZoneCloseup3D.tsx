@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { createFieldCaseWorldMapTexture, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 import {
   board as boardContent,
   books as booksContent,
@@ -23,6 +23,15 @@ type Props = {
   onFaxPrinted?: () => void;
   contactCardRaised?: boolean;
 };
+
+function createFieldCaseWorldMapTexture(resolution=1024) {
+  const texture=new THREE.CanvasTexture(createFieldCaseWorldMapCanvas(resolution));
+  texture.colorSpace=THREE.SRGBColorSpace;
+  texture.minFilter=THREE.LinearMipmapLinearFilter;
+  texture.magFilter=THREE.LinearFilter;
+  texture.userData.fieldCaseOwned=true;
+  return texture;
+}
 
 type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; visuals?: THREE.Mesh[] } };
 

@@ -207,7 +207,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(page, /className="artifact-media"/);
   assert.match(css, /\.artifact-media \{[^}]*grid-template-columns: repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css, /\.drawer-document article small \{[^}]*font: clamp\(9px,1\.1vw,11px\)\/1\.55/);
-  assert.match(css, /\.drawer-document-return \{[^}]*font: 9px/);
+  assert.match(css, /\.drawer-document-return(?:, \.fax-return)? \{[^}]*font: 9px/);
   assert.match(drawerScene, /const cabinetTop=roundedBox\(4\.25,\.18,3\.55/);
   assert.match(drawerScene, /const bottom=roundedBox\(3\.72,\.14,3\.12/);
   assert.match(drawerScene, /const front=roundedBox\(4\.02,1\.18,\.27/);
@@ -262,7 +262,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /TubeGeometry/);
   assert.match(closeups, /if\(showFax\)/);
   assert.match(closeups, /onFaxPrinted/);
-  assert.match(closeups, /fieldCaseContent\.itemLabels\.target/);
+  assert.match(closeups, /fieldCaseContent\.itemLabels\.laserShooting/);
   for (const selector of ["lab-game", "computer-view", "os-screen", "model-scene", "model-detail", "physical-book", "book-turning-sheet", "series-catalog", "contact-reading", "contact-card-detail", "fax-reading", "fax-paper"]) {
     assert.match(css, new RegExp(`\\.${selector}`));
   }
@@ -397,7 +397,7 @@ test("field case map uses real country geometry instead of hand-drawn continents
   assert.doesNotMatch(css, /\.field-map-photo-stage\.is-(?:loading|ready|lost)[^{]*\{[^}]*(?:width|height|padding|margin|aspect-ratio):/);
   assert.doesNotMatch(css, /\.field-map-memory\.is-photo-ready/);
   assert.doesNotMatch(css, /field-map-photo-stage:not\(\.is-ready\)/);
-  assert.match(photoGuide, /不需要修改代码/);
+  assert.match(photoGuide, /You do not need to modify any code/);
   assert.match(nycGuide, /new-york-city/);
   assert.doesNotMatch(mapReading, /item\.copy|field-map-places|object-tags/);
   assert.doesNotMatch(mapSource, /landMasses/);

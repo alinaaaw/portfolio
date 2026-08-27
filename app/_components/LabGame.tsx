@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { room } from "@/content";
-import { createFieldCaseWorldMapTexture, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
@@ -18,6 +18,15 @@ type LabGameProps = {
   onInspect: (zone: ZoneId) => void;
   onPrinterInspect: () => void;
 };
+
+function createFieldCaseWorldMapTexture(resolution=1024) {
+  const texture=new THREE.CanvasTexture(createFieldCaseWorldMapCanvas(resolution));
+  texture.colorSpace=THREE.SRGBColorSpace;
+  texture.minFilter=THREE.LinearMipmapLinearFilter;
+  texture.magFilter=THREE.LinearFilter;
+  texture.userData.fieldCaseOwned=true;
+  return texture;
+}
 
 type ZoneTarget = THREE.Object3D & { userData: { zone?: SceneTargetId } };
 

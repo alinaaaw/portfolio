@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import countries110m from "./worldCountries110m.json";
 
 type Coordinate = readonly [longitude:number,latitude:number];
@@ -322,15 +321,10 @@ export function drawFieldCaseMapViewport(
   return hits;
 }
 
-export function createFieldCaseWorldMapTexture(resolution=1024) {
+export function createFieldCaseWorldMapCanvas(resolution=1024) {
   const canvas=document.createElement("canvas");
   drawFieldCaseWorldMap(canvas,resolution);
-  const texture=new THREE.CanvasTexture(canvas);
-  texture.colorSpace=THREE.SRGBColorSpace;
-  texture.minFilter=THREE.LinearMipmapLinearFilter;
-  texture.magFilter=THREE.LinearFilter;
-  texture.userData.fieldCaseOwned=true;
-  return texture;
+  return canvas;
 }
 
 export function pinPosition(
