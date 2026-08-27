@@ -532,7 +532,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .fax-paper { width: 70%; margin: 0 auto; padding: 60px 55px 40px; background-color: #e9e1cd; background-image: repeating-linear-gradient(0deg,rgba(40,50,45,.035) 0 1px,transparent 1px 4px); color: #17201e; box-shadow: 9px 13px 0 rgba(0,0,0,.25); transform-origin: top center; animation: printPaper 5.8s cubic-bezier(.22,.58,.2,1) both; }
 @keyframes printPaper { 0% { opacity: .35; transform: translateY(-94%); } 12% { opacity: 1; } 100% { opacity: 1; transform: translateY(0); } }
 .fax-paper small { color: #a63f34; font: 7px var(--font-mono), monospace; }
-.fax-paper h2 { margin: 25px 0 30px; font-size: clamp(48px,7vw,83px); line-height: .9; letter-spacing: -.07em; }
+.fax-paper h2 { margin: 25px 0 30px; font-size: clamp(42px,5.8vw,70px); line-height: .9; letter-spacing: -.07em; }
 .fax-paper p { color: #4c5650; font-size: 14px; line-height: 1.8; }
 .fax-reading-scroll > strong { display: block; margin: 30px 0; font: 23px "Segoe Print",cursive; }
 .fax-paper footer { display: flex; justify-content: space-between; gap: 15px; padding-top: 18px; border-top: 1px solid #9fa397; font: 7px var(--font-mono), monospace; }
@@ -700,7 +700,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .fax-paper { width: 88%; padding: 45px 28px 30px; }
   .fax-reading-paper { width: 88%; padding: 0; }
   .fax-reading-scroll { padding: 45px 28px 64px; }
-  .fax-paper h2 { font-size: 52px; }
+  .fax-paper h2 { font-size: 44px; }
   .fax-paper footer { flex-direction: column; }
 }
 
