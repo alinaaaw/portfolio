@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { Noto_Sans_SC, Space_Mono } from "next/font/google";
 import { site } from "@/content";
 import "../public/site.css";
+
+const publicOrigin = "https://alinawu.com";
 
 const sans = Noto_Sans_SC({
   variable: "--font-sans",
@@ -15,26 +16,27 @@ const mono = Space_Mono({
   weight: ["400", "700"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
-  const origin = `${protocol}://${host}`;
+export function generateMetadata(): Metadata {
   const { title, description, ogAlt } = site.metadata;
 
   return {
+    metadataBase: new URL(publicOrigin),
     title,
     description,
+    alternates: { canonical: "/" },
+    robots: { index: false, follow: false },
     openGraph: {
       title,
       description,
-      images: [{ url: `${origin}/og.png`, width: 1639, height: 960, alt: ogAlt }],
+      url: "/",
+      siteName: "Alina Wu — Lab 17 Interactive Portfolio",
+      images: [{ url: "/og.png", width: 1639, height: 960, alt: ogAlt }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${origin}/og.png`],
+      images: ["/og.png"],
     },
   };
 }

@@ -561,7 +561,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .contact-card-detail small { color: var(--red); font: 7px var(--font-mono),monospace; letter-spacing: .12em; }
 .contact-card-detail h2 { margin: 24px 0 20px; font: clamp(34px,5vw,56px)/.98 "Segoe Print",cursive; letter-spacing: -.055em; }
 .contact-card-detail p { color: #59615b; font-size: 13px; }
+.contact-card-detail .contact-feedback-copy { max-width: 470px; margin-top: 18px; color: #59615b; font: 10px/1.65 var(--font-mono),monospace; }
 .contact-card-detail > a { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; padding: 14px 0; border-top: 1px solid #9da398; border-bottom: 1px solid #9da398; color: #9d3e32; font: 700 clamp(12px,1.7vw,17px) var(--font-mono),monospace; }
+.contact-card-detail > .contact-email { display: block; margin-top: 10px; padding: 0; border: 0; color: #6f7871; font-size: 8px; font-weight: 400; }
 .contact-card-detail > button { position: absolute; right: 18px; bottom: 17px; padding: 9px 11px; background: var(--ink); color: var(--paper); cursor: pointer; font: 7px var(--font-mono),monospace; }
 .contact-layer .tactile-scene > header strong { color: var(--cyan); }
 

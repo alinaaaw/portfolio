@@ -112,16 +112,16 @@
 
 这一阶段提前让外部用户通过正式根域名访问网站，但 `0.8.0` 仍是尚在继续改进的早期公开版本，不是稳定版 `1.0.0`。不创建 `preview.alinawu.com`；网站只在内部版本位置显示当前版本号，外部访问地址从这一阶段开始始终保持为 `https://alinawu.com`。
 
-- [ ] 确认 `main` 已完成 Phase 1–3，并且 `package.json` 与 `package-lock.json` 都显示 `0.8.0`。
-- [ ] 在 Computer 的 System Bulletin、Version History 或其他低调位置显示 `Portfolio System v0.8.0`，不额外创建醒目的 Preview 页面或不同访问入口。
-- [ ] 从干净的 `main` 安装依赖、运行测试和 production build；再次检查 repository 与 bundle 中没有 secret、私有 dossier、公司机密或不应公开的个人资料。
+- [x] 确认 `main` 已完成 Phase 1–3，并且 `package.json` 与 `package-lock.json` 都显示 `0.8.0`。
+- [x] 在 Computer 的 System Bulletin、Version History 或其他低调位置显示 `Portfolio System v0.8.0`，不额外创建醒目的 Preview 页面或不同访问入口。
+- [x] 从干净的 `main` 安装依赖、运行测试和 production build；再次检查 repository 与 bundle 中没有 secret、私有 dossier、公司机密或不应公开的个人资料。
 - [ ] 在 Cloudflare 中确认已经拥有并管理 `alinawu.com` 的 active zone，然后创建或连接 Alina Portfolio Worker。
 - [ ] 将 Worker Custom Domain 绑定到 `alinawu.com`；让 Cloudflare 创建对应 DNS 记录和 HTTPS certificate。
 - [ ] 将 `www.alinawu.com` 永久重定向到 `alinawu.com`，确保对外只有一个 canonical 地址。
 - [ ] 把经过验收的 `0.8.0` Worker version 明确部署到 custom domain traffic；仅上传 version 不会改变 `alinawu.com`，必须由 Alina 手动确认 deployment。
 - [ ] 记录 `https://alinawu.com`、Git commit SHA、Cloudflare version/deployment ID、发布日期和 `0.8.0` 简要说明，确保之后能确认域名正在运行哪一份代码。
-- [ ] 决定 `0.8.0` 是否暂时设置 `noindex, nofollow`；如果设置，必须在正式 `1.0.0` 发布时移除。无论是否索引，网站内都只显示正常版本号。
-- [ ] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
+- [x] 决定 `0.8.0` 是否暂时设置 `noindex, nofollow`；如果设置，必须在正式 `1.0.0` 发布时移除。无论是否索引，网站内都只显示正常版本号。
+- [x] 提供一个简单的反馈入口，说明希望测试者重点检查什么；不要在尚未建立隐私方案时收集敏感个人信息。
 - [ ] 使用真实 `https://alinawu.com` 检查 HTTPS、桌面端、手机端、核心探索路线、所有外部链接、404 和资源加载失败状态。
 - [ ] 普通 push 到 `main` 不自动更新 `alinawu.com`；只有 Alina 确认一批修改已经可对外显示后，才手动创建新的 Cloudflare deployment。
 - [ ] `0.8.0` 期间的多次外部测试由 Cloudflare version ID 与 Git commit 区分，不为了每次反馈修复反复增加产品版本号。

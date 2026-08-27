@@ -528,7 +528,8 @@ function PrinterScene({onClose,faxPrinted,onFaxPrinted}:{onClose:()=>void;faxPri
 }
 
 function ContactCardReading({returning,onReturn}:{returning:boolean;onReturn:()=>void}) {
-  return <div className={`contact-reading ${returning?"returning":""}`} onMouseDown={onReturn}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.contact.name}</small><h2>{faxContact.contact.headline[0]}<br />{faxContact.contact.headline[1]}</h2><p>{faxContact.contact.role}</p><a href={`mailto:${faxContact.contact.email}`}>{faxContact.contact.email} <span>{siteContent.shared.arrow}</span></a><button onClick={onReturn}>{faxContact.contact.return}</button></article></div>;
+  const feedbackHref=`mailto:${faxContact.contact.email}?subject=${encodeURIComponent("Portfolio System v0.8.0 feedback")}`;
+  return <div className={`contact-reading ${returning?"returning":""}`} onMouseDown={onReturn}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.contact.name}</small><h2>{faxContact.contact.headline[0]}<br />{faxContact.contact.headline[1]}</h2><p>{faxContact.contact.role}</p><p className="contact-feedback-copy">{faxContact.contact.feedback}</p><a href={feedbackHref}>{faxContact.contact.feedbackLabel} <span>{siteContent.shared.arrow}</span></a><a className="contact-email" href={`mailto:${faxContact.contact.email}`}>{faxContact.contact.email}</a><button onClick={onReturn}>{faxContact.contact.return}</button></article></div>;
 }
 
 function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}) {
