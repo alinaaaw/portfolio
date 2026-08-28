@@ -165,6 +165,20 @@
 
 完成标准：修改一次 `package.json` 后，网站显示、Git tag、GitHub Release、CHANGELOG 和 Cloudflare deployment 都能对应到同一个版本。
 
+### 4.2.1（高优先级）：分层测试与真实浏览器 Smoke Test
+
+目标是验证访客实际操作可以完成核心探索，而不只是确认源码能够构建。
+
+- [ ] 增加真实浏览器端到端测试依赖和可重复的 CI 浏览器环境。
+- [ ] 日常 CI（push 到 `main` 和 Pull Request）运行快速 smoke test：访问首页、进入 Room View、打开和关闭 Computer、双击桌面文件、返回房间。
+- [ ] 日常 CI 覆盖六个 closeup 的打开与 `RETURN TO ROOM` 返回路径，确保核心入口不会失效。
+- [ ] Release workflow 在日常 smoke test 基础上运行完整访客流程：Drawer、Notebook、Board、Field Case、Printer/Fax、Contact、地图控制、键盘操作和关键链接访问。
+- [ ] 验证关键页面和静态资源返回成功，图片加载失败或外部链接失效时不会阻断主体验。
+- [ ] 将版本一致性检查保留在日常和 Release 测试中；Release 额外验证 Git tag 与 `package.json` 版本一致。
+- [ ] 避免重复测试 case：日常测试只保留快速高价值路径，Release 测试补充完整流程和发布前检查。
+
+完成标准：日常 CI 能快速发现首页、核心点击路径或访问错误；发布前能完整走通访客探索流程，并确认网页两处版本显示、`package.json`、Git tag 和 Release 版本一致。
+
 ### 4.3 网站电脑中的 Version History 应用
 
 在 Lab 17 的电脑里增加一个符合系统氛围的版本历史应用。建议使用同一个窗口提供两个入口：

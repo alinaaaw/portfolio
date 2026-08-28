@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -23,6 +25,24 @@ test("server renders a personal laboratory before revealing the mystery", async 
   assert.match(html, /This is where Alina Wu keeps algorithms, physical prototypes, research notes, and questions about how systems become understandable and useful to people/);
   assert.doesNotMatch(html, /missing person/i);
   assert.doesNotMatch(html, /[\u4e00-\u9fff]/);
+});
+
+test("website version displays and release tag match package version", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const response = await render();
+  const html = await response.text();
+  const version = packageJson.version;
+
+  assert.ok(html.includes(`v${version}`), "rendered website must include the package version");
+  assert.ok((html.match(new RegExp(`v${version.replaceAll(".", "\\.")}`, "g")) ?? []).length >= 2, "both website version displays must use the package version");
+
+  let tag;
+  try {
+    tag = execFileSync("git", ["describe", "--tags", "--exact-match", "HEAD"], { encoding: "utf8" }).trim();
+  } catch {
+    tag = "";
+  }
+  if (tag) assert.equal(tag, `v${version}`, "release tag must match package version");
 });
 
 test("source contains six room objects, real work, and a progressive reveal", async () => {

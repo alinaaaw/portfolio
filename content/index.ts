@@ -9,9 +9,24 @@ import board from "./board.json";
 import fieldCase from "./field-case.json";
 import faxContact from "./fax-contact.json";
 import references from "./references.json";
+import packageMetadata from "../package.json";
+
+const version = `v${packageMetadata.version}`;
+const siteWithVersion = {
+  ...site,
+  brand: { ...site.brand, version: `PORTFOLIO SYSTEM ${version}` },
+};
+const faxContactWithVersion = {
+  ...faxContact,
+  contact: {
+    ...faxContact.contact,
+    feedback: faxContact.contact.feedback.replace(/v\d+\.\d+\.\d+/, version),
+    feedbackLabel: faxContact.contact.feedbackLabel.replace(/\d+\.\d+\.\d+/, packageMetadata.version),
+  },
+};
 
 export {
-  site,
+  siteWithVersion as site,
   intro,
   room,
   computer,
@@ -20,6 +35,6 @@ export {
   notebook,
   board,
   fieldCase,
-  faxContact,
+  faxContactWithVersion as faxContact,
   references,
 };
