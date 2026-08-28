@@ -56,6 +56,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 .room-count i { display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--signal); }
 
 .room-intro { position: absolute; z-index: 10; inset: 0; display: grid; grid-template-columns: minmax(400px, 1.2fr) minmax(280px,.7fr); align-items: end; gap: 8vw; padding: 110px 7vw 7vh; background: linear-gradient(90deg,rgba(4,9,8,.92) 0,rgba(4,9,8,.66) 39%,rgba(4,9,8,.12) 69%),linear-gradient(0deg,rgba(4,9,8,.87),transparent 48%); }
+.intro-copy { align-self: center; }
 .intro-copy > p:first-child, .intro-guide > span { color: var(--cyan); font: 9px var(--font-mono), monospace; letter-spacing: .14em; }
 .intro-copy h1 { margin: 20px 0 25px; color: var(--paper-bright); font-size: clamp(55px,7.4vw,112px); font-weight: 550; line-height: .86; letter-spacing: -.075em; }
 .intro-copy h1 em { color: var(--signal); font-family: Georgia, serif; font-weight: 400; }
@@ -594,6 +595,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
   .room-system { gap: 0; }
   .room-count { display: none; }
   .room-intro { display: flex; align-items: flex-end; padding: 85px 20px 38px; }
+  .intro-copy { align-self: auto; }
   .intro-copy h1 { font-size: clamp(50px,17vw,78px); }
   .intro-text { font-size: 11px; }
   .intro-copy > button { width: 100%; }
