@@ -296,10 +296,13 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
 function buildPrinterDesk(scene:THREE.Scene,hits:HitMesh[],withFax:boolean,faxPrinted:boolean) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
   const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=.18; scene.add(desk);
-  const matBoard=roundedBox(7.6,.035,3.85,0x243632,.05,.95,.02); matBoard.position.y=.38; scene.add(matBoard);
   buildPrinterModel(scene,[0,.42,-.35],1,withFax||faxPrinted,hits,withFax);
-  const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.48,-1.1); note.rotation.y=-.12; scene.add(note);
-  const pen=cylinder(.06,1.55,palette.red,14); pen.rotation.z=Math.PI/2; pen.position.set(3.1,.55,.25); scene.add(pen);
+  const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.37,-1.1); note.rotation.y=-.12; scene.add(note);
+  const penBarrel=cylinder(.06,1.1,palette.red,18); penBarrel.rotation.z=Math.PI/2; penBarrel.position.set(3.25,.45,-.85);
+  const penCap=cylinder(.068,.28,0x303a36,18); penCap.rotation.z=Math.PI/2; penCap.position.set(3.88,.45,-.85);
+  const penTip=new THREE.Mesh(new THREE.ConeGeometry(.06,.18,16),mat(0xb6aa91,.32,.52)); penTip.rotation.z=Math.PI/2; penTip.position.set(2.61,.45,-.85);
+  const penClip=box(.42,.018,.026,0x7e8780,.28,.7); penClip.position.set(3.62,.52,-.85);
+  scene.add(penBarrel,penCap,penTip,penClip);
   const cardCase=roundedBox(1.72,.07,1.02,0x4a3428,.06,.72,.04);cardCase.position.set(2.85,.42,.92);cardCase.rotation.y=-.1;scene.add(cardCase);
   addContactCard(scene,[2.85,.48,.92],-.1,hits,.58);
 }
@@ -561,7 +564,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       return found;
     };
     const pointerMove=(event:PointerEvent)=>{
-      if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX+delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
+      if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX-delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
       const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current){const label=hovered?.userData.label;labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??view.hint;}} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
