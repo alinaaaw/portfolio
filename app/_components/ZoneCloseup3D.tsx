@@ -298,8 +298,6 @@ function buildPrinterDesk(scene:THREE.Scene,hits:HitMesh[],withFax:boolean,faxPr
   const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=.18; scene.add(desk);
   const matBoard=roundedBox(7.6,.035,3.85,0x243632,.05,.95,.02); matBoard.position.y=.38; scene.add(matBoard);
   buildPrinterModel(scene,[0,.42,-.35],1,withFax||faxPrinted,hits,withFax);
-  const monitor=roundedBox(2.15,1.45,.22,0x252d2b,.1,.36,.58); monitor.position.set(-3.12,1.52,-1.15); monitor.rotation.y=.13; scene.add(monitor);
-  const monitorScreen=roundedBox(1.82,1.16,.03,0x153b38,.035,.18,.08); monitorScreen.position.set(-3,1.52,-1.02); monitorScreen.rotation.y=.13; scene.add(monitorScreen);
   const note=roundedBox(1.25,.035,1.2,palette.signal,.035,.9,.01); note.position.set(3.18,.48,-1.1); note.rotation.y=-.12; scene.add(note);
   const pen=cylinder(.06,1.55,palette.red,14); pen.rotation.z=Math.PI/2; pen.position.set(3.1,.55,.25); scene.add(pen);
   const cardCase=roundedBox(1.72,.07,1.02,0x4a3428,.06,.72,.04);cardCase.position.set(2.85,.42,.92);cardCase.rotation.y=-.1;scene.add(cardCase);
