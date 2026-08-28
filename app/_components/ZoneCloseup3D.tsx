@@ -229,9 +229,9 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
 function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   const wall=box(11,6,.2,0x18201e,.96,.03); wall.position.set(0,3,-2.8); scene.add(wall);
   const workspace=new THREE.Group();workspace.userData.drawerWorkspace=true;scene.add(workspace);
-  const desk=roundedBox(9,.34,4.7,palette.woodLight,.12,.82,.04); desk.position.y=2.18; workspace.add(desk);
-  const frontEdge=roundedBox(9,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(0,2.03,2.26); workspace.add(frontEdge);
-  for(const x of [-4.05,4.05]){
+  const desk=roundedBox(9.5,.34,5.1,palette.woodLight,.12,.82,.04); desk.position.set(.25,2.18,.2); workspace.add(desk);
+  const frontEdge=roundedBox(9.5,.18,.16,palette.wood,.05,.72,.04); frontEdge.position.set(.25,2.03,2.66); workspace.add(frontEdge);
+  for(const x of [-4.05,4.55]){
     const leg=roundedBox(.3,2.05,.32,palette.metal,.06,.38,.7); leg.position.set(x,1.02,-1.7); workspace.add(leg);
     const foot=roundedBox(.72,.12,1.25,0x222927,.06,.38,.7); foot.position.set(x,.08,-1.7); workspace.add(foot);
   }
@@ -276,8 +276,8 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   workspace.add(tray);
 
   buildPrinterModel(workspace,[2.75,2.32,.35],.76,faxPrinted);
-  addContactCard(workspace,[3.52,2.39,1.15],-.12,undefined,.6);
-  const monitorAssembly=new THREE.Group();monitorAssembly.position.set(-1.2,2.35,-1.25);monitorAssembly.scale.setScalar(1.3);workspace.add(monitorAssembly);
+  addContactCard(workspace,[4.1,2.39,2.2],-.12,undefined,.46);
+  const monitorAssembly=new THREE.Group();monitorAssembly.position.set(-1.5,2.35,-1.25);monitorAssembly.scale.setScalar(1.3);workspace.add(monitorAssembly);
   const monitor=roundedBox(3.45,2.15,.28,0x242c2a,.11,.34,.68);monitor.position.set(0,1.12,0);monitorAssembly.add(monitor);
   const monitorScreen=roundedBox(3.08,1.78,.035,0x0d2928,.035,.18,.08);monitorScreen.position.set(0,1.12,.16);monitorAssembly.add(monitorScreen);
   const monitorMaterial=monitorScreen.material as THREE.MeshStandardMaterial;monitorMaterial.emissive.setHex(palette.cyan);monitorMaterial.emissiveIntensity=.72;
@@ -287,7 +287,14 @@ function buildDrawer(scene:THREE.Scene,hits:HitMesh[],faxPrinted:boolean) {
   const keyboard=roundedBox(2.7,.1,.87,0x202725,.055,.5,.45);keyboard.position.set(.05,.05,1.83);keyboard.rotation.x=-.035;monitorAssembly.add(keyboard);
   for(let row=0;row<4;row+=1){for(let column=0;column<12;column+=1){const key=roundedBox(.14,.025,.1,column===11?0x8a6b52:0x68716c,.02,.42,.34);key.position.set(-.83+column*.16,.115,1.57+row*.14);monitorAssembly.add(key);}}
   const mouse=roundedBox(.35,.13,.52,0x303936,.1,.34,.4);mouse.position.set(1.82,.11,1.83);monitorAssembly.add(mouse);
-  const mug=cylinder(.33,.64,0x28443d,28); mug.position.set(-3.2,2.5,-.5); workspace.add(mug);
+  const mug=new THREE.Group(); mug.position.set(.82,2.36,-.5);
+  const mugMaterial=mat(0x28443d,.34,.12);
+  const mugBody=new THREE.Mesh(new THREE.CylinderGeometry(.33,.29,.64,32,1,true),mugMaterial); mugBody.position.y=.32;
+  const mugBase=new THREE.Mesh(new THREE.CylinderGeometry(.29,.29,.035,32),mugMaterial); mugBase.position.y=.018;
+  const mugInside=new THREE.Mesh(new THREE.CylinderGeometry(.265,.265,.018,32),mat(0x111917,.76,.02)); mugInside.position.y=.57;
+  const mugRim=new THREE.Mesh(new THREE.TorusGeometry(.3,.032,10,36),mugMaterial); mugRim.position.y=.64; mugRim.rotation.x=Math.PI/2;
+  const mugHandle=new THREE.Mesh(new THREE.TorusGeometry(.2,.045,10,30),mugMaterial); mugHandle.position.set(.34,.34,0);
+  mug.add(mugBody,mugBase,mugInside,mugRim,mugHandle); workspace.add(mug);
   const lampBase=cylinder(.42,.11,0x282f2d,28); lampBase.position.set(3.72,2.39,-1.2); workspace.add(lampBase);
   const lampStem=cylinder(.045,1.45,0x3e4945,14); lampStem.position.set(3.72,3.08,-1.2); workspace.add(lampStem);
   const shade=new THREE.Mesh(new THREE.ConeGeometry(.42,.55,28,1,true),mat(0x202825,.36,.62)); shade.position.set(3.72,3.72,-1.2); shade.rotation.z=Math.PI; workspace.add(shade);

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 
@@ -78,6 +79,13 @@ function material(color: number, roughness = .8, metalness = .05, emissive = 0x0
 
 function box(width: number, height: number, depth: number, color: number, roughness?: number, metalness?: number) {
   return new THREE.Mesh(new THREE.BoxGeometry(width,height,depth),material(color,roughness,metalness));
+}
+
+function roundedBox(width: number, height: number, depth: number, color: number, radius = .1, roughness = .78, metalness = .04) {
+  return new THREE.Mesh(
+    new RoundedBoxGeometry(width,height,depth,4,Math.min(radius,width*.2,height*.2,depth*.2)),
+    material(color,roughness,metalness),
+  );
 }
 
 function cylinder(radius: number, height: number, color: number, segments = 24) {
@@ -268,24 +276,36 @@ function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
   const mouse = box(.35,.12,.52,0x303936,.34,.4);
   mouse.position.set(.42,1.68,.62);
   desk.add(mouse);
-  const printer = box(1.65,.84,1.35,0xbcb5a4,.66,.12);
-  printer.position.set(2.38,2.03,-.16);
-  printer.userData.faxPrinter = true;
+  const printer = new THREE.Group();
+  printer.position.set(2.38,1.61,-.16);
+  printer.scale.setScalar(.46);
+  const printerBody=roundedBox(3.5,1.42,2.7,0xc8c2b4,.22,.58,.12); printerBody.position.y=.82; printerBody.userData.faxPrinter=true;
+  const printerLower=roundedBox(3.3,.72,2.45,0xa8a79f,.16,.66,.16); printerLower.position.set(0,.35,.06);
+  const printerScanner=roundedBox(3.28,.22,2.45,0x343c39,.1,.34,.48); printerScanner.position.set(0,1.62,-.05);
+  const printerLid=roundedBox(3.04,.12,2.2,0x1d2422,.08,.3,.46); printerLid.position.set(0,1.79,-.12); printerLid.rotation.x=-.025;
+  const printerGlass=roundedBox(2.62,.025,1.8,0x729794,.04,.12,.08); printerGlass.position.set(0,1.73,-.1);
+  const printerControl=roundedBox(1.35,.16,.5,0x29312f,.07,.32,.45); printerControl.position.set(.75,1.44,1.24); printerControl.rotation.x=-.22;
+  const printerScreen=roundedBox(.58,.025,.24,0x163c39,.025,.2,.1); printerScreen.position.set(.53,1.52,1.33); printerScreen.rotation.x=-.22;
+  const printerScreenMaterial=printerScreen.material as THREE.MeshStandardMaterial; printerScreenMaterial.emissive.setHex(palette.cyan); printerScreenMaterial.emissiveIntensity=.72;
+  const printerSlot=roundedBox(2.45,.11,.12,0x151b1a,.035,.36,.42); printerSlot.position.set(0,.82,1.37);
+  const printerTray=roundedBox(2.72,.09,1.8,0x4a504d,.08,.55,.26); printerTray.position.set(0,.19,1.45); printerTray.rotation.x=.045;
+  const printerTrayLip=roundedBox(2.75,.18,.12,0x5b625e,.05,.48,.35); printerTrayLip.position.set(0,.24,2.31);
+  printer.add(printerLower,printerBody,printerScanner,printerGlass,printerLid,printerControl,printerScreen,printerSlot,printerTray,printerTrayLip);
+  for(let index=0;index<4;index+=1){
+    const button=cylinder(.055,.035,index===3?palette.signal:0x858b84,16); button.rotation.x=Math.PI/2; button.position.set(.78+index*.19,1.48,1.5); if(index===3)button.userData.faxLight=true; printer.add(button);
+  }
+  const printerHingeLeft=cylinder(.07,.26,0x1b2220,16); printerHingeLeft.rotation.z=Math.PI/2; printerHingeLeft.position.set(-1.22,1.72,-1.02);
+  const printerHingeRight=printerHingeLeft.clone(); printerHingeRight.position.x=1.22; printer.add(printerHingeLeft,printerHingeRight);
+  const paper=roundedBox(2.3,.035,3.05,palette.paper,.025,.96,.01); paper.position.set(0,.66,2.74); paper.rotation.x=.025; paper.userData.faxPaper=true; paper.visible=false; printer.add(paper);
   desk.add(printer);
-  const printerSlot = box(1.2,.08,.07,0x28302e);
-  printerSlot.position.set(2.38,2.2,.54);
-  desk.add(printerSlot);
-  const printerLight = cylinder(.055,.055,0x635f4e,12);
-  printerLight.rotation.x = Math.PI/2;
-  printerLight.position.set(2.95,2.38,.54);
-  printerLight.userData.faxLight = true;
-  desk.add(printerLight);
-  const paper = box(1.15,.025,1.35,palette.paper);
-  paper.position.set(2.38,2.28,-.08);
-  paper.rotation.x = -.6;
-  paper.userData.faxPaper = true;
-  paper.visible = false;
-  desk.add(paper);
+
+  const contactCard=new THREE.Group(); contactCard.position.set(3.2,1.62,.96); contactCard.rotation.y=-.12; contactCard.scale.setScalar(.28);
+  const contactPaper=roundedBox(2.55,.045,1.45,0xe5dcc6,.055,.92,.01);
+  const contactAccent=box(.12,.025,1.16,palette.red,.7,.02); contactAccent.position.set(-.93,.045,0);
+  const contactName=box(1.15,.025,.055,0x283f3a,.72,.02); contactName.position.set(-.12,.05,-.32);
+  contactCard.add(contactPaper,contactAccent,contactName);
+  for(let line=0;line<3;line+=1){const detail=box(1.25-line*.14,.018,.028,0x6e7c75,.72,.02); detail.position.set(-.06,.05,.02+line*.18); contactCard.add(detail);}
+  desk.add(contactCard);
   const printerSignal = new THREE.Group();
   printerSignal.userData.faxSignal = true;
   printerSignal.visible = false;
@@ -315,20 +335,26 @@ function buildComputer(scene: THREE.Scene, targets: ZoneTarget[]) {
     desk.add(handle);
   }
 
-  const mug = cylinder(.28,.5,0x253b36,28);
-  mug.position.set(.78,1.86,-.38);
+  const mug = new THREE.Group();
+  mug.position.set(.78,1.59,-.38);
+  const mugMaterial = material(0x253b36,.34,.12);
+  const mugBody = new THREE.Mesh(new THREE.CylinderGeometry(.28,.245,.5,28,1,true),mugMaterial);
+  mugBody.position.y = .25;
+  const mugBase = new THREE.Mesh(new THREE.CylinderGeometry(.245,.245,.03,28),mugMaterial);
+  mugBase.position.y = .015;
+  const mugInside = new THREE.Mesh(new THREE.CylinderGeometry(.225,.225,.016,28),material(0x111917,.76,.02));
+  mugInside.position.y = .445;
+  const mugRim = new THREE.Mesh(new THREE.TorusGeometry(.255,.028,10,32),mugMaterial);
+  mugRim.position.y = .5;
+  mugRim.rotation.x = Math.PI/2;
+  const mugHandle = new THREE.Mesh(new THREE.TorusGeometry(.17,.038,10,28),mugMaterial);
+  mugHandle.position.set(.3,.27,0);
+  mug.add(mugBody,mugBase,mugInside,mugRim,mugHandle);
   desk.add(mug);
   const note = box(.58,.02,.58,0xd1f45c);
   note.position.set(.15,1.64,-.44);
   note.rotation.y = -.18;
   desk.add(note);
-  const contactCard = box(1.05,.018,.58,palette.paper,.92,.01);
-  contactCard.position.set(1.32,1.64,.58);
-  contactCard.rotation.y = -.12;
-  const cardAccent = box(.05,.012,.46,palette.red,.7,.02);
-  cardAccent.position.set(.92,1.66,.63);
-  cardAccent.rotation.y = -.12;
-  desk.add(contactCard,cardAccent);
   addCable(scene,[[-5.9,1.7,-5.8],[-5.25,1.67,-5.25],[-4.4,1.63,-5.6],[-3.5,1.58,-5.2]],palette.red,.022);
 }
 
