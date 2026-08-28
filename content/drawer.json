@@ -1,7 +1,7 @@
 {
   "ariaLabel": "Desk drawer close-up",
-  "header": "DESK DRAWER / PULL TO OPEN",
-  "sceneHint": "PHYSICAL EVIDENCE · OPEN A PACKET",
+  "header": "DESK DRAWER / WORKING MATERIALS",
+  "sceneHint": "PHYSICAL EVIDENCE · PULL TO OPEN DRAWER",
   "handleLabel": "PULL THE METAL HANDLE",
   "closeHandleLabel": "PUSH THE DRAWER CLOSED",
   "returnItem": "PUT IT BACK",

@@ -1,6 +1,6 @@
 {
-  "ariaLabel": "Research notebook close-up",
-  "header": "RESEARCH BOOK / INSPECT A PAGE",
+  "ariaLabel": "Notebook close-up",
+  "header": "NOTEBOOK / DECISIONS + ITERATIONS",
   "sceneHint": "CLICK THE LEFT OR RIGHT PAGE TO OPEN A NOTE",
   "returnItem": "PUT IT BACK",
   "itemLabels": { "research": "EMG DECISION LOG", "margin": "ALGORITHM COMPARISON" },
