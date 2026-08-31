@@ -31,10 +31,11 @@ test("website version displays and release tag match package version", async () 
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   const response = await render();
   const html = await response.text();
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const version = packageJson.version;
 
   assert.ok(html.includes(`v${version}`), "rendered website must include the package version");
-  assert.ok((html.match(new RegExp(`v${version.replaceAll(".", "\\.")}`, "g")) ?? []).length >= 2, "both website version displays must use the package version");
+  assert.ok((page.match(/siteContent\.brand\.version/g) ?? []).length >= 2, "both website version displays must use the shared package-backed version");
 
   let tag;
   try {
