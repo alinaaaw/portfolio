@@ -182,9 +182,12 @@ Review the complete diff before opening or approving a PR. A passing build alone
 
 - Use the repository's existing development flow and local runtime; do not create a second project or move the checkout to another folder merely to preview it.
 - Do not add runtime folders, build artifacts, stdout/stderr logs, local dossiers, or machine-specific files to Git.
-- When the user asks to open the website, start or reuse the local development server and provide the exact local URL.
+- Choose the preview environment deliberately:
+  - **Local runtime:** use the local method when the repository contains a working `.runtime` environment, when the user explicitly asks for localhost/local preview, or when the user says to use the local environment. On Windows, prepend `.runtime/node-v22.14.0-win-x64` to `PATH` and run the existing `npm run dev` script from the selected worktree. Reuse the retained server when possible and provide its exact `http://localhost:<port>` URL.
+  - **Codex-managed preview:** when no usable local runtime is available and the user has not specifically requested local preview, use the Codex/Sites managed development and preview flow described by the applicable Sites instructions. Keep the managed process and browser handoff attached to the same selected worktree; do not copy the project to an ad hoc folder or silently fall back to a different checkout.
+- Do not switch between local and Codex-managed preview in the middle of a debugging session without telling the user. The preview must run from the branch being discussed so the displayed result matches the intended code.
+- When the user asks to open the website, start or reuse the appropriate development server and provide the exact local or managed preview URL.
 - Perform browser interaction or screenshot-based visual QA when the user explicitly requests visual inspection, or when it is necessary to verify a reported visual defect and the appropriate browser tooling is available.
-- Keep the local preview on the branch being discussed so the displayed result matches the intended code.
 
 ## Communication
 
