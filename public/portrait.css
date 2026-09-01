@@ -126,6 +126,21 @@
     min-height: 48px;
   }
 
+  .computer-view {
+    display: block;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .computer-view > .monitor-bezel {
+    width: var(--computer-layout-width,100vw);
+    height: var(--computer-layout-height,100dvh);
+    max-width: none;
+    max-height: none;
+    transform: scale(var(--computer-scale,1)) rotateX(.6deg);
+    transform-origin: top left;
+  }
+
   .room-shell > .modal-layer.tactile-layer {
     display: grid;
     grid-template-columns: minmax(0,1fr);

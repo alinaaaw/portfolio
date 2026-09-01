@@ -544,6 +544,7 @@ function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}
 }
 
 export default function VersionThree() {
+  const computerViewRef=useRef<HTMLDivElement>(null);
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
@@ -568,6 +569,26 @@ export default function VersionThree() {
     if (active!=="computer") return;
     const timer = window.setTimeout(() => setBulletin(true),2300);
     return () => window.clearTimeout(timer);
+  },[active]);
+
+  useEffect(() => {
+    if(active!=="computer")return;
+    const view=computerViewRef.current;
+    if(!view)return;
+    const resize=()=>{
+      const rect=view.getBoundingClientRect();
+      if(rect.width<2||rect.height<2)return;
+      const portrait=rect.height>=rect.width;
+      const layoutWidth=portrait?Math.max(rect.width,620):rect.width;
+      const scale=rect.width/layoutWidth;
+      view.style.setProperty("--computer-scale",String(scale));
+      view.style.setProperty("--computer-layout-width",`${layoutWidth}px`);
+      view.style.setProperty("--computer-layout-height",`${rect.height/scale}px`);
+    };
+    const observer=new ResizeObserver(resize);
+    observer.observe(view);
+    resize();
+    return()=>observer.disconnect();
   },[active]);
 
   useEffect(() => {
@@ -683,7 +704,7 @@ export default function VersionThree() {
       )}
 
       {active==="computer"&&(
-        <div className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
+        <div ref={computerViewRef} className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
             <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
