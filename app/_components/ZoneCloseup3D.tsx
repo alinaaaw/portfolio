@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { aspectOverflowDistanceScale } from "./cameraFraming";
 import {
   board as boardContent,
   books as booksContent,
@@ -566,7 +567,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?THREE.MathUtils.clamp(1.25/nextAspect,1,3.2):1; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=isPortrait?52:42; camera.updateProjectionMatrix(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{

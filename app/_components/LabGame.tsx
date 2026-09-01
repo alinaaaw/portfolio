@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { aspectOverflowDistanceScale } from "./cameraFraming";
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
@@ -735,8 +736,6 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const camera = new THREE.PerspectiveCamera(43,1,.1,80);
     const defaultPosition = new THREE.Vector3(0,4.75,11.5);
     const defaultTarget = new THREE.Vector3(0,1.72,-2.55);
-    const portraitPosition = new THREE.Vector3(0,7.8,22.5);
-    const portraitTarget = new THREE.Vector3(0,1.55,-3.35);
     camera.position.copy(defaultPosition);
     const currentTarget = defaultTarget.clone();
     const targets: ZoneTarget[] = [];
@@ -783,23 +782,18 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let orbit = 0;
     let pitch = 0;
     let isPortrait = false;
+    let portraitDistanceScale = 1;
     let frame = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const nextPortrait = rect.height >= rect.width;
-      if (nextPortrait !== isPortrait) {
-        isPortrait = nextPortrait;
-        camera.fov = isPortrait ? 50 : 43;
-        if (viewingRef.current === null && !requested) {
-          camera.position.copy(isPortrait ? portraitPosition : defaultPosition);
-          currentTarget.copy(isPortrait ? portraitTarget : defaultTarget);
-          orbit = 0;
-          pitch = 0;
-        }
-      }
-      renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
-      camera.aspect = Math.max(1,rect.width)/Math.max(1,rect.height);
+      if(rect.width<2||rect.height<2)return;
+      const nextAspect=rect.width/rect.height;
+      isPortrait=rect.height>=rect.width;
+      portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1;
+      renderer.setSize(rect.width,rect.height,false);
+      camera.aspect=nextAspect;
+      camera.fov=43;
       camera.updateProjectionMatrix();
     };
     const observer = new ResizeObserver(resize);
@@ -855,22 +849,17 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
 
     const tick = (now: number) => {
       if (viewingRef.current === null && !requested) {
-        if (isPortrait) {
-          const portraitDistance = portraitPosition.z-portraitTarget.z;
-          const desiredPosition = portraitPosition.clone();
-          desiredPosition.x = portraitTarget.x+Math.sin(orbit)*portraitDistance+pointerX*.08;
-          desiredPosition.z = portraitTarget.z+Math.cos(orbit)*portraitDistance;
-          desiredPosition.y += pitch*4.5-pointerY*.05;
-          camera.position.lerp(desiredPosition,.035);
-          currentTarget.lerp(portraitTarget.clone().add(new THREE.Vector3(pointerX*.08,pitch*.55-pointerY*.025,0)),.04);
-        } else {
-          const desiredPosition = defaultPosition.clone();
-          desiredPosition.x = Math.sin(orbit)*11.5 + pointerX*.18;
-          desiredPosition.z = Math.cos(orbit)*11.5;
-          desiredPosition.y += pitch*6-pointerY*.1;
-          camera.position.lerp(desiredPosition,.035);
-          currentTarget.lerp(defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,pitch*.75-pointerY*.05,0)),.04);
+        const desiredPosition = defaultPosition.clone();
+        desiredPosition.x = Math.sin(orbit)*11.5 + pointerX*.18;
+        desiredPosition.z = Math.cos(orbit)*11.5;
+        desiredPosition.y += pitch*6-pointerY*.1;
+        const desiredTarget=defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,pitch*.75-pointerY*.05,0));
+        if(isPortrait){
+          const portraitOffset=desiredPosition.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale);
+          desiredPosition.copy(desiredTarget).add(portraitOffset);
         }
+        camera.position.lerp(desiredPosition,.035);
+        currentTarget.lerp(desiredTarget,.04);
       }
       if (requested) {
         const pose = cameraPoses[requested];

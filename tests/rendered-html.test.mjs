@@ -151,12 +151,15 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /fax-reading/);
 });
 
-test("portrait room and closeup sizing stay isolated from the shared overlay architecture", async () => {
-  const [layout, page, game, closeups, portraitCss] = await Promise.all([
+test("portrait room, computer, and closeup sizing stay isolated from desktop architecture", async () => {
+  const [layout, page, game, closeups, framing, portraitComputer, siteCss, portraitCss] = await Promise.all([
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/_components/LabGame.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/_components/ZoneCloseup3D.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/cameraFraming.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/PortraitComputerView.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../public/site.css", import.meta.url), "utf8"),
     readFile(new URL("../public/portrait.css", import.meta.url), "utf8"),
   ]);
 
@@ -166,16 +169,27 @@ test("portrait room and closeup sizing stay isolated from the shared overlay arc
   assert.equal((portraitCss.match(/@media \(orientation: portrait\)/g) ?? []).length, 1, "portrait styling must have one explicit isolation boundary");
   assert.equal((page.match(/<LabGame\b/g) ?? []).length, 1, "the room must keep one LabGame instance");
   assert.equal((game.match(/<canvas\b/g) ?? []).length, 1, "LabGame must keep one WebGL canvas");
-  assert.match(game, /const nextPortrait = rect\.height >= rect\.width/);
+  assert.match(game, /if\(rect\.width<2\|\|rect\.height<2\)return/);
+  assert.match(game, /const nextAspect=rect\.width\/rect\.height/);
+  assert.match(game, /isPortrait=rect\.height>=rect\.width/);
+  assert.match(game, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
+  assert.match(game, /camera\.aspect=nextAspect/);
+  assert.match(game, /camera\.fov=43/);
+  assert.match(game, /portraitDistanceScale=isPortrait\?aspectOverflowDistanceScale\(nextAspect\):1/);
+  assert.match(game, /desiredPosition\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)/);
+  assert.doesNotMatch(game, /portraitPosition|portraitTarget|camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(game, /new ResizeObserver\(resize\)/);
-  assert.match(page, /const computerViewRef=useRef<HTMLDivElement>\(null\)/);
-  assert.match(page, /const computerOsRef=useRef<HTMLDivElement>\(null\)/);
-  assert.match(page, /setLayout\(Math\.max\(rect\.width,620\)\)/);
-  assert.match(page, /const requiredWidth=Math\.max\(rect\.width,620,\.\.\.shells\.map\(\(element\)=>element\.scrollWidth\)\)/);
-  assert.match(page, /view\.style\.setProperty\("--computer-scale",String\(scale\)\)/);
-  assert.match(page, /view\.style\.setProperty\("--computer-layout-height",`\$\{rect\.height\/scale\}px`\)/);
-  assert.match(page, /<div ref=\{computerViewRef\} className="computer-view"/);
-  assert.match(page, /<div ref=\{computerOsRef\} className="computer-os">[\s\S]*<header className="os-bar">/);
+  assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);
+  assert.match(framing, /Math\.max\(1, IDEAL_LANDSCAPE_ASPECT \/ safeAspect\)/);
+  assert.match(page, /<div className="computer-view computer-view-desktop"/);
+  assert.match(page, /<PortraitComputerView computerWindows=\{computerWindows\} referenceFilter=\{referenceFilter\} bulletin=\{bulletin\}/);
+  assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onCloseWindow=\{closeComputerWindow\}[\s\S]*onOpenReferences=\{openReferences\}/);
+  assert.doesNotMatch(page, /computerViewRef|computerOsRef|--computer-scale|--computer-layout-(?:width|height)|scrollWidth/);
+  assert.doesNotMatch(page, /className="computer-os"/);
+  assert.match(siteCss, /\.portrait-computer-view \{ display: none; \}/);
+  assert.match(portraitCss, /\.computer-view-desktop \{\s*display: none/);
+  assert.match(portraitCss, /\.portrait-computer-view \{[\s\S]*display: grid;[\s\S]*height: 100svh;[\s\S]*height: 100dvh;[\s\S]*overflow: hidden/);
+  assert.doesNotMatch(`${page}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/);
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
@@ -200,18 +214,41 @@ test("portrait room and closeup sizing stay isolated from the shared overlay arc
   assert.match(sceneContract, /place-self: stretch[\s\S]*width: auto[\s\S]*height: auto[\s\S]*min-width: 0[\s\S]*min-height: 0[\s\S]*max-height: none/);
   assert.match(stageContract, /inset: 58px 0 0[\s\S]*height: auto[\s\S]*min-height: 1px/);
   assert.match(canvasContract, /display: block[\s\S]*width: 100%[\s\S]*height: 100%[\s\S]*min-height: 1px/);
-  const computerContract = declarationsFor(".computer-view > .monitor-bezel");
-  assert.match(computerContract, /position: absolute[\s\S]*inset: 0[\s\S]*width: auto[\s\S]*height: auto[\s\S]*transform: none[\s\S]*animation: none/);
-  const computerOsContract = declarationsFor(".computer-view .computer-os");
-  assert.match(computerOsContract, /position: absolute[\s\S]*top: 0[\s\S]*left: 0[\s\S]*width: var\(--computer-layout-width,100vw\)[\s\S]*height: var\(--computer-layout-height,100dvh\)[\s\S]*transform: scale\(var\(--computer-scale,1\)[\s\S]*transform-origin: top left/);
+  const computerPanelContract = declarationsFor(".portrait-computer-panel");
+  const computerScrollContract = declarationsFor(".portrait-panel-scroll");
+  const bulletinContract = declarationsFor(".portrait-bulletin");
+  const bulletinHeaderContract = declarationsFor(".portrait-bulletin header");
+  const referenceHeaderMetaContract = declarationsFor(".portrait-references > header small");
+  const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
+  assert.match(computerPanelContract, /inset: 12px[\s\S]*width: calc\(100% - 24px\)[\s\S]*height: calc\(100% - 24px\)[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
+  assert.match(computerScrollContract, /min-height: 0[\s\S]*overflow-y: auto[\s\S]*overscroll-behavior: contain/);
+  assert.match(bulletinContract, /border: 1px solid var\(--red\)/, "portrait bulletin must retain the desktop warning color");
+  assert.match(bulletinHeaderContract, /color: var\(--red\)/, "portrait bulletin header must retain the desktop warning color");
+  assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
+  assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
+  assert.match(portraitCss, /\.portrait-computer-bar button,[\s\S]*\.portrait-computer-view \.portrait-bulletin button \{\s*min-height: 48px/);
+  assert.match(portraitCss, /\.portrait-file-grid \{[\s\S]*grid-template-columns: repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(portraitComputer, /from "@\/content"/);
+  assert.match(portraitComputer, /const activeWindow=computerWindows\.at\(-1\)\?\?null/);
+  for (const windowId of ["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"]) {
+    assert.match(portraitComputer, new RegExp(`(?:activeWindow===\\"${windowId}\\"|\\[\\"map\\",\\"allocation\\",\\"emg\\"\\]|\\[\\"research\\",\\"internship\\"\\])`), `${windowId} must remain reachable in the portrait computer`);
+  }
+  assert.match(portraitComputer, /onOpenFile\(file\.id\)/);
+  assert.match(portraitComputer, /onOpenReferences\(project\.id\)/);
+  assert.match(portraitComputer, /onSetReferenceFilter\(group\.id\)/);
+  assert.match(portraitComputer, /href=\{reference\.url\}/);
+  assert.match(portraitComputer, /bulletin&&<aside className="portrait-bulletin"/);
   assert.doesNotMatch(portraitCss, /\.tactile-scene[\s\S]{0,240}animation: none/);
   assert.match(closeups, /const stage=canvas\?\.parentElement/);
   assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);
   assert.match(closeups, /observer\.observe\(stage\)/);
   assert.match(closeups, /layoutFrame=requestAnimationFrame\(resize\)/);
   assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
-  assert.match(closeups, /portraitDistanceScale=isPortrait\?THREE\.MathUtils\.clamp\(1\.25\/nextAspect,1,[^)]+\):1/);
-  assert.match(closeups, /camera\.fov=isPortrait\?[^:;]+:42/);
+  assert.match(closeups, /portraitDistanceScale=isPortrait\?aspectOverflowDistanceScale\(nextAspect\):1/);
+  assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
+  assert.match(closeups, /camera\.aspect=nextAspect/);
+  assert.match(closeups, /camera\.fov=42/);
+  assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(closeups, /if\(isPortrait\)\{[\s\S]*desired\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
   assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
 });

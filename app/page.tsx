@@ -11,6 +11,8 @@ import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCas
 import { drawerArtifactMedia } from "./_components/drawerArtifactMedia";
 import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
 import type { TravelPhoto } from "./_components/travelPhotoLibrary";
+import PortraitComputerView from "./_components/PortraitComputerView";
+import type { ComputerFile, ComputerWindowId, ProjectFileId, ReferenceFilter } from "./_components/PortraitComputerView";
 import {
   board as boardContent,
   books as booksContent,
@@ -35,11 +37,7 @@ const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
   loading: () => <div className="lab-loading"><i /><span>{siteContent.loading.closeup}</span></div>,
 });
 
-type ProjectFileId = "map" | "allocation" | "emg";
-type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references";
-type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 type WindowPosition = { x:number; y:number };
-type ReferenceFilter = "all" | ProjectFileId;
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
 
@@ -544,8 +542,6 @@ function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}
 }
 
 export default function VersionThree() {
-  const computerViewRef=useRef<HTMLDivElement>(null);
-  const computerOsRef=useRef<HTMLDivElement>(null);
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
@@ -570,37 +566,6 @@ export default function VersionThree() {
     if (active!=="computer") return;
     const timer = window.setTimeout(() => setBulletin(true),2300);
     return () => window.clearTimeout(timer);
-  },[active]);
-
-  useEffect(() => {
-    if(active!=="computer")return;
-    const view=computerViewRef.current;
-    const os=computerOsRef.current;
-    if(!view||!os)return;
-    let layoutFrame=0;
-    const resize=()=>{
-      const rect=view.getBoundingClientRect();
-      if(rect.width<2||rect.height<2)return;
-      const portrait=rect.height>=rect.width;
-      const setLayout=(layoutWidth:number)=>{
-        const scale=rect.width/layoutWidth;
-        view.style.setProperty("--computer-scale",String(scale));
-        view.style.setProperty("--computer-layout-width",`${layoutWidth}px`);
-        view.style.setProperty("--computer-layout-height",`${rect.height/scale}px`);
-      };
-      if(!portrait){setLayout(rect.width);return;}
-      setLayout(Math.max(rect.width,620));
-      cancelAnimationFrame(layoutFrame);
-      layoutFrame=requestAnimationFrame(()=>{
-        const shells=[os,os.querySelector<HTMLElement>(".os-bar"),os.querySelector<HTMLElement>(".os-screen")].filter((element):element is HTMLElement=>Boolean(element));
-        const requiredWidth=Math.max(rect.width,620,...shells.map((element)=>element.scrollWidth));
-        setLayout(requiredWidth);
-      });
-    };
-    const observer=new ResizeObserver(resize);
-    observer.observe(view);
-    resize();
-    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);};
   },[active]);
 
   useEffect(() => {
@@ -633,6 +598,12 @@ export default function VersionThree() {
     setReferenceFilter(filter);
     focusComputerWindow("references");
     setSelectedComputerFile(null);
+  };
+
+  const leaveComputer=()=>{
+    setComputerWindows([]);
+    setMaximizedWindow(null);
+    setActive(null);
   };
 
   const closeComputerWindow=(windowId:ComputerWindowId)=>{
@@ -716,10 +687,10 @@ export default function VersionThree() {
       )}
 
       {active==="computer"&&(
-        <div ref={computerViewRef} className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
+        <>
+        <div className="computer-view computer-view-desktop" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
-            <div ref={computerOsRef} className="computer-os">
-            <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
+            <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={leaveComputer}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
               <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
               <main className="os-workspace">
@@ -790,9 +761,10 @@ export default function VersionThree() {
               </main>
               <footer className="os-taskbar"><button className="taskbar-home" onClick={() => openComputerFile("desktop")} aria-label="Show desktop">{siteContent.brand.initials}</button><div className="taskbar-apps" aria-label="Open applications">{taskbarWindows.map((windowId)=>{const item=computerTaskbarItem(windowId);return <button className={`taskbar-app ${computerWindows.at(-1)===windowId?"active":""}`} key={windowId} onClick={()=>focusComputerWindow(windowId)} aria-label={`Focus ${item.label}`} aria-pressed={computerWindows.at(-1)===windowId}><i aria-hidden="true">{item.icon}</i><span>{item.label}</span></button>;})}</div><span className="taskbar-files">{computerContent.taskbar.files}</span><span className="taskbar-alert">{bulletin?computerContent.taskbar.unread:computerContent.taskbar.clear}</span></footer>
             </div>
-            </div>
           </div>
         </div>
+        <PortraitComputerView computerWindows={computerWindows} referenceFilter={referenceFilter} bulletin={bulletin} onOpenFile={openComputerFile} onFocusWindow={focusComputerWindow} onCloseWindow={closeComputerWindow} onOpenReferences={openReferences} onSetReferenceFilter={setReferenceFilter} onDismissBulletin={()=>setBulletin(false)} onLeave={leaveComputer}/>
+        </>
       )}
 
       {active==="drawer"&&<DrawerScene faxPrinted={faxPrinted} onClose={() => setActive(null)} />}
