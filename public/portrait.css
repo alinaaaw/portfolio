@@ -133,12 +133,18 @@
   }
 
   .computer-view > .monitor-bezel {
-    width: var(--computer-layout-width,100vw);
-    height: var(--computer-layout-height,100dvh);
+    width: 100vw;
+    height: 100svh;
+    height: 100dvh;
     max-width: none;
     max-height: none;
-    transform: scale(var(--computer-scale,1)) rotateX(.6deg);
-    transform-origin: top left;
+  }
+
+  .computer-view .computer-os {
+    display: block;
+    width: var(--computer-layout-width,100vw);
+    height: var(--computer-layout-height,100dvh);
+    zoom: var(--computer-scale,1);
   }
 
   .room-shell > .modal-layer.tactile-layer {

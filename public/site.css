@@ -117,6 +117,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 
 .computer-view { display: grid; place-items: center; padding: 18px; background: radial-gradient(circle at center,#25322e 0,#020504 78%); perspective: 1200px; }
 .monitor-bezel { width: min(1460px,98vw); height: min(920px,96vh); padding: 13px; border: 1px solid #4e5b57; border-radius: 14px; background: linear-gradient(145deg,#303a37,#101615 48%,#343e3b); box-shadow: 0 45px 110px #000, inset 0 0 0 4px #080c0b; transform: rotateX(.6deg); animation: monitorIn .7s cubic-bezier(.2,.8,.2,1) both; }
+.computer-os { display: contents; }
 @keyframes monitorIn { from { opacity: 0; transform: translateY(5vh) scale(.82) rotateX(4deg); } }
 .os-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 42px; padding: 0 14px; border: 1px solid #59655f; border-bottom: 0; background: #0b1312; color: var(--cyan); font: 9px var(--font-mono), monospace; }
 .os-bar > div { display: flex; align-items: center; gap: 8px; color: #8d9690; }

@@ -173,6 +173,7 @@ test("portrait room and closeup sizing stay isolated from the shared overlay arc
   assert.match(page, /view\.style\.setProperty\("--computer-scale",String\(scale\)\)/);
   assert.match(page, /view\.style\.setProperty\("--computer-layout-height",`\$\{rect\.height\/scale\}px`\)/);
   assert.match(page, /<div ref=\{computerViewRef\} className="computer-view"/);
+  assert.match(page, /<div className="computer-os">[\s\S]*<header className="os-bar">/);
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
@@ -198,8 +199,9 @@ test("portrait room and closeup sizing stay isolated from the shared overlay arc
   assert.match(stageContract, /inset: 58px 0 0[\s\S]*height: auto[\s\S]*min-height: 1px/);
   assert.match(canvasContract, /display: block[\s\S]*width: 100%[\s\S]*height: 100%[\s\S]*min-height: 1px/);
   const computerContract = declarationsFor(".computer-view > .monitor-bezel");
-  assert.match(computerContract, /width: var\(--computer-layout-width,100vw\)[\s\S]*height: var\(--computer-layout-height,100dvh\)/);
-  assert.match(computerContract, /transform: scale\(var\(--computer-scale,1\)\) rotateX\(\.6deg\)[\s\S]*transform-origin: top left/);
+  assert.match(computerContract, /width: 100vw[\s\S]*height: 100svh[\s\S]*height: 100dvh/);
+  const computerOsContract = declarationsFor(".computer-view .computer-os");
+  assert.match(computerOsContract, /display: block[\s\S]*width: var\(--computer-layout-width,100vw\)[\s\S]*height: var\(--computer-layout-height,100dvh\)[\s\S]*zoom: var\(--computer-scale,1\)/);
   assert.doesNotMatch(portraitCss, /\.monitor-bezel[\s\S]{0,180}animation: none|\.tactile-scene[\s\S]{0,240}animation: none/);
   assert.match(closeups, /const stage=canvas\?\.parentElement/);
   assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);

@@ -706,6 +706,7 @@ export default function VersionThree() {
       {active==="computer"&&(
         <div ref={computerViewRef} className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
+            <div className="computer-os">
             <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
               <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
@@ -776,6 +777,7 @@ export default function VersionThree() {
                 <div className={`news-popup ${bulletin?"visible":""}`}><header><span>{computerContent.bulletin.header}</span><button onClick={() => setBulletin(false)}>{siteContent.shared.close}</button></header><strong>{computerContent.bulletin.title}</strong><p>{computerContent.bulletin.copy}</p></div>
               </main>
               <footer className="os-taskbar"><button className="taskbar-home" onClick={() => openComputerFile("desktop")} aria-label="Show desktop">{siteContent.brand.initials}</button><div className="taskbar-apps" aria-label="Open applications">{taskbarWindows.map((windowId)=>{const item=computerTaskbarItem(windowId);return <button className={`taskbar-app ${computerWindows.at(-1)===windowId?"active":""}`} key={windowId} onClick={()=>focusComputerWindow(windowId)} aria-label={`Focus ${item.label}`} aria-pressed={computerWindows.at(-1)===windowId}><i aria-hidden="true">{item.icon}</i><span>{item.label}</span></button>;})}</div><span className="taskbar-files">{computerContent.taskbar.files}</span><span className="taskbar-alert">{bulletin?computerContent.taskbar.unread:computerContent.taskbar.clear}</span></footer>
+            </div>
             </div>
           </div>
         </div>
