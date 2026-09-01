@@ -243,6 +243,13 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /className="portrait-phone-dock"[\s\S]*PhoneAppIcon kind="projects"[\s\S]*PhoneAppIcon kind="references"[\s\S]*PhoneAppIcon kind="lablog"/);
   assert.match(portraitComputer, /className="portrait-phone-navbar"[\s\S]*onClick=\{canGoBack\?onBack:\(\)=>onOpenRoot\("desktop"\)\}/);
   assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
+  assert.match(portraitComputer, /useState<LabLogFilter>\("all"\)/);
+  assert.match(portraitComputer, /visibleLabLogEntries=[\s\S]*entry\.type\.toLowerCase\(\)\.includes\(labLogFilter\)/);
+  assert.match(portraitComputer, /className="portrait-log-filters"[\s\S]*aria-pressed=\{labLogFilter===filter\.id\}/);
+  assert.match(portraitComputer, /className="portrait-log-timeline"[\s\S]*visibleLabLogEntries\.map/);
+  assert.match(portraitCss, /\.portrait-log-filters \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(portraitCss, /\.portrait-log-timeline \{[\s\S]*position: relative[\s\S]*padding-left/);
+  assert.match(portraitCss, /\.portrait-log-timeline p \{[\s\S]*grid-template-columns: auto minmax\(0,1fr\)/);
   assert.doesNotMatch(portraitComputer, /portrait-mobile-appbar|portrait-mobile-tabs|const tabs:/, "portrait computer must use phone home and app navigation instead of a desktop-like global tab bar");
   assert.doesNotMatch(portraitComputer, /portrait-computer-panel|portrait-panel-bar|portrait-bulletin/, "portrait computer must not retain desktop window or popup chrome");
   for (const windowId of ["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"]) {

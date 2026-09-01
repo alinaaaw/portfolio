@@ -527,7 +527,6 @@
   }
 
   .portrait-document,
-  .portrait-lab-log,
   .portrait-profile > div {
     min-height: 100%;
     padding: 30px max(20px,env(safe-area-inset-right)) 36px max(20px,env(safe-area-inset-left));
@@ -692,25 +691,171 @@
 
   .portrait-lab-log {
     min-height: 100%;
-    background: #0b1311;
-    color: #b9c4bd;
-  }
-
-  .portrait-lab-log > article {
-    margin-top: 26px;
-    padding-top: 18px;
-    border-top: 1px solid #2d3b36;
-  }
-
-  .portrait-lab-log h2 {
-    color: var(--signal);
-    font-size: 27px;
-  }
-
-  .portrait-lab-log p {
-    color: #b9c4bd;
+    padding: 24px max(16px,env(safe-area-inset-right)) 38px max(16px,env(safe-area-inset-left));
+    background-color: #09110f;
+    background-image: linear-gradient(rgba(112,201,192,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(112,201,192,.025) 1px,transparent 1px);
+    background-size: 32px 32px;
+    color: #c5cdc6;
     font-family: var(--font-mono),monospace;
-    font-size: 10px;
+  }
+
+  .portrait-log-overview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 3px 18px;
+    border-bottom: 1px dashed #405049;
+  }
+
+  .portrait-log-overview > small {
+    color: var(--signal);
+    font-size: 8px;
+  }
+
+  .portrait-log-overview > span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #7c8881;
+    font-size: 6px;
+  }
+
+  .portrait-log-overview > span i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--signal);
+    box-shadow: 0 0 8px rgba(182,226,54,.55);
+  }
+
+  .portrait-log-filters {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    margin: 18px 0 24px;
+    overflow: hidden;
+    border: 1px solid #405049;
+    border-radius: 15px;
+    background: rgba(19,31,27,.8);
+  }
+
+  .portrait-log-filters button {
+    position: relative;
+    min-width: 0;
+    min-height: 48px;
+    border-right: 1px solid #405049;
+    background: transparent;
+    color: #8f9993;
+    font: 8px/1 var(--font-mono),monospace;
+  }
+
+  .portrait-log-filters button:last-child {
+    border-right: 0;
+  }
+
+  .portrait-log-filters button::after {
+    content: "";
+    position: absolute;
+    right: 22%;
+    bottom: 7px;
+    left: 22%;
+    height: 2px;
+    background: transparent;
+  }
+
+  .portrait-log-filters button.active {
+    color: var(--signal);
+  }
+
+  .portrait-log-filters button.active::after {
+    background: var(--signal);
+  }
+
+  .portrait-log-timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+
+  .portrait-log-timeline::before {
+    content: "";
+    position: absolute;
+    top: 26px;
+    bottom: 18px;
+    left: 9px;
+    width: 1px;
+    background: linear-gradient(var(--signal),rgba(182,226,54,.15));
+  }
+
+  .portrait-log-timeline > article {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 19px 17px;
+    border: 1px solid #405049;
+    border-radius: 18px;
+    background: linear-gradient(145deg,rgba(22,37,32,.96),rgba(12,22,19,.96));
+    box-shadow: 0 13px 28px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.025);
+  }
+
+  .portrait-log-marker {
+    position: absolute;
+    top: 23px;
+    left: -29px;
+    width: 17px;
+    height: 17px;
+    border: 1px solid var(--signal);
+    border-radius: 50%;
+    background: #09110f;
+    box-shadow: 0 0 0 4px #09110f;
+  }
+
+  .portrait-log-marker::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--signal);
+  }
+
+  .portrait-log-timeline article > header small {
+    color: var(--signal);
+    font-size: 8px;
+  }
+
+  .portrait-log-timeline h2 {
+    margin: 12px 0 9px;
+    color: var(--paper);
+    font-size: clamp(19px,5.8vw,25px);
+    line-height: 1.18;
+    letter-spacing: -.035em;
+  }
+
+  .portrait-log-timeline article > header > span {
+    display: block;
+    overflow: hidden;
+    color: #718078;
+    font-size: 8px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .portrait-log-timeline article > div {
+    display: grid;
+    gap: 14px;
+    margin-top: 17px;
+  }
+
+  .portrait-log-timeline p {
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr);
+    gap: 9px;
+    margin: 0;
+    color: #bdc6bf;
+    font: 9px/1.65 var(--font-mono),monospace;
+  }
+
+  .portrait-log-timeline p > span {
+    color: var(--cyan);
+    white-space: nowrap;
   }
 
   .portrait-references > header {

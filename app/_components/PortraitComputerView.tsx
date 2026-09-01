@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   computer as computerContent,
   references as referencesContent,
@@ -14,6 +15,7 @@ export type PortraitComputerRoot = "desktop" | "projects" | "experience" | "refe
 
 type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:string;citation:string;summary:string;annotation:string;provenance:string;url:string};
 type PhoneAppIconKind = "profile" | "notes" | "projects" | "experience" | "references" | "lablog";
+type LabLogFilter = "all" | "program" | "role";
 
 type Props = {
   computerWindows: ComputerWindowId[];
@@ -33,16 +35,19 @@ const projectFiles = (["map","allocation","emg"] as const).map((id)=>({id,...com
 const projectReferences=referencesContent.references as ProjectReference[];
 const referenceGroups=referencesContent.groups as {id:ReferenceFilter;label:string}[];
 const rootWindows:ComputerWindowId[]=["projects","experience","references","lablog"];
+const labLogFilters:{id:LabLogFilter;label:string}[]=[{id:"all",label:"ALL"},{id:"program",label:"PROGRAM"},{id:"role",label:"ROLE"}];
 
 function PhoneAppIcon({kind,badge=false}:{kind:PhoneAppIconKind;badge?:boolean}) {
   return <span className={`portrait-app-icon portrait-app-icon-${kind}`} aria-hidden="true"><i />{badge&&<b>1</b>}</span>;
 }
 
 export default function PortraitComputerView({computerWindows,referenceFilter,bulletin,onOpenFile,onOpenRoot,onFocusWindow,onBack,onOpenReferences,onSetReferenceFilter,onDismissBulletin,onLeave}:Props) {
+  const [labLogFilter,setLabLogFilter]=useState<LabLogFilter>("all");
   const activeWindow=computerWindows.at(-1)??null;
   const project=projectFiles.find((file)=>file.id===activeWindow);
   const experience=activeWindow==="research"||activeWindow==="internship"?computerContent.experience[activeWindow]:null;
   const visibleReferences=referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
+  const visibleLabLogEntries=labLogFilter==="all"?computerContent.labLog.entries:computerContent.labLog.entries.filter((entry)=>entry.type.toLowerCase().includes(labLogFilter));
   const canGoBack=Boolean(activeWindow)&&(!rootWindows.includes(activeWindow as ComputerWindowId)||computerWindows.length>1);
   const screenTitle=activeWindow==="profile"?"Profile"
     :activeWindow==="readme"?"Notes"
@@ -99,7 +104,15 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
         <main className="portrait-phone-app-content">
           {activeWindow==="readme"&&<section className="portrait-document"><small>{computerContent.readme.meta}</small><h2>{computerContent.readme.title}</h2>{computerContent.readme.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</section>}
 
-          {activeWindow==="lablog"&&<section className="portrait-lab-log"><small>{computerContent.labLog.meta}</small>{computerContent.labLog.entries.map((entry)=><article key={`${entry.date}-${entry.title}`}><small>[{entry.date}] {entry.type}</small><h2>{entry.title}</h2>{entry.body.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</article>)}</section>}
+          {activeWindow==="lablog"&&<section className="portrait-lab-log">
+            <header className="portrait-log-overview"><small>{computerContent.labLog.meta}</small><span><i />{computerContent.topBar.sync}</span></header>
+            <nav className="portrait-log-filters" aria-label="Filter lab log entries">{labLogFilters.map((filter)=><button type="button" className={labLogFilter===filter.id?"active":""} key={filter.id} onClick={()=>setLabLogFilter(filter.id)} aria-pressed={labLogFilter===filter.id}>{filter.label}</button>)}</nav>
+            <div className="portrait-log-timeline">{visibleLabLogEntries.map((entry,entryIndex)=><article key={`${entry.date}-${entry.title}`}>
+              <i className="portrait-log-marker" aria-hidden="true" />
+              <header><small>{entry.date} / {entry.type}</small><h2>{entry.title}</h2><span aria-hidden="true">└─ --------------------------------</span></header>
+              <div>{entry.body.map((paragraph,paragraphIndex)=><p key={paragraph}><span>[LOG.{String(entryIndex*10+paragraphIndex+1).padStart(2,"0")}]</span>{paragraph}</p>)}</div>
+            </article>)}</div>
+          </section>}
 
           {activeWindow==="projects"&&<section className="portrait-list portrait-root-list"><header><small>{computerContent.projectsFolder.title}</small><h2>{computerContent.sidebar.projects}</h2></header>{projectFiles.map((file)=><button type="button" key={file.id} onClick={()=>onOpenFile(file.id)}><i className="document-icon" /><span><strong>{file.name}</strong><small>{file.meta}</small></span><b>{siteContent.shared.arrow}</b></button>)}</section>}
 
