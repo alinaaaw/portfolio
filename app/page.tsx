@@ -545,6 +545,7 @@ function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}
 
 export default function VersionThree() {
   const computerViewRef=useRef<HTMLDivElement>(null);
+  const computerOsRef=useRef<HTMLDivElement>(null);
   const [entered,setEntered] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
@@ -574,21 +575,32 @@ export default function VersionThree() {
   useEffect(() => {
     if(active!=="computer")return;
     const view=computerViewRef.current;
-    if(!view)return;
+    const os=computerOsRef.current;
+    if(!view||!os)return;
+    let layoutFrame=0;
     const resize=()=>{
       const rect=view.getBoundingClientRect();
       if(rect.width<2||rect.height<2)return;
       const portrait=rect.height>=rect.width;
-      const layoutWidth=portrait?Math.max(rect.width,620):rect.width;
-      const scale=rect.width/layoutWidth;
-      view.style.setProperty("--computer-scale",String(scale));
-      view.style.setProperty("--computer-layout-width",`${layoutWidth}px`);
-      view.style.setProperty("--computer-layout-height",`${rect.height/scale}px`);
+      const setLayout=(layoutWidth:number)=>{
+        const scale=rect.width/layoutWidth;
+        view.style.setProperty("--computer-scale",String(scale));
+        view.style.setProperty("--computer-layout-width",`${layoutWidth}px`);
+        view.style.setProperty("--computer-layout-height",`${rect.height/scale}px`);
+      };
+      if(!portrait){setLayout(rect.width);return;}
+      setLayout(Math.max(rect.width,620));
+      cancelAnimationFrame(layoutFrame);
+      layoutFrame=requestAnimationFrame(()=>{
+        const shells=[os,os.querySelector<HTMLElement>(".os-bar"),os.querySelector<HTMLElement>(".os-screen")].filter((element):element is HTMLElement=>Boolean(element));
+        const requiredWidth=Math.max(rect.width,620,...shells.map((element)=>element.scrollWidth));
+        setLayout(requiredWidth);
+      });
     };
     const observer=new ResizeObserver(resize);
     observer.observe(view);
     resize();
-    return()=>observer.disconnect();
+    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);};
   },[active]);
 
   useEffect(() => {
@@ -706,7 +718,7 @@ export default function VersionThree() {
       {active==="computer"&&(
         <div ref={computerViewRef} className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
-            <div className="computer-os">
+            <div ref={computerOsRef} className="computer-os">
             <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
               <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>

@@ -133,19 +133,33 @@
   }
 
   .computer-view > .monitor-bezel {
-    width: 100vw;
-    height: 100svh;
-    height: 100dvh;
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
     max-width: none;
     max-height: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    transform: none;
+    animation: none;
   }
 
   .computer-view .computer-os {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
     width: var(--computer-layout-width,100vw);
     height: var(--computer-layout-height,100dvh);
     transform: scale(var(--computer-scale,1));
     transform-origin: top left;
+  }
+
+  .computer-view .os-bar,
+  .computer-view .os-screen {
+    width: 100%;
   }
 
   .room-shell > .modal-layer.tactile-layer {
