@@ -144,7 +144,8 @@
     display: block;
     width: var(--computer-layout-width,100vw);
     height: var(--computer-layout-height,100dvh);
-    zoom: var(--computer-scale,1);
+    transform: scale(var(--computer-scale,1));
+    transform-origin: top left;
   }
 
   .room-shell > .modal-layer.tactile-layer {

@@ -201,7 +201,7 @@ test("portrait room and closeup sizing stay isolated from the shared overlay arc
   const computerContract = declarationsFor(".computer-view > .monitor-bezel");
   assert.match(computerContract, /width: 100vw[\s\S]*height: 100svh[\s\S]*height: 100dvh/);
   const computerOsContract = declarationsFor(".computer-view .computer-os");
-  assert.match(computerOsContract, /display: block[\s\S]*width: var\(--computer-layout-width,100vw\)[\s\S]*height: var\(--computer-layout-height,100dvh\)[\s\S]*zoom: var\(--computer-scale,1\)/);
+  assert.match(computerOsContract, /display: block[\s\S]*width: var\(--computer-layout-width,100vw\)[\s\S]*height: var\(--computer-layout-height,100dvh\)[\s\S]*transform: scale\(var\(--computer-scale,1\)\)[\s\S]*transform-origin: top left/);
   assert.doesNotMatch(portraitCss, /\.monitor-bezel[\s\S]{0,180}animation: none|\.tactile-scene[\s\S]{0,240}animation: none/);
   assert.match(closeups, /const stage=canvas\?\.parentElement/);
   assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);
