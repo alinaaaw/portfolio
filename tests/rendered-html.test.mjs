@@ -151,6 +151,59 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /fax-reading/);
 });
 
+test("portrait room and closeup sizing stay isolated from the shared overlay architecture", async () => {
+  const [layout, page, game, closeups, portraitCss] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/LabGame.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/ZoneCloseup3D.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../public/portrait.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.ok(layout.indexOf('import "../public/site.css"') < layout.indexOf('import "../public/portrait.css"'), "portrait overrides must load after the shared stylesheet");
+  assert.match(layout, /viewportFit: "cover"/);
+  assert.match(portraitCss.trim(), /^@media \(orientation: portrait\) \{/);
+  assert.equal((portraitCss.match(/@media \(orientation: portrait\)/g) ?? []).length, 1, "portrait styling must have one explicit isolation boundary");
+  assert.equal((page.match(/<LabGame\b/g) ?? []).length, 1, "the room must keep one LabGame instance");
+  assert.equal((game.match(/<canvas\b/g) ?? []).length, 1, "LabGame must keep one WebGL canvas");
+  assert.match(game, /const nextPortrait = rect\.height >= rect\.width/);
+  assert.match(game, /new ResizeObserver\(resize\)/);
+  assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
+  assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
+  for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
+    assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
+  }
+
+  for (const zone of ["books", "drawer", "notebook", "board", "fieldcase", "printer", "contact"]) {
+    assert.match(page, new RegExp(`className=\"tactile-scene\"[\\s\\S]{0,900}<ZoneCloseup3D zone=\"${zone}\"`), `${zone} must render inside the sized tactile closeup container`);
+  }
+
+  const declarationsFor = (selector) => {
+    const start = portraitCss.indexOf(`${selector} {`);
+    assert.notEqual(start, -1, `${selector} must have an explicit portrait sizing contract`);
+    return portraitCss.slice(start, portraitCss.indexOf("}", start));
+  };
+  const layerContract = declarationsFor(".room-shell > .modal-layer.tactile-layer");
+  const sceneContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene");
+  const stageContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene");
+  const canvasContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene > canvas");
+  assert.match(layerContract, /display: grid[\s\S]*grid-template-columns: minmax\(0,1fr\)[\s\S]*grid-template-rows: minmax\(0,1fr\)[\s\S]*place-items: stretch/);
+  assert.match(layerContract, /height: 100svh[\s\S]*height: 100dvh[\s\S]*min-height: 0/);
+  assert.match(sceneContract, /place-self: stretch[\s\S]*width: auto[\s\S]*height: auto[\s\S]*min-width: 0[\s\S]*min-height: 0[\s\S]*max-height: none/);
+  assert.match(stageContract, /inset: 58px 0 0[\s\S]*height: auto[\s\S]*min-height: 1px/);
+  assert.match(canvasContract, /display: block[\s\S]*width: 100%[\s\S]*height: 100%[\s\S]*min-height: 1px/);
+  assert.doesNotMatch(portraitCss, /\.monitor-bezel[\s\S]{0,180}animation: none|\.tactile-scene[\s\S]{0,240}animation: none/);
+  assert.match(closeups, /const stage=canvas\?\.parentElement/);
+  assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);
+  assert.match(closeups, /observer\.observe\(stage\)/);
+  assert.match(closeups, /layoutFrame=requestAnimationFrame\(resize\)/);
+  assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
+  assert.match(closeups, /portraitDistanceScale=isPortrait\?THREE\.MathUtils\.clamp\(1\.25\/nextAspect,1,[^)]+\):1/);
+  assert.match(closeups, /camera\.fov=isPortrait\?[^:;]+:42/);
+  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*desired\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
+  assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
+});
+
 test("editable copy is organized into valid category files", async () => {
   const { readFile } = await import("node:fs/promises");
   for (const name of ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"]) {

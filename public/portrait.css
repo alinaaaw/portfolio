@@ -1,0 +1,185 @@
+@media (orientation: portrait) {
+  .room-shell {
+    height: 100svh;
+    height: 100dvh;
+  }
+
+  .room-viewport {
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  .room-viewport .room-vignette {
+    background:
+      linear-gradient(180deg,rgba(2,6,5,.58) 0,transparent 23%,transparent 63%,rgba(2,6,5,.76) 100%),
+      radial-gradient(ellipse 92% 64% at 50% 48%,transparent 38%,rgba(2,6,5,.62) 100%);
+  }
+
+  .room-shell .room-nav {
+    grid-template-columns: minmax(0,1fr) auto auto;
+    gap: 14px;
+    min-height: calc(58px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));
+  }
+
+  .room-shell .room-nav button,
+  .room-shell .room-nav a {
+    min-height: 48px;
+  }
+
+  .room-shell .room-nav nav {
+    gap: 18px;
+  }
+
+  .room-shell .room-system {
+    gap: 10px;
+  }
+
+  .room-viewport .room-intro {
+    display: flex;
+    align-items: flex-end;
+    padding: calc(78px + env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));
+    background:
+      linear-gradient(180deg,rgba(4,9,8,.3) 0,rgba(4,9,8,.08) 29%,rgba(4,9,8,.76) 62%,rgba(4,9,8,.97) 100%),
+      linear-gradient(90deg,rgba(4,9,8,.76),rgba(4,9,8,.1) 82%);
+  }
+
+  .room-intro .intro-copy {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .room-intro .intro-copy h1 {
+    margin: 15px 0 18px;
+    font-size: clamp(48px,15vw,82px);
+    line-height: .88;
+  }
+
+  .room-intro .intro-text {
+    max-width: 540px;
+    font-size: clamp(11px,2.8vw,14px);
+    line-height: 1.65;
+  }
+
+  .room-intro .intro-copy > button {
+    width: min(100%,420px);
+    min-height: 52px;
+    margin: 22px 0 18px;
+  }
+
+  .room-intro .intro-guide {
+    display: none;
+  }
+
+  .room-entered .room-status {
+    top: calc(70px + env(safe-area-inset-top));
+    left: max(14px,env(safe-area-inset-left));
+    right: max(14px,env(safe-area-inset-right));
+    width: auto;
+    padding: 11px 13px;
+  }
+
+  .room-entered .room-status strong {
+    margin: 4px 0;
+  }
+
+  .room-entered .hover-readout {
+    display: none;
+  }
+
+  .room-entered .explore-dock {
+    left: max(12px,env(safe-area-inset-left));
+    right: max(12px,env(safe-area-inset-right));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    display: flex;
+    width: auto;
+    max-width: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 8px;
+    scroll-snap-type: x proximity;
+    translate: 0 0;
+  }
+
+  .room-entered .explore-dock button {
+    flex: 0 0 clamp(108px,31vw,150px);
+    justify-content: flex-start;
+    min-height: 64px;
+    padding: 12px 13px;
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  .room-entered .explore-dock button:last-child {
+    border-right: 0;
+  }
+
+  .room-entered .explore-dock i {
+    display: block;
+    font-size: 8px;
+  }
+
+  .room-entered .fax-alert {
+    right: max(14px,env(safe-area-inset-right));
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    min-height: 48px;
+  }
+
+  .room-shell > .modal-layer.tactile-layer {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    grid-template-rows: minmax(0,1fr);
+    place-items: stretch;
+    width: 100vw;
+    height: 100svh;
+    height: 100dvh;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .room-shell > .modal-layer.tactile-layer > .tactile-scene {
+    place-self: stretch;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene {
+    inset: 58px 0 0;
+    width: auto;
+    height: auto;
+    min-width: 1px;
+    min-height: 1px;
+  }
+
+  .room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene > canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 1px;
+    min-height: 1px;
+  }
+
+  .room-shell .tactile-scene > header {
+    padding-left: max(16px,env(safe-area-inset-left));
+    padding-right: max(16px,env(safe-area-inset-right));
+  }
+
+  .room-shell .quick-index > header button,
+  .room-shell .tactile-scene > header button,
+  .room-shell .fax-machine > header button,
+  .room-shell .quick-list button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  .room-shell .explore-dock button:focus-visible,
+  .room-shell .quick-list button:focus-visible,
+  .room-shell .tactile-scene > header button:focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: -3px;
+  }
+}

@@ -506,7 +506,8 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
 
   useEffect(()=>{
     const canvas=canvasRef.current;
-    if(!canvas)return;
+    const stage=canvas?.parentElement;
+    if(!canvas||!stage)return;
     const initialFaxPrinted=faxPrintedRef.current;
     const initialContactCardRaised=contactCardRaisedRef.current;
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"});
@@ -560,11 +561,14 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     let printProgress=zone==="printer"&&!initialFaxPrinted?0:1;
     let printNotified=initialFaxPrinted;
     let contactCardProgress=initialContactCardRaised?1:0;
+    let isPortrait=false;
+    let portraitDistanceScale=1;
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const resize=()=>{ const rect=canvas.getBoundingClientRect(); renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false); camera.aspect=Math.max(1,rect.width)/Math.max(1,rect.height); camera.updateProjectionMatrix(); };
-    const observer=new ResizeObserver(resize); observer.observe(canvas); resize();
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?THREE.MathUtils.clamp(1.25/nextAspect,1,3.2):1; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=isPortrait?52:42; camera.updateProjectionMatrix(); };
+    const observer=new ResizeObserver(resize); observer.observe(stage); resize();
+    const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{
       const rect=canvas.getBoundingClientRect(); pointer.x=((event.clientX-rect.left)/rect.width)*2-1; pointer.y=-((event.clientY-rect.top)/rect.height)*2+1; raycaster.setFromCamera(pointer,camera);
       const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96))??null;
@@ -611,11 +615,15 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       if((zone==="printer"||zone==="contact")&&contactCardProgress>0){
         desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
+      if(isPortrait){
+        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale);
+        desired.copy(desiredTarget).add(portraitOffset);
+      }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
     };frame=requestAnimationFrame(tick);
-    return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
+    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
   return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
