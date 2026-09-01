@@ -904,9 +904,14 @@
     white-space: nowrap;
   }
 
-  .portrait-room-return span {
-    margin-right: 3px;
-    font: 24px/1 system-ui,sans-serif;
+  .portrait-room-return > i {
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-bottom: 1.5px solid currentColor;
+    border-left: 1.5px solid currentColor;
+    flex: 0 0 auto;
+    transform: rotate(45deg);
   }
 
   .portrait-phone-island {
