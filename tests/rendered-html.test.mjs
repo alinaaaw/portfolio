@@ -183,7 +183,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(framing, /Math\.max\(1, IDEAL_LANDSCAPE_ASPECT \/ safeAspect\)/);
   assert.match(page, /<div className="computer-view computer-view-desktop"/);
   assert.match(page, /<PortraitComputerView computerWindows=\{computerWindows\} referenceFilter=\{referenceFilter\} bulletin=\{bulletin\}/);
-  assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onCloseWindow=\{closeComputerWindow\}[\s\S]*onOpenReferences=\{openReferences\}/);
+  assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onOpenRoot=\{openPortraitComputerRoot\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onBack=\{backPortraitComputer\}[\s\S]*onOpenReferences=\{openReferences\}/);
+  assert.match(page, /setComputerWindows\(file==="desktop"\?\[\]:\[file\]\)/, "portrait tabs must replace desktop window stacking with top-level mobile destinations");
   assert.doesNotMatch(page, /computerViewRef|computerOsRef|--computer-scale|--computer-layout-(?:width|height)|scrollWidth/);
   assert.doesNotMatch(page, /className="computer-os"/);
   assert.match(siteCss, /\.portrait-computer-view \{ display: none; \}/);
@@ -214,22 +215,28 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(sceneContract, /place-self: stretch[\s\S]*width: auto[\s\S]*height: auto[\s\S]*min-width: 0[\s\S]*min-height: 0[\s\S]*max-height: none/);
   assert.match(stageContract, /inset: 58px 0 0[\s\S]*height: auto[\s\S]*min-height: 1px/);
   assert.match(canvasContract, /display: block[\s\S]*width: 100%[\s\S]*height: 100%[\s\S]*min-height: 1px/);
-  const computerPanelContract = declarationsFor(".portrait-computer-panel");
-  const computerScrollContract = declarationsFor(".portrait-panel-scroll");
-  const bulletinContract = declarationsFor(".portrait-bulletin");
-  const bulletinHeaderContract = declarationsFor(".portrait-bulletin header");
+  const computerScreenContract = declarationsFor(".portrait-mobile-screen");
+  const computerTabsContract = declarationsFor(".portrait-mobile-tabs");
+  const bulletinContract = declarationsFor(".portrait-mobile-notification");
+  const bulletinMetaContract = declarationsFor(".portrait-mobile-notification small");
   const referenceHeaderMetaContract = declarationsFor(".portrait-references > header small");
   const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
-  assert.match(computerPanelContract, /inset: 12px[\s\S]*width: calc\(100% - 24px\)[\s\S]*height: calc\(100% - 24px\)[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
-  assert.match(computerScrollContract, /min-height: 0[\s\S]*overflow-y: auto[\s\S]*overscroll-behavior: contain/);
-  assert.match(bulletinContract, /border: 1px solid var\(--red\)/, "portrait bulletin must retain the desktop warning color");
-  assert.match(bulletinHeaderContract, /color: var\(--red\)/, "portrait bulletin header must retain the desktop warning color");
+  assert.match(computerScreenContract, /min-height: 0[\s\S]*overflow-x: hidden[\s\S]*overflow-y: auto[\s\S]*overscroll-behavior: contain/);
+  assert.match(computerTabsContract, /grid-template-columns: repeat\(5,minmax\(0,1fr\)\)[\s\S]*safe-area-inset-bottom[\s\S]*border-top/);
+  assert.match(bulletinContract, /display: grid[\s\S]*border-bottom: 1px solid var\(--red\)/, "portrait bulletin must be an in-flow mobile notification banner");
+  assert.match(bulletinMetaContract, /color: var\(--red\)/, "portrait notification metadata must retain the desktop warning color");
   assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
   assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
-  assert.match(portraitCss, /\.portrait-computer-bar button,[\s\S]*\.portrait-computer-view \.portrait-bulletin button \{\s*min-height: 48px/);
+  assert.match(portraitCss, /\.portrait-mobile-appbar button,[\s\S]*\.portrait-computer-view \.portrait-panel-actions button \{\s*min-height: 48px/);
   assert.match(portraitCss, /\.portrait-file-grid \{[\s\S]*grid-template-columns: repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(portraitComputer, /from "@\/content"/);
   assert.match(portraitComputer, /const activeWindow=computerWindows\.at\(-1\)\?\?null/);
+  assert.match(portraitComputer, /const tabs:[^=]+=\[[\s\S]*id:"desktop"[\s\S]*id:"projects"[\s\S]*id:"experience"[\s\S]*id:"references"[\s\S]*id:"lablog"/);
+  assert.match(portraitComputer, /const canGoBack=[\s\S]*computerWindows\.length>1/);
+  assert.match(portraitComputer, /className="portrait-mobile-appbar"[\s\S]*onClick=\{onBack\}/);
+  assert.match(portraitComputer, /className="portrait-mobile-tabs"[\s\S]*onClick=\{\(\)=>onOpenRoot\(tab\.id\)\}/);
+  assert.doesNotMatch(portraitComputer, /portrait-computer-panel|portrait-panel-bar|portrait-bulletin/, "portrait computer must not retain desktop window or popup chrome");
+  assert.doesNotMatch(portraitCss, /\.portrait-computer-panel|\.portrait-panel-bar|\.portrait-panel-scroll|\.portrait-bulletin/);
   for (const windowId of ["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"]) {
     assert.match(portraitComputer, new RegExp(`(?:activeWindow===\\"${windowId}\\"|\\[\\"map\\",\\"allocation\\",\\"emg\\"\\]|\\[\\"research\\",\\"internship\\"\\])`), `${windowId} must remain reachable in the portrait computer`);
   }
@@ -237,7 +244,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /onOpenReferences\(project\.id\)/);
   assert.match(portraitComputer, /onSetReferenceFilter\(group\.id\)/);
   assert.match(portraitComputer, /href=\{reference\.url\}/);
-  assert.match(portraitComputer, /bulletin&&<aside className="portrait-bulletin"/);
+  assert.match(portraitComputer, /bulletin&&<aside className="portrait-mobile-notification" role="status" aria-live="polite"/);
+  assert.match(portraitComputer, /tab\.id==="desktop"&&bulletin&&<span className="portrait-tab-badge"/);
   assert.doesNotMatch(portraitCss, /\.tactile-scene[\s\S]{0,240}animation: none/);
   assert.match(closeups, /const stage=canvas\?\.parentElement/);
   assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);

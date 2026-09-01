@@ -12,7 +12,7 @@ import { drawerArtifactMedia } from "./_components/drawerArtifactMedia";
 import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
 import type { TravelPhoto } from "./_components/travelPhotoLibrary";
 import PortraitComputerView from "./_components/PortraitComputerView";
-import type { ComputerFile, ComputerWindowId, ProjectFileId, ReferenceFilter } from "./_components/PortraitComputerView";
+import type { ComputerFile, ComputerWindowId, PortraitComputerRoot, ProjectFileId, ReferenceFilter } from "./_components/PortraitComputerView";
 import {
   board as boardContent,
   books as booksContent,
@@ -600,6 +600,19 @@ export default function VersionThree() {
     setSelectedComputerFile(null);
   };
 
+  const openPortraitComputerRoot=(file:PortraitComputerRoot)=>{
+    setComputerWindows(file==="desktop"?[]:[file]);
+    setMaximizedWindow(null);
+    setSelectedComputerFile(null);
+    if(file==="references")setReferenceFilter("all");
+  };
+
+  const backPortraitComputer=()=>{
+    const closing=computerWindows.at(-1);
+    setComputerWindows((current)=>current.slice(0,-1));
+    setMaximizedWindow((current)=>current===closing?null:current);
+  };
+
   const leaveComputer=()=>{
     setComputerWindows([]);
     setMaximizedWindow(null);
@@ -763,7 +776,7 @@ export default function VersionThree() {
             </div>
           </div>
         </div>
-        <PortraitComputerView computerWindows={computerWindows} referenceFilter={referenceFilter} bulletin={bulletin} onOpenFile={openComputerFile} onFocusWindow={focusComputerWindow} onCloseWindow={closeComputerWindow} onOpenReferences={openReferences} onSetReferenceFilter={setReferenceFilter} onDismissBulletin={()=>setBulletin(false)} onLeave={leaveComputer}/>
+        <PortraitComputerView computerWindows={computerWindows} referenceFilter={referenceFilter} bulletin={bulletin} onOpenFile={openComputerFile} onOpenRoot={openPortraitComputerRoot} onFocusWindow={focusComputerWindow} onBack={backPortraitComputer} onOpenReferences={openReferences} onSetReferenceFilter={setReferenceFilter} onDismissBulletin={()=>setBulletin(false)} onLeave={leaveComputer}/>
         </>
       )}
 
