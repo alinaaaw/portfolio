@@ -65,6 +65,8 @@
     width: min(100%,420px);
     min-height: 52px;
     margin: 22px 0 18px;
+    font-size: clamp(12px,3.4vw,14px);
+    letter-spacing: .12em;
   }
 
   .room-intro .intro-guide {
