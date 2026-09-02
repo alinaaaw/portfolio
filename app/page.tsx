@@ -544,6 +544,7 @@ function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}
 export default function VersionThree() {
   const [entered,setEntered] = useState(false);
   const [roomPanView,setRoomPanView] = useState<RoomPanView>("center");
+  const [showRoomPanHint,setShowRoomPanHint] = useState(true);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
   const [discovered,setDiscovered] = useState<ZoneId[]>([]);
@@ -561,6 +562,11 @@ export default function VersionThree() {
   const inspect = useCallback((zone: ZoneId) => {
     setActive(zone);
     setDiscovered((current) => current.includes(zone)?current:[...current,zone]);
+  },[]);
+
+  const changeRoomPanView = useCallback((view: RoomPanView) => {
+    setRoomPanView(view);
+    setShowRoomPanHint(false);
   },[]);
 
   useEffect(() => {
@@ -657,7 +663,7 @@ export default function VersionThree() {
       </header>
 
       <section className="room-viewport" aria-label={roomContent.ariaLabel}>
-        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} faxPrinted={faxPrinted} roomPanView={roomPanView} onRoomPanViewChange={setRoomPanView} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
+        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} faxPrinted={faxPrinted} roomPanView={roomPanView} onRoomPanViewChange={changeRoomPanView} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
         <div className="room-grain" aria-hidden="true" />
         <div className="room-vignette" aria-hidden="true" />
 
@@ -682,9 +688,7 @@ export default function VersionThree() {
           <>
             <div className="room-status"><span>{roomContent.status.label}</span><strong>{status}</strong><p>{roomContent.status.instruction}</p></div>
             <div className="hover-readout" aria-live="polite"><span>{hovered?`${roomContent.hover.signalPrefix} ${zoneInfo[hovered].index}`:roomContent.hover.defaultMeta}</span><strong>{hovered?zoneInfo[hovered].label:roomContent.hover.defaultTitle}</strong><p>{hovered?zoneInfo[hovered].hint:roomContent.hover.defaultHint}</p></div>
-            <nav className="room-pan-nav" aria-label="Room view">
-              {(["left","center","right"] as RoomPanView[]).map((view)=><button key={view} className={roomPanView===view?"active":""} aria-label={`Show ${view} side of the room`} aria-pressed={roomPanView===view} onClick={()=>setRoomPanView(view)}><i /><span>{view}</span></button>)}
-            </nav>
+            {showRoomPanHint&&<div className="room-pan-hint" role="status"><i aria-hidden="true">←</i><span>{roomContent.navigation.portraitPanHint}</span><i aria-hidden="true">→</i></div>}
             <div className="explore-dock">
               {zoneOrder.map((zone) => <button className={discovered.includes(zone)?"found":""} key={zone} onClick={() => inspect(zone)}><span>{zoneInfo[zone].index}</span><i>{zoneInfo[zone].label}</i></button>)}
             </div>

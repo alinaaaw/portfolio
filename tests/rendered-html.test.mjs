@@ -196,9 +196,11 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.doesNotMatch(`${page}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/);
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
-  assert.match(page, /className="room-pan-nav"[\s\S]*setRoomPanView\(view\)/, "portrait room must expose direct left, center, and right view controls");
-  assert.match(siteCss, /\.room-pan-nav \{ display: none; \}/, "room pan controls must remain hidden from desktop layouts");
-  assert.match(portraitCss, /\.room-entered \.room-pan-nav \{[\s\S]*display: grid;/);
+  assert.match(page, /showRoomPanHint&&<div className="room-pan-hint"[\s\S]*portraitPanHint/, "portrait room must explain the horizontal swipe gesture without permanent view controls");
+  assert.match(page, /setRoomPanView\(view\);\s*setShowRoomPanHint\(false\)/, "the swipe hint must dismiss after the visitor changes the room view");
+  assert.doesNotMatch(page, /room-pan-nav|Show \$\{view\} side of the room/);
+  assert.match(siteCss, /\.room-pan-hint \{ display: none; \}/, "room pan hint must remain hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-entered \.room-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
   }
