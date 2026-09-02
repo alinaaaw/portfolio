@@ -180,6 +180,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /desiredPosition\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)/);
   assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
   assert.match(game, /roomPanViewChangeRef\.current\(roomPanOrder\[nextIndex\]\)/, "portrait room swipes must snap between complete lateral views");
+  assert.match(game, /booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+\(isPortrait\?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0\)/, "portrait room must bring the bookshelf indicator in front of the shelf");
+  assert.match(game, /booksZoneRing\.rotation\.x=isPortrait\?0:Math\.PI\/2/, "portrait bookshelf indicator must face the visitor while desktop keeps its original orientation");
+  assert.match(game, /booksZoneHit\.scale\.setScalar\(isPortrait\?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1\)/, "portrait bookshelf must have a larger touch target");
   assert.doesNotMatch(game, /portraitPosition|portraitTarget|camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(game, /new ResizeObserver\(resize\)/);
   assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);

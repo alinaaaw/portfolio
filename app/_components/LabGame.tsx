@@ -11,6 +11,9 @@ const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
 const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
 const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
+const PORTRAIT_BOOKS_ZONE_FRONT_OFFSET = .82;
+const PORTRAIT_BOOKS_ZONE_RING_SCALE = 1.3;
+const PORTRAIT_BOOKS_ZONE_HIT_SCALE = 1.35;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 export type RoomPanView = "left" | "center" | "right";
@@ -152,6 +155,7 @@ function addZone(scene: THREE.Scene, zone: ZoneId, targets: ZoneTarget[]) {
   label.position.y = .72;
   group.add(label);
   group.position.set(x,y,z);
+  group.name = `zone-indicator-${zone}`;
   scene.add(group);
   targets.push(hit);
   return group;
@@ -759,6 +763,9 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const currentTarget = defaultTarget.clone();
     const targets: ZoneTarget[] = [];
     buildRoom(scene,targets);
+    const booksZoneIndicator=scene.getObjectByName("zone-indicator-books") as THREE.Group;
+    const booksZoneRing=booksZoneIndicator.children[0] as THREE.Mesh;
+    const booksZoneHit=booksZoneIndicator.children[1] as THREE.Mesh;
 
     scene.add(new THREE.HemisphereLight(0x71918b,0x080c0b,.72));
     const key = new THREE.DirectionalLight(0xffd29c,2.7);
@@ -812,6 +819,10 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       const nextAspect=rect.width/rect.height;
       isPortrait=rect.height>=rect.width;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
+      booksZoneIndicator.position.z=zonePositions.books[2]+(isPortrait?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0);
+      booksZoneRing.rotation.x=isPortrait?0:Math.PI/2;
+      booksZoneRing.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_RING_SCALE:1);
+      booksZoneHit.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1);
       renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
       renderer.setSize(rect.width,rect.height,false);
       camera.aspect=nextAspect;
