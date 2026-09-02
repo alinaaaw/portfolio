@@ -7,6 +7,10 @@ import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
 import { aspectOverflowDistanceScale } from "./cameraFraming";
 
+const DEFAULT_ROOM_EXPOSURE = .92;
+const PORTRAIT_ROOM_EXPOSURE = 1.08;
+const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
+
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 type SceneTargetId = ZoneId | "printer";
 
@@ -727,7 +731,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.65));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = .92;
+    renderer.toneMappingExposure = DEFAULT_ROOM_EXPOSURE;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const scene = new THREE.Scene();
@@ -790,7 +794,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       if(rect.width<2||rect.height<2)return;
       const nextAspect=rect.width/rect.height;
       isPortrait=rect.height>=rect.width;
-      portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1;
+      portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
+      renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
       renderer.setSize(rect.width,rect.height,false);
       camera.aspect=nextAspect;
       camera.fov=43;
