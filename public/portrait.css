@@ -89,6 +89,59 @@
     display: none;
   }
 
+  .room-entered .room-pan-nav {
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(3,48px);
+    min-height: 46px;
+    overflow: hidden;
+    translate: -50% 0;
+    border: 1px solid rgba(229,220,198,.28);
+    border-radius: 24px;
+    background: rgba(5,12,11,.82);
+    box-shadow: 0 8px 26px rgba(0,0,0,.36);
+    backdrop-filter: blur(12px);
+  }
+
+  .room-entered .room-pan-nav button {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 3px;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 4px;
+    border-right: 1px solid rgba(229,220,198,.16);
+    background: transparent;
+    color: #8f9992;
+    cursor: pointer;
+  }
+
+  .room-entered .room-pan-nav button:last-child {
+    border-right: 0;
+  }
+
+  .room-entered .room-pan-nav i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .room-entered .room-pan-nav span {
+    font: 6px/1 var(--font-mono),monospace;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .room-entered .room-pan-nav button.active {
+    background: rgba(112,201,192,.13);
+    color: var(--cyan);
+  }
+
   .room-entered .explore-dock {
     left: max(12px,env(safe-area-inset-left));
     right: max(12px,env(safe-area-inset-right));
@@ -124,7 +177,7 @@
 
   .room-entered .fax-alert {
     right: max(14px,env(safe-area-inset-right));
-    bottom: calc(88px + env(safe-area-inset-bottom));
+    bottom: calc(146px + env(safe-area-inset-bottom));
     min-height: 48px;
   }
 

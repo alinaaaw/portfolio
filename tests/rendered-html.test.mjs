@@ -175,9 +175,11 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(game, /camera\.aspect=nextAspect/);
   assert.match(game, /camera\.fov=43/);
-  assert.match(game, /portraitDistanceScale=isPortrait\?aspectOverflowDistanceScale\(nextAspect\):1/);
+  assert.match(game, /portraitDistanceScale=isPortrait\?Math\.min\(aspectOverflowDistanceScale\(nextAspect\),MAX_PORTRAIT_ROOM_DISTANCE_SCALE\):1/);
   assert.match(game, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE/);
   assert.match(game, /desiredPosition\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)/);
+  assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
+  assert.match(game, /roomPanViewChangeRef\.current\(roomPanOrder\[nextIndex\]\)/, "portrait room swipes must snap between complete lateral views");
   assert.doesNotMatch(game, /portraitPosition|portraitTarget|camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(game, /new ResizeObserver\(resize\)/);
   assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);
@@ -194,6 +196,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.doesNotMatch(`${page}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/);
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
+  assert.match(page, /className="room-pan-nav"[\s\S]*setRoomPanView\(view\)/, "portrait room must expose direct left, center, and right view controls");
+  assert.match(siteCss, /\.room-pan-nav \{ display: none; \}/, "room pan controls must remain hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-entered \.room-pan-nav \{[\s\S]*display: grid;/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
   }

@@ -9,9 +9,19 @@ import { aspectOverflowDistanceScale } from "./cameraFraming";
 
 const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
+const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
+const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
+export type RoomPanView = "left" | "center" | "right";
 type SceneTargetId = ZoneId | "printer";
+
+const roomPanOffsets: Record<RoomPanView,number> = {
+  left: -PORTRAIT_ROOM_VIEW_OFFSET,
+  center: 0,
+  right: PORTRAIT_ROOM_VIEW_OFFSET,
+};
+const roomPanOrder: RoomPanView[] = ["left","center","right"];
 
 type LabGameProps = {
   active: boolean;
@@ -19,6 +29,8 @@ type LabGameProps = {
   discovered: ZoneId[];
   faxReady: boolean;
   faxPrinted: boolean;
+  roomPanView: RoomPanView;
+  onRoomPanViewChange: (view: RoomPanView) => void;
   onHover: (zone: ZoneId | null) => void;
   onInspect: (zone: ZoneId) => void;
   onPrinterInspect: () => void;
@@ -705,13 +717,15 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
   (Object.keys(zonePositions) as ZoneId[]).forEach((zone) => addZone(scene,zone,targets));
 }
 
-export default function LabGame({ active, viewing, discovered, faxReady, faxPrinted, onHover, onInspect, onPrinterInspect }: LabGameProps) {
+export default function LabGame({ active, viewing, discovered, faxReady, faxPrinted, roomPanView, onRoomPanViewChange, onHover, onInspect, onPrinterInspect }: LabGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRef = useRef(active);
   const viewingRef = useRef(viewing);
   const discoveredRef = useRef(discovered);
   const faxReadyRef = useRef(faxReady);
   const faxPrintedRef = useRef(faxPrinted);
+  const roomPanViewRef = useRef(roomPanView);
+  const roomPanViewChangeRef = useRef(onRoomPanViewChange);
   const inspectRef = useRef(onInspect);
   const printerInspectRef = useRef(onPrinterInspect);
 
@@ -720,6 +734,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
   useEffect(() => { discoveredRef.current = discovered; },[discovered]);
   useEffect(() => { faxReadyRef.current = faxReady; },[faxReady]);
   useEffect(() => { faxPrintedRef.current = faxPrinted; },[faxPrinted]);
+  useEffect(() => { roomPanViewRef.current = roomPanView; },[roomPanView]);
+  useEffect(() => { roomPanViewChangeRef.current = onRoomPanViewChange; },[onRoomPanViewChange]);
   useEffect(() => { inspectRef.current = onInspect; },[onInspect]);
   useEffect(() => { printerInspectRef.current = onPrinterInspect; },[onPrinterInspect]);
 
@@ -782,6 +798,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let dragStartY = 0;
     let dragOrbit = 0;
     let dragPitch = 0;
+    let portraitDragOffset = 0;
+    let portraitPointerZone: SceneTargetId | null = null;
     let orbit = 0;
     let pitch = 0;
     let isPortrait = false;
@@ -793,7 +811,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       if(rect.width<2||rect.height<2)return;
       const nextAspect=rect.width/rect.height;
       isPortrait=rect.height>=rect.width;
-      portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1;
+      portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
       renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
       renderer.setSize(rect.width,rect.height,false);
       camera.aspect=nextAspect;
@@ -818,17 +836,26 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       const zone = readPointer(event);
       if (zone !== hovered) { hovered = zone; onHover(zone==="printer"?null:zone); }
       if (dragging) {
-        const orbitLimit = isPortrait ? .3 : .42;
-        const minPitch = isPortrait ? -.12 : -.22;
-        const maxPitch = isPortrait ? .16 : .26;
-        orbit = THREE.MathUtils.clamp(dragOrbit-(event.clientX-dragStartX)*.0025,-orbitLimit,orbitLimit);
-        pitch = THREE.MathUtils.clamp(dragPitch+(event.clientY-dragStartY)*.003,minPitch,maxPitch);
+        if(isPortrait){
+          const rect=canvas.getBoundingClientRect();
+          portraitDragOffset=THREE.MathUtils.clamp(-(event.clientX-dragStartX)/rect.width*PORTRAIT_ROOM_VIEW_OFFSET,-PORTRAIT_ROOM_VIEW_OFFSET,PORTRAIT_ROOM_VIEW_OFFSET);
+        }else{
+          orbit = THREE.MathUtils.clamp(dragOrbit-(event.clientX-dragStartX)*.0025,-.42,.42);
+          pitch = THREE.MathUtils.clamp(dragPitch+(event.clientY-dragStartY)*.003,-.22,.26);
+        }
       }
       canvas.style.cursor = zone ? "pointer" : dragging ? "grabbing" : "grab";
     };
     const pointerDown = (event: PointerEvent) => {
       const zone = readPointer(event);
-      if (zone && activeRef.current) {
+      if(isPortrait){
+        dragging = true;
+        portraitPointerZone = zone;
+        portraitDragOffset = 0;
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+        canvas.setPointerCapture(event.pointerId);
+      }else if (zone && activeRef.current) {
         requested = zone;
         requestStarted = performance.now();
         requestDelivered = false;
@@ -842,6 +869,23 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       }
     };
     const pointerUp = (event: PointerEvent) => {
+      if(isPortrait&&dragging){
+        const deltaX=event.clientX-dragStartX;
+        const deltaY=event.clientY-dragStartY;
+        const isTap=Math.hypot(deltaX,deltaY)<12;
+        if(isTap&&portraitPointerZone&&activeRef.current){
+          requested=portraitPointerZone;
+          requestStarted=performance.now();
+          requestDelivered=false;
+        }else if(Math.abs(deltaX)>32){
+          const currentIndex=roomPanOrder.indexOf(roomPanViewRef.current);
+          const direction=deltaX<0?1:-1;
+          const nextIndex=THREE.MathUtils.clamp(currentIndex+direction,0,roomPanOrder.length-1);
+          roomPanViewChangeRef.current(roomPanOrder[nextIndex]);
+        }
+        portraitDragOffset=0;
+        portraitPointerZone=null;
+      }
       dragging = false;
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     };
@@ -854,10 +898,11 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const tick = (now: number) => {
       if (viewingRef.current === null && !requested) {
         const desiredPosition = defaultPosition.clone();
-        desiredPosition.x = Math.sin(orbit)*11.5 + pointerX*.18;
-        desiredPosition.z = Math.cos(orbit)*11.5;
+        const portraitPan=roomPanOffsets[roomPanViewRef.current]+portraitDragOffset;
+        desiredPosition.x = isPortrait?portraitPan+pointerX*.08:Math.sin(orbit)*11.5+pointerX*.18;
+        desiredPosition.z = isPortrait?defaultPosition.z:Math.cos(orbit)*11.5;
         desiredPosition.y += pitch*6-pointerY*.1;
-        const desiredTarget=defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,pitch*.75-pointerY*.05,0));
+        const desiredTarget=defaultTarget.clone().add(new THREE.Vector3(isPortrait?portraitPan+pointerX*.08:pointerX*.18,pitch*.75-pointerY*.05,0));
         if(isPortrait){
           const portraitOffset=desiredPosition.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale);
           desiredPosition.copy(desiredTarget).add(portraitOffset);
