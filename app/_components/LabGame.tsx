@@ -820,7 +820,6 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       isPortrait=rect.height>=rect.width;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
       booksZoneIndicator.position.z=zonePositions.books[2]+(isPortrait?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0);
-      booksZoneRing.rotation.x=isPortrait?0:Math.PI/2;
       booksZoneRing.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_RING_SCALE:1);
       booksZoneHit.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1);
       renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
