@@ -175,7 +175,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(game, /camera\.aspect=nextAspect/);
   assert.match(game, /camera\.fov=43/);
-  assert.match(game, /portraitDistanceScale=isPortrait\?Math\.min\(aspectOverflowDistanceScale\(nextAspect\),MAX_PORTRAIT_ROOM_DISTANCE_SCALE\):1/);
+  assert.match(game, /portraitDistanceScale=isPortrait\?aspectOverflowDistanceScale\(nextAspect\):1/);
   assert.match(game, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE/);
   assert.match(game, /desiredPosition\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)/);
   assert.doesNotMatch(game, /portraitPosition|portraitTarget|camera\.fov\s*=\s*isPortrait\s*\?/);
