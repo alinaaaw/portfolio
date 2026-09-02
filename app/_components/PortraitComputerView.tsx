@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   computer as computerContent,
   references as referencesContent,
@@ -36,6 +37,7 @@ const projectReferences=referencesContent.references as ProjectReference[];
 const referenceGroups=referencesContent.groups as {id:ReferenceFilter;label:string}[];
 const rootWindows:ComputerWindowId[]=["projects","experience","references","lablog"];
 const labLogFilters:{id:LabLogFilter;label:string}[]=[{id:"all",label:"ALL"},{id:"program",label:"PROGRAM"},{id:"role",label:"ROLE"}];
+const NOTIFICATION_DISMISS_DISTANCE=52;
 
 function PhoneAppIcon({kind,badge=false}:{kind:PhoneAppIconKind;badge?:boolean}) {
   return <span className={`portrait-app-icon portrait-app-icon-${kind}`} aria-hidden="true"><i />{badge&&<b>1</b>}</span>;
@@ -43,6 +45,9 @@ function PhoneAppIcon({kind,badge=false}:{kind:PhoneAppIconKind;badge?:boolean})
 
 export default function PortraitComputerView({computerWindows,referenceFilter,bulletin,onOpenFile,onOpenRoot,onFocusWindow,onBack,onOpenReferences,onSetReferenceFilter,onDismissBulletin,onLeave}:Props) {
   const [labLogFilter,setLabLogFilter]=useState<LabLogFilter>("all");
+  const [notificationOffset,setNotificationOffset]=useState(0);
+  const [notificationDragging,setNotificationDragging]=useState(false);
+  const notificationGestureRef=useRef({pointerId:-1,startY:0,offset:0});
   const activeWindow=computerWindows.at(-1)??null;
   const project=projectFiles.find((file)=>file.id===activeWindow);
   const experience=activeWindow==="research"||activeWindow==="internship"?computerContent.experience[activeWindow]:null;
@@ -57,6 +62,26 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
     :activeWindow==="references"?"References"
     :project?.name??experience?.filename??computerContent.desktop.welcome.title;
 
+  const startNotificationGesture=(event:ReactPointerEvent<HTMLElement>)=>{
+    notificationGestureRef.current={pointerId:event.pointerId,startY:event.clientY,offset:0};
+    setNotificationDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const moveNotificationGesture=(event:ReactPointerEvent<HTMLElement>)=>{
+    if(notificationGestureRef.current.pointerId!==event.pointerId)return;
+    const offset=Math.min(0,event.clientY-notificationGestureRef.current.startY);
+    notificationGestureRef.current.offset=offset;
+    setNotificationOffset(offset);
+  };
+  const endNotificationGesture=(event:ReactPointerEvent<HTMLElement>)=>{
+    if(notificationGestureRef.current.pointerId!==event.pointerId)return;
+    if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
+    const shouldDismiss=notificationGestureRef.current.offset<=-NOTIFICATION_DISMISS_DISTANCE;
+    notificationGestureRef.current={pointerId:-1,startY:0,offset:0};
+    setNotificationDragging(false);
+    setNotificationOffset(0);
+    if(shouldDismiss)onDismissBulletin();
+  };
   return <section className="portrait-computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
     <header className="portrait-phone-statusbar">
       <button type="button" className="portrait-room-return" onClick={onLeave} aria-label={computerContent.topBar.leave}><i aria-hidden="true" /> LAB 17</button>
@@ -64,12 +89,11 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
       <div className="portrait-phone-status" aria-label={`${computerContent.topBar.sync}, ${computerContent.topBar.time}`}><span>{computerContent.topBar.time}</span><i className="portrait-cellular" /><i className="portrait-wifi" /><i className="portrait-battery" /></div>
     </header>
 
-    {bulletin&&<aside className="portrait-phone-notification" role="status" aria-live="polite">
-      <button type="button" className="portrait-notification-open" onClick={()=>{onDismissBulletin();onOpenRoot("lablog");}} aria-label={`Open ${computerContent.bulletin.header}`}>
-        <PhoneAppIcon kind="lablog" />
-        <span><small>{computerContent.bulletin.header} <em>NOW</em></small><strong>{computerContent.bulletin.title}</strong><span>{computerContent.bulletin.copy}</span></span>
-      </button>
-      <button type="button" className="portrait-notification-dismiss" onClick={onDismissBulletin} aria-label={`Dismiss ${computerContent.bulletin.header}`}><span aria-hidden="true">&#215;</span></button>
+    {bulletin&&<aside className={`portrait-phone-notification ${notificationDragging?"is-dragging":""}`} role="status" aria-live="polite" aria-label={computerContent.bulletin.notificationHeader} style={{transform:`translateY(${notificationOffset}px)`,opacity:Math.max(.45,1+notificationOffset/160)}} onPointerDown={startNotificationGesture} onPointerMove={moveNotificationGesture} onPointerUp={endNotificationGesture} onPointerCancel={endNotificationGesture}>
+      <div className="portrait-notification-content">
+        <span className="portrait-notification-system-icon" aria-hidden="true"><i /></span>
+        <span><small>{computerContent.bulletin.notificationHeader} <em>NOW</em></small><strong>{computerContent.bulletin.title}</strong><span>{computerContent.bulletin.copy}</span></span>
+      </div>
     </aside>}
 
     <div className={`portrait-phone-stage ${activeWindow?"is-app":"is-home"}`}>
@@ -90,7 +114,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
         <nav className="portrait-phone-dock" aria-label="Favorite applications">
           <button type="button" onClick={()=>onOpenRoot("projects")} aria-label={computerContent.sidebar.projects}><PhoneAppIcon kind="projects" /></button>
           <button type="button" onClick={()=>onOpenRoot("references")} aria-label={computerContent.sidebar.references}><PhoneAppIcon kind="references" /></button>
-          <button type="button" onClick={()=>onOpenRoot("lablog")} aria-label={computerContent.sidebar.labLog}><PhoneAppIcon kind="lablog" badge={bulletin} /></button>
+          <button type="button" onClick={()=>onOpenRoot("lablog")} aria-label={computerContent.sidebar.labLog}><PhoneAppIcon kind="lablog" /></button>
         </nav>
       </main>}
 
