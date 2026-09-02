@@ -144,12 +144,14 @@ function addZone(scene: THREE.Scene, zone: ZoneId, targets: ZoneTarget[]) {
     material(palette.signal,.28,.2,palette.signal,1.5),
   );
   ring.rotation.x = Math.PI/2;
+  ring.userData.interactionOverlay = true;
   group.add(ring);
   const hit = new THREE.Mesh(
     new THREE.SphereGeometry(.68,16,12),
     new THREE.MeshBasicMaterial({ transparent:true,opacity:0,depthWrite:false }),
   ) as ZoneTarget;
   hit.userData.zone = zone;
+  hit.userData.interactionOverlay = true;
   group.add(hit);
   const label = makeLabel(zoneLabels[zone]);
   label.position.y = .72;
@@ -789,7 +791,11 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     workLight.target.position.set(3.7,1.3,-1.6);
     scene.add(cyan,warm,boardLight,boardLight.target,workLight,workLight.target);
     scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
+      if (object instanceof THREE.Mesh) {
+        const isInteractionOverlay=object.userData.interactionOverlay===true;
+        object.castShadow=!isInteractionOverlay;
+        object.receiveShadow=!isInteractionOverlay;
+      }
     });
 
     const pointer = new THREE.Vector2(5,5);
