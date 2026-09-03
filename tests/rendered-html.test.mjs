@@ -357,6 +357,9 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
   assert.match(closeups, /item!=="travelMap"&&!fieldCaseContent\.personalDetailsOpeningEnabled/);
   assert.match(closeups, /siteContent\.shared\.comingSoon/);
+  assert.match(closeups, /hit\?\.userData\.hoverOnly&&event\.pointerType!=="mouse"/);
+  assert.match(closeups, /setHoveredHit\(hit,true\)/);
+  assert.match(closeups, /aria-live="polite"/);
   assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);

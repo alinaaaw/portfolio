@@ -2,6 +2,7 @@
   "ariaLabel": "Personal books and films shelf close-up",
   "header": "PERSONAL SHELF / BOOKS + FILMS",
   "sceneHint": "READING SHELF LEFT / FILM LIBRARY RIGHT",
+  "touchSceneHint": "TAP A BOOK OR FILM TO VIEW ITS TITLE",
   "openingEnabled": false,
   "books": [
     {"id":"mockingbird","title":"To Kill a Mockingbird","author":"Harper Lee","isReading":false},

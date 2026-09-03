@@ -477,12 +477,12 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   for(const x of [mapCenterX-.3,mapCenterX+.3]){const mount=cylinder(.07,.13,0x4e5954,14);mount.position.set(x,.48,-1.59);scene.add(mount);}
 }
 
-const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
-  books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint},
+const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string;touchHint?:string}>={
+  books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint,touchHint:booksContent.touchSceneHint},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
   notebook:{position:[-.35,5.7,5.7],target:[-.45,1.1,0],hint:notebookContent.sceneHint},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
-  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
+  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint,touchHint:fieldCaseContent.touchSceneHint},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},
   contact:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.contact.sceneHint},
 };
@@ -572,7 +572,16 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); };
+    const idleHint=()=>isPortrait?(view.touchHint??view.hint):view.hint;
+    const setHoveredHit=(next:HitMesh|null,touchReveal=false)=>{
+      if(next!==hovered){setHighlight(hovered,false);hovered=next;setHighlight(hovered,true);}
+      if(labelRef.current){
+        const label=hovered?.userData.label;
+        labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??idleHint();
+        labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
+      }
+    };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{
@@ -582,10 +591,10 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     };
     const pointerMove=(event:PointerEvent)=>{
       if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX-delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
-      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current){const label=hovered?.userData.label;labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??view.hint;}} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
+      const next=readHit(event);setHoveredHit(next);canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item&&!hit?.userData.hoverOnly)selectRef.current(item);}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
@@ -632,5 +641,5 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
-  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
+  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout" aria-live="polite">{views[zone].hint}</div></div>;
 }
