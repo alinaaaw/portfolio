@@ -2155,6 +2155,25 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .room-shell .drawer-document-paper {
+    width: min(88vw,calc((100svh - 112px)*.78),520px);
+    width: min(88vw,calc((100dvh - 112px)*.78),520px);
+    height: auto;
+    aspect-ratio: .78;
+    max-height: none;
+  }
+
+  .room-shell .drawer-document article {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding-bottom: 64px;
+    -webkit-overflow-scrolling: touch;
+  }
+
   @keyframes mobileSceneCoachIn {
     from { opacity: 0; translate: -50% -6px; }
     to { opacity: 1; translate: -50% 0; }

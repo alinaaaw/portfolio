@@ -248,6 +248,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   const referenceHeaderMetaContract = declarationsFor(".portrait-references > header small");
   const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
   const notebookScrollContract = declarationsFor(".room-shell .notebook-scroll");
+  const drawerPaperContract = declarationsFor(".room-shell .drawer-document-paper");
+  const drawerArticleContract = declarationsFor(".room-shell .drawer-document article");
   assert.match(phoneStageContract, /grid-row: 2[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
   assert.match(phoneHomeContract, /display: grid[\s\S]*height: 100%[\s\S]*min-height: 0/);
   assert.match(phoneAppContract, /display: grid[\s\S]*grid-template-rows: auto minmax\(0,1fr\)[\s\S]*height: 100%/);
@@ -257,6 +259,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
   assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
   assert.match(notebookScrollContract, /overflow-y: auto[\s\S]*overscroll-behavior: contain[\s\S]*touch-action: pan-y[\s\S]*padding-bottom:/, "portrait notebook paper must scroll without hiding its final lines beneath the return control");
+  assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\),520px\)[\s\S]*aspect-ratio: \.78/, "portrait drawer documents must keep a paper-like ratio based on their own width");
+  assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
   assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
   assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
