@@ -2261,6 +2261,26 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .room-shell .fax-reading {
+    padding: clamp(14px,3vw,28px);
+  }
+
+  .room-shell .fax-reading-paper {
+    width: min(88vw,650px,calc((100svh - 96px)*.72));
+    width: min(88vw,650px,calc((100dvh - 96px)*.72));
+    height: auto;
+    max-height: none;
+    aspect-ratio: .72;
+  }
+
+  .room-shell .fax-reading-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .room-shell .evidence-card.note-card {
     width: min(86vw,560px,calc((100svh - 126px)*1.35));
     width: min(86vw,560px,calc((100dvh - 126px)*1.35));
@@ -2433,6 +2453,26 @@
       font-size: 12px;
       line-height: 1.4;
     }
+
+    .room-shell .fax-reading-scroll {
+      padding: clamp(46px,5vw,58px) clamp(38px,5vw,54px) 52px;
+    }
+
+    .room-shell .fax-reading-paper h2 {
+      margin: 18px 0 22px;
+      font-size: clamp(34px,4.5vw,42px);
+    }
+
+    .room-shell .fax-reading-paper p {
+      margin-block: 12px;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .room-shell .fax-reading-scroll > strong {
+      margin: 20px 0;
+      font-size: clamp(18px,2.5vw,22px);
+    }
   }
 
   @media (min-width: 700px) and (min-height: 900px) {
@@ -2444,6 +2484,17 @@
     }
 
     .room-shell .drawer-document article::-webkit-scrollbar {
+      display: none;
+    }
+
+    .room-shell .fax-reading-scroll {
+      overflow-y: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      scrollbar-width: none;
+    }
+
+    .room-shell .fax-reading-scroll::-webkit-scrollbar {
       display: none;
     }
   }
