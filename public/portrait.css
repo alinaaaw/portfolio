@@ -2221,11 +2221,11 @@
   }
 
   .room-shell .notebook-closeup .paper-return-control {
-    right: clamp(10px,2vw,18px);
-    bottom: clamp(10px,2vw,18px);
-    min-height: clamp(30px,5vw,42px);
-    padding: clamp(6px,1.2vw,10px) clamp(8px,1.8vw,14px);
-    font-size: clamp(7px,1.35vw,11px);
+    right: 10px;
+    bottom: 10px;
+    min-height: 0;
+    padding: 6px 8px;
+    font-size: 6px;
   }
 
   .room-shell .drawer-document-paper {
@@ -2350,6 +2350,16 @@
   .room-shell .tactile-scene > header button:focus-visible {
     outline: 2px solid var(--signal);
     outline-offset: -3px;
+  }
+
+  @media (min-width: 621px) {
+    .room-shell .notebook-closeup .paper-return-control {
+      right: clamp(10px,2vw,18px);
+      bottom: clamp(10px,2vw,18px);
+      min-height: clamp(30px,5vw,42px);
+      padding: clamp(6px,1.2vw,10px) clamp(8px,1.8vw,14px);
+      font-size: clamp(7px,1.35vw,11px);
+    }
   }
 
   @media (min-width: 621px) and (min-height: 850px) {
