@@ -2362,7 +2362,7 @@
     }
   }
 
-  @media (min-width: 621px) and (min-height: 850px) {
+  @media (min-width: 520px) and (min-height: 700px) {
     .room-shell .notebook-scroll {
       overflow-y: hidden;
       overscroll-behavior: none;
