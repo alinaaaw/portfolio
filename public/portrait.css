@@ -2161,8 +2161,8 @@
 
   .room-shell .model-detail .notebook-closeup {
     --portrait-notebook-rule: clamp(24px,3.8vw,34px);
-    width: min(88vw,600px,calc((100svh - 96px)*.79));
-    width: min(88vw,600px,calc((100dvh - 96px)*.79));
+    width: min(88vw,650px,calc((100svh - 96px)*.79));
+    width: min(88vw,650px,calc((100dvh - 96px)*.79));
     max-width: none;
     max-height: calc(100svh - 96px);
     max-height: calc(100dvh - 96px);
