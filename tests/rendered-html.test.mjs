@@ -360,6 +360,11 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /hit\?\.userData\.hoverOnly&&event\.pointerType!=="mouse"/);
   assert.match(closeups, /setHoveredHit\(hit,true\)/);
   assert.match(closeups, /aria-live="polite"/);
+  assert.match(closeups, /className="mobile-scene-hotspots"/);
+  assert.match(closeups, /guideGroup="books"/);
+  assert.match(closeups, /guideGroup="films"/);
+  assert.match(closeups, /getWorldPosition\(worldPosition\)[\s\S]*projectedPosition\.multiplyScalar\(1\/visibleHits\.length\)\.project\(camera\)/);
+  assert.match(closeups, /touchGuideTimer=window\.setTimeout\(dismissTouchGuide,4200\)/);
   assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);

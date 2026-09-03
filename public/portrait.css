@@ -2066,6 +2066,81 @@
     to { opacity: 1; translate: -50% 0; }
   }
 
+  .room-shell .mobile-scene-hotspots {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .room-shell .mobile-scene-hotspot {
+    --hotspot-color: var(--signal);
+    position: absolute;
+    display: block;
+    width: 17px;
+    height: 17px;
+    translate: -50% -50%;
+    border: 1px solid color-mix(in srgb,var(--hotspot-color) 78%,transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb,var(--hotspot-color) 10%,transparent);
+    box-shadow: 0 0 0 3px rgba(3,8,7,.34),0 0 14px color-mix(in srgb,var(--hotspot-color) 24%,transparent);
+    opacity: .72;
+  }
+
+  .room-shell .mobile-scene-hotspot::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: inherit;
+    background: var(--hotspot-color);
+  }
+
+  .room-shell .mobile-scene-hotspot.is-preview {
+    --hotspot-color: var(--cyan);
+  }
+
+  .room-shell .mobile-scene-hotspot.is-active {
+    opacity: 1;
+    box-shadow: 0 0 0 4px rgba(3,8,7,.45),0 0 19px color-mix(in srgb,var(--hotspot-color) 54%,transparent);
+  }
+
+  .room-shell .mobile-scene-hotspots.is-intro .mobile-scene-hotspot {
+    animation: mobileSceneHotspotIntro 1.15s ease-in-out var(--hotspot-delay) 2;
+  }
+
+  @keyframes mobileSceneHotspotIntro {
+    0%,100% { opacity: .72; scale: 1; }
+    50% { opacity: 1; scale: 1.28; }
+  }
+
+  .room-shell .mobile-scene-hotspot-coach {
+    position: absolute;
+    z-index: 4;
+    top: 16px;
+    left: 50%;
+    max-width: calc(100% - 32px);
+    min-height: 34px;
+    padding: 9px 13px;
+    translate: -50% 0;
+    border: 1px solid rgba(229,220,198,.3);
+    border-radius: 18px;
+    background: rgba(5,12,11,.88);
+    color: var(--paper);
+    box-shadow: 0 9px 24px rgba(0,0,0,.34);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    white-space: nowrap;
+    font: 7px/1.2 var(--font-mono),monospace;
+    letter-spacing: .08em;
+    animation: mobileSceneCoachIn .3s ease-out both;
+  }
+
+  @keyframes mobileSceneCoachIn {
+    from { opacity: 0; translate: -50% -6px; }
+    to { opacity: 1; translate: -50% 0; }
+  }
+
   .room-shell .field-detail {
     padding: 14px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
   }
@@ -2137,5 +2212,12 @@
   .room-shell .tactile-scene > header button:focus-visible {
     outline: 2px solid var(--signal);
     outline-offset: -3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .room-shell .mobile-scene-hotspots.is-intro .mobile-scene-hotspot,
+  .room-shell .mobile-scene-hotspot-coach {
+    animation: none;
   }
 }

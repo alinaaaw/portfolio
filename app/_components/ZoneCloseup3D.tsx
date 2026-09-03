@@ -38,7 +38,7 @@ function createFieldCaseWorldMapTexture(resolution=1024) {
   return texture;
 }
 
-type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; visuals?: THREE.Mesh[] } };
+type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; guideGroup?: string; visuals?: THREE.Mesh[] } };
 
 const palette = {
   void: 0x07100f,
@@ -190,13 +190,13 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.47,.023,.028,series?0xe5c675:0xd7cba9,.75,.01);titleMark.position.set(.04,height*.53-mark*.17,.51);group.add(titleMark);}
     if(book.isReading){const bookmark=box(.15,.58,.035,palette.signal);bookmark.position.set(width*.12,height+.17,.08);group.add(bookmark);}
     group.position.set(x,y,.05);group.rotation.z=(index%3-1)*.018;shelf.add(group);
-    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(hit);hits.push(hit);}
+    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;hit.userData.guideGroup="books";shelf.add(hit);hits.push(hit);}
     return {group,cover,pages,spine,band};
   };
   books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.74+index*.58,.43));
   const seriesBooks=books.filter((book)=>book.author==="Keigo Higashino");
   const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.35+index*.42,.43,true,false));
-  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[.8,2.28,1.12],[-.14,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(seriesHit);hits.push(seriesHit);
+  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[.8,2.28,1.12],[-.14,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;seriesHit.userData.guideGroup="books";shelf.add(seriesHit);hits.push(seriesHit);
 
   const filmBasket=new THREE.Group();filmBasket.userData.mediaBasket=true;
   filmBasket.position.set(1.43,0,.03);filmBasket.rotation.y=Math.PI/2;
@@ -225,7 +225,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     const latch=roundedBox(.075,.035,.07,0xb8c9c4,.009,.24,.12);latch.position.set(.32,.43,.108);
     group.add(disc,colorRing,label,hub,centerHole,clearCase,hinge,topEdge,bottomEdge,latch);
     group.position.set(x,y,z);group.rotation.z=[0,.022,0,-.018,0,.016,0,-.02,0,.018,0,-.014][index];filmBasket.add(group);
-    const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.075],[0,.43,.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;group.add(hit);hits.push(hit);
+    const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.075],[0,.43,.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;hit.userData.guideGroup="films";group.add(hit);hits.push(hit);
   });
   shelf.add(filmBasket);
   scene.add(shelf);
@@ -540,6 +540,30 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(zone==="fieldcase")buildFieldCase(scene,hits);
     if(zone==="printer")buildPrinter(scene,hits,initialFaxPrinted);
     if(zone==="contact")buildContact(scene,hits,initialFaxPrinted);
+    const hotspotLayer=document.createElement("div");
+    hotspotLayer.className="mobile-scene-hotspots";
+    hotspotLayer.hidden=true;
+    hotspotLayer.setAttribute("aria-hidden","true");
+    const hotspotGroups=new Map<string,HitMesh[]>();
+    hits.forEach((hit,index)=>{
+      const group=hit.userData.guideGroup??hit.userData.item??`target-${index}`;
+      const groupedHits=hotspotGroups.get(group)??[];
+      groupedHits.push(hit);
+      hotspotGroups.set(group,groupedHits);
+    });
+    const hotspotMarkers=Array.from(hotspotGroups.entries()).map(([group,groupHits],index)=>{
+      const marker=document.createElement("i");
+      marker.className=`mobile-scene-hotspot ${groupHits.every((hit)=>hit.userData.hoverOnly)?"is-preview":"is-actionable"}`;
+      marker.style.setProperty("--hotspot-delay",`${index*70}ms`);
+      marker.dataset.hotspotGroup=group;
+      hotspotLayer.append(marker);
+      return {marker,hits:groupHits,projectedPosition:new THREE.Vector3(),worldPosition:new THREE.Vector3()};
+    });
+    const touchCoach=document.createElement("div");
+    touchCoach.className="mobile-scene-hotspot-coach";
+    touchCoach.hidden=true;
+    touchCoach.textContent=siteContent.shared.touchHotspotHint;
+    stage.append(hotspotLayer,touchCoach);
     scene.add(new THREE.HemisphereLight(0x789892,0x090d0c,.85));
     const warm=new THREE.DirectionalLight(0xffc889,3.4); warm.position.set(-4,8,6); warm.castShadow=true; warm.shadow.mapSize.set(1536,1536); scene.add(warm);
     const cyan=new THREE.PointLight(palette.cyan,8,14,1.8); cyan.position.set(4,3,4); scene.add(cyan);
@@ -569,19 +593,40 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     let contactCardProgress=initialContactCardRaised?1:0;
     let isPortrait=false;
     let portraitDistanceScale=1;
+    let touchGuideStarted=false;
+    let touchGuideDismissed=false;
+    let touchGuideTimer=0;
+    let hotspotIntroTimer=0;
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
     const idleHint=()=>isPortrait?(view.touchHint??view.hint):view.hint;
+    const dismissTouchGuide=()=>{
+      if(touchGuideDismissed)return;
+      touchGuideDismissed=true;
+      touchCoach.hidden=true;
+      hotspotLayer.classList.remove("is-intro");
+      window.clearTimeout(touchGuideTimer);
+      window.clearTimeout(hotspotIntroTimer);
+    };
+    const startTouchGuide=()=>{
+      if(touchGuideStarted||!isPortrait)return;
+      touchGuideStarted=true;
+      hotspotLayer.classList.add("is-intro");
+      touchCoach.hidden=false;
+      hotspotIntroTimer=window.setTimeout(()=>hotspotLayer.classList.remove("is-intro"),2800);
+      touchGuideTimer=window.setTimeout(dismissTouchGuide,4200);
+    };
     const setHoveredHit=(next:HitMesh|null,touchReveal=false)=>{
       if(next!==hovered){setHighlight(hovered,false);hovered=next;setHighlight(hovered,true);}
+      hotspotMarkers.forEach(({marker,hits:markerHits})=>marker.classList.toggle("is-active",Boolean(hovered&&markerHits.includes(hovered))));
       if(labelRef.current){
         const label=hovered?.userData.label;
         labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??idleHint();
         labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
       }
     };
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; hotspotLayer.hidden=!isPortrait; touchCoach.hidden=!isPortrait||touchGuideDismissed; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{
@@ -594,7 +639,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       const next=readHit(event);setHoveredHit(next);canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(event.pointerType!=="mouse")dismissTouchGuide();if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
@@ -636,9 +681,23 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
+      if(isPortrait){
+        const stageRect=stage.getBoundingClientRect();
+        hotspotMarkers.forEach(({marker,hits:markerHits,projectedPosition,worldPosition})=>{
+          const visibleHits=markerHits.filter((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96));
+          marker.hidden=visibleHits.length===0;
+          if(visibleHits.length===0)return;
+          projectedPosition.set(0,0,0);
+          visibleHits.forEach((hit)=>projectedPosition.add(hit.getWorldPosition(worldPosition)));
+          projectedPosition.multiplyScalar(1/visibleHits.length).project(camera);
+          const onScreen=projectedPosition.z>=-1&&projectedPosition.z<=1&&projectedPosition.x>=-1.1&&projectedPosition.x<=1.1&&projectedPosition.y>=-1.1&&projectedPosition.y<=1.1;
+          marker.hidden=!onScreen;
+          if(onScreen){marker.style.left=`${(projectedPosition.x*.5+.5)*stageRect.width}px`;marker.style.top=`${(-projectedPosition.y*.5+.5)*stageRect.height}px`;}
+        });
+      }
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
     };frame=requestAnimationFrame(tick);
-    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
+    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);cancelAnimationFrame(frame);window.clearTimeout(touchGuideTimer);window.clearTimeout(hotspotIntroTimer);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);hotspotLayer.remove();touchCoach.remove();scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
   return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout" aria-live="polite">{views[zone].hint}</div></div>;
