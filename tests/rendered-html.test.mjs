@@ -199,7 +199,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(siteCss, /\.portrait-computer-view \{ display: none; \}/);
   assert.match(portraitCss, /\.computer-view-desktop \{\s*display: none/);
   assert.match(portraitCss, /\.portrait-computer-view \{[\s\S]*display: grid;[\s\S]*height: 100svh;[\s\S]*height: 100dvh;[\s\S]*overflow: hidden/);
-  assert.doesNotMatch(`${page}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/);
+  assert.doesNotMatch(`${portraitComputer}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/, "portrait Computer must not return to whole-interface scaling");
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
   assert.match(page, /showRoomPanHint&&<div className="room-pan-hint"[\s\S]*portraitPanHint/, "portrait room must explain the horizontal swipe gesture without permanent view controls");
@@ -207,6 +207,10 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.doesNotMatch(page, /room-pan-nav|Show \$\{view\} side of the room/);
   assert.match(siteCss, /\.room-pan-hint \{ display: none; \}/, "room pan hint must remain hidden from desktop layouts");
   assert.match(portraitCss, /\.room-entered \.room-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
+  assert.match(page, /PORTRAIT_MAP_INITIAL_ZOOM[\s\S]*portraitMapInitializedRef[\s\S]*sheet\.clientHeight>=sheet\.clientWidth[\s\S]*camera\.zoom<PORTRAIT_MAP_INITIAL_ZOOM/, "portrait travel map must open closer without changing its desktop camera");
+  assert.match(page, /setShowMapPanHint\(false\)[\s\S]*className="field-map-pan-hint"[\s\S]*fieldCaseContent\.mapPortraitPanHint/, "portrait travel map must explain horizontal dragging until the visitor uses it");
+  assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-shell \.field-map-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
   }

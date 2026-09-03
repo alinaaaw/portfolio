@@ -192,6 +192,7 @@ const lostTravelMessages=[
   "MEMORY STILL OFF THE RECORD",
   "EVIDENCE LOST SOMEWHERE EN ROUTE",
 ] as const;
+const PORTRAIT_MAP_INITIAL_ZOOM=1.5;
 
 function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.random()*lostTravelMessages.length)];}
 
@@ -210,6 +211,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const selectionRequestRef=useRef(0);
   const navigationRequestRef=useRef(0);
   const navigationLockedRef=useRef(false);
+  const portraitMapInitializedRef=useRef(false);
   const [camera,setCamera]=useState<FieldCaseMapCamera>({...FIELD_CASE_MAP_VIEWS.world});
   const [activeView,setActiveView]=useState<FieldCaseMapView>("world");
   const [selectedPin,setSelectedPin]=useState<FieldCaseTravelPin|null>(null);
@@ -217,6 +219,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
   const [navigationPending,setNavigationPending]=useState(false);
+  const [showMapPanHint,setShowMapPanHint]=useState(true);
   const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
@@ -242,6 +245,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
   const chooseView=useCallback((view:FieldCaseMapView)=>{
     closeTravelPhotos();
+    if(view==="world")portraitMapInitializedRef.current=false;
     setActiveView(view);
     setCamera({...FIELD_CASE_MAP_VIEWS[view]});
   },[closeTravelPhotos]);
@@ -413,13 +417,20 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       const width=Math.max(1,Math.round(sheet.clientWidth*ratio));
       const height=Math.max(1,Math.round(sheet.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
-      pinHitsRef.current=drawFieldCaseMapViewport(canvas,camera);
+      const portrait=sheet.clientHeight>=sheet.clientWidth;
+      if(!portrait)portraitMapInitializedRef.current=false;
+      let drawCamera=camera;
+      if(portrait&&activeView==="world"&&!portraitMapInitializedRef.current){
+        portraitMapInitializedRef.current=true;
+        if(camera.zoom<PORTRAIT_MAP_INITIAL_ZOOM){drawCamera=normalizeCamera({...camera,zoom:PORTRAIT_MAP_INITIAL_ZOOM});setCamera(drawCamera);}
+      }
+      pinHitsRef.current=drawFieldCaseMapViewport(canvas,drawCamera);
     };
     draw();
     const observer=new ResizeObserver(draw);
     observer.observe(sheet);
     return ()=>observer.disconnect();
-  },[camera]);
+  },[activeView,camera,normalizeCamera]);
 
   const beginPointer=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
     if(event.pointerType==="mouse"&&event.button!==0)return;
@@ -428,6 +439,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     pointersRef.current.set(event.pointerId,point);
     if(pointersRef.current.size===1)pressRef.current={id:event.pointerId,...point,moved:false};
     if(pointersRef.current.size===2){
+      setShowMapPanHint(false);
       const [first,second]=Array.from(pointersRef.current.values());
       gestureRef.current={center:{x:(first.x+second.x)/2,y:(first.y+second.y)/2},distance:Math.hypot(second.x-first.x,second.y-first.y)};
       if(pressRef.current)pressRef.current.moved=true;
@@ -438,7 +450,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     if(!previous)return;
     const point=canvasPoint(event.clientX,event.clientY);
     pointersRef.current.set(event.pointerId,point);
-    if(pressRef.current&&Math.hypot(point.x-pressRef.current.x,point.y-pressRef.current.y)>6*(canvasRef.current?.width??1)/(canvasRef.current?.clientWidth||1))pressRef.current.moved=true;
+    if(pressRef.current&&Math.hypot(point.x-pressRef.current.x,point.y-pressRef.current.y)>6*(canvasRef.current?.width??1)/(canvasRef.current?.clientWidth||1)){pressRef.current.moved=true;setShowMapPanHint(false);}
     if(pointersRef.current.size===1){
       const canvas=canvasRef.current;if(!canvas)return;
       setCamera((current)=>{
@@ -485,6 +497,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
+      {showMapPanHint&&<div className="field-map-pan-hint" role="status"><i aria-hidden="true">←</i><span>{fieldCaseContent.mapPortraitPanHint}</span><i aria-hidden="true">→</i></div>}
       {selectedPin&&<aside className="field-map-memory" role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
         <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={closeTravelPhotos}>×</button></header>
         <div className={`field-map-photo-stage is-${photoStatus}`} aria-busy={photoStatus==="loading"}>

@@ -2054,6 +2054,46 @@
     min-height: 1px;
   }
 
+  .room-shell .field-map-pan-hint {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: calc(70px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 7px 13px;
+    translate: -50% 0;
+    border: 1px solid rgba(36,55,49,.3);
+    border-radius: 18px;
+    background: rgba(239,229,199,.9);
+    color: #263b35;
+    box-shadow: 0 8px 26px rgba(54,42,27,.24);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    animation: roomPanHintIn .35s ease-out both;
+  }
+
+  .room-shell .field-map-pan-hint span {
+    font: 7px/1 var(--font-mono),monospace;
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+
+  .room-shell .field-map-pan-hint i {
+    color: #9b4338;
+    font: normal 15px/1 var(--font-mono),monospace;
+  }
+
+  .room-shell .field-map-pan-hint i:first-child {
+    animation: roomPanArrowLeft 1.25s ease-in-out infinite;
+  }
+
+  .room-shell .field-map-pan-hint i:last-child {
+    animation: roomPanArrowRight 1.25s ease-in-out infinite;
+  }
+
   .room-shell .tactile-scene > header {
     padding-left: max(16px,env(safe-area-inset-left));
     padding-right: max(16px,env(safe-area-inset-right));
