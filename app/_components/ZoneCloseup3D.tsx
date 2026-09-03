@@ -15,6 +15,10 @@ import {
   site as siteContent,
 } from "@/content";
 
+const DEFAULT_CLOSEUP_EXPOSURE=1;
+const PORTRAIT_CLOSEUP_EXPOSURE=1.1;
+const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
+
 export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
 
 type Props = {
@@ -515,12 +519,13 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.6));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1;
+    renderer.toneMappingExposure=DEFAULT_CLOSEUP_EXPOSURE;
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     const scene=new THREE.Scene();
     scene.background=new THREE.Color(palette.void);
-    scene.fog=new THREE.FogExp2(palette.void,.035);
+    const closeupFog=new THREE.FogExp2(palette.void,DEFAULT_CLOSEUP_FOG_DENSITY);
+    scene.fog=closeupFog;
     const camera=new THREE.PerspectiveCamera(42,1,.1,50);
     const view=views[zone];
     const defaultPosition=new THREE.Vector3(...view.position);
@@ -567,7 +572,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{

@@ -215,6 +215,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
     assert.match(page, new RegExp(`className=\"tactile-scene\"[\\s\\S]{0,900}<ZoneCloseup3D zone=\"${zone}\"`), `${zone} must render inside the sized tactile closeup container`);
   }
 
+  assert.match(closeups, /closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/portraitDistanceScale/, "portrait closeups must compensate fog when the camera moves back to fit their width");
+  assert.match(closeups, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE/, "portrait closeups must retain readable exposure without changing desktop rendering");
+
   const declarationsFor = (selector) => {
     const start = portraitCss.indexOf(`${selector} {`);
     assert.notEqual(start, -1, `${selector} must have an explicit portrait sizing contract`);
