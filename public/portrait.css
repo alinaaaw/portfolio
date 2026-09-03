@@ -1794,43 +1794,16 @@
     font-weight: 600;
   }
 
-  .portrait-notes-nav-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    min-width: 0;
-    padding-right: 14px;
-    color: #b47f00;
-  }
-
-  .portrait-notes-nav-actions i {
-    position: relative;
-    display: block;
-    width: 20px;
-    height: 20px;
-    border: 1.5px solid currentColor;
-    border-radius: 6px;
-  }
-
-  .portrait-notes-nav-actions i:first-child::after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    border-top: 1.5px solid currentColor;
-    border-right: 1.5px solid currentColor;
-    transform: translateX(-50%) rotate(-45deg);
-  }
-
-  .portrait-notes-nav-actions i:last-child::after {
-    content: "...";
-    position: absolute;
-    inset: -4px 0 auto;
-    font: 700 14px/1 system-ui,sans-serif;
-    text-align: center;
+  .portrait-notes-access {
+    justify-self: end;
+    margin-right: 12px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    background: #f1ead4;
+    color: #876700;
+    font: 700 8px/1 system-ui,sans-serif;
+    letter-spacing: .05em;
+    white-space: nowrap;
   }
 
   .portrait-apple-note {
@@ -1873,71 +1846,87 @@
     position: sticky;
     bottom: 0;
     display: grid;
-    grid-template-columns: repeat(4,1fr);
-    align-items: center;
-    min-height: 50px;
+    grid-template-rows: auto auto;
+    min-height: 88px;
     margin: 26px -20px 0;
-    padding: 0 22px;
+    padding: 8px 14px 5px;
     border-top: 1px solid #dedbd2;
     background: rgba(251,250,246,.94);
-    color: #b47f00;
     backdrop-filter: blur(16px);
   }
 
-  .portrait-notes-toolbar > i {
-    position: relative;
-    justify-self: center;
+  .portrait-notes-readonly {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 28px;
+    color: #6e6e73;
+  }
+
+  .portrait-notes-readonly > svg {
     display: block;
-    width: 22px;
-    height: 22px;
-    color: inherit;
-    font-style: normal;
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  .portrait-notes-format {
-    font: 600 17px/22px Georgia,serif;
-    text-align: center;
+  .portrait-notes-readonly > span {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    min-width: 0;
   }
 
-  .portrait-notes-checklist {
-    border: 1.5px solid currentColor;
-    border-radius: 50%;
+  .portrait-notes-readonly strong {
+    color: #69635a;
+    font: 700 9px/1 system-ui,sans-serif;
+    letter-spacing: .05em;
+    white-space: nowrap;
   }
 
-  .portrait-notes-checklist::after {
-    content: "";
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 8px;
-    height: 4px;
-    border-bottom: 1.5px solid currentColor;
-    border-left: 1.5px solid currentColor;
-    transform: rotate(-45deg);
+  .portrait-notes-readonly small {
+    overflow: hidden;
+    color: #8e8e93;
+    font: 10px/1.2 system-ui,sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .portrait-notes-camera {
-    height: 16px !important;
-    margin-top: 3px;
-    border: 1.5px solid currentColor;
-    border-radius: 4px;
+  .portrait-notes-tools {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    align-items: center;
   }
 
-  .portrait-notes-camera::after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    left: 7px;
-    width: 5px;
-    height: 5px;
-    border: 1.5px solid currentColor;
-    border-radius: 50%;
+  .portrait-notes-tools button {
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    width: 44px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #8f876f;
+    cursor: not-allowed;
+    opacity: .5;
   }
 
-  .portrait-notes-draw {
-    width: 18px !important;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(-48deg) translate(1px,-3px);
+  .portrait-notes-tools svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .portrait-computer-view.is-notes-active .portrait-phone-systembar i {

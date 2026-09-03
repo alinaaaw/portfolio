@@ -17,6 +17,7 @@ export type PortraitComputerRoot = "desktop" | "projects" | "experience" | "refe
 type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:string;citation:string;summary:string;annotation:string;provenance:string;url:string};
 type PhoneAppIconKind = "profile" | "notes" | "projects" | "experience" | "references" | "lablog";
 type LabLogFilter = "all" | "program" | "role";
+type NotesToolIconKind = "lock" | "checklist" | "format" | "camera" | "draw";
 
 type Props = {
   computerWindows: ComputerWindowId[];
@@ -38,9 +39,18 @@ const referenceGroups=referencesContent.groups as {id:ReferenceFilter;label:stri
 const rootWindows:ComputerWindowId[]=["projects","experience","references","lablog"];
 const labLogFilters:{id:LabLogFilter;label:string}[]=[{id:"all",label:"ALL"},{id:"program",label:"PROGRAM"},{id:"role",label:"ROLE"}];
 const NOTIFICATION_DISMISS_DISTANCE=52;
+const notesTools=(["checklist","format","camera","draw"] as const).map((kind)=>({kind,label:computerContent.readme.mobileToolLabels[kind]}));
 
 function PhoneAppIcon({kind,badge=false}:{kind:PhoneAppIconKind;badge?:boolean}) {
   return <span className={`portrait-app-icon portrait-app-icon-${kind}`} aria-hidden="true"><i />{badge&&<b>1</b>}</span>;
+}
+
+function NotesToolIcon({kind}:{kind:NotesToolIconKind}) {
+  if(kind==="lock")return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="10" width="11" height="9" rx="2"/><path d="M9 10V7.5a3 3 0 0 1 6 0V10"/></svg>;
+  if(kind==="checklist")return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.3 2.3 4.9-5"/></svg>;
+  if(kind==="format")return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18 9.3 6h1.9L16 18M6.6 13.2h7.3M17 11v7m-2.5-3.5h5"/></svg>;
+  if(kind==="camera")return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 8.5h3L9.2 6h5.6l1.7 2.5h3v10h-15z"/><circle cx="12" cy="13.5" r="3.2"/></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 18 1.1-4.2 8.8-8.8 3.1 3.1-8.8 8.8zM14.5 6.5l3 3M5.5 19h13"/></svg>;
 }
 
 export default function PortraitComputerView({computerWindows,referenceFilter,bulletin,onOpenFile,onOpenRoot,onFocusWindow,onBack,onOpenReferences,onSetReferenceFilter,onDismissBulletin,onLeave}:Props) {
@@ -123,14 +133,17 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
         <header className="portrait-phone-navbar">
           <button type="button" onClick={canGoBack?onBack:()=>onOpenRoot("desktop")} aria-label={canGoBack?"Back":"Home"}><i aria-hidden="true" /><span>{notesOpen?"Notes":canGoBack?"Back":"Home"}</span></button>
           <strong>{screenTitle}</strong>
-          <span className={notesOpen?"portrait-notes-nav-actions":""} aria-hidden="true">{notesOpen&&<><i /><i /></>}</span>
+          <span className={notesOpen?"portrait-notes-access":""} aria-hidden="true">{notesOpen&&computerContent.readme.mobileAccess}</span>
         </header>
 
         <main className="portrait-phone-app-content">
           {activeWindow==="readme"&&<section className="portrait-document portrait-apple-note">
             <header><small>{computerContent.readme.mobileMeta}</small><h2>{computerContent.readme.mobileTitle}</h2></header>
             <div className="portrait-notes-body">{computerContent.readme.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</div>
-            <footer className="portrait-notes-toolbar" aria-hidden="true"><i className="portrait-notes-checklist" /><i className="portrait-notes-format">Aa</i><i className="portrait-notes-camera" /><i className="portrait-notes-draw" /></footer>
+            <footer className="portrait-notes-toolbar" aria-label={computerContent.readme.mobileReadOnly}>
+              <div className="portrait-notes-readonly"><NotesToolIcon kind="lock" /><span><strong>{computerContent.readme.mobileAccess}</strong><small>{computerContent.readme.mobileReadOnly}</small></span></div>
+              <div className="portrait-notes-tools">{notesTools.map((tool)=><button type="button" key={tool.kind} disabled aria-label={tool.label} title={computerContent.readme.mobileReadOnly}><NotesToolIcon kind={tool.kind} /></button>)}</div>
+            </footer>
           </section>}
 
           {activeWindow==="lablog"&&<section className="portrait-lab-log">

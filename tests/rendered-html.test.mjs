@@ -259,8 +259,15 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
   assert.match(portraitComputer, /notesOpen=activeWindow==="readme"[\s\S]*is-notes-active/);
   assert.match(portraitComputer, /className="portrait-document portrait-apple-note"[\s\S]*computerContent\.readme\.mobileMeta[\s\S]*computerContent\.readme\.mobileTitle[\s\S]*className="portrait-notes-toolbar"/, "portrait Notes must use a dedicated phone-native note surface");
+  assert.match(portraitComputer, /className=\{notesOpen\?"portrait-notes-access":""\}[\s\S]*computerContent\.readme\.mobileAccess/, "portrait Notes must identify the shared note as view only");
+  assert.match(portraitComputer, /className="portrait-notes-readonly"[\s\S]*NotesToolIcon kind="lock"[\s\S]*computerContent\.readme\.mobileReadOnly/);
+  assert.match(portraitComputer, /className="portrait-notes-tools"[\s\S]*notesTools\.map[\s\S]*disabled[\s\S]*NotesToolIcon kind=\{tool\.kind\}/, "unavailable note tools must be honest disabled controls");
+  assert.match(portraitComputer, /viewBox="0 0 24 24"/, "note toolbar artwork must share one centered SVG coordinate system");
+  assert.doesNotMatch(portraitComputer, /portrait-notes-nav-actions|portrait-notes-toolbar" aria-hidden/, "note controls must not masquerade as decorative actions");
   assert.match(portraitCss, /\.portrait-apple-note \{[\s\S]*display: grid;[\s\S]*background: #fbfaf6/);
   assert.match(portraitCss, /\.portrait-notes-toolbar \{[\s\S]*position: sticky;[\s\S]*bottom: 0/);
+  assert.match(portraitCss, /\.portrait-notes-tools button \{[\s\S]*display: grid;[\s\S]*place-items: center/);
+  assert.match(portraitCss, /\.portrait-notes-tools svg \{[\s\S]*width: 24px;[\s\S]*height: 24px/);
   assert.match(page, /computerContent\.readme\.meta[\s\S]*computerContent\.readme\.title/, "desktop README must keep its existing content fields");
   assert.match(portraitComputer, /useState<LabLogFilter>\("all"\)/);
   assert.match(portraitComputer, /visibleLabLogEntries=[\s\S]*entry\.type\.toLowerCase\(\)\.includes\(labLogFilter\)/);

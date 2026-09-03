@@ -28,6 +28,14 @@
     "title": "WORKSPACE NOTES",
     "mobileMeta": "Shared Note",
     "mobileTitle": "Workspace Notes",
+    "mobileAccess": "VIEW ONLY",
+    "mobileReadOnly": "Editing disabled for this shared note",
+    "mobileToolLabels": {
+      "checklist": "Checklist unavailable",
+      "format": "Formatting unavailable",
+      "camera": "Attachments unavailable",
+      "draw": "Drawing unavailable"
+    },
     "paragraphs": [
       "Read before reorganizing the lab. PROJECTS holds finished work. Working notes and unfinished ideas stay where they were last used.",
       "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, project sources in REFERENCES.web, physical iterations in the drawer, and open questions on the board. The bookshelf is reserved for personal reading and film notes.",
