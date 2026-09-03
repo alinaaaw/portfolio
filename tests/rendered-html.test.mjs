@@ -257,6 +257,11 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /className="portrait-phone-dock"[\s\S]*PhoneAppIcon kind="projects"[\s\S]*PhoneAppIcon kind="references"[\s\S]*PhoneAppIcon kind="lablog"/);
   assert.match(portraitComputer, /className="portrait-phone-navbar"[\s\S]*onClick=\{canGoBack\?onBack:\(\)=>onOpenRoot\("desktop"\)\}/);
   assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
+  assert.match(portraitComputer, /notesOpen=activeWindow==="readme"[\s\S]*is-notes-active/);
+  assert.match(portraitComputer, /className="portrait-document portrait-apple-note"[\s\S]*computerContent\.readme\.mobileMeta[\s\S]*computerContent\.readme\.mobileTitle[\s\S]*className="portrait-notes-toolbar"/, "portrait Notes must use a dedicated phone-native note surface");
+  assert.match(portraitCss, /\.portrait-apple-note \{[\s\S]*display: grid;[\s\S]*background: #fbfaf6/);
+  assert.match(portraitCss, /\.portrait-notes-toolbar \{[\s\S]*position: sticky;[\s\S]*bottom: 0/);
+  assert.match(page, /computerContent\.readme\.meta[\s\S]*computerContent\.readme\.title/, "desktop README must keep its existing content fields");
   assert.match(portraitComputer, /useState<LabLogFilter>\("all"\)/);
   assert.match(portraitComputer, /visibleLabLogEntries=[\s\S]*entry\.type\.toLowerCase\(\)\.includes\(labLogFilter\)/);
   assert.match(portraitComputer, /className="portrait-log-filters"[\s\S]*aria-pressed=\{labLogFilter===filter\.id\}/);

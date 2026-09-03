@@ -54,6 +54,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
   const visibleReferences=referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
   const visibleLabLogEntries=labLogFilter==="all"?computerContent.labLog.entries:computerContent.labLog.entries.filter((entry)=>entry.type.toLowerCase().includes(labLogFilter));
   const canGoBack=Boolean(activeWindow)&&(!rootWindows.includes(activeWindow as ComputerWindowId)||computerWindows.length>1);
+  const notesOpen=activeWindow==="readme";
   const screenTitle=activeWindow==="profile"?"Profile"
     :activeWindow==="readme"?"Notes"
     :activeWindow==="lablog"?"Lab Log"
@@ -82,7 +83,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
     setNotificationOffset(0);
     if(shouldDismiss)onDismissBulletin();
   };
-  return <section className="portrait-computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
+  return <section className={`portrait-computer-view ${notesOpen?"is-notes-active":""}`} role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
     <header className="portrait-phone-statusbar">
       <button type="button" className="portrait-room-return" onClick={onLeave} aria-label={computerContent.topBar.leave}><i aria-hidden="true" /> LAB 17</button>
       <span className="portrait-phone-island" aria-hidden="true"><i /></span>
@@ -118,15 +119,19 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
         </nav>
       </main>}
 
-      {activeWindow&&<div className="portrait-phone-app">
+      {activeWindow&&<div className={`portrait-phone-app ${notesOpen?"is-notes":""}`}>
         <header className="portrait-phone-navbar">
-          <button type="button" onClick={canGoBack?onBack:()=>onOpenRoot("desktop")} aria-label={canGoBack?"Back":"Home"}><i aria-hidden="true" /><span>{canGoBack?"Back":"Home"}</span></button>
+          <button type="button" onClick={canGoBack?onBack:()=>onOpenRoot("desktop")} aria-label={canGoBack?"Back":"Home"}><i aria-hidden="true" /><span>{notesOpen?"Notes":canGoBack?"Back":"Home"}</span></button>
           <strong>{screenTitle}</strong>
-          <span aria-hidden="true" />
+          <span className={notesOpen?"portrait-notes-nav-actions":""} aria-hidden="true">{notesOpen&&<><i /><i /></>}</span>
         </header>
 
         <main className="portrait-phone-app-content">
-          {activeWindow==="readme"&&<section className="portrait-document"><small>{computerContent.readme.meta}</small><h2>{computerContent.readme.title}</h2>{computerContent.readme.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</section>}
+          {activeWindow==="readme"&&<section className="portrait-document portrait-apple-note">
+            <header><small>{computerContent.readme.mobileMeta}</small><h2>{computerContent.readme.mobileTitle}</h2></header>
+            <div className="portrait-notes-body">{computerContent.readme.paragraphs.map((paragraph)=><p key={paragraph}>{paragraph}</p>)}</div>
+            <footer className="portrait-notes-toolbar" aria-hidden="true"><i className="portrait-notes-checklist" /><i className="portrait-notes-format">Aa</i><i className="portrait-notes-camera" /><i className="portrait-notes-draw" /></footer>
+          </section>}
 
           {activeWindow==="lablog"&&<section className="portrait-lab-log">
             <header className="portrait-log-overview"><small>{computerContent.labLog.meta}</small><span><i />{computerContent.topBar.sync}</span></header>

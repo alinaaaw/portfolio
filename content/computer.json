@@ -26,6 +26,8 @@
     "filename": "README.txt",
     "meta": "WORKSTATION FILE / SHARED NOTES",
     "title": "WORKSPACE NOTES",
+    "mobileMeta": "Shared Note",
+    "mobileTitle": "Workspace Notes",
     "paragraphs": [
       "Read before reorganizing the lab. PROJECTS holds finished work. Working notes and unfinished ideas stay where they were last used.",
       "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, project sources in REFERENCES.web, physical iterations in the drawer, and open questions on the board. The bookshelf is reserved for personal reading and film notes.",
