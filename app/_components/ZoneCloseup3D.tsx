@@ -20,6 +20,9 @@ const PORTRAIT_CLOSEUP_EXPOSURE=1.1;
 const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
 const PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE=390;
 const PORTRAIT_CLOSEUP_MAGNIFICATION=1.2;
+const PORTRAIT_BOOKS_CENTER_X_OFFSET=.36;
+const PORTRAIT_NOTEBOOK_CENTER_X_OFFSET=.1;
+const PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE=1.06;
 const PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE=.68;
 const PORTRAIT_DRAWER_CENTER_X_OFFSET=.22;
 
@@ -687,13 +690,16 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
       if(isPortrait){
+        const sceneCenterShiftX=zone==="books"?-PORTRAIT_BOOKS_CENTER_X_OFFSET:zone==="notebook"?PORTRAIT_NOTEBOOK_CENTER_X_OFFSET:0;
+        desired.x+=sceneCenterShiftX;
+        desiredTarget.x+=sceneCenterShiftX;
         if(zone==="drawer"){
           const drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET*drawerProgress;
           desired.x-=drawerCenterShift;
           desiredTarget.x-=drawerCenterShift;
         }
-        const drawerOpenDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(1,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
-        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerOpenDistanceScale);
+        const drawerDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
+        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerDistanceScale);
         desired.copy(desiredTarget).add(portraitOffset);
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
