@@ -2088,6 +2088,10 @@
     opacity: .72;
   }
 
+  .room-shell .mobile-scene-hotspot[hidden] {
+    display: none;
+  }
+
   .room-shell .mobile-scene-hotspot::before {
     content: "";
     position: absolute;

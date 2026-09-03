@@ -21,6 +21,7 @@ const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
 const PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE=390;
 const PORTRAIT_CLOSEUP_MAGNIFICATION=1.2;
 const PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE=.68;
+const PORTRAIT_DRAWER_CENTER_X_OFFSET=.22;
 
 function portraitCloseupFitScale(width:number,height:number,aspect:number) {
   const shortestSide=Math.min(width,height);
@@ -638,9 +639,10 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; hotspotLayer.hidden=!isPortrait; touchCoach.hidden=!isPortrait||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
+    const isHitAvailable=(hit:HitMesh)=>(!hit.userData.requiresOpen||(drawerTarget>.5&&drawerProgress>.72))&&(!hit.userData.requiresPrinted||printProgress>.96);
     const readHit=(event:PointerEvent)=>{
       const rect=canvas.getBoundingClientRect(); pointer.x=((event.clientX-rect.left)/rect.width)*2-1; pointer.y=-((event.clientY-rect.top)/rect.height)*2+1; raycaster.setFromCamera(pointer,camera);
-      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96))??null;
+      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find(isHitAvailable)??null;
       return found;
     };
     const pointerMove=(event:PointerEvent)=>{
@@ -648,7 +650,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       const next=readHit(event);setHoveredHit(next);canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(event.pointerType!=="mouse")dismissTouchGuide();if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(event.pointerType!=="mouse")dismissTouchGuide();if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(!drawerTarget)setHoveredHit(null);if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
@@ -685,6 +687,11 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
       if(isPortrait){
+        if(zone==="drawer"){
+          const drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET*drawerProgress;
+          desired.x-=drawerCenterShift;
+          desiredTarget.x-=drawerCenterShift;
+        }
         const drawerOpenDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(1,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
         const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerOpenDistanceScale);
         desired.copy(desiredTarget).add(portraitOffset);
@@ -694,7 +701,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       if(isPortrait){
         const stageRect=stage.getBoundingClientRect();
         hotspotMarkers.forEach(({marker,hits:markerHits,projectedPosition,worldPosition})=>{
-          const visibleHits=markerHits.filter((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96));
+          const visibleHits=markerHits.filter(isHitAvailable);
           marker.hidden=visibleHits.length===0;
           if(visibleHits.length===0)return;
           projectedPosition.set(0,0,0);

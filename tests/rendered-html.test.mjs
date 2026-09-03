@@ -308,11 +308,13 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
   assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
   assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
+  assert.match(closeups, /isHitAvailable=\(hit:HitMesh\)=>\(!hit\.userData\.requiresOpen\|\|\(drawerTarget>\.5&&drawerProgress>\.72\)\)/, "drawer contents must stop accepting taps as soon as the drawer starts closing");
   assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(closeups, /camera\.aspect=nextAspect/);
   assert.match(closeups, /camera\.fov=42/);
   assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerOpenDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(1,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerOpenDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
+  assert.match(closeups, /drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET\*drawerProgress[\s\S]*desired\.x-=drawerCenterShift[\s\S]*desiredTarget\.x-=drawerCenterShift/, "portrait drawer framing must center the open tray without changing desktop framing");
   assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
 });
 
@@ -366,6 +368,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /guideGroup="films"/);
   assert.match(closeups, /getWorldPosition\(worldPosition\)[\s\S]*projectedPosition\.multiplyScalar\(1\/visibleHits\.length\)\.project\(camera\)/);
   assert.match(closeups, /touchGuideTimer=window\.setTimeout\(dismissTouchGuide,4200\)/);
+  assert.match(closeups, /const visibleHits=markerHits\.filter\(isHitAvailable\)/, "hotspot visibility must follow the same availability rule as hit testing");
   assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);
