@@ -2054,6 +2054,20 @@
     min-height: 1px;
   }
 
+  .room-shell .field-detail {
+    padding: 14px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+
+  .room-shell .field-map-reading {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 1px solid #8a7453;
+    border-radius: 12px;
+    box-shadow: 0 16px 42px rgba(0,0,0,.42);
+    transform: none;
+  }
+
   .room-shell .field-map-pan-hint {
     position: absolute;
     z-index: 4;

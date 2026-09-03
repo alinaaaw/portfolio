@@ -192,7 +192,7 @@ const lostTravelMessages=[
   "MEMORY STILL OFF THE RECORD",
   "EVIDENCE LOST SOMEWHERE EN ROUTE",
 ] as const;
-const PORTRAIT_MAP_INITIAL_ZOOM=1.5;
+const PORTRAIT_MAP_INITIAL_ZOOM=1.9;
 
 function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.random()*lostTravelMessages.length)];}
 

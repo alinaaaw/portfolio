@@ -210,6 +210,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(page, /PORTRAIT_MAP_INITIAL_ZOOM[\s\S]*portraitMapInitializedRef[\s\S]*sheet\.clientHeight>=sheet\.clientWidth[\s\S]*camera\.zoom<PORTRAIT_MAP_INITIAL_ZOOM/, "portrait travel map must open closer without changing its desktop camera");
   assert.match(page, /setShowMapPanHint\(false\)[\s\S]*className="field-map-pan-hint"[\s\S]*fieldCaseContent\.mapPortraitPanHint/, "portrait travel map must explain horizontal dragging until the visitor uses it");
   assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-shell \.field-detail \{[\s\S]*padding: 14px/, "portrait map closeup must leave space around every edge");
+  assert.match(portraitCss, /\.room-shell \.field-map-reading \{[\s\S]*width: 100%;[\s\S]*height: 100%;[\s\S]*border-radius: 12px/, "portrait map must remain a framed card inside its inset closeup");
   assert.match(portraitCss, /\.room-shell \.field-map-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
