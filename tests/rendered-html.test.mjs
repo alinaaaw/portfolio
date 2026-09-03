@@ -264,7 +264,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(notebookPaperContract, /width: min\(91vw,calc\(\(100dvh - 96px\)\*\.79\)\)[\s\S]*max-width: none/, "portrait notebook papers must grow beyond their desktop cap on tablet-sized screens");
   assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\)\)[\s\S]*aspect-ratio: \.78[\s\S]*max-width: none/, "portrait drawer documents must scale with the available tablet viewport while keeping their paper ratio");
   assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
-  assert.match(boardCardContract, /width: min\(86vw,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: clamp\(330px,62vw,500px\)[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: 1\.35/, "portrait board cards must grow with phone and tablet viewports without overflowing the available height");
+  assert.match(boardCardContract, /width: min\(86vw,560px,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: 330px[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: auto/, "portrait board cards must respond to the viewport while staying compact enough for their short content");
   assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
   assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
