@@ -18,6 +18,15 @@ import {
 const DEFAULT_CLOSEUP_EXPOSURE=1;
 const PORTRAIT_CLOSEUP_EXPOSURE=1.1;
 const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
+const PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE=390;
+const PORTRAIT_CLOSEUP_MAGNIFICATION=1.2;
+const PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE=.68;
+
+function portraitCloseupFitScale(width:number,height:number,aspect:number) {
+  const shortestSide=Math.min(width,height);
+  const viewportSizeFactor=THREE.MathUtils.clamp(shortestSide/PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE,.92,1.15);
+  return Math.max(1,aspectOverflowDistanceScale(aspect)/(PORTRAIT_CLOSEUP_MAGNIFICATION*viewportSizeFactor));
+}
 
 export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
 
@@ -626,7 +635,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
       }
     };
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; hotspotLayer.hidden=!isPortrait; touchCoach.hidden=!isPortrait||touchGuideDismissed; portraitDistanceScale=isPortrait?aspectOverflowDistanceScale(nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; hotspotLayer.hidden=!isPortrait; touchCoach.hidden=!isPortrait||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const readHit=(event:PointerEvent)=>{
@@ -676,7 +685,8 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
       if(isPortrait){
-        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale);
+        const drawerOpenDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(1,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
+        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerOpenDistanceScale);
         desired.copy(desiredTarget).add(portraitOffset);
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;

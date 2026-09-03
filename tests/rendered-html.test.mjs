@@ -306,12 +306,13 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(closeups, /observer\.observe\(stage\)/);
   assert.match(closeups, /layoutFrame=requestAnimationFrame\(resize\)/);
   assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
-  assert.match(closeups, /portraitDistanceScale=isPortrait\?aspectOverflowDistanceScale\(nextAspect\):1/);
+  assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
+  assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
   assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(closeups, /camera\.aspect=nextAspect/);
   assert.match(closeups, /camera\.fov=42/);
   assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
-  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*desired\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
+  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerOpenDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(1,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerOpenDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
   assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
 });
 
