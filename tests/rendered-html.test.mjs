@@ -249,7 +249,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
   const notebookScrollContract = declarationsFor(".room-shell .notebook-scroll");
   const notebookPaperContract = declarationsFor(".room-shell .model-detail .notebook-closeup");
-  const notebookTextContract = declarationsFor(".room-shell .notebook-closeup blockquote");
+  const notebookMarginContract = declarationsFor(".room-shell .model-detail .notebook-closeup::before");
   const notebookReturnContract = declarationsFor(".room-shell .notebook-closeup .paper-return-control");
   const drawerPaperContract = declarationsFor(".room-shell .drawer-document-paper");
   const drawerArticleContract = declarationsFor(".room-shell .drawer-document article");
@@ -263,8 +263,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
   assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
   assert.match(notebookScrollContract, /overflow-y: auto[\s\S]*overscroll-behavior: contain[\s\S]*touch-action: pan-y[\s\S]*padding-bottom:/, "portrait notebook paper must scroll without hiding its final lines beneath the return control");
-  assert.match(notebookPaperContract, /--portrait-notebook-rule: clamp\([\s\S]*width: min\(88vw,\d+px,calc\(\(100dvh - 96px\)\*\.79\)\)[\s\S]*max-width: none[\s\S]*aspect-ratio: \.79[\s\S]*background-repeat: no-repeat,repeat-y,no-repeat[\s\S]*background-size:[\s\S]*var\(--portrait-notebook-rule\)/, "portrait notebook papers must keep their established ratio at a responsive tablet cap while their rules scale continuously from the top edge");
-  assert.match(notebookTextContract, /font-size: clamp\([\s\S]*line-height: var\(--portrait-notebook-rule\)/, "portrait notebook copy must scale with its ruled paper");
+  assert.match(notebookPaperContract, /--portrait-notebook-rule: clamp\([\s\S]*width: min\(88vw,\d+px,calc\(\(100dvh - 96px\)\*\.79\)\)[\s\S]*max-width: none[\s\S]*aspect-ratio: \.79[\s\S]*background-repeat: repeat-y,no-repeat[\s\S]*background-size:[\s\S]*var\(--portrait-notebook-rule\)/, "portrait notebook papers must keep their established ratio at a responsive tablet cap while their rules scale continuously from the top edge");
+  assert.match(notebookMarginContract, /position: absolute[\s\S]*top: 0[\s\S]*bottom: 0[\s\S]*left: 10%[\s\S]*width: 1px/, "portrait notebook paper must render one uninterrupted margin line from top to bottom");
+  assert.match(portraitCss, /\.room-shell \.notebook-closeup p,\s*\.room-shell \.notebook-process li,\s*\.room-shell \.notebook-closeup blockquote \{[^}]*font-size: clamp\([^}]*line-height: var\(--portrait-notebook-rule\)/, "portrait notebook copy must scale with its ruled paper");
   assert.match(notebookReturnContract, /min-height: clamp\([\s\S]*padding: clamp\([\s\S]*font-size: clamp\(/, "portrait notebook controls must remain proportional and touchable as the paper grows");
   assert.match(portraitCss, /@media \(min-width: 621px\) and \(min-height: 850px\) \{[\s\S]*\.room-shell \.notebook-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "tablet-sized portrait notebooks must show their full page without an unnecessary inner scroller");
   assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\)\)[\s\S]*aspect-ratio: \.78[\s\S]*max-width: none/, "portrait drawer documents must scale with the available tablet viewport while keeping their paper ratio");
