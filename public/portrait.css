@@ -2229,8 +2229,8 @@
   }
 
   .room-shell .drawer-document-paper {
-    width: min(88vw,calc((100svh - 112px)*.78));
-    width: min(88vw,calc((100dvh - 112px)*.78));
+    width: min(88vw,690px,calc((100svh - 112px)*.78));
+    width: min(88vw,690px,calc((100dvh - 112px)*.78));
     height: auto;
     aspect-ratio: .78;
     max-width: none;
