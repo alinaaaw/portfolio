@@ -211,7 +211,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(page, /setShowMapPanHint\(false\)[\s\S]*className="field-map-pan-hint"[\s\S]*fieldCaseContent\.mapPortraitPanHint/, "portrait travel map must explain horizontal dragging until the visitor uses it");
   assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");
   assert.match(portraitCss, /\.room-shell \.field-detail \{[\s\S]*padding: 14px/, "portrait map closeup must leave space around every edge");
-  assert.match(portraitCss, /\.room-shell \.field-map-reading \{[\s\S]*width: 100%;[\s\S]*height: 100%;[\s\S]*border: 1px solid #8a7453/, "portrait map must remain a framed sheet inside its inset closeup");
+  assert.match(portraitCss, /\.room-shell \.field-map-reading \{[\s\S]*width: min\(100%,calc\(\(100dvh - 128px\)\*\.7\)\);[\s\S]*height: auto;[\s\S]*aspect-ratio:[\s\S]*border: 1px solid #8a7453/, "portrait map must remain a proportioned framed sheet inside its inset closeup");
   assert.doesNotMatch(portraitCss, /\.room-shell \.field-map-reading \{[^}]*border-radius/, "the map paper must retain square corners");
   assert.match(portraitCss, /\.room-shell \.field-map-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
