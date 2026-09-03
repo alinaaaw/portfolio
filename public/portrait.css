@@ -2161,8 +2161,8 @@
 
   .room-shell .model-detail .notebook-closeup {
     --portrait-notebook-rule: clamp(24px,3.8vw,34px);
-    width: min(88vw,650px,calc((100svh - 96px)*.79));
-    width: min(88vw,650px,calc((100dvh - 96px)*.79));
+    width: min(88vw,690px,calc((100svh - 96px)*.79));
+    width: min(88vw,690px,calc((100dvh - 96px)*.79));
     max-width: none;
     max-height: calc(100svh - 96px);
     max-height: calc(100dvh - 96px);
@@ -2333,6 +2333,19 @@
   .room-shell .tactile-scene > header button:focus-visible {
     outline: 2px solid var(--signal);
     outline-offset: -3px;
+  }
+
+  @media (min-width: 621px) and (min-height: 850px) {
+    .room-shell .notebook-scroll {
+      overflow-y: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      scrollbar-width: none;
+    }
+
+    .room-shell .notebook-scroll::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
