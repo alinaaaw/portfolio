@@ -248,8 +248,10 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   const referenceHeaderMetaContract = declarationsFor(".portrait-references > header small");
   const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
   const notebookScrollContract = declarationsFor(".room-shell .notebook-scroll");
+  const notebookPaperContract = declarationsFor(".room-shell .model-detail .notebook-closeup");
   const drawerPaperContract = declarationsFor(".room-shell .drawer-document-paper");
   const drawerArticleContract = declarationsFor(".room-shell .drawer-document article");
+  const boardCardContract = declarationsFor(".room-shell .evidence-card.note-card");
   assert.match(phoneStageContract, /grid-row: 2[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
   assert.match(phoneHomeContract, /display: grid[\s\S]*height: 100%[\s\S]*min-height: 0/);
   assert.match(phoneAppContract, /display: grid[\s\S]*grid-template-rows: auto minmax\(0,1fr\)[\s\S]*height: 100%/);
@@ -259,8 +261,10 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
   assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
   assert.match(notebookScrollContract, /overflow-y: auto[\s\S]*overscroll-behavior: contain[\s\S]*touch-action: pan-y[\s\S]*padding-bottom:/, "portrait notebook paper must scroll without hiding its final lines beneath the return control");
-  assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\),520px\)[\s\S]*aspect-ratio: \.78/, "portrait drawer documents must keep a paper-like ratio based on their own width");
+  assert.match(notebookPaperContract, /width: min\(91vw,calc\(\(100dvh - 96px\)\*\.79\)\)[\s\S]*max-width: none/, "portrait notebook papers must grow beyond their desktop cap on tablet-sized screens");
+  assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\)\)[\s\S]*aspect-ratio: \.78[\s\S]*max-width: none/, "portrait drawer documents must scale with the available tablet viewport while keeping their paper ratio");
   assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
+  assert.match(boardCardContract, /width: min\(86vw,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: clamp\(330px,62vw,500px\)[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: 1\.35/, "portrait board cards must grow with phone and tablet viewports without overflowing the available height");
   assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
   assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
