@@ -2229,8 +2229,8 @@
   }
 
   .room-shell .drawer-document-paper {
-    width: min(88vw,690px,calc((100svh - 112px)*.78));
-    width: min(88vw,690px,calc((100dvh - 112px)*.78));
+    width: min(88vw,760px,calc((100svh - 112px)*.78));
+    width: min(88vw,760px,calc((100dvh - 112px)*.78));
     height: auto;
     aspect-ratio: .78;
     max-width: none;
@@ -2379,6 +2379,58 @@
       right: 22px;
       padding: 6px 2px 5px;
       font-size: 9px;
+    }
+
+    .room-shell .drawer-document-paper {
+      width: min(90vw,760px,calc((100svh - 96px)*.78));
+      width: min(90vw,760px,calc((100dvh - 96px)*.78));
+    }
+
+    .room-shell .drawer-document article {
+      padding: clamp(48px,5vw,60px) clamp(40px,5vw,60px) 52px;
+    }
+
+    .room-shell .drawer-document article h2 {
+      margin: 18px 0 16px;
+      font-size: clamp(28px,3.2vw,36px);
+    }
+
+    .room-shell .drawer-document article p {
+      line-height: 1.65;
+    }
+
+    .room-shell .drawer-document article blockquote {
+      margin: 20px 0;
+      padding: 10px 15px;
+      font-size: clamp(15px,2vw,18px);
+    }
+
+    .room-shell .drawer-document .artifact-media,
+    .room-shell .drawer-document .artifact-facts {
+      margin-block: 18px;
+    }
+
+    .room-shell .drawer-document .artifact-facts > div {
+      padding: 10px 12px;
+    }
+
+    .room-shell .drawer-document .artifact-facts dd {
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  }
+
+  @media (min-width: 700px) and (min-height: 900px) {
+    .room-shell .drawer-document article {
+      overflow-y: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      scrollbar-width: none;
+    }
+
+    .room-shell .drawer-document article::-webkit-scrollbar {
+      display: none;
     }
   }
 
