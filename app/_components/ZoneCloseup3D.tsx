@@ -21,6 +21,7 @@ const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
 const PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE=390;
 const PORTRAIT_CLOSEUP_MAGNIFICATION=1.2;
 const PORTRAIT_BOOKS_CENTER_X_OFFSET=.86;
+const PORTRAIT_BOOKS_DISTANCE_SCALE=.88;
 const PORTRAIT_NOTEBOOK_CENTER_X_OFFSET=.1;
 const PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE=1.06;
 const PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE=.68;
@@ -699,7 +700,8 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
           desiredTarget.x-=drawerCenterShift;
         }
         const drawerDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
-        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerDistanceScale);
+        const sceneDistanceScale=zone==="books"?PORTRAIT_BOOKS_DISTANCE_SCALE:1;
+        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerDistanceScale*sceneDistanceScale);
         desired.copy(desiredTarget).add(portraitOffset);
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;

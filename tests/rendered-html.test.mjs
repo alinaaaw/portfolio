@@ -320,7 +320,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(closeups, /camera\.fov=42/);
   assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(closeups, /sceneCenterShiftX=zone==="books"\?-PORTRAIT_BOOKS_CENTER_X_OFFSET:zone==="notebook"\?PORTRAIT_NOTEBOOK_CENTER_X_OFFSET:0[\s\S]*desired\.x\+=sceneCenterShiftX[\s\S]*desiredTarget\.x\+=sceneCenterShiftX/, "portrait shelf and notebook closeups must use isolated horizontal framing offsets");
-  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/);
+  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*sceneDistanceScale=zone==="books"\?PORTRAIT_BOOKS_DISTANCE_SCALE:1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerDistanceScale\*sceneDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/, "portrait bookshelf can move closer without changing the framing of other closeups");
   assert.match(closeups, /drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET\*drawerProgress[\s\S]*desired\.x-=drawerCenterShift[\s\S]*desiredTarget\.x-=drawerCenterShift/, "portrait drawer framing must center the open tray without changing desktop framing");
   assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
 });
