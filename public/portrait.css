@@ -2305,6 +2305,20 @@
     transform: none;
   }
 
+  @media (max-width: 620px) {
+    .room-shell .field-map-reading {
+      width: min(100%,calc((100svh - 96px)*.65));
+      width: min(100%,calc((100dvh - 96px)*.65));
+      aspect-ratio: .65;
+    }
+
+    .room-shell .field-map-memory {
+      height: min(625px,calc(100svh - 104px),calc(100vw + 90px),calc(100% - 96px));
+      height: min(625px,calc(100dvh - 104px),calc(100vw + 90px),calc(100% - 96px));
+      max-height: calc(100% - 96px);
+    }
+  }
+
   .room-shell .field-map-pan-hint {
     position: absolute;
     z-index: 4;

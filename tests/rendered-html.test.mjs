@@ -212,6 +212,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");
   assert.match(portraitCss, /\.room-shell \.field-detail \{[\s\S]*padding: 14px/, "portrait map closeup must leave space around every edge");
   assert.match(portraitCss, /\.room-shell \.field-map-reading \{[\s\S]*width: min\(100%,calc\(\(100dvh - 128px\)\*\.7\)\);[\s\S]*height: auto;[\s\S]*aspect-ratio:[\s\S]*border: 1px solid #8a7453/, "portrait map must remain a proportioned framed sheet inside its inset closeup");
+  assert.match(portraitCss, /@media \(max-width: 620px\) \{[\s\S]*\.room-shell \.field-map-reading \{[\s\S]*width: min\(100%,calc\(\(100dvh - 96px\)\*\.65\)\)[\s\S]*aspect-ratio: \.65[\s\S]*\.room-shell \.field-map-memory \{[\s\S]*height: min\([^}]*calc\(100% - 96px\)[\s\S]*max-height: calc\(100% - 96px\)/, "phone map sheets must grow slightly longer while photo memories preserve visible map space around them");
   assert.doesNotMatch(portraitCss, /\.room-shell \.field-map-reading \{[^}]*border-radius/, "the map paper must retain square corners");
   assert.match(portraitCss, /\.room-shell \.field-map-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
