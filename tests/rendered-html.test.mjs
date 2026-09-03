@@ -252,6 +252,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   const notebookMarginContract = declarationsFor(".room-shell .model-detail .notebook-closeup::before");
   const notebookReturnContract = declarationsFor(".room-shell .notebook-closeup .paper-return-control");
   const drawerPaperContract = declarationsFor(".room-shell .drawer-document-paper");
+  const drawerReturnContract = declarationsFor(".room-shell .drawer-document-return");
+  const drawerReturnHitContract = declarationsFor(".room-shell .drawer-document-return::before");
   const drawerArticleContract = declarationsFor(".room-shell .drawer-document article");
   const boardCardContract = declarationsFor(".room-shell .evidence-card.note-card");
   assert.match(phoneStageContract, /grid-row: 2[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
@@ -270,6 +272,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitCss, /@media \(min-width: 621px\) \{[\s\S]*\.room-shell \.notebook-closeup \.paper-return-control \{[\s\S]*min-height: clamp\([\s\S]*padding: clamp\([\s\S]*font-size: clamp\(/, "tablet-sized portrait notebooks must enlarge the return control independently from phones");
   assert.match(portraitCss, /@media \(min-width: 520px\) and \(min-height: 700px\) \{[\s\S]*\.room-shell \.notebook-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy portrait notebooks, including a 540 by 720 viewport, must show their full page without an unnecessary inner scroller");
   assert.match(drawerPaperContract, /width: min\(88vw,calc\(\(100dvh - 112px\)\*\.78\)\)[\s\S]*aspect-ratio: \.78[\s\S]*max-width: none/, "portrait drawer documents must scale with the available tablet viewport while keeping their paper ratio");
+  assert.match(drawerReturnContract, /top:[\s\S]*right:[\s\S]*padding:[\s\S]*font-size:/, "phone-sized portrait drawer documents must use a compact visible return control");
+  assert.match(drawerReturnHitContract, /position: absolute[\s\S]*inset: -10px/, "the compact drawer return control must retain an expanded touch target");
+  assert.match(portraitCss, /@media \(min-width: 621px\) \{[\s\S]*\.room-shell \.drawer-document-return \{[\s\S]*font-size: 9px/, "tablet-sized portrait drawer documents must preserve their larger return control");
   assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
   assert.match(boardCardContract, /width: min\(86vw,560px,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: 330px[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: auto/, "portrait board cards must respond to the viewport while staying compact enough for their short content");
   assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);

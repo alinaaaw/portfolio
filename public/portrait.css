@@ -2237,6 +2237,19 @@
     max-height: none;
   }
 
+  .room-shell .drawer-document-return {
+    top: 13px;
+    right: 15px;
+    padding: 4px 2px 3px;
+    font-size: 6px;
+  }
+
+  .room-shell .drawer-document-return::before {
+    position: absolute;
+    inset: -10px;
+    content: "";
+  }
+
   .room-shell .drawer-document article {
     height: 100%;
     min-height: 0;
@@ -2359,6 +2372,13 @@
       min-height: clamp(30px,5vw,42px);
       padding: clamp(6px,1.2vw,10px) clamp(8px,1.8vw,14px);
       font-size: clamp(7px,1.35vw,11px);
+    }
+
+    .room-shell .drawer-document-return {
+      top: 19px;
+      right: 22px;
+      padding: 6px 2px 5px;
+      font-size: 9px;
     }
   }
 
