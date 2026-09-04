@@ -189,7 +189,7 @@ function BoardScene({onClose}:{onClose:()=>void}) {
   return <div className="modal-layer tactile-layer" onMouseDown={onClose}><section className="tactile-scene" role="dialog" aria-modal="true" aria-label={boardContent.ariaLabel} onMouseDown={(event)=>event.stopPropagation()}>
     <header><div><span>{zoneInfo.board.index}</span><strong>{boardContent.header}</strong></div><button onClick={onClose}>{siteContent.shared.returnToRoom}</button></header>
     <ZoneCloseup3D zone="board" onSelect={(item)=>{const index=Number(item);if(boardNotes[index])setSelected(index);}}/>
-    {note&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className="evidence-card note-card" onMouseDown={(event)=>event.stopPropagation()}><small>{boardContent.detailMeta} {String((selected??0)+1).padStart(2,"0")} · {note.status}</small><blockquote>{note.label}</blockquote><p>{note.copy}</p><em>{note.detail}</em><button onClick={()=>setSelected(null)}>{boardContent.returnItem}</button></article></div>}
+    {note&&<div className="model-detail" onMouseDown={()=>setSelected(null)}><article className={`evidence-card note-card ${note.completed?"is-complete":""}`} onMouseDown={(event)=>event.stopPropagation()}><small>{boardContent.detailMeta} {String((selected??0)+1).padStart(2,"0")} · {note.status}</small><blockquote>{note.label}</blockquote><p>{note.copy}</p><em>{note.detail}</em><button onClick={()=>setSelected(null)}>{boardContent.returnItem}</button></article></div>}
   </section></div>;
 }
 
@@ -573,7 +573,6 @@ function SystemUpdatesContent(){
           <div><span>{releasesContent.currentLabel}</span><strong>{releasesContent.versionLabel} {currentVersion}</strong>{currentRelease&&<p className="system-current-title">{currentRelease.title}</p>}{currentRelease?.summary&&<p>{currentRelease.summary}</p>}</div>
           <aside><i>{versionStatus(currentVersion)}</i>{currentRelease&&<time dateTime={currentRelease.date}>{currentRelease.date}</time>}</aside>
         </div>
-        {currentRelease&&<ul className="system-current-highlights">{currentRelease.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul>}
       </div>:<div className="system-history-panel" tabIndex={0}>
         <header><div><small>{releasesContent.historyLabel}</small><h2>Update History</h2></div><span>{publicReleases.length} {releasesContent.releaseCountLabel}</span></header>
         <div className="system-release-timeline">{publicReleases.map((release)=><article className="system-release-entry" key={release.version}>
