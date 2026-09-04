@@ -2120,6 +2120,138 @@
     touch-action: manipulation;
   }
 
+  /* Keep the phone shell fixed while its interface type grows on portrait tablets. */
+  .portrait-computer-view {
+    --portrait-type-micro: clamp(6px,1.05vw,9px);
+    --portrait-type-meta: clamp(7px,1.25vw,10px);
+    --portrait-type-label: clamp(8px,1.45vw,12px);
+    --portrait-type-copy: clamp(12px,1.95vw,17px);
+    --portrait-type-lead: clamp(14px,2.25vw,19px);
+    --portrait-type-list-title: clamp(13px,2.05vw,18px);
+    --portrait-type-section-title: clamp(24px,4.2vw,34px);
+    --portrait-type-screen-title: clamp(34px,6.25vw,50px);
+  }
+
+  .portrait-room-return,
+  .portrait-phone-status,
+  .portrait-notification-content small,
+  .portrait-phone-widget small,
+  .portrait-profile-card small,
+  .portrait-profile-card em,
+  .portrait-welcome small,
+  .portrait-document > small,
+  .portrait-lab-log small,
+  .portrait-profile small,
+  .portrait-references small,
+  .portrait-root-list > header small,
+  .portrait-list button small,
+  .portrait-list button em,
+  .portrait-document dt,
+  .portrait-tags span,
+  .portrait-panel-actions button,
+  .portrait-panel-actions span,
+  .portrait-references > nav button,
+  .portrait-references footer {
+    font-size: var(--portrait-type-meta);
+  }
+
+  .portrait-notification-content > span:last-child > span,
+  .portrait-phone-widget p,
+  .portrait-home-apps button > span:last-child,
+  .portrait-log-overview > small,
+  .portrait-log-filters button,
+  .portrait-log-timeline article > header small,
+  .portrait-log-timeline article > header > span,
+  .portrait-references .portrait-citation,
+  .portrait-profile > header p {
+    font-size: var(--portrait-type-label);
+  }
+
+  .portrait-notification-content strong,
+  .portrait-phone-navbar > strong,
+  .portrait-list button strong {
+    font-size: var(--portrait-type-list-title);
+  }
+
+  .portrait-welcome p,
+  .portrait-document p,
+  .portrait-document dd,
+  .portrait-lab-log p,
+  .portrait-profile p,
+  .portrait-references p,
+  .portrait-profile a,
+  .portrait-profile > div section > small + strong {
+    font-size: var(--portrait-type-copy);
+  }
+
+  .portrait-lead,
+  .portrait-profile > header > strong,
+  .portrait-references blockquote {
+    font-size: var(--portrait-type-lead) !important;
+  }
+
+  .portrait-root-list > header h2 {
+    font-size: var(--portrait-type-screen-title);
+  }
+
+  .portrait-experience-list button strong,
+  .portrait-references h3 {
+    font-size: var(--portrait-type-section-title);
+  }
+
+  .portrait-log-overview > span {
+    font-size: var(--portrait-type-micro);
+  }
+
+  .portrait-log-timeline h2 {
+    font-size: clamp(19px,4vw,32px);
+  }
+
+  .portrait-log-timeline p {
+    font-size: clamp(9px,1.55vw,13px);
+  }
+
+  .portrait-phone-widget > div,
+  .portrait-phone-navbar > button {
+    font-size: clamp(9px,1.45vw,12px);
+  }
+
+  .portrait-phone-widget h1 {
+    font-size: clamp(37px,11vw,64px);
+  }
+
+  .portrait-phone-app.is-notes .portrait-phone-navbar > button {
+    font-size: clamp(15px,2.25vw,19px);
+  }
+
+  .portrait-phone-app.is-notes .portrait-phone-navbar > strong {
+    font-size: clamp(16px,2.5vw,21px);
+  }
+
+  .portrait-notes-access {
+    font-size: var(--portrait-type-label);
+  }
+
+  .portrait-notes-readonly strong {
+    font-size: clamp(9px,1.45vw,12px);
+  }
+
+  .portrait-notes-readonly small {
+    font-size: clamp(10px,1.6vw,13px);
+  }
+
+  .portrait-apple-note > header small {
+    font-size: clamp(11px,1.7vw,14px);
+  }
+
+  .portrait-apple-note > header h2 {
+    font-size: clamp(27px,8vw,46px);
+  }
+
+  .portrait-notes-body p {
+    font-size: clamp(15px,2.25vw,19px);
+  }
+
   @media (max-width: 340px), (max-height: 700px) {
     .portrait-phone-home {
       gap: 12px;

@@ -272,6 +272,10 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(phoneHomeContract, /display: grid[\s\S]*height: 100%[\s\S]*min-height: 0/);
   assert.match(phoneAppContract, /display: grid[\s\S]*grid-template-rows: auto minmax\(0,1fr\)[\s\S]*height: 100%/);
   assert.match(appContentContract, /min-height: 0[\s\S]*overflow-x: hidden[\s\S]*overflow-y: auto[\s\S]*overscroll-behavior: contain/);
+  assert.match(portraitCss, /Keep the phone shell fixed[\s\S]*\.portrait-computer-view \{[\s\S]*--portrait-type-meta: clamp\([\s\S]*--portrait-type-copy: clamp\([\s\S]*--portrait-type-screen-title: clamp\(/, "portrait Computer typography must scale independently of its unchanged phone shell");
+  assert.match(portraitCss, /\.portrait-welcome p,[\s\S]*\.portrait-document p,[\s\S]*\.portrait-profile p,[\s\S]*\.portrait-references p,[\s\S]*font-size: var\(--portrait-type-copy\)/, "all primary portrait Computer views must share responsive body copy");
+  assert.match(portraitCss, /\.portrait-experience-list button strong,[\s\S]*\.portrait-references h3 \{[\s\S]*font-size: var\(--portrait-type-section-title\)/, "portrait Computer lists and reference cards must scale their information hierarchy on tablets");
+  assert.match(portraitCss, /\.portrait-notes-body p \{[\s\S]*font-size: clamp\(15px,2\.25vw,19px\)/, "portrait Notes copy must grow on tablets without changing the Notes screen");
   assert.match(bulletinContract, /position: absolute[\s\S]*z-index: 20[\s\S]*border: 1px solid var\(--red\)[\s\S]*touch-action: pan-x/, "portrait notification must float above phone content and own its vertical swipe gesture");
   assert.match(bulletinMetaContract, /color: var\(--red\)/, "portrait notification metadata must retain the desktop warning color");
   assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
