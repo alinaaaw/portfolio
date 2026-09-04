@@ -3114,8 +3114,9 @@
   .portrait-phone-app-content > .portrait-references,
   .portrait-phone-app-content > .portrait-profile,
   .portrait-phone-app-content > .portrait-root-list {
-    width: min(100%,1040px);
-    margin-inline: auto;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
   }
 
   .portrait-ios-settings {
@@ -3260,26 +3261,22 @@
 
   .landscape-phone-rotate-arrow {
     position: absolute;
-    top: 15px;
-    left: 9px;
-    width: 77px;
-    height: 49px;
-    border: 1px solid transparent;
-    border-top-color: var(--cyan);
-    border-radius: 50%;
+    inset: 0;
+    width: 100px;
+    height: 82px;
+    overflow: visible;
+    fill: none;
+    stroke: var(--cyan);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+    transform-origin: 50% 50%;
     animation: rotatePhoneArrow 2.8s ease-in-out infinite;
   }
 
-  .landscape-phone-rotate-arrow::after {
-    content: "";
-    position: absolute;
-    top: -4px;
-    right: 1px;
-    width: 7px;
-    height: 7px;
-    border-top: 1px solid var(--cyan);
-    border-right: 1px solid var(--cyan);
-    transform: rotate(28deg);
+  .landscape-phone-rotate-arrow path {
+    stroke-dasharray: 128;
+    stroke-dashoffset: 0;
   }
 
   .landscape-phone-rotate small,
@@ -3314,8 +3311,8 @@
   }
 
   @keyframes rotatePhoneArrow {
-    0%,18%,100% { opacity: .25; transform: rotate(-12deg); }
-    48%,76% { opacity: 1; transform: rotate(28deg); }
+    0%,18%,100% { opacity: .25; transform: rotate(12deg); }
+    48%,76% { opacity: 1; transform: rotate(-12deg); }
   }
 }
 
