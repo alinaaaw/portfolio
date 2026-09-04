@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
-import { aspectOverflowDistanceScale } from "./cameraFraming";
+import { aspectOverflowDistanceScale, shortSideFitDistanceScale } from "./cameraFraming";
 
 const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
@@ -817,6 +817,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let pitch = 0;
     let isPortrait = false;
     let portraitDistanceScale = 1;
+    let landscapeTouchDistanceScale = 1;
     let frame = 0;
 
     const resize = () => {
@@ -824,7 +825,9 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       if(rect.width<2||rect.height<2)return;
       const nextAspect=rect.width/rect.height;
       isPortrait=rect.height>=rect.width;
+      const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
+      landscapeTouchDistanceScale=isCoarseLandscape?shortSideFitDistanceScale(rect.width,rect.height):1;
       booksZoneIndicator.position.z=zonePositions.books[2]+(isPortrait?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0);
       booksZoneRing.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_RING_SCALE:1);
       booksZoneHit.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1);
@@ -919,9 +922,10 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
         desiredPosition.z = isPortrait?defaultPosition.z:Math.cos(orbit)*11.5;
         desiredPosition.y += pitch*6-pointerY*.1;
         const desiredTarget=defaultTarget.clone().add(new THREE.Vector3(isPortrait?portraitPan+pointerX*.08:pointerX*.18,pitch*.75-pointerY*.05,0));
-        if(isPortrait){
-          const portraitOffset=desiredPosition.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale);
-          desiredPosition.copy(desiredTarget).add(portraitOffset);
+        const viewportDistanceScale=isPortrait?portraitDistanceScale:landscapeTouchDistanceScale;
+        if(viewportDistanceScale>1){
+          const fittedOffset=desiredPosition.clone().sub(desiredTarget).multiplyScalar(viewportDistanceScale);
+          desiredPosition.copy(desiredTarget).add(fittedOffset);
         }
         camera.position.lerp(desiredPosition,.035);
         currentTarget.lerp(desiredTarget,.04);

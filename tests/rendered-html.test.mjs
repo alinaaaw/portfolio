@@ -176,8 +176,9 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /camera\.aspect=nextAspect/);
   assert.match(game, /camera\.fov=43/);
   assert.match(game, /portraitDistanceScale=isPortrait\?Math\.min\(aspectOverflowDistanceScale\(nextAspect\),MAX_PORTRAIT_ROOM_DISTANCE_SCALE\):1/);
+  assert.match(game, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*landscapeTouchDistanceScale=isCoarseLandscape\?shortSideFitDistanceScale\(rect\.width,rect\.height\):1/, "coarse-pointer landscape rooms must fit their camera to the available short side");
   assert.match(game, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE/);
-  assert.match(game, /desiredPosition\.clone\(\)\.sub\(desiredTarget\)\.multiplyScalar\(portraitDistanceScale\)/);
+  assert.match(game, /viewportDistanceScale=isPortrait\?portraitDistanceScale:landscapeTouchDistanceScale[\s\S]*multiplyScalar\(viewportDistanceScale\)/);
   assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
   assert.match(game, /roomPanViewChangeRef\.current\(roomPanOrder\[nextIndex\]\)/, "portrait room swipes must snap between complete lateral views");
   assert.match(game, /booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+\(isPortrait\?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0\)/, "portrait room must bring the bookshelf indicator in front of the shelf");
@@ -190,6 +191,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /new ResizeObserver\(resize\)/);
   assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);
   assert.match(framing, /Math\.max\(1, IDEAL_LANDSCAPE_ASPECT \/ safeAspect\)/);
+  assert.match(framing, /shortSideFitDistanceScale[\s\S]*Math\.min\(width,height\)[\s\S]*referenceShortSide\/shortSide[\s\S]*maxScale/, "touch landscape fitting must scale continuously with the viewport short side and remain capped");
   assert.match(page, /<div className="computer-view computer-view-desktop"/);
   assert.match(page, /<PortraitComputerView computerWindows=\{computerWindows\} referenceFilter=\{referenceFilter\} bulletin=\{bulletin\}/);
   assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onOpenRoot=\{openPortraitComputerRoot\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onBack=\{backPortraitComputer\}[\s\S]*onOpenReferences=\{openReferences\}/);
@@ -227,7 +229,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
     assert.match(page, new RegExp(`className=\"tactile-scene\"[\\s\\S]{0,900}<ZoneCloseup3D zone=\"${zone}\"`), `${zone} must render inside the sized tactile closeup container`);
   }
 
-  assert.match(closeups, /closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/portraitDistanceScale/, "portrait closeups must compensate fog when the camera moves back to fit their width");
+  assert.match(closeups, /closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "portrait and coarse-pointer landscape closeups must compensate fog when the camera moves back to fit the viewport");
   assert.match(closeups, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE/, "portrait closeups must retain readable exposure without changing desktop rendering");
 
   const declarationsFor = (selector) => {
@@ -356,6 +358,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(siteCss, /@media \(orientation: landscape\) and \(pointer: coarse\) \{[\s\S]*\.mobile-scene-hotspots[\s\S]*\.mobile-scene-hotspot-coach/, "landscape hotspot styling must be isolated to coarse pointers");
   assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
   assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
+  assert.match(closeups, /landscapeTouchDistanceScale=isCoarseLandscape\?shortSideFitDistanceScale\(rect\.width,rect\.height\):1[\s\S]*closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "coarse-pointer landscape closeups must fit their camera and compensate fog together");
   assert.match(closeups, /isHitAvailable=\(hit:HitMesh\)=>\(!hit\.userData\.requiresOpen\|\|\(drawerTarget>\.5&&drawerProgress>\.72\)\)/, "drawer contents must stop accepting taps as soon as the drawer starts closing");
   assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(closeups, /camera\.aspect=nextAspect/);
@@ -363,6 +366,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
   assert.match(closeups, /sceneCenterShiftX=zone==="books"\?-PORTRAIT_BOOKS_CENTER_X_OFFSET:zone==="notebook"\?PORTRAIT_NOTEBOOK_CENTER_X_OFFSET:0[\s\S]*desired\.x\+=sceneCenterShiftX[\s\S]*desiredTarget\.x\+=sceneCenterShiftX/, "portrait shelf and notebook closeups must use isolated horizontal framing offsets");
   assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*sceneDistanceScale=zone==="books"\?PORTRAIT_BOOKS_DISTANCE_SCALE:1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerDistanceScale\*sceneDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/, "portrait bookshelf can move closer without changing the framing of other closeups");
+  assert.match(closeups, /else if\(landscapeTouchDistanceScale>1\)\{[\s\S]*multiplyScalar\(landscapeTouchDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(fittedOffset\)/, "landscape touch fitting must not reuse portrait-only scene offsets");
   assert.match(closeups, /drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET\*drawerProgress[\s\S]*desired\.x-=drawerCenterShift[\s\S]*desiredTarget\.x-=drawerCenterShift/, "portrait drawer framing must center the open tray without changing desktop framing");
   assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
 });
