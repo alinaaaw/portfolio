@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_SC, Space_Mono } from "next/font/google";
 import { site } from "@/content";
 import "../public/site.css";
+import "../public/portrait.css";
 
 const publicOrigin = "https://alinawu.com";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 const sans = Noto_Sans_SC({
   variable: "--font-sans",

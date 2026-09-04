@@ -17,6 +17,7 @@
     "returnToRoom": "RETURN TO ROOM ×",
     "close": "×",
     "arrow": "→",
-    "comingSoon": "COMING SOON"
+    "comingSoon": "COMING SOON",
+    "touchHotspotHint": "TAP MARKERS TO INSPECT OBJECTS"
   }
 }

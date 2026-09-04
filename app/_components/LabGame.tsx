@@ -5,9 +5,25 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { aspectOverflowDistanceScale, touchViewportFitDistanceScale } from "./cameraFraming";
+
+const DEFAULT_ROOM_EXPOSURE = .92;
+const PORTRAIT_ROOM_EXPOSURE = 1.08;
+const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
+const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
+const BOOKS_ZONE_FRONT_OFFSET = .61;
+const TOUCH_BOOKS_ZONE_HIT_SCALE = 1.35;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
+export type RoomPanView = "left" | "center" | "right";
 type SceneTargetId = ZoneId | "printer";
+
+const roomPanOffsets: Record<RoomPanView,number> = {
+  left: -PORTRAIT_ROOM_VIEW_OFFSET,
+  center: 0,
+  right: PORTRAIT_ROOM_VIEW_OFFSET,
+};
+const roomPanOrder: RoomPanView[] = ["left","center","right"];
 
 type LabGameProps = {
   active: boolean;
@@ -15,6 +31,8 @@ type LabGameProps = {
   discovered: ZoneId[];
   faxReady: boolean;
   faxPrinted: boolean;
+  roomPanView: RoomPanView;
+  onRoomPanViewChange: (view: RoomPanView) => void;
   onHover: (zone: ZoneId | null) => void;
   onInspect: (zone: ZoneId) => void;
   onPrinterInspect: () => void;
@@ -125,17 +143,20 @@ function addZone(scene: THREE.Scene, zone: ZoneId, targets: ZoneTarget[]) {
     material(palette.signal,.28,.2,palette.signal,1.5),
   );
   ring.rotation.x = Math.PI/2;
+  ring.userData.interactionOverlay = true;
   group.add(ring);
   const hit = new THREE.Mesh(
     new THREE.SphereGeometry(.68,16,12),
     new THREE.MeshBasicMaterial({ transparent:true,opacity:0,depthWrite:false }),
   ) as ZoneTarget;
   hit.userData.zone = zone;
+  hit.userData.interactionOverlay = true;
   group.add(hit);
   const label = makeLabel(zoneLabels[zone]);
   label.position.y = .72;
   group.add(label);
   group.position.set(x,y,z);
+  group.name = `zone-indicator-${zone}`;
   scene.add(group);
   targets.push(hit);
   return group;
@@ -701,13 +722,15 @@ function buildRoom(scene: THREE.Scene, targets: ZoneTarget[]) {
   (Object.keys(zonePositions) as ZoneId[]).forEach((zone) => addZone(scene,zone,targets));
 }
 
-export default function LabGame({ active, viewing, discovered, faxReady, faxPrinted, onHover, onInspect, onPrinterInspect }: LabGameProps) {
+export default function LabGame({ active, viewing, discovered, faxReady, faxPrinted, roomPanView, onRoomPanViewChange, onHover, onInspect, onPrinterInspect }: LabGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRef = useRef(active);
   const viewingRef = useRef(viewing);
   const discoveredRef = useRef(discovered);
   const faxReadyRef = useRef(faxReady);
   const faxPrintedRef = useRef(faxPrinted);
+  const roomPanViewRef = useRef(roomPanView);
+  const roomPanViewChangeRef = useRef(onRoomPanViewChange);
   const inspectRef = useRef(onInspect);
   const printerInspectRef = useRef(onPrinterInspect);
 
@@ -716,6 +739,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
   useEffect(() => { discoveredRef.current = discovered; },[discovered]);
   useEffect(() => { faxReadyRef.current = faxReady; },[faxReady]);
   useEffect(() => { faxPrintedRef.current = faxPrinted; },[faxPrinted]);
+  useEffect(() => { roomPanViewRef.current = roomPanView; },[roomPanView]);
+  useEffect(() => { roomPanViewChangeRef.current = onRoomPanViewChange; },[onRoomPanViewChange]);
   useEffect(() => { inspectRef.current = onInspect; },[onInspect]);
   useEffect(() => { printerInspectRef.current = onPrinterInspect; },[onPrinterInspect]);
 
@@ -726,7 +751,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.65));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = .92;
+    renderer.toneMappingExposure = DEFAULT_ROOM_EXPOSURE;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const scene = new THREE.Scene();
@@ -739,6 +764,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const currentTarget = defaultTarget.clone();
     const targets: ZoneTarget[] = [];
     buildRoom(scene,targets);
+    const booksZoneIndicator=scene.getObjectByName("zone-indicator-books") as THREE.Group;
+    const booksZoneHit=booksZoneIndicator.children[1] as THREE.Mesh;
 
     scene.add(new THREE.HemisphereLight(0x71918b,0x080c0b,.72));
     const key = new THREE.DirectionalLight(0xffd29c,2.7);
@@ -762,7 +789,11 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     workLight.target.position.set(3.7,1.3,-1.6);
     scene.add(cyan,warm,boardLight,boardLight.target,workLight,workLight.target);
     scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
+      if (object instanceof THREE.Mesh) {
+        const isInteractionOverlay=object.userData.interactionOverlay===true;
+        object.castShadow=!isInteractionOverlay;
+        object.receiveShadow=!isInteractionOverlay;
+      }
     });
 
     const pointer = new THREE.Vector2(5,5);
@@ -778,14 +809,30 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let dragStartY = 0;
     let dragOrbit = 0;
     let dragPitch = 0;
+    let portraitDragOffset = 0;
+    let portraitPointerZone: SceneTargetId | null = null;
     let orbit = 0;
     let pitch = 0;
+    let isPortrait = false;
+    let portraitDistanceScale = 1;
+    let landscapeTouchDistanceScale = 1;
     let frame = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
-      camera.aspect = Math.max(1,rect.width)/Math.max(1,rect.height);
+      if(rect.width<2||rect.height<2)return;
+      const nextAspect=rect.width/rect.height;
+      isPortrait=rect.height>=rect.width;
+      const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches;
+      const usesTouchBooksIndicator=isPortrait||isCoarseLandscape;
+      portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
+      landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1;
+      booksZoneIndicator.position.z=zonePositions.books[2]+BOOKS_ZONE_FRONT_OFFSET;
+      booksZoneHit.scale.setScalar(usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_HIT_SCALE:1);
+      renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
+      renderer.setSize(rect.width,rect.height,false);
+      camera.aspect=nextAspect;
+      camera.fov=43;
       camera.updateProjectionMatrix();
     };
     const observer = new ResizeObserver(resize);
@@ -806,14 +853,26 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       const zone = readPointer(event);
       if (zone !== hovered) { hovered = zone; onHover(zone==="printer"?null:zone); }
       if (dragging) {
-        orbit = THREE.MathUtils.clamp(dragOrbit-(event.clientX-dragStartX)*.0025,-.42,.42);
-        pitch = THREE.MathUtils.clamp(dragPitch+(event.clientY-dragStartY)*.003,-.22,.26);
+        if(isPortrait){
+          const rect=canvas.getBoundingClientRect();
+          portraitDragOffset=THREE.MathUtils.clamp(-(event.clientX-dragStartX)/rect.width*PORTRAIT_ROOM_VIEW_OFFSET,-PORTRAIT_ROOM_VIEW_OFFSET,PORTRAIT_ROOM_VIEW_OFFSET);
+        }else{
+          orbit = THREE.MathUtils.clamp(dragOrbit-(event.clientX-dragStartX)*.0025,-.42,.42);
+          pitch = THREE.MathUtils.clamp(dragPitch+(event.clientY-dragStartY)*.003,-.22,.26);
+        }
       }
       canvas.style.cursor = zone ? "pointer" : dragging ? "grabbing" : "grab";
     };
     const pointerDown = (event: PointerEvent) => {
       const zone = readPointer(event);
-      if (zone && activeRef.current) {
+      if(isPortrait){
+        dragging = true;
+        portraitPointerZone = zone;
+        portraitDragOffset = 0;
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+        canvas.setPointerCapture(event.pointerId);
+      }else if (zone && activeRef.current) {
         requested = zone;
         requestStarted = performance.now();
         requestDelivered = false;
@@ -827,6 +886,23 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       }
     };
     const pointerUp = (event: PointerEvent) => {
+      if(isPortrait&&dragging){
+        const deltaX=event.clientX-dragStartX;
+        const deltaY=event.clientY-dragStartY;
+        const isTap=Math.hypot(deltaX,deltaY)<12;
+        if(isTap&&portraitPointerZone&&activeRef.current){
+          requested=portraitPointerZone;
+          requestStarted=performance.now();
+          requestDelivered=false;
+        }else if(Math.abs(deltaX)>32){
+          const currentIndex=roomPanOrder.indexOf(roomPanViewRef.current);
+          const direction=deltaX<0?1:-1;
+          const nextIndex=THREE.MathUtils.clamp(currentIndex+direction,0,roomPanOrder.length-1);
+          roomPanViewChangeRef.current(roomPanOrder[nextIndex]);
+        }
+        portraitDragOffset=0;
+        portraitPointerZone=null;
+      }
       dragging = false;
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     };
@@ -839,11 +915,18 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     const tick = (now: number) => {
       if (viewingRef.current === null && !requested) {
         const desiredPosition = defaultPosition.clone();
-        desiredPosition.x = Math.sin(orbit)*11.5 + pointerX*.18;
-        desiredPosition.z = Math.cos(orbit)*11.5;
+        const portraitPan=roomPanOffsets[roomPanViewRef.current]+portraitDragOffset;
+        desiredPosition.x = isPortrait?portraitPan+pointerX*.08:Math.sin(orbit)*11.5+pointerX*.18;
+        desiredPosition.z = isPortrait?defaultPosition.z:Math.cos(orbit)*11.5;
         desiredPosition.y += pitch*6-pointerY*.1;
+        const desiredTarget=defaultTarget.clone().add(new THREE.Vector3(isPortrait?portraitPan+pointerX*.08:pointerX*.18,pitch*.75-pointerY*.05,0));
+        const viewportDistanceScale=isPortrait?portraitDistanceScale:landscapeTouchDistanceScale;
+        if(viewportDistanceScale>1){
+          const fittedOffset=desiredPosition.clone().sub(desiredTarget).multiplyScalar(viewportDistanceScale);
+          desiredPosition.copy(desiredTarget).add(fittedOffset);
+        }
         camera.position.lerp(desiredPosition,.035);
-        currentTarget.lerp(defaultTarget.clone().add(new THREE.Vector3(pointerX*.18,pitch*.75-pointerY*.05,0)),.04);
+        currentTarget.lerp(desiredTarget,.04);
       }
       if (requested) {
         const pose = cameraPoses[requested];

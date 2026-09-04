@@ -181,6 +181,229 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /fax-reading/);
 });
 
+test("portrait room, computer, and closeup sizing stay isolated from desktop architecture", async () => {
+  const [layout, page, game, closeups, framing, portraitComputer, siteCss, portraitCss] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/LabGame.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/ZoneCloseup3D.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/cameraFraming.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/_components/PortraitComputerView.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../public/site.css", import.meta.url), "utf8"),
+    readFile(new URL("../public/portrait.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.ok(layout.indexOf('import "../public/site.css"') < layout.indexOf('import "../public/portrait.css"'), "portrait overrides must load after the shared stylesheet");
+  assert.match(layout, /viewportFit: "cover"/);
+  assert.match(portraitCss.trim(), /^@media \(orientation: portrait\) \{/);
+  assert.equal((portraitCss.match(/@media \(orientation: portrait\)/g) ?? []).length, 1, "portrait styling must have one explicit isolation boundary");
+  assert.equal((page.match(/<LabGame\b/g) ?? []).length, 1, "the room must keep one LabGame instance");
+  assert.equal((game.match(/<canvas\b/g) ?? []).length, 1, "LabGame must keep one WebGL canvas");
+  assert.match(game, /if\(rect\.width<2\|\|rect\.height<2\)return/);
+  assert.match(game, /const nextAspect=rect\.width\/rect\.height/);
+  assert.match(game, /isPortrait=rect\.height>=rect\.width/);
+  assert.match(game, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
+  assert.match(game, /camera\.aspect=nextAspect/);
+  assert.match(game, /camera\.fov=43/);
+  assert.match(game, /portraitDistanceScale=isPortrait\?Math\.min\(aspectOverflowDistanceScale\(nextAspect\),MAX_PORTRAIT_ROOM_DISTANCE_SCALE\):1/);
+  assert.match(game, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*landscapeTouchDistanceScale=isCoarseLandscape\?touchViewportFitDistanceScale\(rect\.width,rect\.height,nextAspect\):1/, "coarse-pointer landscape rooms must fit their camera to both viewport dimensions");
+  assert.match(game, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE/);
+  assert.match(game, /viewportDistanceScale=isPortrait\?portraitDistanceScale:landscapeTouchDistanceScale[\s\S]*multiplyScalar\(viewportDistanceScale\)/);
+  assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
+  assert.match(game, /roomPanViewChangeRef\.current\(roomPanOrder\[nextIndex\]\)/, "portrait room swipes must snap between complete lateral views");
+  assert.match(game, /booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+BOOKS_ZONE_FRONT_OFFSET/, "all room layouts must keep the bookshelf indicator visibly inset at the front of the shelf");
+  assert.doesNotMatch(game, /booksZoneRing\.rotation\.x=/, "portrait bookshelf indicator must retain its original orientation");
+  assert.match(game, /booksZoneHit\.scale\.setScalar\(usesTouchBooksIndicator\?TOUCH_BOOKS_ZONE_HIT_SCALE:1\)/, "touch bookshelf must have a larger target in both orientations");
+  assert.doesNotMatch(game, /BOOKS_ZONE_RING_SCALE|booksZoneRingScale/, "bookshelf indicator must use the same visible scale as the other room markers");
+  assert.match(game, /ring\.userData\.interactionOverlay = true/);
+  assert.match(game, /hit\.userData\.interactionOverlay = true/);
+  assert.match(game, /object\.castShadow=!isInteractionOverlay/, "room interaction overlays must never cast geometry-shaped shadows");
+  assert.doesNotMatch(game, /portraitPosition|portraitTarget|camera\.fov\s*=\s*isPortrait\s*\?/);
+  assert.match(game, /new ResizeObserver\(resize\)/);
+  assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);
+  assert.match(framing, /Math\.max\(1, IDEAL_LANDSCAPE_ASPECT \/ safeAspect\)/);
+  assert.match(framing, /shortSideFitDistanceScale[\s\S]*Math\.min\(width,height\)[\s\S]*referenceShortSide\/shortSide[\s\S]*maxScale/, "touch landscape fitting must scale continuously with the viewport short side and remain capped");
+  assert.match(framing, /touchViewportFitDistanceScale[\s\S]*Math\.max\(aspectOverflowDistanceScale\(aspect\),shortSideFitDistanceScale\(width,height\)\)/, "touch landscape fitting must choose the larger horizontal or short-side distance requirement");
+  assert.match(page, /<div className="computer-view computer-view-desktop"/);
+  assert.match(page, /<PortraitComputerView computerWindows=\{computerWindows\} referenceFilter=\{referenceFilter\} bulletin=\{bulletin\}/);
+  assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onOpenRoot=\{openPortraitComputerRoot\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onBack=\{backPortraitComputer\}[\s\S]*onOpenReferences=\{openReferences\}/);
+  assert.match(page, /setComputerWindows\(file==="desktop"\?\[\]:\[file\]\)/, "portrait apps must replace desktop window stacking with top-level phone destinations");
+  assert.doesNotMatch(page, /computerViewRef|computerOsRef|--computer-scale|--computer-layout-(?:width|height)|scrollWidth/);
+  assert.doesNotMatch(page, /className="computer-os"/);
+  assert.match(siteCss, /\.portrait-computer-view \{ display: none; \}/);
+  assert.match(portraitCss, /\.computer-view-desktop \{\s*display: none/);
+  assert.match(portraitCss, /\.portrait-computer-view \{[\s\S]*display: grid;[\s\S]*height: 100svh;[\s\S]*height: 100dvh;[\s\S]*overflow: hidden/);
+  assert.doesNotMatch(`${portraitComputer}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/, "portrait Computer must not return to whole-interface scaling");
+  assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
+  assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
+  assert.match(page, /portraitExploreOpen[\s\S]*className="portrait-explore-launcher"[\s\S]*aria-expanded=\{portraitExploreOpen\}[\s\S]*className="portrait-explore-backdrop"[\s\S]*is-portrait-open/, "portrait room navigation must open as a dismissible bottom sheet");
+  assert.match(page, /showRoomPanHint&&<div className="room-pan-hint"[\s\S]*portraitPanHint/, "portrait room must explain the horizontal swipe gesture without permanent view controls");
+  assert.match(page, /setRoomPanView\(view\);\s*setShowRoomPanHint\(false\)/, "the swipe hint must dismiss after the visitor changes the room view");
+  assert.doesNotMatch(page, /room-pan-nav|Show \$\{view\} side of the room/);
+  assert.match(siteCss, /\.room-pan-hint \{ display: none; \}/, "room pan hint must remain hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-entered \.room-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
+  assert.match(siteCss, /\.portrait-explore-launcher[^}]*display: none/, "portrait explorer controls must remain absent from desktop layout");
+  assert.match(portraitCss, /\.room-entered \.explore-dock \{[\s\S]*display: grid[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)[\s\S]*overflow: hidden[\s\S]*visibility: hidden/);
+  assert.doesNotMatch(portraitCss, /\.room-entered \.explore-dock \{[^}]*overflow-x: auto/, "portrait room navigation must not compete with room panning through horizontal scrolling");
+  assert.match(page, /PORTRAIT_MAP_INITIAL_ZOOM[\s\S]*portraitMapInitializedRef[\s\S]*sheet\.clientHeight>=sheet\.clientWidth[\s\S]*camera\.zoom<PORTRAIT_MAP_INITIAL_ZOOM/, "portrait travel map must open closer without changing its desktop camera");
+  assert.match(page, /setShowMapPanHint\(false\)[\s\S]*className="field-map-pan-hint"[\s\S]*fieldCaseContent\.mapPortraitPanHint/, "portrait travel map must explain horizontal dragging until the visitor uses it");
+  assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");
+  assert.match(portraitCss, /\.room-shell \.field-detail \{[\s\S]*padding: 14px/, "portrait map closeup must leave space around every edge");
+  assert.match(portraitCss, /\.room-shell \.field-map-reading \{[\s\S]*width: min\(100%,calc\(\(100dvh - 128px\)\*\.7\)\);[\s\S]*height: auto;[\s\S]*aspect-ratio:[\s\S]*border: 1px solid #8a7453/, "portrait map must remain a proportioned framed sheet inside its inset closeup");
+  assert.match(portraitCss, /@media \(max-width: 620px\) \{[\s\S]*\.room-shell \.field-map-reading \{[\s\S]*width: min\(100%,calc\(\(100dvh - 96px\)\*\.65\)\)[\s\S]*aspect-ratio: \.65[\s\S]*\.room-shell \.field-map-memory \{[\s\S]*height: min\([^}]*calc\(100% - 96px\)[\s\S]*max-height: calc\(100% - 96px\)/, "phone map sheets must grow slightly longer while photo memories preserve visible map space around them");
+  assert.doesNotMatch(portraitCss, /\.room-shell \.field-map-reading \{[^}]*border-radius/, "the map paper must retain square corners");
+  assert.match(portraitCss, /\.room-shell \.field-map-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
+  for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
+    assert.match(page, new RegExp(`active===\\"${zone}\\"`), `${zone} must retain its existing closeup branch`);
+  }
+
+  for (const zone of ["books", "drawer", "notebook", "board", "fieldcase", "printer", "contact"]) {
+    assert.match(page, new RegExp(`className=\"tactile-scene\"[\\s\\S]{0,900}<ZoneCloseup3D zone=\"${zone}\"`), `${zone} must render inside the sized tactile closeup container`);
+  }
+
+  assert.match(closeups, /closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "portrait and coarse-pointer landscape closeups must compensate fog when the camera moves back to fit the viewport");
+  assert.match(closeups, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE/, "portrait closeups must retain readable exposure without changing desktop rendering");
+
+  const declarationsFor = (selector) => {
+    const start = portraitCss.indexOf(`${selector} {`);
+    assert.notEqual(start, -1, `${selector} must have an explicit portrait sizing contract`);
+    return portraitCss.slice(start, portraitCss.indexOf("}", start));
+  };
+  const layerContract = declarationsFor(".room-shell > .modal-layer.tactile-layer");
+  const sceneContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene");
+  const stageContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene");
+  const canvasContract = declarationsFor(".room-shell > .modal-layer.tactile-layer > .tactile-scene > .model-scene > canvas");
+  assert.match(layerContract, /display: grid[\s\S]*grid-template-columns: minmax\(0,1fr\)[\s\S]*grid-template-rows: minmax\(0,1fr\)[\s\S]*place-items: stretch/);
+  assert.match(layerContract, /height: 100svh[\s\S]*height: 100dvh[\s\S]*min-height: 0/);
+  assert.match(sceneContract, /place-self: stretch[\s\S]*width: auto[\s\S]*height: auto[\s\S]*min-width: 0[\s\S]*min-height: 0[\s\S]*max-height: none/);
+  assert.match(stageContract, /inset: 58px 0 0[\s\S]*height: auto[\s\S]*min-height: 1px/);
+  assert.match(canvasContract, /display: block[\s\S]*width: 100%[\s\S]*height: 100%[\s\S]*min-height: 1px/);
+  const phoneStageContract = declarationsFor(".portrait-phone-stage");
+  const phoneHomeContract = declarationsFor(".portrait-phone-home");
+  const phoneAppContract = declarationsFor(".portrait-phone-app");
+  const appContentContract = declarationsFor(".portrait-phone-app-content");
+  const bulletinContract = declarationsFor(".portrait-phone-notification");
+  const bulletinMetaContract = declarationsFor(".portrait-notification-content small");
+  const referenceHeaderMetaContract = declarationsFor(".portrait-references > header small");
+  const referenceArticleMetaContract = declarationsFor(".portrait-references article > small");
+  const notebookScrollContract = declarationsFor(".room-shell .notebook-scroll");
+  const notebookPaperContract = declarationsFor(".room-shell .model-detail .notebook-closeup");
+  const notebookMarginContract = declarationsFor(".room-shell .model-detail .notebook-closeup::before");
+  const notebookReturnContract = declarationsFor(".room-shell .notebook-closeup .paper-return-control");
+  const drawerPaperContract = declarationsFor(".room-shell .drawer-document-paper");
+  const drawerReturnContract = declarationsFor(".room-shell .drawer-document-return");
+  const drawerReturnHitContract = declarationsFor(".room-shell .drawer-document-return::before");
+  const drawerArticleContract = declarationsFor(".room-shell .drawer-document article");
+  const boardCardContract = declarationsFor(".room-shell .evidence-card.note-card");
+  const faxPaperContract = declarationsFor(".room-shell .fax-reading-paper");
+  const faxScrollContract = declarationsFor(".room-shell .fax-reading-scroll");
+  const faxTitleContract = declarationsFor(".room-shell .fax-reading-paper h2");
+  const faxCopyContract = declarationsFor(".room-shell .fax-reading-paper p");
+  const faxMetaContract = declarationsFor(".room-shell .fax-reading-paper small");
+  const faxSignatureContract = declarationsFor(".room-shell .fax-reading-scroll > strong");
+  const faxFooterContract = declarationsFor(".room-shell .fax-reading-paper footer");
+  assert.match(phoneStageContract, /grid-row: 2[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
+  assert.match(phoneHomeContract, /display: grid[\s\S]*height: 100%[\s\S]*min-height: 0/);
+  assert.match(phoneAppContract, /display: grid[\s\S]*grid-template-rows: auto minmax\(0,1fr\)[\s\S]*height: 100%/);
+  assert.match(appContentContract, /min-height: 0[\s\S]*overflow-x: hidden[\s\S]*overflow-y: auto[\s\S]*overscroll-behavior: contain/);
+  assert.match(portraitCss, /Keep the phone shell fixed[\s\S]*\.portrait-computer-view \{[\s\S]*--portrait-type-meta: clamp\([\s\S]*--portrait-type-copy: clamp\([\s\S]*--portrait-type-screen-title: clamp\(/, "portrait Computer typography must scale independently of its unchanged phone shell");
+  assert.match(portraitCss, /\.portrait-welcome p,[\s\S]*\.portrait-document p,[\s\S]*\.portrait-profile p,[\s\S]*\.portrait-references p,[\s\S]*font-size: var\(--portrait-type-copy\)/, "all primary portrait Computer views must share responsive body copy");
+  assert.match(portraitCss, /\.portrait-experience-list button strong,[\s\S]*\.portrait-references h3 \{[\s\S]*font-size: var\(--portrait-type-section-title\)/, "portrait Computer lists and reference cards must scale their information hierarchy on tablets");
+  assert.match(portraitCss, /\.portrait-notes-body p \{[\s\S]*font-size: clamp\(15px,2\.25vw,19px\)/, "portrait Notes copy must grow on tablets without changing the Notes screen");
+  assert.match(bulletinContract, /position: absolute[\s\S]*z-index: 20[\s\S]*border: 1px solid var\(--red\)[\s\S]*touch-action: pan-x/, "portrait notification must float above phone content and own its vertical swipe gesture");
+  assert.match(bulletinMetaContract, /color: var\(--red\)/, "portrait notification metadata must retain the desktop warning color");
+  assert.match(referenceHeaderMetaContract, /color: var\(--cyan\)/, "reference header metadata must retain its dark-surface contrast");
+  assert.match(referenceArticleMetaContract, /color: #a44235/, "reference card metadata must retain its light-paper contrast");
+  assert.match(notebookScrollContract, /overflow-y: auto[\s\S]*overscroll-behavior: contain[\s\S]*touch-action: pan-y[\s\S]*padding-bottom:/, "portrait notebook paper must scroll without hiding its final lines beneath the return control");
+  assert.match(notebookPaperContract, /--portrait-notebook-rule: clamp\([\s\S]*width: min\(88vw,\d+px,calc\(\(100dvh - 96px\)\*\.79\)\)[\s\S]*max-width: none[\s\S]*aspect-ratio: \.79[\s\S]*background-repeat: repeat-y,no-repeat[\s\S]*background-size:[\s\S]*var\(--portrait-notebook-rule\)/, "portrait notebook papers must keep their established ratio at a responsive tablet cap while their rules scale continuously from the top edge");
+  assert.match(notebookMarginContract, /position: absolute[\s\S]*top: 0[\s\S]*bottom: 0[\s\S]*left: 10%[\s\S]*width: 1px/, "portrait notebook paper must render one uninterrupted margin line from top to bottom");
+  assert.match(portraitCss, /\.room-shell \.notebook-closeup p,\s*\.room-shell \.notebook-process li,\s*\.room-shell \.notebook-closeup blockquote \{[^}]*font-size: clamp\([^}]*line-height: var\(--portrait-notebook-rule\)/, "portrait notebook copy must scale with its ruled paper");
+  assert.match(notebookReturnContract, /min-height: 0[\s\S]*padding:[\s\S]*font-size:/, "phone-sized portrait notebooks must retain a compact visible return control");
+  assert.match(portraitCss, /@media \(min-width: 621px\) \{[\s\S]*\.room-shell \.notebook-closeup \.paper-return-control \{[\s\S]*min-height: clamp\([\s\S]*padding: clamp\([\s\S]*font-size: clamp\(/, "tablet-sized portrait notebooks must enlarge the return control independently from phones");
+  assert.match(portraitCss, /@media \(min-width: 520px\) and \(min-height: 700px\) \{[\s\S]*\.room-shell \.notebook-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy portrait notebooks, including a 540 by 720 viewport, must show their full page without an unnecessary inner scroller");
+  assert.match(drawerPaperContract, /width: min\(88vw,\d+px,calc\(\(100dvh - 112px\)\*\.78\)\)[\s\S]*aspect-ratio: \.78[\s\S]*max-width: none/, "portrait drawer documents must keep their paper ratio while respecting a tablet-sized cap");
+  assert.match(drawerReturnContract, /top:[\s\S]*right:[\s\S]*padding:[\s\S]*font-size:/, "phone-sized portrait drawer documents must use a compact visible return control");
+  assert.match(drawerReturnHitContract, /position: absolute[\s\S]*inset: -10px/, "the compact drawer return control must retain an expanded touch target");
+  assert.match(portraitCss, /@media \(min-width: 621px\) \{[\s\S]*\.room-shell \.drawer-document-return \{[\s\S]*font-size: 9px/, "tablet-sized portrait drawer documents must preserve their larger return control");
+  assert.match(portraitCss, /@media \(min-width: 621px\) \{[\s\S]*\.room-shell \.drawer-document-paper \{[\s\S]*width: min\(90vw,[\s\S]*\.room-shell \.drawer-document article \{[\s\S]*padding: clamp\(/, "tablet-sized portrait drawer documents must use the available paper area with compact content spacing");
+  assert.match(portraitCss, /@media \(min-width: 700px\) and \(min-height: 900px\) \{[\s\S]*\.room-shell \.drawer-document article \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy iPad-sized drawer documents must show their full content without an inner scroller");
+  assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
+  assert.match(boardCardContract, /width: min\(86vw,560px,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: 330px[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: auto/, "portrait board cards must respond to the viewport while staying compact enough for their short content");
+  assert.match(faxPaperContract, /width: min\(88vw,520px,calc\(\(100dvh - 96px\)\*\.72\)\)[\s\S]*height: auto[\s\S]*max-height: none[\s\S]*aspect-ratio: \.72/, "portrait fax reports must keep a paper-like ratio with a compact tablet cap");
+  assert.match(faxScrollContract, /height: 100%[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y[\s\S]*padding: clamp\(/, "phone fax reports must retain overflow protection while their content spacing scales with the paper");
+  for (const contract of [faxTitleContract, faxCopyContract, faxMetaContract, faxSignatureContract, faxFooterContract]) {
+    assert.match(contract, /font-size: clamp\(/, "every portrait fax text tier must scale continuously with the viewport");
+  }
+  assert.match(portraitCss, /@media \(min-width: 520px\) and \(min-height: 700px\) \{[\s\S]*\.room-shell \.fax-reading-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy portrait fax reports, including a 540 by 720 viewport, must show their fitted content without an inner scroller");
+  assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
+  assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
+  assert.match(portraitCss, /\.portrait-phone-systembar button \{[\s\S]*height: 44px/);
+  assert.match(portraitComputer, /from "@\/content"/);
+  assert.match(portraitComputer, /const activeWindow=computerWindows\.at\(-1\)\?\?null/);
+  assert.match(portraitComputer, /const canGoBack=[\s\S]*computerWindows\.length>1/);
+  assert.match(portraitComputer, /className="portrait-phone-statusbar"[\s\S]*className="portrait-room-return"[\s\S]*onClick=\{onLeave\}/);
+  assert.match(portraitComputer, /className="portrait-home-apps"[\s\S]*PhoneAppIcon kind="profile"[\s\S]*PhoneAppIcon kind="notes"[\s\S]*PhoneAppIcon kind="experience"/);
+  assert.match(portraitComputer, /className="portrait-phone-dock"[\s\S]*PhoneAppIcon kind="projects"[\s\S]*PhoneAppIcon kind="references"[\s\S]*PhoneAppIcon kind="lablog"/);
+  assert.match(portraitComputer, /className="portrait-phone-navbar"[\s\S]*onClick=\{canGoBack\?onBack:\(\)=>onOpenRoot\("desktop"\)\}/);
+  assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
+  assert.match(portraitComputer, /notesOpen=activeWindow==="readme"[\s\S]*is-notes-active/);
+  assert.match(portraitComputer, /className="portrait-document portrait-apple-note"[\s\S]*computerContent\.readme\.mobileMeta[\s\S]*computerContent\.readme\.mobileTitle[\s\S]*className="portrait-notes-toolbar"/, "portrait Notes must use a dedicated phone-native note surface");
+  assert.match(portraitComputer, /className=\{notesOpen\?"portrait-notes-access":""\}[\s\S]*computerContent\.readme\.mobileAccess/, "portrait Notes must identify the shared note as view only");
+  assert.match(portraitComputer, /className="portrait-notes-readonly"[\s\S]*NotesToolIcon kind="lock"[\s\S]*computerContent\.readme\.mobileReadOnly/);
+  assert.match(portraitComputer, /className="portrait-notes-tools"[\s\S]*notesTools\.map[\s\S]*disabled[\s\S]*NotesToolIcon kind=\{tool\.kind\}/, "unavailable note tools must be honest disabled controls");
+  assert.match(portraitComputer, /viewBox="0 0 24 24"/, "note toolbar artwork must share one centered SVG coordinate system");
+  assert.doesNotMatch(portraitComputer, /portrait-notes-nav-actions|portrait-notes-toolbar" aria-hidden/, "note controls must not masquerade as decorative actions");
+  assert.match(portraitCss, /\.portrait-apple-note \{[\s\S]*display: grid;[\s\S]*background: #fbfaf6/);
+  assert.match(portraitCss, /\.portrait-notes-toolbar \{[\s\S]*position: sticky;[\s\S]*bottom: 0/);
+  assert.match(portraitCss, /\.portrait-notes-tools button \{[\s\S]*display: grid;[\s\S]*place-items: center/);
+  assert.match(portraitCss, /\.portrait-notes-tools svg \{[\s\S]*width: 24px;[\s\S]*height: 24px/);
+  assert.match(page, /computerContent\.readme\.meta[\s\S]*computerContent\.readme\.title/, "desktop README must keep its existing content fields");
+  assert.match(portraitComputer, /useState<LabLogFilter>\("all"\)/);
+  assert.match(portraitComputer, /visibleLabLogEntries=[\s\S]*entry\.type\.toLowerCase\(\)\.includes\(labLogFilter\)/);
+  assert.match(portraitComputer, /className="portrait-log-filters"[\s\S]*aria-pressed=\{labLogFilter===filter\.id\}/);
+  assert.match(portraitComputer, /className="portrait-log-timeline"[\s\S]*visibleLabLogEntries\.map/);
+  assert.match(portraitCss, /\.portrait-log-filters \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(portraitCss, /\.portrait-log-timeline \{[\s\S]*position: relative[\s\S]*padding-left/);
+  assert.match(portraitCss, /\.portrait-log-timeline p \{[\s\S]*grid-template-columns: auto minmax\(0,1fr\)/);
+  assert.doesNotMatch(portraitComputer, /portrait-mobile-appbar|portrait-mobile-tabs|const tabs:/, "portrait computer must use phone home and app navigation instead of a desktop-like global tab bar");
+  assert.doesNotMatch(portraitComputer, /portrait-computer-panel|portrait-panel-bar|portrait-bulletin/, "portrait computer must not retain desktop window or popup chrome");
+  for (const windowId of ["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"]) {
+    assert.match(portraitComputer, new RegExp(`(?:activeWindow===\\"${windowId}\\"|\\[\\"map\\",\\"allocation\\",\\"emg\\"\\]|\\[\\"research\\",\\"internship\\"\\])`), `${windowId} must remain reachable in the portrait computer`);
+  }
+  assert.match(portraitComputer, /onOpenFile\(file\.id\)/);
+  assert.match(portraitComputer, /onOpenReferences\(project\.id\)/);
+  assert.match(portraitComputer, /onSetReferenceFilter\(group\.id\)/);
+  assert.match(portraitComputer, /href=\{reference\.url\}/);
+  assert.match(portraitComputer, /bulletin&&<aside className=\{`portrait-phone-notification/);
+  assert.match(portraitComputer, /onPointerDown=\{startNotificationGesture\}[\s\S]*onPointerMove=\{moveNotificationGesture\}[\s\S]*onPointerUp=\{endNotificationGesture\}/);
+  assert.match(portraitComputer, /notificationGestureRef\.current\.offset<=-NOTIFICATION_DISMISS_DISTANCE[\s\S]*if\(shouldDismiss\)onDismissBulletin\(\)/, "an upward notification swipe must dismiss after crossing the threshold");
+  assert.match(portraitComputer, /portrait-notification-system-icon[\s\S]*computerContent\.bulletin\.notificationHeader/);
+  assert.doesNotMatch(portraitComputer, /portrait-notification-dismiss|openNotification|badge=\{bulletin\}/, "system notification must have no close button or Lab Log linkage");
+  assert.doesNotMatch(portraitCss, /\.tactile-scene[\s\S]{0,240}animation: none/);
+  assert.match(closeups, /const stage=canvas\?\.parentElement/);
+  assert.match(closeups, /if\(rect\.width<2\|\|rect\.height<2\)return/);
+  assert.match(closeups, /observer\.observe\(stage\)/);
+  assert.match(closeups, /layoutFrame=requestAnimationFrame\(resize\)/);
+  assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
+  assert.match(closeups, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*usesTouchHotspots=isPortrait\|\|isCoarseLandscape[\s\S]*hotspotLayer\.hidden=!usesTouchHotspots/, "landscape touch devices must reuse closeup hotspots without changing landscape layout");
+  assert.match(siteCss, /@media \(orientation: landscape\) and \(pointer: coarse\) \{[\s\S]*\.mobile-scene-hotspots[\s\S]*\.mobile-scene-hotspot-coach/, "landscape hotspot styling must be isolated to coarse pointers");
+  assert.match(siteCss, /@media \(orientation: landscape\) and \(pointer: coarse\) \{[\s\S]*\.room-viewport \.room-intro \{[\s\S]*overflow-y: auto[\s\S]*\.room-intro \.intro-copy h1 \{[\s\S]*font-size: clamp\([^}]*vh[^}]*\}[\s\S]*\.room-intro \.intro-copy > button \{[\s\S]*min-height: 44px/, "landscape touch covers must fit their heading and keep the enter action reachable");
+  assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
+  assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
+  assert.match(closeups, /landscapeTouchDistanceScale=isCoarseLandscape\?touchViewportFitDistanceScale\(rect\.width,rect\.height,nextAspect\):1[\s\S]*closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "coarse-pointer landscape closeups must fit both viewport dimensions and compensate fog together");
+  assert.match(closeups, /isHitAvailable=\(hit:HitMesh\)=>\(!hit\.userData\.requiresOpen\|\|\(drawerTarget>\.5&&drawerProgress>\.72\)\)/, "drawer contents must stop accepting taps as soon as the drawer starts closing");
+  assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
+  assert.match(closeups, /camera\.aspect=nextAspect/);
+  assert.match(closeups, /camera\.fov=42/);
+  assert.doesNotMatch(closeups, /camera\.fov\s*=\s*isPortrait\s*\?/);
+  assert.match(closeups, /sceneCenterShiftX=zone==="books"\?-PORTRAIT_BOOKS_CENTER_X_OFFSET:zone==="notebook"\?PORTRAIT_NOTEBOOK_CENTER_X_OFFSET:0[\s\S]*desired\.x\+=sceneCenterShiftX[\s\S]*desiredTarget\.x\+=sceneCenterShiftX/, "portrait shelf and notebook closeups must use isolated horizontal framing offsets");
+  assert.match(closeups, /if\(isPortrait\)\{[\s\S]*drawerDistanceScale=zone==="drawer"\?THREE\.MathUtils\.lerp\(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress\):1[\s\S]*sceneDistanceScale=zone==="books"\?PORTRAIT_BOOKS_DISTANCE_SCALE:1[\s\S]*multiplyScalar\(portraitDistanceScale\*drawerDistanceScale\*sceneDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(portraitOffset\)/, "portrait bookshelf can move closer without changing the framing of other closeups");
+  assert.match(closeups, /else if\(landscapeTouchDistanceScale>1\)\{[\s\S]*multiplyScalar\(landscapeTouchDistanceScale\)[\s\S]*desired\.copy\(desiredTarget\)\.add\(fittedOffset\)/, "landscape touch fitting must not reuse portrait-only scene offsets");
+  assert.match(closeups, /drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET\*drawerProgress[\s\S]*desired\.x-=drawerCenterShift[\s\S]*desiredTarget\.x-=drawerCenterShift/, "portrait drawer framing must center the open tray without changing desktop framing");
+  assert.doesNotMatch(closeups, /portrait(?:Position|Target|Views)|Record<CloseupZone,[^>]+portrait/i);
+});
+
 test("editable copy is organized into valid category files", async () => {
   const { readFile } = await import("node:fs/promises");
   for (const name of ["site","intro","room","computer","references","releases","books","drawer","notebook","board","field-case","fax-contact"]) {
@@ -260,6 +483,16 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /hoverOnly=!booksContent\.openingEnabled/);
   assert.match(closeups, /item!=="travelMap"&&!fieldCaseContent\.personalDetailsOpeningEnabled/);
   assert.match(closeups, /siteContent\.shared\.comingSoon/);
+  assert.match(closeups, /hit\?\.userData\.hoverOnly&&event\.pointerType!=="mouse"/);
+  assert.match(closeups, /setHoveredHit\(hit,true\)/);
+  assert.match(closeups, /if\(usesTouchHotspots\)\{[\s\S]*hotspotMarkers\.forEach/, "hotspot positions must update in both portrait and coarse-pointer landscape closeups");
+  assert.match(closeups, /aria-live="polite"/);
+  assert.match(closeups, /className="mobile-scene-hotspots"/);
+  assert.match(closeups, /guideGroup="books"/);
+  assert.match(closeups, /guideGroup="films"/);
+  assert.match(closeups, /getWorldPosition\(worldPosition\)[\s\S]*projectedPosition\.multiplyScalar\(1\/visibleHits\.length\)\.project\(camera\)/);
+  assert.match(closeups, /touchGuideTimer=window\.setTimeout\(dismissTouchGuide,4200\)/);
+  assert.match(closeups, /const visibleHits=markerHits\.filter\(isHitAvailable\)/, "hotspot visibility must follow the same availability rule as hit testing");
   assert.match(closeups, /when those personal close-ups are ready to reopen/);
   assert.doesNotMatch(closeups, /const bookShelf=/);
   assert.doesNotMatch(closeups, /const divider=/);

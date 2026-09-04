@@ -4,7 +4,11 @@
   "navigation": {
     "index": "QUICK INDEX",
     "contact": "CONTACT",
-    "foundSuffix": "/06 FOUND"
+    "foundSuffix": "/06 FOUND",
+    "portraitPanHint": "SWIPE TO EXPLORE",
+    "portraitExplore": "EXPLORE THE LAB",
+    "portraitExploreCount": "6 OBJECTS",
+    "portraitExploreClose": "Close lab explorer"
   },
   "status": {
     "label": "LAB STATUS",

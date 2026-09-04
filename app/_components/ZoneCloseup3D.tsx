@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
+import { aspectOverflowDistanceScale, touchViewportFitDistanceScale } from "./cameraFraming";
 import {
   board as boardContent,
   books as booksContent,
@@ -13,6 +14,24 @@ import {
   notebook as notebookContent,
   site as siteContent,
 } from "@/content";
+
+const DEFAULT_CLOSEUP_EXPOSURE=1;
+const PORTRAIT_CLOSEUP_EXPOSURE=1.1;
+const DEFAULT_CLOSEUP_FOG_DENSITY=.035;
+const PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE=390;
+const PORTRAIT_CLOSEUP_MAGNIFICATION=1.2;
+const PORTRAIT_BOOKS_CENTER_X_OFFSET=.86;
+const PORTRAIT_BOOKS_DISTANCE_SCALE=.88;
+const PORTRAIT_NOTEBOOK_CENTER_X_OFFSET=.1;
+const PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE=1.06;
+const PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE=.68;
+const PORTRAIT_DRAWER_CENTER_X_OFFSET=.22;
+
+function portraitCloseupFitScale(width:number,height:number,aspect:number) {
+  const shortestSide=Math.min(width,height);
+  const viewportSizeFactor=THREE.MathUtils.clamp(shortestSide/PORTRAIT_CLOSEUP_REFERENCE_SHORT_SIDE,.92,1.15);
+  return Math.max(1,aspectOverflowDistanceScale(aspect)/(PORTRAIT_CLOSEUP_MAGNIFICATION*viewportSizeFactor));
+}
 
 export type CloseupZone = "drawer" | "books" | "notebook" | "board" | "fieldcase" | "printer" | "contact";
 
@@ -33,7 +52,7 @@ function createFieldCaseWorldMapTexture(resolution=1024) {
   return texture;
 }
 
-type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; visuals?: THREE.Mesh[] } };
+type HitMesh = THREE.Mesh & { userData: { item?: string; label?: string; requiresOpen?: boolean; requiresPrinted?: boolean; hoverOnly?: boolean; guideGroup?: string; visuals?: THREE.Mesh[] } };
 
 const palette = {
   void: 0x07100f,
@@ -185,13 +204,13 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     for(let mark=0;mark<3;mark+=1){const titleMark=box(width*.47,.023,.028,series?0xe5c675:0xd7cba9,.75,.01);titleMark.position.set(.04,height*.53-mark*.17,.51);group.add(titleMark);}
     if(book.isReading){const bookmark=box(.15,.58,.035,palette.signal);bookmark.position.set(width*.12,height+.17,.08);group.add(bookmark);}
     group.position.set(x,y,.05);group.rotation.z=(index%3-1)*.018;shelf.add(group);
-    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(hit);hits.push(hit);}
+    if(selectable){const hit=hitBox(`book:${book.id}`,book.title,[width+.16,height+.24,1.12],[x,y+height/2,.05],[cover,pages,spine,band]);hit.userData.hoverOnly=!booksContent.openingEnabled;hit.userData.guideGroup="books";shelf.add(hit);hits.push(hit);}
     return {group,cover,pages,spine,band};
   };
   books.filter((book)=>book.author!=="Keigo Higashino").forEach((book,index)=>makeBook(book,index,-3.74+index*.58,.43));
   const seriesBooks=books.filter((book)=>book.author==="Keigo Higashino");
   const seriesVisuals=seriesBooks.map((book,index)=>makeBook(book,index,-.35+index*.42,.43,true,false));
-  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[.8,2.28,1.12],[-.14,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;shelf.add(seriesHit);hits.push(seriesHit);
+  const seriesHit=hitBox("series:higashino","KEIGO HIGASHINO SERIES",[.8,2.28,1.12],[-.14,1.45,.05],seriesVisuals.flatMap((entry)=>[entry.cover,entry.pages,entry.spine,entry.band]));seriesHit.userData.hoverOnly=!booksContent.openingEnabled;seriesHit.userData.guideGroup="books";shelf.add(seriesHit);hits.push(seriesHit);
 
   const filmBasket=new THREE.Group();filmBasket.userData.mediaBasket=true;
   filmBasket.position.set(1.43,0,.03);filmBasket.rotation.y=Math.PI/2;
@@ -220,7 +239,7 @@ function buildBooks(scene:THREE.Scene,hits:HitMesh[]) {
     const latch=roundedBox(.075,.035,.07,0xb8c9c4,.009,.24,.12);latch.position.set(.32,.43,.108);
     group.add(disc,colorRing,label,hub,centerHole,clearCase,hinge,topEdge,bottomEdge,latch);
     group.position.set(x,y,z);group.rotation.z=[0,.022,0,-.018,0,.016,0,-.02,0,.018,0,-.014][index];filmBasket.add(group);
-    const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.075],[0,.43,.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;group.add(hit);hits.push(hit);
+    const hit=hitBox(`movie:${movie.id}`,movie.title,[.285,.9,.075],[0,.43,.08],[disc,colorRing,label,hub,clearCase,hinge]);hit.userData.hoverOnly=true;hit.userData.guideGroup="films";group.add(hit);hits.push(hit);
   });
   shelf.add(filmBasket);
   scene.add(shelf);
@@ -472,12 +491,12 @@ function buildFieldCase(scene:THREE.Scene,hits:HitMesh[]) {
   for(const x of [mapCenterX-.3,mapCenterX+.3]){const mount=cylinder(.07,.13,0x4e5954,14);mount.position.set(x,.48,-1.59);scene.add(mount);}
 }
 
-const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string}>={
-  books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint},
+const views:Record<CloseupZone,{position:[number,number,number];target:[number,number,number];hint:string;touchHint?:string}>={
+  books:{position:[0,2.05,9.4],target:[0,1.62,0],hint:booksContent.sceneHint,touchHint:booksContent.touchSceneHint},
   drawer:{position:[0,4.75,8.8],target:[0,1.45,-.15],hint:drawerContent.sceneHint},
   notebook:{position:[-.35,5.7,5.7],target:[-.45,1.1,0],hint:notebookContent.sceneHint},
   board:{position:[0,3,8.8],target:[0,2.65,0],hint:boardContent.sceneHint},
-  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint},
+  fieldcase:{position:[0,6.2,7.8],target:[0,.62,0],hint:fieldCaseContent.sceneHint,touchHint:fieldCaseContent.touchSceneHint},
   printer:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.printer.sceneHint},
   contact:{position:[0,4.25,8.2],target:[0,1.25,.55],hint:faxContact.contact.sceneHint},
 };
@@ -506,19 +525,21 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
 
   useEffect(()=>{
     const canvas=canvasRef.current;
-    if(!canvas)return;
+    const stage=canvas?.parentElement;
+    if(!canvas||!stage)return;
     const initialFaxPrinted=faxPrintedRef.current;
     const initialContactCardRaised=contactCardRaisedRef.current;
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.6));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1;
+    renderer.toneMappingExposure=DEFAULT_CLOSEUP_EXPOSURE;
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     const scene=new THREE.Scene();
     scene.background=new THREE.Color(palette.void);
-    scene.fog=new THREE.FogExp2(palette.void,.035);
+    const closeupFog=new THREE.FogExp2(palette.void,DEFAULT_CLOSEUP_FOG_DENSITY);
+    scene.fog=closeupFog;
     const camera=new THREE.PerspectiveCamera(42,1,.1,50);
     const view=views[zone];
     const defaultPosition=new THREE.Vector3(...view.position);
@@ -533,6 +554,30 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(zone==="fieldcase")buildFieldCase(scene,hits);
     if(zone==="printer")buildPrinter(scene,hits,initialFaxPrinted);
     if(zone==="contact")buildContact(scene,hits,initialFaxPrinted);
+    const hotspotLayer=document.createElement("div");
+    hotspotLayer.className="mobile-scene-hotspots";
+    hotspotLayer.hidden=true;
+    hotspotLayer.setAttribute("aria-hidden","true");
+    const hotspotGroups=new Map<string,HitMesh[]>();
+    hits.forEach((hit,index)=>{
+      const group=hit.userData.guideGroup??hit.userData.item??`target-${index}`;
+      const groupedHits=hotspotGroups.get(group)??[];
+      groupedHits.push(hit);
+      hotspotGroups.set(group,groupedHits);
+    });
+    const hotspotMarkers=Array.from(hotspotGroups.entries()).map(([group,groupHits],index)=>{
+      const marker=document.createElement("i");
+      marker.className=`mobile-scene-hotspot ${groupHits.every((hit)=>hit.userData.hoverOnly)?"is-preview":"is-actionable"}`;
+      marker.style.setProperty("--hotspot-delay",`${index*70}ms`);
+      marker.dataset.hotspotGroup=group;
+      hotspotLayer.append(marker);
+      return {marker,hits:groupHits,projectedPosition:new THREE.Vector3(),worldPosition:new THREE.Vector3()};
+    });
+    const touchCoach=document.createElement("div");
+    touchCoach.className="mobile-scene-hotspot-coach";
+    touchCoach.hidden=true;
+    touchCoach.textContent=siteContent.shared.touchHotspotHint;
+    stage.append(hotspotLayer,touchCoach);
     scene.add(new THREE.HemisphereLight(0x789892,0x090d0c,.85));
     const warm=new THREE.DirectionalLight(0xffc889,3.4); warm.position.set(-4,8,6); warm.castShadow=true; warm.shadow.mapSize.set(1536,1536); scene.add(warm);
     const cyan=new THREE.PointLight(palette.cyan,8,14,1.8); cyan.position.set(4,3,4); scene.add(cyan);
@@ -560,22 +605,58 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     let printProgress=zone==="printer"&&!initialFaxPrinted?0:1;
     let printNotified=initialFaxPrinted;
     let contactCardProgress=initialContactCardRaised?1:0;
+    let isPortrait=false;
+    let usesTouchHotspots=false;
+    let portraitDistanceScale=1;
+    let landscapeTouchDistanceScale=1;
+    let touchGuideStarted=false;
+    let touchGuideDismissed=false;
+    let touchGuideTimer=0;
+    let hotspotIntroTimer=0;
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const resize=()=>{ const rect=canvas.getBoundingClientRect(); renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false); camera.aspect=Math.max(1,rect.width)/Math.max(1,rect.height); camera.updateProjectionMatrix(); };
-    const observer=new ResizeObserver(resize); observer.observe(canvas); resize();
+    const idleHint=()=>usesTouchHotspots?(view.touchHint??view.hint):view.hint;
+    const dismissTouchGuide=()=>{
+      if(touchGuideDismissed)return;
+      touchGuideDismissed=true;
+      touchCoach.hidden=true;
+      hotspotLayer.classList.remove("is-intro");
+      window.clearTimeout(touchGuideTimer);
+      window.clearTimeout(hotspotIntroTimer);
+    };
+    const startTouchGuide=()=>{
+      if(touchGuideStarted||!usesTouchHotspots)return;
+      touchGuideStarted=true;
+      hotspotLayer.classList.add("is-intro");
+      touchCoach.hidden=false;
+      hotspotIntroTimer=window.setTimeout(()=>hotspotLayer.classList.remove("is-intro"),2800);
+      touchGuideTimer=window.setTimeout(dismissTouchGuide,4200);
+    };
+    const setHoveredHit=(next:HitMesh|null,touchReveal=false)=>{
+      if(next!==hovered){setHighlight(hovered,false);hovered=next;setHighlight(hovered,true);}
+      hotspotMarkers.forEach(({marker,hits:markerHits})=>marker.classList.toggle("is-active",Boolean(hovered&&markerHits.includes(hovered))));
+      if(labelRef.current){
+        const label=hovered?.userData.label;
+        labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??idleHint();
+        labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
+      }
+    };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches; usesTouchHotspots=isPortrait||isCoarseLandscape; hotspotLayer.hidden=!usesTouchHotspots; touchCoach.hidden=!usesTouchHotspots||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1; const viewportDistanceScale=isPortrait?portraitDistanceScale:landscapeTouchDistanceScale; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/viewportDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
+    const observer=new ResizeObserver(resize); observer.observe(stage); resize();
+    const layoutFrame=requestAnimationFrame(resize);
+    const isHitAvailable=(hit:HitMesh)=>(!hit.userData.requiresOpen||(drawerTarget>.5&&drawerProgress>.72))&&(!hit.userData.requiresPrinted||printProgress>.96);
     const readHit=(event:PointerEvent)=>{
       const rect=canvas.getBoundingClientRect(); pointer.x=((event.clientX-rect.left)/rect.width)*2-1; pointer.y=-((event.clientY-rect.top)/rect.height)*2+1; raycaster.setFromCamera(pointer,camera);
-      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find((hit)=>(!hit.userData.requiresOpen||drawerProgress>.72)&&(!hit.userData.requiresPrinted||printProgress>.96))??null;
+      const found=raycaster.intersectObjects(hits,false).map((entry)=>entry.object as HitMesh).find(isHitAvailable)??null;
       return found;
     };
     const pointerMove=(event:PointerEvent)=>{
       if(dragging){ const delta=event.clientX-lastX; moved+=Math.abs(delta); orbitX=THREE.MathUtils.clamp(orbitX-delta*.0025,-.32,.32); orbitY=THREE.MathUtils.clamp(orbitY+(event.movementY||0)*.0015,-.12,.12); lastX=event.clientX; canvas.style.cursor="grabbing"; return; }
-      const next=readHit(event); if(next!==hovered){setHighlight(hovered,false); hovered=next; setHighlight(hovered,true); if(labelRef.current){const label=hovered?.userData.label;labelRef.current.textContent=hovered?.userData.item==="drawer-handle"&&drawerProgress>.5?drawerContent.closeHandleLabel:hovered?.userData.hoverOnly&&label?`${label} · ${siteContent.shared.comingSoon}`:label??view.hint;}} canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
+      const next=readHit(event);setHoveredHit(next);canvas.style.cursor=next?.userData.hoverOnly?"help":next?"pointer":"grab";
     };
     const pointerDown=(event:PointerEvent)=>{dragging=true;moved=0;lastX=event.clientX;canvas.setPointerCapture(event.pointerId);};
-    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(item&&!hit?.userData.hoverOnly)selectRef.current(item);}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
+    const pointerUp=(event:PointerEvent)=>{dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(event.pointerType!=="mouse")dismissTouchGuide();if(moved<7){const hit=readHit(event);const item=hit?.userData.item;if(item==="drawer-handle"){drawerTarget=drawerTarget>.5?0:1;if(!drawerTarget)setHoveredHit(null);if(labelRef.current)labelRef.current.textContent=drawerTarget?drawerContent.closeHandleLabel:drawerContent.handleLabel;}else if(hit?.userData.hoverOnly&&event.pointerType!=="mouse"){setHoveredHit(hit,true);}else if(item&&!hit?.userData.hoverOnly){selectRef.current(item);}else if(!hit&&event.pointerType!=="mouse"){setHoveredHit(null);}}canvas.style.cursor=hovered?.userData.hoverOnly?"help":hovered?"pointer":"grab";};
     canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
     const tick=(now:number)=>{
       drawerProgress=THREE.MathUtils.lerp(drawerProgress,drawerTarget,.055);
@@ -611,12 +692,43 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       if((zone==="printer"||zone==="contact")&&contactCardProgress>0){
         desiredTarget.lerp(new THREE.Vector3(2.5,1.55,1.3),contactCardProgress*.42);
       }
+      if(isPortrait){
+        const sceneCenterShiftX=zone==="books"?-PORTRAIT_BOOKS_CENTER_X_OFFSET:zone==="notebook"?PORTRAIT_NOTEBOOK_CENTER_X_OFFSET:0;
+        desired.x+=sceneCenterShiftX;
+        desiredTarget.x+=sceneCenterShiftX;
+        if(zone==="drawer"){
+          const drawerCenterShift=PORTRAIT_DRAWER_CENTER_X_OFFSET*drawerProgress;
+          desired.x-=drawerCenterShift;
+          desiredTarget.x-=drawerCenterShift;
+        }
+        const drawerDistanceScale=zone==="drawer"?THREE.MathUtils.lerp(PORTRAIT_DRAWER_CLOSED_DISTANCE_SCALE,PORTRAIT_DRAWER_OPEN_DISTANCE_SCALE,drawerProgress):1;
+        const sceneDistanceScale=zone==="books"?PORTRAIT_BOOKS_DISTANCE_SCALE:1;
+        const portraitOffset=desired.clone().sub(desiredTarget).multiplyScalar(portraitDistanceScale*drawerDistanceScale*sceneDistanceScale);
+        desired.copy(desiredTarget).add(portraitOffset);
+      }else if(landscapeTouchDistanceScale>1){
+        const fittedOffset=desired.clone().sub(desiredTarget).multiplyScalar(landscapeTouchDistanceScale);
+        desired.copy(desiredTarget).add(fittedOffset);
+      }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
+      if(usesTouchHotspots){
+        const stageRect=stage.getBoundingClientRect();
+        hotspotMarkers.forEach(({marker,hits:markerHits,projectedPosition,worldPosition})=>{
+          const visibleHits=markerHits.filter(isHitAvailable);
+          marker.hidden=visibleHits.length===0;
+          if(visibleHits.length===0)return;
+          projectedPosition.set(0,0,0);
+          visibleHits.forEach((hit)=>projectedPosition.add(hit.getWorldPosition(worldPosition)));
+          projectedPosition.multiplyScalar(1/visibleHits.length).project(camera);
+          const onScreen=projectedPosition.z>=-1&&projectedPosition.z<=1&&projectedPosition.x>=-1.1&&projectedPosition.x<=1.1&&projectedPosition.y>=-1.1&&projectedPosition.y<=1.1;
+          marker.hidden=!onScreen;
+          if(onScreen){marker.style.left=`${(projectedPosition.x*.5+.5)*stageRect.width}px`;marker.style.top=`${(-projectedPosition.y*.5+.5)*stageRect.height}px`;}
+        });
+      }
       renderer.render(scene,camera);frame=requestAnimationFrame(tick);
     };frame=requestAnimationFrame(tick);
-    return()=>{observer.disconnect();cancelAnimationFrame(frame);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
+    return()=>{observer.disconnect();cancelAnimationFrame(layoutFrame);cancelAnimationFrame(frame);window.clearTimeout(touchGuideTimer);window.clearTimeout(hotspotIntroTimer);canvas.removeEventListener("pointermove",pointerMove);canvas.removeEventListener("pointerdown",pointerDown);canvas.removeEventListener("pointerup",pointerUp);canvas.removeEventListener("pointercancel",pointerUp);hotspotLayer.remove();touchCoach.remove();scene.traverse((object)=>{if(object instanceof THREE.Mesh){object.geometry.dispose();if(object.userData.fieldCaseTexture instanceof THREE.Texture)object.userData.fieldCaseTexture.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach((material)=>material.dispose());}});renderer.dispose();};
   },[zone]);
 
-  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout">{views[zone].hint}</div></div>;
+  return <div className={`model-scene model-${zone}`}><canvas ref={canvasRef} aria-label={ariaLabels[zone]} />{zone==="notebook"&&<div className="model-accessibility-controls" aria-label="Notebook pages"><button type="button" onClick={()=>selectRef.current("research")}>{notebookContent.itemLabels.research}</button><button type="button" onClick={()=>selectRef.current("margin")}>{notebookContent.itemLabels.margin}</button></div>}<div ref={labelRef} className="model-scene-readout" aria-live="polite">{views[zone].hint}</div></div>;
 }

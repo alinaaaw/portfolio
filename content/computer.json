@@ -26,6 +26,16 @@
     "filename": "README.txt",
     "meta": "WORKSTATION FILE / SHARED NOTES",
     "title": "WORKSPACE NOTES",
+    "mobileMeta": "Shared Note",
+    "mobileTitle": "Workspace Notes",
+    "mobileAccess": "VIEW ONLY",
+    "mobileReadOnly": "Editing disabled for this shared note",
+    "mobileToolLabels": {
+      "checklist": "Checklist unavailable",
+      "format": "Formatting unavailable",
+      "camera": "Attachments unavailable",
+      "draw": "Drawing unavailable"
+    },
     "paragraphs": [
       "Read before reorganizing the lab. PROJECTS holds finished work. Working notes and unfinished ideas stay where they were last used.",
       "Check the latest LAB LOG before picking up an old thread. Design decisions belong in the notebook, project sources in REFERENCES.web, physical iterations in the drawer, and open questions on the board. The bookshelf is reserved for personal reading and film notes.",
@@ -134,6 +144,6 @@
       ]
     }
   },
-  "bulletin": { "header": "LAB BULLETIN", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
+  "bulletin": { "header": "LAB BULLETIN", "notificationHeader": "SYSTEM NOTIFICATION", "title": "User has not checked in.", "copy": "Alina Wu has been offline for four days. This workstation continues to sync, but no new lab entry has been recorded." },
   "taskbar": { "files": "LOCAL FILES", "unread": "1 UNREAD BULLETIN", "clear": "NO NEW ALERTS" }
 }

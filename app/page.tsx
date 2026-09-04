@@ -5,12 +5,14 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
-import type { ZoneId } from "./_components/LabGame";
+import type { RoomPanView, ZoneId } from "./_components/LabGame";
 import { drawFieldCaseMapViewport, FIELD_CASE_MAP_VIEWS, FIELD_CASE_TRAVEL_PINS } from "./_components/fieldCaseMap";
 import type { FieldCaseMapCamera, FieldCaseMapPinHit, FieldCaseMapView, FieldCaseTravelPin } from "./_components/fieldCaseMap";
 import { drawerArtifactMedia } from "./_components/drawerArtifactMedia";
 import { travelPhotosForPin } from "./_components/travelPhotoLibrary";
 import type { TravelPhoto } from "./_components/travelPhotoLibrary";
+import PortraitComputerView from "./_components/PortraitComputerView";
+import type { ComputerFile, ComputerWindowId, PortraitComputerRoot, ProjectFileId, ReferenceFilter } from "./_components/PortraitComputerView";
 import {
   board as boardContent,
   books as booksContent,
@@ -41,7 +43,6 @@ type ProjectFileId = "map" | "allocation" | "emg";
 type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references" | "updates";
 type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 type WindowPosition = { x:number; y:number };
-type ReferenceFilter = "all" | ProjectFileId;
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
 
@@ -206,6 +207,7 @@ const lostTravelMessages=[
   "MEMORY STILL OFF THE RECORD",
   "EVIDENCE LOST SOMEWHERE EN ROUTE",
 ] as const;
+const PORTRAIT_MAP_INITIAL_ZOOM=2.7;
 
 function randomLostTravelMessage(){return lostTravelMessages[Math.floor(Math.random()*lostTravelMessages.length)];}
 
@@ -224,6 +226,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const selectionRequestRef=useRef(0);
   const navigationRequestRef=useRef(0);
   const navigationLockedRef=useRef(false);
+  const portraitMapInitializedRef=useRef(false);
   const [camera,setCamera]=useState<FieldCaseMapCamera>({...FIELD_CASE_MAP_VIEWS.world});
   const [activeView,setActiveView]=useState<FieldCaseMapView>("world");
   const [selectedPin,setSelectedPin]=useState<FieldCaseTravelPin|null>(null);
@@ -231,6 +234,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
   const [photos,setPhotos]=useState<TravelPhoto[]>([]);
   const [photoIndex,setPhotoIndex]=useState(0);
   const [navigationPending,setNavigationPending]=useState(false);
+  const [showMapPanHint,setShowMapPanHint]=useState(true);
   const [lostMessage,setLostMessage]=useState<(typeof lostTravelMessages)[number]>(lostTravelMessages[0]);
 
   const normalizeCamera=useCallback((next:FieldCaseMapCamera)=>{
@@ -256,6 +260,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
 
   const chooseView=useCallback((view:FieldCaseMapView)=>{
     closeTravelPhotos();
+    if(view==="world")portraitMapInitializedRef.current=false;
     setActiveView(view);
     setCamera({...FIELD_CASE_MAP_VIEWS[view]});
   },[closeTravelPhotos]);
@@ -427,13 +432,20 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       const width=Math.max(1,Math.round(sheet.clientWidth*ratio));
       const height=Math.max(1,Math.round(sheet.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
-      pinHitsRef.current=drawFieldCaseMapViewport(canvas,camera);
+      const portrait=sheet.clientHeight>=sheet.clientWidth;
+      if(!portrait)portraitMapInitializedRef.current=false;
+      let drawCamera=camera;
+      if(portrait&&activeView==="world"&&!portraitMapInitializedRef.current){
+        portraitMapInitializedRef.current=true;
+        if(camera.zoom<PORTRAIT_MAP_INITIAL_ZOOM){drawCamera=normalizeCamera({...camera,zoom:PORTRAIT_MAP_INITIAL_ZOOM});setCamera(drawCamera);}
+      }
+      pinHitsRef.current=drawFieldCaseMapViewport(canvas,drawCamera);
     };
     draw();
     const observer=new ResizeObserver(draw);
     observer.observe(sheet);
     return ()=>observer.disconnect();
-  },[camera]);
+  },[activeView,camera,normalizeCamera]);
 
   const beginPointer=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
     if(event.pointerType==="mouse"&&event.button!==0)return;
@@ -442,6 +454,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     pointersRef.current.set(event.pointerId,point);
     if(pointersRef.current.size===1)pressRef.current={id:event.pointerId,...point,moved:false};
     if(pointersRef.current.size===2){
+      setShowMapPanHint(false);
       const [first,second]=Array.from(pointersRef.current.values());
       gestureRef.current={center:{x:(first.x+second.x)/2,y:(first.y+second.y)/2},distance:Math.hypot(second.x-first.x,second.y-first.y)};
       if(pressRef.current)pressRef.current.moved=true;
@@ -452,7 +465,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
     if(!previous)return;
     const point=canvasPoint(event.clientX,event.clientY);
     pointersRef.current.set(event.pointerId,point);
-    if(pressRef.current&&Math.hypot(point.x-pressRef.current.x,point.y-pressRef.current.y)>6*(canvasRef.current?.width??1)/(canvasRef.current?.clientWidth||1))pressRef.current.moved=true;
+    if(pressRef.current&&Math.hypot(point.x-pressRef.current.x,point.y-pressRef.current.y)>6*(canvasRef.current?.width??1)/(canvasRef.current?.clientWidth||1)){pressRef.current.moved=true;setShowMapPanHint(false);}
     if(pointersRef.current.size===1){
       const canvas=canvasRef.current;if(!canvas)return;
       setCamera((current)=>{
@@ -499,6 +512,7 @@ function FieldMapReading({onClose}:{onClose:()=>void}) {
       <nav className="field-map-views" aria-label="Map views">{(["world","usa","asia"] as const).map((view)=><button key={view} className={activeView===view?"active":""} onClick={()=>chooseView(view)}>{view.toUpperCase()}</button>)}</nav>
       <div className="field-map-zoom"><button aria-label="Zoom out" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},.72);}}>−</button><button aria-label="Zoom in" onClick={()=>{const canvas=canvasRef.current;if(canvas)zoomAt({x:canvas.width/2,y:canvas.height/2},1.4);}}>+</button></div>
       <button className="field-map-return" aria-label="Close map" onClick={onClose}>×</button>
+      {showMapPanHint&&<div className="field-map-pan-hint" role="status"><i aria-hidden="true">←</i><span>{fieldCaseContent.mapPortraitPanHint}</span><i aria-hidden="true">→</i></div>}
       {selectedPin&&<aside className="field-map-memory" role="dialog" aria-modal="true" aria-labelledby="field-map-memory-title">
         <header><div><small>{selectedPin.country} · TRAVEL PRINT</small><h2 id="field-map-memory-title">{selectedPin.name}</h2></div><button ref={photoCloseRef} type="button" aria-label="Return to map" onClick={closeTravelPhotos}>×</button></header>
         <div className={`field-map-photo-stage is-${photoStatus}`} aria-busy={photoStatus==="loading"}>
@@ -591,6 +605,9 @@ function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}
 
 export default function VersionThree() {
   const [entered,setEntered] = useState(false);
+  const [roomPanView,setRoomPanView] = useState<RoomPanView>("center");
+  const [showRoomPanHint,setShowRoomPanHint] = useState(true);
+  const [portraitExploreOpen,setPortraitExploreOpen] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
   const [discovered,setDiscovered] = useState<ZoneId[]>([]);
@@ -606,8 +623,14 @@ export default function VersionThree() {
   const [contactOpen,setContactOpen] = useState(false);
 
   const inspect = useCallback((zone: ZoneId) => {
+    setPortraitExploreOpen(false);
     setActive(zone);
     setDiscovered((current) => current.includes(zone)?current:[...current,zone]);
+  },[]);
+
+  const changeRoomPanView = useCallback((view: RoomPanView) => {
+    setRoomPanView(view);
+    setShowRoomPanHint(false);
   },[]);
 
   useEffect(() => {
@@ -619,12 +642,13 @@ export default function VersionThree() {
   useEffect(() => {
     const close = (event:KeyboardEvent) => {
       if (event.key!=="Escape") return;
+      if(portraitExploreOpen){setPortraitExploreOpen(false);return;}
       if(active==="computer"&&computerWindows.length){const closing=computerWindows.at(-1); setComputerWindows((current)=>current.slice(0,-1)); setMaximizedWindow((current)=>current===closing?null:current); return;}
       setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false);
     };
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
-  },[active,computerWindows]);
+  },[active,computerWindows,portraitExploreOpen]);
 
   const focusComputerWindow = useCallback((windowId:ComputerWindowId) => {
     setComputerWindows((current)=>current.at(-1)===windowId?current:[...current.filter((item)=>item!==windowId),windowId]);
@@ -646,6 +670,25 @@ export default function VersionThree() {
     setReferenceFilter(filter);
     focusComputerWindow("references");
     setSelectedComputerFile(null);
+  };
+
+  const openPortraitComputerRoot=(file:PortraitComputerRoot)=>{
+    setComputerWindows(file==="desktop"?[]:[file]);
+    setMaximizedWindow(null);
+    setSelectedComputerFile(null);
+    if(file==="references")setReferenceFilter("all");
+  };
+
+  const backPortraitComputer=()=>{
+    const closing=computerWindows.at(-1);
+    setComputerWindows((current)=>current.slice(0,-1));
+    setMaximizedWindow((current)=>current===closing?null:current);
+  };
+
+  const leaveComputer=()=>{
+    setComputerWindows([]);
+    setMaximizedWindow(null);
+    setActive(null);
   };
 
   const closeComputerWindow=(windowId:ComputerWindowId)=>{
@@ -678,7 +721,7 @@ export default function VersionThree() {
   const visibleReferences = referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
 
   return (
-    <main className={`room-shell ${entered?"room-entered":""}`}>
+    <main className={`room-shell ${entered?"room-entered":""} ${portraitExploreOpen?"portrait-explore-open":""}`}>
       <header className="room-nav">
         <button className="room-brand" onClick={() => setIndexOpen(true)}>{siteContent.brand.name} <span>{siteContent.brand.lab}</span></button>
         <nav><button onClick={() => setIndexOpen(true)}>{roomContent.navigation.index}</button><button onClick={() => setContactOpen(true)}>{roomContent.navigation.contact}</button></nav>
@@ -686,7 +729,7 @@ export default function VersionThree() {
       </header>
 
       <section className="room-viewport" aria-label={roomContent.ariaLabel}>
-        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} faxPrinted={faxPrinted} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
+        <LabGame active={entered&&!active&&!indexOpen&&!faxOpen&&!contactOpen} viewing={active} discovered={discovered} faxReady={solved} faxPrinted={faxPrinted} roomPanView={roomPanView} onRoomPanViewChange={changeRoomPanView} onHover={setHovered} onInspect={inspect} onPrinterInspect={()=>setFaxOpen(true)} />
         <div className="room-grain" aria-hidden="true" />
         <div className="room-vignette" aria-hidden="true" />
 
@@ -711,7 +754,11 @@ export default function VersionThree() {
           <>
             <div className="room-status"><span>{roomContent.status.label}</span><strong>{status}</strong><p>{roomContent.status.instruction}</p></div>
             <div className="hover-readout" aria-live="polite"><span>{hovered?`${roomContent.hover.signalPrefix} ${zoneInfo[hovered].index}`:roomContent.hover.defaultMeta}</span><strong>{hovered?zoneInfo[hovered].label:roomContent.hover.defaultTitle}</strong><p>{hovered?zoneInfo[hovered].hint:roomContent.hover.defaultHint}</p></div>
-            <div className="explore-dock">
+            {showRoomPanHint&&<div className="room-pan-hint" role="status"><i aria-hidden="true">←</i><span>{roomContent.navigation.portraitPanHint}</span><i aria-hidden="true">→</i></div>}
+            <button type="button" className="portrait-explore-launcher" aria-expanded={portraitExploreOpen} aria-controls="portrait-explore-sheet" onClick={()=>setPortraitExploreOpen(true)}><span><i aria-hidden="true" />{roomContent.navigation.portraitExplore}</span><strong>{roomContent.navigation.portraitExploreCount}</strong></button>
+            {portraitExploreOpen&&<button type="button" className="portrait-explore-backdrop" aria-label={roomContent.navigation.portraitExploreClose} onClick={()=>setPortraitExploreOpen(false)} />}
+            <div id="portrait-explore-sheet" className={`explore-dock ${portraitExploreOpen?"is-portrait-open":""}`} role="group" aria-label={roomContent.navigation.portraitExplore}>
+              <div className="portrait-explore-sheet-header"><div><span>{roomContent.navigation.portraitExplore}</span><strong>{roomContent.navigation.portraitExploreCount}</strong></div><button type="button" aria-label={roomContent.navigation.portraitExploreClose} onClick={()=>setPortraitExploreOpen(false)}><i aria-hidden="true" /></button></div>
               {zoneOrder.map((zone) => <button className={discovered.includes(zone)?"found":""} key={zone} onClick={() => inspect(zone)}><span>{zoneInfo[zone].index}</span><i>{zoneInfo[zone].label}</i></button>)}
             </div>
             {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> {roomContent.faxAlert.title} <strong>{roomContent.faxAlert.action}</strong></button>}
@@ -730,7 +777,8 @@ export default function VersionThree() {
       )}
 
       {active==="computer"&&(
-        <div className="computer-view" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
+        <>
+        <div className="computer-view computer-view-desktop" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
             <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><button className="os-version-button" type="button" aria-label={releasesContent.openAriaLabel} onClick={()=>focusComputerWindow("updates")}>{siteContent.brand.version}</button></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
@@ -810,6 +858,8 @@ export default function VersionThree() {
             </div>
           </div>
         </div>
+        <PortraitComputerView computerWindows={computerWindows} referenceFilter={referenceFilter} bulletin={bulletin} onOpenFile={openComputerFile} onOpenRoot={openPortraitComputerRoot} onFocusWindow={focusComputerWindow} onBack={backPortraitComputer} onOpenReferences={openReferences} onSetReferenceFilter={setReferenceFilter} onDismissBulletin={()=>setBulletin(false)} onLeave={leaveComputer}/>
+        </>
       )}
 
       {active==="drawer"&&<DrawerScene faxPrinted={faxPrinted} onClose={() => setActive(null)} />}
