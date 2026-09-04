@@ -39,9 +39,6 @@ const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
   loading: () => <div className="lab-loading"><i /><span>{siteContent.loading.closeup}</span></div>,
 });
 
-type ProjectFileId = "map" | "allocation" | "emg";
-type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references" | "updates";
-type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 type WindowPosition = { x:number; y:number };
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];

@@ -16,5 +16,15 @@
     "prerelease": "PRERELEASE",
     "releaseCandidate": "RELEASE CANDIDATE"
   },
-  "showHistory": "VIEW UPDATE HISTORY"
+  "showHistory": "VIEW UPDATE HISTORY",
+  "mobile": {
+    "appLabel": "Settings",
+    "screenTitle": "Settings",
+    "aboutTitle": "About",
+    "nameLabel": "Name",
+    "softwareVersionLabel": "Software Version",
+    "statusLabel": "Status",
+    "releaseDateLabel": "Release Date",
+    "historyTitle": "Update History"
+  }
 }
