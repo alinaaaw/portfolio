@@ -184,7 +184,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /usesTouchBooksIndicator=isPortrait\|\|isCoarseLandscape[\s\S]*booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+\(usesTouchBooksIndicator\?TOUCH_BOOKS_ZONE_FRONT_OFFSET:0\)/, "touch rooms must bring the bookshelf indicator in front of the shelf in both orientations");
   assert.doesNotMatch(game, /booksZoneRing\.rotation\.x=/, "portrait bookshelf indicator must retain its original orientation");
   assert.match(game, /booksZoneHit\.scale\.setScalar\(usesTouchBooksIndicator\?TOUCH_BOOKS_ZONE_HIT_SCALE:1\)/, "touch bookshelf must have a larger target in both orientations");
-  assert.match(game, /baseScale=zone==="books"\?booksZoneRingScale:1[\s\S]*ring\.scale\.setScalar\(baseScale\*\(1\+Math\.sin/, "bookshelf indicator animation must preserve its touch scale");
+  assert.doesNotMatch(game, /BOOKS_ZONE_RING_SCALE|booksZoneRingScale/, "bookshelf indicator must use the same visible scale as the other room markers");
   assert.match(game, /ring\.userData\.interactionOverlay = true/);
   assert.match(game, /hit\.userData\.interactionOverlay = true/);
   assert.match(game, /object\.castShadow=!isInteractionOverlay/, "room interaction overlays must never cast geometry-shaped shadows");
