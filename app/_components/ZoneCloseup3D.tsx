@@ -606,6 +606,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     let printNotified=initialFaxPrinted;
     let contactCardProgress=initialContactCardRaised?1:0;
     let isPortrait=false;
+    let usesTouchHotspots=false;
     let portraitDistanceScale=1;
     let touchGuideStarted=false;
     let touchGuideDismissed=false;
@@ -614,7 +615,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
     if(faxPaperGroup&&initialFaxPrinted){faxPaperGroup.scale.z=1;faxPaperGroup.position.y=.66;}
     let frame=0;
     const setHighlight=(hit:HitMesh|null,on:boolean)=>hit?.userData.visuals?.forEach((visual)=>{ const material=visual.material as THREE.MeshStandardMaterial; if("emissive" in material){ material.emissive.setHex(on?palette.signal:0x000000); material.emissiveIntensity=on ? .16 : 0; }});
-    const idleHint=()=>isPortrait?(view.touchHint??view.hint):view.hint;
+    const idleHint=()=>usesTouchHotspots?(view.touchHint??view.hint):view.hint;
     const dismissTouchGuide=()=>{
       if(touchGuideDismissed)return;
       touchGuideDismissed=true;
@@ -624,7 +625,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       window.clearTimeout(hotspotIntroTimer);
     };
     const startTouchGuide=()=>{
-      if(touchGuideStarted||!isPortrait)return;
+      if(touchGuideStarted||!usesTouchHotspots)return;
       touchGuideStarted=true;
       hotspotLayer.classList.add("is-intro");
       touchCoach.hidden=false;
@@ -640,7 +641,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
       }
     };
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; hotspotLayer.hidden=!isPortrait; touchCoach.hidden=!isPortrait||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches; usesTouchHotspots=isPortrait||isCoarseLandscape; hotspotLayer.hidden=!usesTouchHotspots; touchCoach.hidden=!usesTouchHotspots||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/portraitDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const isHitAvailable=(hit:HitMesh)=>(!hit.userData.requiresOpen||(drawerTarget>.5&&drawerProgress>.72))&&(!hit.userData.requiresPrinted||printProgress>.96);
@@ -706,7 +707,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
       }
       desired.x+=Math.sin(orbitX)*2.4; desired.y+=orbitY*2; desired.z-=Math.abs(Math.sin(orbitX))*.5;
       camera.position.lerp(desired,.06);target.lerp(desiredTarget,.075);camera.lookAt(target);
-      if(isPortrait){
+      if(usesTouchHotspots){
         const stageRect=stage.getBoundingClientRect();
         hotspotMarkers.forEach(({marker,hits:markerHits,projectedPosition,worldPosition})=>{
           const visibleHits=markerHits.filter(isHitAvailable);

@@ -352,6 +352,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(closeups, /observer\.observe\(stage\)/);
   assert.match(closeups, /layoutFrame=requestAnimationFrame\(resize\)/);
   assert.match(closeups, /isPortrait=rect\.height>=rect\.width/);
+  assert.match(closeups, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*usesTouchHotspots=isPortrait\|\|isCoarseLandscape[\s\S]*hotspotLayer\.hidden=!usesTouchHotspots/, "landscape touch devices must reuse closeup hotspots without changing landscape layout");
+  assert.match(siteCss, /@media \(orientation: landscape\) and \(pointer: coarse\) \{[\s\S]*\.mobile-scene-hotspots[\s\S]*\.mobile-scene-hotspot-coach/, "landscape hotspot styling must be isolated to coarse pointers");
   assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
   assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
   assert.match(closeups, /isHitAvailable=\(hit:HitMesh\)=>\(!hit\.userData\.requiresOpen\|\|\(drawerTarget>\.5&&drawerProgress>\.72\)\)/, "drawer contents must stop accepting taps as soon as the drawer starts closing");
@@ -409,6 +411,7 @@ test("3D room and layered object exploration remain connected", async () => {
   assert.match(closeups, /siteContent\.shared\.comingSoon/);
   assert.match(closeups, /hit\?\.userData\.hoverOnly&&event\.pointerType!=="mouse"/);
   assert.match(closeups, /setHoveredHit\(hit,true\)/);
+  assert.match(closeups, /if\(usesTouchHotspots\)\{[\s\S]*hotspotMarkers\.forEach/, "hotspot positions must update in both portrait and coarse-pointer landscape closeups");
   assert.match(closeups, /aria-live="polite"/);
   assert.match(closeups, /className="mobile-scene-hotspots"/);
   assert.match(closeups, /guideGroup="books"/);
