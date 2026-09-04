@@ -2419,7 +2419,45 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     touch-action: pan-y;
+    padding: clamp(30px,6.5vw,58px) clamp(22px,5.8vw,54px) clamp(48px,8vw,72px);
     -webkit-overflow-scrolling: touch;
+  }
+
+  .room-shell .fax-reading-paper small {
+    font-size: clamp(6px,1.15vw,10px);
+    line-height: 1.45;
+  }
+
+  .room-shell .fax-reading-paper h2 {
+    margin: clamp(14px,3vw,22px) 0 clamp(16px,3.4vw,28px);
+    font-size: clamp(25px,5.2vw,42px);
+    line-height: .98;
+  }
+
+  .room-shell .fax-reading-paper p {
+    margin-block: clamp(8px,1.8vw,13px);
+    font-size: clamp(10px,2.35vw,15px);
+    line-height: 1.55;
+  }
+
+  .room-shell .fax-reading-scroll > strong {
+    margin: clamp(14px,3vw,24px) 0;
+    font-size: clamp(15px,2.5vw,22px);
+    line-height: 1.25;
+  }
+
+  .room-shell .fax-reading-paper footer {
+    gap: clamp(8px,2vw,15px);
+    padding-top: clamp(12px,2.4vw,18px);
+    font-size: clamp(6px,1.15vw,9px);
+    line-height: 1.45;
+  }
+
+  .room-shell .fax-reading-paper .fax-return {
+    top: clamp(12px,2.5vw,19px);
+    right: clamp(13px,2.8vw,22px);
+    padding: clamp(4px,1vw,6px) 2px;
+    font-size: clamp(6px,1.15vw,9px);
   }
 
   .room-shell .evidence-card.note-card {
@@ -2595,25 +2633,6 @@
       line-height: 1.4;
     }
 
-    .room-shell .fax-reading-scroll {
-      padding: clamp(46px,5vw,58px) clamp(38px,5vw,54px) 52px;
-    }
-
-    .room-shell .fax-reading-paper h2 {
-      margin: 18px 0 22px;
-      font-size: clamp(34px,4.5vw,42px);
-    }
-
-    .room-shell .fax-reading-paper p {
-      margin-block: 12px;
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    .room-shell .fax-reading-scroll > strong {
-      margin: 20px 0;
-      font-size: clamp(18px,2.5vw,22px);
-    }
   }
 
   @media (min-width: 700px) and (min-height: 900px) {
@@ -2628,16 +2647,6 @@
       display: none;
     }
 
-    .room-shell .fax-reading-scroll {
-      overflow-y: hidden;
-      overscroll-behavior: none;
-      touch-action: manipulation;
-      scrollbar-width: none;
-    }
-
-    .room-shell .fax-reading-scroll::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   @media (min-width: 520px) and (min-height: 700px) {
@@ -2649,6 +2658,17 @@
     }
 
     .room-shell .notebook-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .room-shell .fax-reading-scroll {
+      overflow-y: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      scrollbar-width: none;
+    }
+
+    .room-shell .fax-reading-scroll::-webkit-scrollbar {
       display: none;
     }
   }

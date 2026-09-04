@@ -263,6 +263,11 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   const boardCardContract = declarationsFor(".room-shell .evidence-card.note-card");
   const faxPaperContract = declarationsFor(".room-shell .fax-reading-paper");
   const faxScrollContract = declarationsFor(".room-shell .fax-reading-scroll");
+  const faxTitleContract = declarationsFor(".room-shell .fax-reading-paper h2");
+  const faxCopyContract = declarationsFor(".room-shell .fax-reading-paper p");
+  const faxMetaContract = declarationsFor(".room-shell .fax-reading-paper small");
+  const faxSignatureContract = declarationsFor(".room-shell .fax-reading-scroll > strong");
+  const faxFooterContract = declarationsFor(".room-shell .fax-reading-paper footer");
   assert.match(phoneStageContract, /grid-row: 2[\s\S]*min-height: 0[\s\S]*overflow: hidden/);
   assert.match(phoneHomeContract, /display: grid[\s\S]*height: 100%[\s\S]*min-height: 0/);
   assert.match(phoneAppContract, /display: grid[\s\S]*grid-template-rows: auto minmax\(0,1fr\)[\s\S]*height: 100%/);
@@ -287,8 +292,11 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(drawerArticleContract, /height: 100%[\s\S]*min-height: 0[\s\S]*max-height: none[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "long drawer content must scroll inside the proportioned paper");
   assert.match(boardCardContract, /width: min\(86vw,560px,calc\(\(100dvh - 126px\)\*1\.35\)\)[\s\S]*min-height: 330px[\s\S]*max-width: none[\s\S]*overflow-y: auto[\s\S]*aspect-ratio: auto/, "portrait board cards must respond to the viewport while staying compact enough for their short content");
   assert.match(faxPaperContract, /width: min\(88vw,\d+px,calc\(\(100dvh - 96px\)\*\.72\)\)[\s\S]*height: auto[\s\S]*max-height: none[\s\S]*aspect-ratio: \.72/, "portrait fax reports must keep a paper-like ratio with a restrained tablet cap");
-  assert.match(faxScrollContract, /height: 100%[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y/, "phone fax reports must retain overflow protection when the fixed-ratio paper cannot contain the report");
-  assert.match(portraitCss, /@media \(min-width: 700px\) and \(min-height: 900px\) \{[\s\S]*\.room-shell \.fax-reading-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy iPad-sized fax reports must show their compacted content without an inner scroller");
+  assert.match(faxScrollContract, /height: 100%[\s\S]*overflow-y: auto[\s\S]*touch-action: pan-y[\s\S]*padding: clamp\(/, "phone fax reports must retain overflow protection while their content spacing scales with the paper");
+  for (const contract of [faxTitleContract, faxCopyContract, faxMetaContract, faxSignatureContract, faxFooterContract]) {
+    assert.match(contract, /font-size: clamp\(/, "every portrait fax text tier must scale continuously with the viewport");
+  }
+  assert.match(portraitCss, /@media \(min-width: 520px\) and \(min-height: 700px\) \{[\s\S]*\.room-shell \.fax-reading-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy portrait fax reports, including a 540 by 720 viewport, must show their fitted content without an inner scroller");
   assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
   assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
