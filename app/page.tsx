@@ -57,8 +57,7 @@ type DrawerArtifact = {meta:string;title:string|null;copy:string;images?:{asset:
 type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];reverseMeta:string;reverseTitle:string|null;reverseCopy:string;note:string};
 type FieldRecord = {meta:string;title:string|null;copy:string;metrics:{value:string;label:string}[];tags:string[]};
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
-type ReleaseType = "major" | "minor" | "patch";
-type PublicRelease = {version:string;date:string;title:string;type:ReleaseType;summary:string;highlights:string[];details:Record<string,string[]>;releaseUrl?:string};
+type PublicRelease = {version:string;date:string;title:string;summary:string;highlights:string[];details:Record<string,string[]>};
 
 const publicReleases=releasesContent.releases as PublicRelease[];
 
@@ -557,19 +556,18 @@ function SystemUpdatesContent(){
     </nav>
     <section className="system-settings-pane">
       {section==="general"?<div className="system-general-panel">
-        <header><small>{releasesContent.eyebrow}</small><h2>{releasesContent.currentStatus}</h2><p>{releasesContent.product}</p></header>
+        <header><div><small>{releasesContent.eyebrow}</small><h2>{releasesContent.currentStatus}</h2><p>{releasesContent.product}</p></div><button className="system-history-link" type="button" onClick={()=>setSection("history")}>{releasesContent.showHistory}<span aria-hidden="true">→</span></button></header>
         <div className="system-current-release">
           <SystemGearIcon />
-          <div><span>{releasesContent.currentLabel}</span><strong>{releasesContent.versionLabel} {currentVersion}</strong>{currentRelease&&<p>{currentRelease.summary}</p>}</div>
+          <div><span>{releasesContent.currentLabel}</span><strong>{releasesContent.versionLabel} {currentVersion}</strong>{currentRelease&&<p className="system-current-title">{currentRelease.title}</p>}{currentRelease?.summary&&<p>{currentRelease.summary}</p>}</div>
           <aside><i>{versionStatus(currentVersion)}</i>{currentRelease&&<time dateTime={currentRelease.date}>{currentRelease.date}</time>}</aside>
         </div>
         {currentRelease&&<ul className="system-current-highlights">{currentRelease.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul>}
-        <button className="system-history-link" type="button" onClick={()=>setSection("history")}>{releasesContent.showHistory}<span aria-hidden="true">→</span></button>
       </div>:<div className="system-history-panel" tabIndex={0}>
         <header><div><small>{releasesContent.historyLabel}</small><h2>Update History</h2></div><span>{publicReleases.length} {releasesContent.releaseCountLabel}</span></header>
-        <div className="system-release-timeline">{publicReleases.map((release)=><article className={`system-release-entry release-${release.type}`} key={release.version}>
-          <header><strong>v{release.version}</strong><span className="system-release-type">{release.type.toUpperCase()}</span><time dateTime={release.date}>{release.date}</time></header>
-          <div><h3>{release.title}</h3><p>{release.summary}</p><ul>{release.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul>{release.releaseUrl&&<a href={release.releaseUrl} target="_blank" rel="noreferrer">{releasesContent.releaseLink}</a>}</div>
+        <div className="system-release-timeline">{publicReleases.map((release)=><article className="system-release-entry" key={release.version}>
+          <header><strong>v{release.version}</strong><time dateTime={release.date}>{release.date}</time></header>
+          <div><h3>{release.title}</h3>{release.summary&&<p>{release.summary}</p>}<ul>{release.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul></div>
         </article>)}</div>
       </div>}
     </section>

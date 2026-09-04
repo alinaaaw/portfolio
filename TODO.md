@@ -210,13 +210,13 @@
 #### 版本历史列表
 
 - [x] 按时间倒序显示，最新版本在最上方。
-- [x] 每个版本显示版本号、发布日期、版本标题和 1–3 条简短概要。
-- [x] 使用容易识别但不过度抢眼的标签区分 `MAJOR`、`MINOR`、`PATCH`。
-- [x] 所有版本使用统一、紧凑的条目排版，类型标签用于区分 `MAJOR`、`MINOR` 和 `PATCH`。
+- [x] 每个版本显示版本号、CHANGELOG 中的加粗标题、较醒目的发布日期和全部公开修改条目。
+- [x] 不在版本历史中额外显示 `MAJOR`、`MINOR`、`PATCH` 标签。
+- [x] 所有版本使用统一、紧凑的两列条目排版：左侧显示版本号和日期，右侧显示标题与修改内容。
 - [x] 当前少量版本直接完整列出概要，不要求逐项选择或展开。
-- [x] 可选：提供该版本的 GitHub Release 链接，但不要求普通访客理解 commit 或内部部署信息。
+- [x] 仓库未公开期间不显示 GitHub Release 链接；公开后再决定是否加入。
 - [ ] 可选：为与场景有关的变化提供 **Explore this update**，带访客前往对应项目、物体或 AI Guide。
-- [ ] 版本数量增加后采用 major version 分组或分页，继续避免页面滚动和窗口无限变长。
+- [x] 当前少量版本保持在一页内；版本增加并超出可用高度后，历史页才自动启用滚动。
 
 建议显示效果：
 
@@ -239,35 +239,16 @@ Improved mobile hotspots and camera transitions.
 
 #### 版本历史数据
 
-- [x] 新建 `content/releases.json`，只存放已经发布或明确标记为 prerelease 的公开版本概要。
-- [x] 每条记录包含 `version`、`date`、`title`、`type`、`summary`、`highlights` 和可选的 `releaseUrl`、`relatedScene`。
-- [x] 当前版本号仍然只从 `package.json` 读取；`releases.json` 负责历史内容，不成为第二个当前版本来源。
-- [x] CI 检查 `releases.json` 最新公开记录、Git tag 和 `package.json` version 是否一致。
+- [x] 根目录 `CHANGELOG.md` 是版本历史的唯一内容来源；网站构建时直接读取并解析。
+- [x] 解析 Keep a Changelog 格式中的版本、日期、加粗展示标题、说明和 `Added`、`Changed`、`Fixed` 等分类列表。
+- [x] 当前版本号仍然只从 `package.json` 读取；`CHANGELOG.md` 负责历史内容，不成为第二个当前版本来源。
+- [x] CI 检查 `CHANGELOG.md` 最新公开记录、Git tag 和 `package.json` version 是否一致。
 - [x] 正式网站默认不显示普通 commit、内部 build、未发布草稿或失败部署。
 - [x] Prerelease 和 Release Candidate 使用相应状态；历史中只显示已经公开发布的记录。
-- [x] 初期继续使用 JSON，不需要为了 Version History 增加数据库或 CMS。
-- [x] 未来 CMS 可以辅助撰写 release summary，但版本记录仍随正式 release 一起进入 Git 历史。
+- [x] `content/releases.json` 只保存界面标签，不再重复维护版本记录。
+- [x] 不需要为了 Version History 增加数据库或 CMS。
 
-数据结构示例：
-
-```json
-{
-  "releases": [
-    {
-      "version": "1.0.0",
-      "date": "YYYY-MM-DD",
-      "title": "Initial Public Release",
-      "type": "major",
-      "summary": "The first public release of the Lab 17 portfolio.",
-      "highlights": [
-        "Introduced the complete 3D laboratory exploration",
-        "Published the first project and research case files"
-      ],
-      "releaseUrl": "https://github.com/alinaaaw/portfolio/releases/tag/v1.0.0"
-    }
-  ]
-}
-```
+继续沿用当前 `CHANGELOG.md` 的 Keep a Changelog 格式，不为网站展示增加额外的专用字段。
 
 #### 交互和无障碍要求
 

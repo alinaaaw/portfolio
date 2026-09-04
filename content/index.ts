@@ -9,10 +9,13 @@ import board from "./board.json";
 import fieldCase from "./field-case.json";
 import faxContact from "./fax-contact.json";
 import references from "./references.json";
-import releases from "./releases.json";
+import releaseInterface from "./releases.json";
+import changelogSource from "../CHANGELOG.md?raw";
+import { parseReleaseHistory } from "./release-history.mjs";
 import packageMetadata from "../package.json";
 
 const version = `v${packageMetadata.version}`;
+const releases = { ...releaseInterface, releases: parseReleaseHistory(changelogSource) };
 const siteWithVersion = {
   ...site,
   brand: { ...site.brand, version: `PORTFOLIO SYSTEM ${version}` },

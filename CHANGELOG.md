@@ -7,6 +7,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [0.8.1] - 2026-08-28
 
+**Interaction Alignment**
+
 ### Fixed
 
 - Fixed printer, drawer, and room closeup staging and alignment.
@@ -15,6 +17,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 - Updated the release workflow runtime.
 
 ## [0.8.0] - 2026-08-27
+
+**Initial Public Preview**
 
 > First public prerelease. This version is available for external testing and is not the stable `1.0.0` release.
 

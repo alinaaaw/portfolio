@@ -89,9 +89,11 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /className="system-release-timeline"/);
   assert.doesNotMatch(page, /selectedVersion|selectedRelease/);
   assert.doesNotMatch(page, /className="system-release-list"/);
+  assert.doesNotMatch(page, /releaseUrl|releaseLink/);
   assert.match(siteCss, /\.system-updates-window > \.system-settings-content \{[^}]*overflow: hidden/);
   assert.match(siteCss, /\.system-settings-pane \{[^}]*overflow: hidden/);
-  assert.match(siteCss, /\.system-history-panel \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-general-panel \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-history-panel \{[^}]*overflow-y: auto/);
   assert.match(page, /tabIndex=\{0\}/);
   assert.match(page, /onToggleMaximize=\{toggleMaximizedWindow\}/);
   assert.match(page, /maximizedWindow===\"references\"/);
@@ -191,8 +193,9 @@ test("editable copy is organized into valid category files", async () => {
 
 test("public release history is ordered and matches the package version", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
-  const releaseContent = JSON.parse(await readFile(new URL("../content/releases.json", import.meta.url), "utf8"));
-  const releases = releaseContent.releases;
+  const changelog = await readFile(new URL("../CHANGELOG.md", import.meta.url), "utf8");
+  const { parseReleaseHistory } = await import("../content/release-history.mjs");
+  const releases = parseReleaseHistory(changelog);
 
   assert.ok(releases.length > 0);
   assert.equal(releases[0].version, packageJson.version, "latest public release must match the current package version");
@@ -200,11 +203,11 @@ test("public release history is ordered and matches the package version", async 
   for (const release of releases) {
     assert.match(release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
     assert.match(release.date, /^\d{4}-\d{2}-\d{2}$/);
-    assert.ok(release.title && release.summary);
-    assert.ok(["major","minor","patch"].includes(release.type));
-    assert.ok(Array.isArray(release.highlights) && release.highlights.length >= 1 && release.highlights.length <= 3);
+    assert.ok(release.title);
+    assert.equal(typeof release.summary, "string");
+    assert.ok(Array.isArray(release.highlights) && release.highlights.length >= 1);
+    assert.equal(release.highlights.length, Object.values(release.details).flat().length, "every changelog item must appear in version history");
     assert.ok(Object.values(release.details).every((items) => Array.isArray(items) && items.length > 0));
-    if (release.releaseUrl) assert.equal(new URL(release.releaseUrl).protocol, "https:");
   }
 });
 
