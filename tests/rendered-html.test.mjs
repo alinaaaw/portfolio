@@ -29,6 +29,9 @@ test("server renders a personal laboratory before revealing the mystery", async 
 
 test("website version displays and release tag match package version", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const siteContent = await readFile(new URL("../content/site.json", import.meta.url), "utf8");
+  const faxContent = await readFile(new URL("../content/fax-contact.json", import.meta.url), "utf8");
+  const contentIndex = await readFile(new URL("../content/index.ts", import.meta.url), "utf8");
   const response = await render();
   const html = await response.text();
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
@@ -36,6 +39,13 @@ test("website version displays and release tag match package version", async () 
 
   assert.ok(html.includes(`v${version}`), "rendered website must include the package version");
   assert.ok((page.match(/siteContent\.brand\.version/g) ?? []).length >= 2, "both website version displays must use the shared package-backed version");
+  const faxJson = JSON.parse(faxContent);
+  assert.ok(faxJson.contact.feedback.includes("{version}"), "contact feedback must reserve a package-backed version display");
+  assert.ok(faxJson.contact.feedbackLabel.includes("{version}"), "contact feedback link must reserve a package-backed version display");
+  assert.match(contentIndex, /from "\.\.\/package\.json"/, "website content must import the authoritative package version");
+  assert.ok((contentIndex.match(/\{version\}/g) ?? []).length >= 2, "contact placeholders must consume the package-backed version");
+  assert.doesNotMatch(siteContent, /PORTFOLIO SYSTEM v\d+\.\d+\.\d+/, "site content must not duplicate the package version");
+  assert.doesNotMatch(faxContent, /(?:Portfolio System v|SEND )\d+\.\d+\.\d+/, "feedback content must not duplicate the package version");
 
   let tag;
   try {
@@ -159,6 +169,23 @@ test("editable copy is organized into valid category files", async () => {
   }
   const guide = await readFile(new URL("../content/CONTENT_GUIDE.md", import.meta.url), "utf8");
   assert.match(guide, /Website Copy Editing Guide/);
+});
+
+test("critical local assets and visitor links remain valid", async () => {
+  const { access, readFile } = await import("node:fs/promises");
+  await Promise.all([
+    access(new URL("../public/site.css", import.meta.url)),
+    access(new URL("../public/og.png", import.meta.url)),
+  ]);
+
+  const references = JSON.parse(await readFile(new URL("../content/references.json", import.meta.url), "utf8"));
+  const contact = JSON.parse(await readFile(new URL("../content/fax-contact.json", import.meta.url), "utf8"));
+  assert.ok(references.references.length > 0);
+  assert.ok(references.references.every((reference) => {
+    const url = new URL(reference.url);
+    return url.protocol === "https:";
+  }), "every external reference must use HTTPS");
+  assert.match(contact.contact.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "contact email must remain usable by mailto links");
 });
 
 test("3D room and layered object exploration remain connected", async () => {

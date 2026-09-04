@@ -142,42 +142,51 @@
 | `MINOR` | 向后兼容的重要新增 | 新项目、新场景、新内容类型、一轮明显的 3D 升级或新的访客功能 | `1.1.3` → `1.2.0` |
 | `PATCH` | 修复和小幅改进 | 错字、链接、手机布局、点击区域、性能、无障碍或小型视觉修复 | `1.2.0` → `1.2.1` |
 
-- [ ] 当前可运行的网站以及 Phase 3.5 的第一轮早期公开版本使用 `0.8.0`；普通 commit 和测试反馈修复不反复增加这个号码。
-- [ ] 3D 改进和正式发布结构基本完成、准备进行更完整的 beta 验收时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
-- [ ] 文字、3D 和发布流程全部完成，网站达到“如果没有阻塞问题就可以正式上线”的状态时使用 `1.0.0-rc.1`；如果发现问题，依次使用 `rc.2`、`rc.3`。
-- [ ] 将 `alinawu.com` 从早期公开版本升级为第一个公开稳定版时设为 `1.0.0`；域名保持不变，只更新经过验收的网站版本。
-- [ ] 将新增项目、场景或明显 3D 升级作为 `MINOR` 发布，例如 `1.1.0`。
-- [ ] 将只包含修复的版本作为 `PATCH` 发布，例如 `1.1.1`。
-- [ ] 如果 AI Guide 变成网站的核心探索和问答方式，将其作为 `2.0.0`；如果只是可选的小功能，则可以作为 `1.x.0`。
-- [ ] CMS、analytics 或内部重构如果不改变访客体验，不单独要求 `MAJOR` 版本；它们随下一次有公开价值的 release 一起记录。
-- [ ] `MAJOR` 增加时把 `MINOR` 和 `PATCH` 重置为零；`MINOR` 增加时把 `PATCH` 重置为零。
+- [x] Phase 3.5 的第一轮早期公开版本使用 `0.8.0`；当前正式 patch release 为 `0.8.1`。普通 commit 和测试反馈修复不修改版本号，只有经过确认的 release 才升级版本。
+- [x] 3D 改进和正式发布结构基本完成、准备进行更完整的 beta 验收时使用 `0.9.0-beta.1`；如果 beta 阶段需要再次发布测试版，依次使用 `beta.2`、`beta.3`。
+- [x] 文字、3D 和发布流程全部完成，网站达到“如果没有阻塞问题就可以正式上线”的状态时使用 `1.0.0-rc.1`；如果发现问题，依次使用 `rc.2`、`rc.3`。
+- [x] 将 `alinawu.com` 从早期公开版本升级为第一个公开稳定版时设为 `1.0.0`；域名保持不变，只更新经过验收的网站版本。
+- [x] 将新增项目、场景或明显 3D 升级作为 `MINOR` 发布，例如 `1.1.0`。
+- [x] 将只包含修复的版本作为 `PATCH` 发布，例如 `1.1.1`。
+- [x] 如果 AI Guide 变成网站的核心探索和问答方式，将其作为 `2.0.0`；如果只是可选的小功能，则可以作为 `1.x.0`。
+- [x] CMS、analytics 或内部重构如果不改变访客体验，不单独要求 `MAJOR` 版本；它们随下一次有公开价值的 release 一起记录。
+- [x] `MAJOR` 增加时把 `MINOR` 和 `PATCH` 重置为零；`MINOR` 增加时把 `PATCH` 重置为零。
 
 ### 4.2 版本号的唯一来源和显示位置
 
-- [ ] 以 `package.json` 的 `version` 作为唯一权威版本号。
-- [ ] 使用版本工具同步更新 `package-lock.json`，不要分别手改两个不一致的号码。
-- [ ] 新建 `CHANGELOG.md`，按版本记录公开变化。
-- [ ] 每个正式版本创建完全对应的 Git tag，例如 package version `1.2.0` 对应 tag `v1.2.0`。
-- [ ] 每个 tag 创建同名 GitHub Release，并填写该版本的发布说明。
-- [ ] 网站构建时自动从 `package.json` 读取版本，不在多个 JSON 或组件中重复维护号码。
-- [ ] 在 Lab 17 的 computer System Bulletin、README 窗口或较低调的位置显示 `Portfolio System v1.2.0`；不要把版本号放在首页主标题中。
-- [ ] 在 Cloudflare deployment message 或 version tag 中记录相同的 release 版本，方便定位和回退。
+- [x] 以 `package.json` 的 `version` 作为唯一权威版本号。
+- [x] 使用版本工具同步更新 `package-lock.json`，不要分别手改两个不一致的号码。
+- [x] 新建 `CHANGELOG.md`，按版本记录公开变化。
+- [x] 每个正式版本创建完全对应的 Git tag，例如 package version `1.2.0` 对应 tag `v1.2.0`。
+- [x] 每个正式版本 tag 创建同名 GitHub Release，并填写该版本的发布说明。
+- [x] 网站构建时自动从 `package.json` 读取版本，不在多个 JSON 或组件中重复维护号码。
+- [x] 在 Lab 17 的 computer System Bulletin、README 窗口或较低调的位置显示 `Portfolio System v1.2.0`；不要把版本号放在首页主标题中。
+- [x] 在 Cloudflare deployment message 或 version tag 中记录相同的 release 版本，方便定位和回退。
 
 完成标准：修改一次 `package.json` 后，网站显示、Git tag、GitHub Release、CHANGELOG 和 Cloudflare deployment 都能对应到同一个版本。
 
-### 4.2.1（高优先级）：分层测试与真实浏览器 Smoke Test
+### 4.2.1（高优先级）：分层自动检查与人工浏览器 Smoke Test
 
-目标是验证访客实际操作可以完成核心探索，而不只是确认源码能够构建。
+这个个人作品集保持轻量测试策略：CI 负责快速、稳定的构建和结构检查；真实浏览器交互由每次正式发布前的 localhost 人工验收负责，不在 CI 中安装或运行 Playwright 等浏览器依赖。
 
-- [ ] 增加真实浏览器端到端测试依赖和可重复的 CI 浏览器环境。
-- [ ] 日常 CI（push 到 `main` 和 Pull Request）运行快速 smoke test：访问首页、进入 Room View、打开和关闭 Computer、双击桌面文件、返回房间。
-- [ ] 日常 CI 覆盖六个 closeup 的打开与 `RETURN TO ROOM` 返回路径，确保核心入口不会失效。
-- [ ] Release workflow 在日常 smoke test 基础上运行完整访客流程：Drawer、Notebook、Board、Field Case、Printer/Fax、Contact、地图控制、键盘操作和关键链接访问。
-- [ ] 验证关键页面和静态资源返回成功，图片加载失败或外部链接失效时不会阻断主体验。
-- [ ] 将版本一致性检查保留在日常和 Release 测试中；Release 额外验证 Git tag 与 `package.json` 版本一致。
-- [ ] 避免重复测试 case：日常测试只保留快速高价值路径，Release 测试补充完整流程和发布前检查。
+- [x] 日常 CI（push 到 `main` 和 Pull Request）运行 lint、production build 和 rendered-site tests。
+- [x] 自动测试覆盖首页渲染、内容 JSON、六个核心场景的连接、3D/地图结构和关键静态资源。
+- [x] 自动测试验证网站显示版本来自 `package.json`，避免多个内容文件重复维护版本号。
+- [x] Release workflow 在部署前重复运行 lint 和完整 `npm test`，任一检查失败都不部署。
+- [x] Release workflow 额外验证 Git tag 与 `package.json` 版本完全一致。
+- [x] 不在日常或 Release CI 中运行真实浏览器，避免为低频发布引入较慢且易受 WebGL 环境影响的测试。
+- [x] 将真实交互保留为每次正式发布前的人工 smoke test，并使用下面同一份清单，避免维护重复自动化 case。
 
-完成标准：日常 CI 能快速发现首页、核心点击路径或访问错误；发布前能完整走通访客探索流程，并确认网页两处版本显示、`package.json`、Git tag 和 Release 版本一致。
+每次正式发布前，在 localhost 用桌面和手机宽度各完成一次：
+
+1. 访问首页并进入 Room View，确认页面和关键图片正常加载。
+2. 打开和关闭 Computer，双击桌面文件，并返回房间。
+3. 依次打开 Computer、Drawer、Notebook、Books、Board 和 Field Case，确认每个入口和 `RETURN TO ROOM` 都可用。
+4. 完成 Printer/Fax 和 Contact 流程，确认反馈卡显示当前 `package.json` 版本且邮件链接正确。
+5. 操作地图视图、缩放、地点照片和键盘返回路径；抽查主要外部链接不会阻断当前页面。
+6. 确认 Room View 与 Computer 顶栏两处版本显示一致。
+
+完成标准：日常 CI 能快速发现构建、首页渲染、内容结构、静态资源或版本错误；每个正式 release 在发布前完成人工浏览器清单，并确认网页显示、`package.json`、Git tag 和 Release 版本一致。
 
 ### 4.3 网站电脑中的 Version History 应用
 

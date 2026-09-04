@@ -20,8 +20,8 @@ const faxContactWithVersion = {
   ...faxContact,
   contact: {
     ...faxContact.contact,
-    feedback: faxContact.contact.feedback.replace(/v\d+\.\d+\.\d+/, version),
-    feedbackLabel: faxContact.contact.feedbackLabel.replace(/\d+\.\d+\.\d+/, packageMetadata.version),
+    feedback: faxContact.contact.feedback.replace("{version}", version),
+    feedbackLabel: faxContact.contact.feedbackLabel.replace("{version}", packageMetadata.version),
   },
 };
 
