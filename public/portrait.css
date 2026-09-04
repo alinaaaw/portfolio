@@ -323,6 +323,10 @@
     min-height: 48px;
   }
 
+}
+
+@media (orientation: portrait), (orientation: landscape) and (pointer: coarse) and (min-height: 600px) {
+
   .computer-view-desktop {
     display: none;
   }
@@ -2514,6 +2518,10 @@
     }
   }
 
+}
+
+@media (orientation: portrait) {
+
   .room-shell > .modal-layer.tactile-layer {
     display: grid;
     grid-template-columns: minmax(0,1fr);
@@ -3030,9 +3038,296 @@
   }
 }
 
+@media (orientation: landscape) and (pointer: coarse) and (min-height: 600px) {
+  .computer-view-desktop {
+    display: none;
+  }
+
+  .portrait-computer-view {
+    display: grid;
+  }
+
+  .landscape-phone-rotate {
+    display: none;
+  }
+
+  .portrait-phone-home {
+    grid-template: minmax(0,1fr) auto / minmax(280px,.85fr) minmax(420px,1.15fr);
+    gap: 18px 5vw;
+    padding: 20px max(32px,env(safe-area-inset-right)) 12px max(32px,env(safe-area-inset-left));
+  }
+
+  .portrait-phone-widget {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+    width: min(100%,520px);
+    margin-left: auto;
+  }
+
+  .portrait-phone-widget h1 {
+    font-size: clamp(46px,6.5vw,76px);
+  }
+
+  .portrait-phone-widget p {
+    font-size: clamp(10px,1.25vw,14px);
+    -webkit-line-clamp: 4;
+  }
+
+  .portrait-home-apps {
+    grid-row: 1;
+    grid-column: 2;
+    align-self: center;
+    grid-template-columns: repeat(4,minmax(72px,1fr));
+    gap: clamp(14px,2.4vw,30px);
+    width: min(100%,650px);
+    margin-right: auto;
+  }
+
+  .portrait-home-apps button {
+    min-height: 104px;
+  }
+
+  .portrait-app-icon {
+    width: clamp(62px,6.6vw,78px);
+    height: clamp(62px,6.6vw,78px);
+  }
+
+  .portrait-home-apps button > span:last-child {
+    font-size: clamp(10px,1.15vw,13px);
+  }
+
+  .portrait-phone-dock {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    width: min(440px,48vw);
+    min-height: 82px;
+    padding-block: 7px;
+  }
+
+  .portrait-phone-dock button {
+    min-height: 66px;
+  }
+
+  .portrait-phone-app-content > .portrait-document,
+  .portrait-phone-app-content > .portrait-lab-log,
+  .portrait-phone-app-content > .portrait-references,
+  .portrait-phone-app-content > .portrait-profile,
+  .portrait-phone-app-content > .portrait-root-list {
+    width: min(100%,1040px);
+    margin-inline: auto;
+  }
+
+  .portrait-ios-settings {
+    display: grid;
+    grid-template: auto auto / minmax(230px,.62fr) minmax(400px,1.38fr);
+    align-content: start;
+    gap: 22px 34px;
+    min-height: 100%;
+    padding: 30px max(34px,env(safe-area-inset-right)) 34px max(34px,env(safe-area-inset-left));
+  }
+
+  .portrait-settings-hero {
+    position: sticky;
+    top: 20px;
+    grid-row: 1 / span 2;
+    grid-column: 1;
+    align-self: start;
+    padding-top: 18px;
+  }
+
+  .portrait-settings-section {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .portrait-settings-history {
+    grid-row: 2;
+    grid-column: 2;
+    margin-top: 0;
+  }
+}
+
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 599px) {
+  .computer-view-desktop {
+    display: none;
+  }
+
+  .portrait-computer-view {
+    position: fixed;
+    z-index: 40;
+    inset: 0;
+    display: grid;
+    width: 100vw;
+    height: 100svh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #07100e;
+    color: var(--paper);
+  }
+
+  .portrait-computer-view > .portrait-phone-statusbar,
+  .portrait-computer-view > .portrait-phone-notification,
+  .portrait-computer-view > .portrait-phone-stage,
+  .portrait-computer-view > .portrait-phone-systembar {
+    display: none;
+  }
+
+  .landscape-phone-rotate {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    padding: 18px max(32px,env(safe-area-inset-right)) 16px max(32px,env(safe-area-inset-left));
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 44%,rgba(112,201,192,.12),transparent 34%),
+      linear-gradient(rgba(112,201,192,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(112,201,192,.035) 1px,transparent 1px),
+      #07100e;
+    background-size: auto,34px 34px,34px 34px,auto;
+    text-align: center;
+  }
+
+  .landscape-phone-rotate-leave {
+    position: absolute;
+    top: max(10px,env(safe-area-inset-top));
+    left: max(16px,env(safe-area-inset-left));
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px 0 0;
+    background: transparent;
+    color: var(--cyan);
+    font: 8px/1 var(--font-mono),monospace;
+  }
+
+  .landscape-phone-rotate-leave > i {
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-bottom: 1.5px solid currentColor;
+    border-left: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .landscape-phone-rotate-graphic {
+    position: relative;
+    width: 100px;
+    height: 82px;
+    margin-bottom: 7px;
+  }
+
+  .landscape-phone-outline {
+    position: absolute;
+    top: 8px;
+    left: 31px;
+    width: 38px;
+    height: 66px;
+    border: 2px solid var(--paper);
+    border-radius: 8px;
+    box-shadow: 0 0 22px rgba(112,201,192,.14);
+    transform-origin: center;
+    animation: rotatePhoneUpright 2.8s cubic-bezier(.55,.05,.35,1) infinite;
+  }
+
+  .landscape-phone-outline::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 14px;
+    height: 3px;
+    translate: -50% 0;
+    border-radius: 999px;
+    background: rgba(229,220,198,.7);
+  }
+
+  .landscape-phone-outline i {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    left: 8px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--signal);
+  }
+
+  .landscape-phone-rotate-arrow {
+    position: absolute;
+    top: 15px;
+    left: 9px;
+    width: 77px;
+    height: 49px;
+    border: 1px solid transparent;
+    border-top-color: var(--cyan);
+    border-radius: 50%;
+    animation: rotatePhoneArrow 2.8s ease-in-out infinite;
+  }
+
+  .landscape-phone-rotate-arrow::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    right: 1px;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid var(--cyan);
+    border-right: 1px solid var(--cyan);
+    transform: rotate(28deg);
+  }
+
+  .landscape-phone-rotate small,
+  .landscape-phone-rotate strong {
+    color: var(--cyan);
+    font: 7px/1.2 var(--font-mono),monospace;
+    letter-spacing: .14em;
+  }
+
+  .landscape-phone-rotate h2 {
+    margin: 7px 0 5px;
+    font-size: clamp(22px,6.5vh,34px);
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+
+  .landscape-phone-rotate p {
+    max-width: 390px;
+    margin: 0 0 9px;
+    color: #aeb9b2;
+    font-size: clamp(10px,2.6vh,13px);
+    line-height: 1.4;
+  }
+
+  .landscape-phone-rotate strong {
+    color: var(--signal);
+  }
+
+  @keyframes rotatePhoneUpright {
+    0%,18%,100% { transform: rotate(90deg); }
+    48%,76% { transform: rotate(0deg); }
+  }
+
+  @keyframes rotatePhoneArrow {
+    0%,18%,100% { opacity: .25; transform: rotate(-12deg); }
+    48%,76% { opacity: 1; transform: rotate(28deg); }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .room-shell .mobile-scene-hotspots.is-intro .mobile-scene-hotspot,
-  .room-shell .mobile-scene-hotspot-coach {
+  .room-shell .mobile-scene-hotspot-coach,
+  .landscape-phone-outline,
+  .landscape-phone-rotate-arrow {
     animation: none;
+  }
+
+  .landscape-phone-outline {
+    transform: rotate(0deg);
   }
 }

@@ -196,7 +196,8 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.ok(layout.indexOf('import "../public/site.css"') < layout.indexOf('import "../public/portrait.css"'), "portrait overrides must load after the shared stylesheet");
   assert.match(layout, /viewportFit: "cover"/);
   assert.match(portraitCss.trim(), /^@media \(orientation: portrait\) \{/);
-  assert.equal((portraitCss.match(/@media \(orientation: portrait\)/g) ?? []).length, 1, "portrait styling must have one explicit isolation boundary");
+  assert.equal((portraitCss.match(/^@media \(orientation: portrait\) \{$/gm) ?? []).length, 2, "room and closeup portrait rules must remain isolated around the shared mobile Computer rules");
+  assert.equal((portraitCss.match(/^@media \(orientation: portrait\), \(orientation: landscape\) and \(pointer: coarse\) and \(min-height: 600px\) \{$/gm) ?? []).length, 1, "mobile Computer rules must have one explicit portrait and touch-tablet boundary");
   assert.equal((page.match(/<LabGame\b/g) ?? []).length, 1, "the room must keep one LabGame instance");
   assert.equal((game.match(/<canvas\b/g) ?? []).length, 1, "LabGame must keep one WebGL canvas");
   assert.match(game, /if\(rect\.width<2\|\|rect\.height<2\)return/);
@@ -230,7 +231,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(page, /setComputerWindows\(file==="desktop"\?\[\]:\[file\]\)/, "portrait apps must replace desktop window stacking with top-level phone destinations");
   assert.doesNotMatch(page, /computerViewRef|computerOsRef|--computer-scale|--computer-layout-(?:width|height)|scrollWidth/);
   assert.doesNotMatch(page, /className="computer-os"/);
-  assert.match(siteCss, /\.portrait-computer-view \{ display: none; \}/);
+  assert.match(siteCss, /\.portrait-computer-view, \.landscape-phone-rotate \{ display: none; \}/);
   assert.match(portraitCss, /\.computer-view-desktop \{\s*display: none/);
   assert.match(portraitCss, /\.portrait-computer-view \{[\s\S]*display: grid;[\s\S]*height: 100svh;[\s\S]*height: 100dvh;[\s\S]*overflow: hidden/);
   assert.doesNotMatch(`${portraitComputer}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/, "portrait Computer must not return to whole-interface scaling");
@@ -348,6 +349,12 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /className="portrait-phone-dock"[\s\S]*PhoneAppIcon kind="projects"[\s\S]*PhoneAppIcon kind="references"[\s\S]*PhoneAppIcon kind="lablog"/);
   assert.match(portraitComputer, /className="portrait-phone-navbar"[\s\S]*onClick=\{canGoBack\?onBack:\(\)=>onOpenRoot\("desktop"\)\}/);
   assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
+  assert.match(portraitComputer, /className="landscape-phone-rotate"[\s\S]*computerContent\.rotatePrompt\.title[\s\S]*computerContent\.rotatePrompt\.hint/, "landscape phones must render a content-backed rotate-device prompt");
+  assert.match(portraitCss, /@media \(orientation: portrait\), \(orientation: landscape\) and \(pointer: coarse\) and \(min-height: 600px\) \{[\s\S]*\.computer-view-desktop \{[\s\S]*display: none;[\s\S]*\.portrait-computer-view \{[\s\S]*display: grid;/, "portrait devices and landscape touch tablets must share the mobile computer architecture");
+  assert.match(portraitCss, /@media \(orientation: landscape\) and \(pointer: coarse\) and \(min-height: 600px\) \{[\s\S]*\.portrait-phone-home \{[\s\S]*grid-template:[^}]*minmax\(420px,1\.15fr\)[\s\S]*\.portrait-ios-settings \{[\s\S]*grid-template:[^}]*minmax\(400px,1\.38fr\)/, "landscape touch tablets must use a horizontal home and app layout");
+  assert.match(portraitCss, /@media \(orientation: landscape\) and \(pointer: coarse\) and \(max-height: 599px\) \{[\s\S]*\.computer-view-desktop \{[\s\S]*display: none;[\s\S]*\.portrait-computer-view > \.portrait-phone-stage,[\s\S]*display: none;[\s\S]*\.landscape-phone-rotate \{[\s\S]*display: flex;/, "short landscape touch phones must show only the portrait-orientation guide");
+  assert.match(portraitCss, /@keyframes rotatePhoneUpright[\s\S]*rotate\(90deg\)[\s\S]*rotate\(0deg\)/, "the phone guide must visibly demonstrate the required rotation");
+  assert.match(portraitCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.landscape-phone-outline,[\s\S]*animation: none/, "the rotate-device guide must respect reduced-motion preferences");
   assert.match(portraitComputer, /notesOpen=activeWindow==="readme"[\s\S]*is-notes-active/);
   assert.match(portraitComputer, /settingsOpen=activeWindow==="updates"[\s\S]*is-settings-active[\s\S]*activeWindow==="updates"&&<PortraitSystemSettings/, "portrait settings must stay isolated from the desktop System window");
   assert.match(portraitComputer, /className="portrait-settings-group"[\s\S]*currentVersion[\s\S]*versionStatus\(currentVersion\)[\s\S]*currentRelease\.date/, "portrait About must use the shared package and release data");

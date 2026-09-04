@@ -205,5 +205,13 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
     </div>
 
     <footer className="portrait-phone-systembar"><button type="button" onClick={()=>onOpenRoot("desktop")} aria-label="Go to Home Screen"><i /></button></footer>
+    <aside className="landscape-phone-rotate" role="status" aria-live="polite" aria-label={computerContent.rotatePrompt.ariaLabel}>
+      <button type="button" className="landscape-phone-rotate-leave" onClick={onLeave}><i aria-hidden="true" /> LAB 17</button>
+      <div className="landscape-phone-rotate-graphic" aria-hidden="true"><span className="landscape-phone-outline"><i /></span><span className="landscape-phone-rotate-arrow" /></div>
+      <small>{computerContent.rotatePrompt.eyebrow}</small>
+      <h2>{computerContent.rotatePrompt.title}</h2>
+      <p>{computerContent.rotatePrompt.copy}</p>
+      <strong>{computerContent.rotatePrompt.hint}</strong>
+    </aside>
   </section>;
 }

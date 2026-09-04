@@ -1,5 +1,12 @@
 {
   "ariaLabel": "Alina's computer desktop",
+  "rotatePrompt": {
+    "ariaLabel": "Portrait orientation required",
+    "eyebrow": "MOBILE COMPUTER",
+    "title": "Turn your phone upright",
+    "copy": "Rotate to portrait to continue exploring this computer.",
+    "hint": "ROTATE TO CONTINUE"
+  },
   "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
   "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "labLog": "LAB LOG", "system": "SYSTEM", "location": "LAB-17 / LOCAL" },
   "profile": {
