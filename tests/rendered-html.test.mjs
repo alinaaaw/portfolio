@@ -29,6 +29,9 @@ test("server renders a personal laboratory before revealing the mystery", async 
 
 test("website version displays and release tag match package version", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const siteContent = await readFile(new URL("../content/site.json", import.meta.url), "utf8");
+  const faxContent = await readFile(new URL("../content/fax-contact.json", import.meta.url), "utf8");
+  const contentIndex = await readFile(new URL("../content/index.ts", import.meta.url), "utf8");
   const response = await render();
   const html = await response.text();
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
@@ -36,6 +39,13 @@ test("website version displays and release tag match package version", async () 
 
   assert.ok(html.includes(`v${version}`), "rendered website must include the package version");
   assert.ok((page.match(/siteContent\.brand\.version/g) ?? []).length >= 2, "both website version displays must use the shared package-backed version");
+  const faxJson = JSON.parse(faxContent);
+  assert.ok(faxJson.contact.feedback.includes("{version}"), "contact feedback must reserve a package-backed version display");
+  assert.ok(faxJson.contact.feedbackLabel.includes("{version}"), "contact feedback link must reserve a package-backed version display");
+  assert.match(contentIndex, /from "\.\.\/package\.json"/, "website content must import the authoritative package version");
+  assert.ok((contentIndex.match(/\{version\}/g) ?? []).length >= 2, "contact placeholders must consume the package-backed version");
+  assert.doesNotMatch(siteContent, /PORTFOLIO SYSTEM v\d+\.\d+\.\d+/, "site content must not duplicate the package version");
+  assert.doesNotMatch(faxContent, /(?:Portfolio System v|SEND )\d+\.\d+\.\d+/, "feedback content must not duplicate the package version");
 
   let tag;
   try {
@@ -49,7 +59,8 @@ test("website version displays and release tag match package version", async () 
 test("source contains six room objects, real work, and a progressive reveal", async () => {
   const { readFile } = await import("node:fs/promises");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const contentFiles = ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"];
+  const siteCss = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
+  const contentFiles = ["site","intro","room","computer","references","releases","books","drawer","notebook","board","field-case","fax-contact"];
   const content = (await Promise.all(contentFiles.map((name) => readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8")))).join("\n");
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"|active!==\\"${zone}\\"|\\"${zone}\\"`));
@@ -65,6 +76,25 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /lab-log-line/);
   assert.match(content, /USER PROFILE \/ ALINA\.WU/);
   assert.match(page, /os-profile-trigger/);
+  assert.match(content, /SYSTEM_UPDATES\.app/);
+  assert.match(page, /selectedComputerFile==="updates"/);
+  assert.match(page, /focusComputerWindow\("updates"\)/);
+  assert.match(page, /className="os-version-button"/);
+  assert.match(page, /className="os-system-trigger"/);
+  assert.match(page, /className="settings-app-icon"/);
+  assert.doesNotMatch(page, /desktopBadge|updates-app-icon/);
+  assert.doesNotMatch(page, /profile-version-history/);
+  assert.match(page, /showComputerWindow\("updates"\)/);
+  assert.match(page, /section===\"history\"/);
+  assert.match(page, /className="system-release-timeline"/);
+  assert.doesNotMatch(page, /selectedVersion|selectedRelease/);
+  assert.doesNotMatch(page, /className="system-release-list"/);
+  assert.doesNotMatch(page, /releaseUrl|releaseLink/);
+  assert.match(siteCss, /\.system-updates-window > \.system-settings-content \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-settings-pane \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-general-panel \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-history-panel \{[^}]*overflow-y: auto/);
+  assert.match(page, /tabIndex=\{0\}/);
   assert.match(page, /onToggleMaximize=\{toggleMaximizedWindow\}/);
   assert.match(page, /maximizedWindow===\"references\"/);
   assert.match(page, /window-maximize/);
@@ -376,12 +406,49 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
 
 test("editable copy is organized into valid category files", async () => {
   const { readFile } = await import("node:fs/promises");
-  for (const name of ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"]) {
+  for (const name of ["site","intro","room","computer","references","releases","books","drawer","notebook","board","field-case","fax-contact"]) {
     const source = await readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8");
     assert.doesNotThrow(() => JSON.parse(source), `${name}.json must remain valid JSON`);
   }
   const guide = await readFile(new URL("../content/CONTENT_GUIDE.md", import.meta.url), "utf8");
   assert.match(guide, /Website Copy Editing Guide/);
+});
+
+test("public release history is ordered and matches the package version", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const changelog = await readFile(new URL("../CHANGELOG.md", import.meta.url), "utf8");
+  const { parseReleaseHistory } = await import("../content/release-history.mjs");
+  const releases = parseReleaseHistory(changelog);
+
+  assert.ok(releases.length > 0);
+  assert.equal(releases[0].version, packageJson.version, "latest public release must match the current package version");
+  assert.deepEqual([...releases].sort((a,b) => b.date.localeCompare(a.date)), releases, "public releases must remain newest first");
+  for (const release of releases) {
+    assert.match(release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+    assert.match(release.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(release.title);
+    assert.equal(typeof release.summary, "string");
+    assert.ok(Array.isArray(release.highlights) && release.highlights.length >= 1);
+    assert.equal(release.highlights.length, Object.values(release.details).flat().length, "every changelog item must appear in version history");
+    assert.ok(Object.values(release.details).every((items) => Array.isArray(items) && items.length > 0));
+  }
+});
+
+test("critical local assets and visitor links remain valid", async () => {
+  const { access, readFile } = await import("node:fs/promises");
+  await Promise.all([
+    access(new URL("../public/site.css", import.meta.url)),
+    access(new URL("../public/og.png", import.meta.url)),
+  ]);
+
+  const references = JSON.parse(await readFile(new URL("../content/references.json", import.meta.url), "utf8"));
+  const contact = JSON.parse(await readFile(new URL("../content/fax-contact.json", import.meta.url), "utf8"));
+  assert.ok(references.references.length > 0);
+  assert.ok(references.references.every((reference) => {
+    const url = new URL(reference.url);
+    return url.protocol === "https:";
+  }), "every external reference must use HTTPS");
+  assert.match(contact.contact.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "contact email must remain usable by mailto links");
 });
 
 test("3D room and layered object exploration remain connected", async () => {

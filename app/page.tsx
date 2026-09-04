@@ -23,8 +23,10 @@ import {
   intro as introContent,
   notebook as notebookContent,
   references as referencesContent,
+  releases as releasesContent,
   room as roomContent,
   site as siteContent,
+  currentVersion,
 } from "@/content";
 
 const LabGame = dynamic(() => import("./_components/LabGame"), {
@@ -37,6 +39,9 @@ const ZoneCloseup3D = dynamic(() => import("./_components/ZoneCloseup3D"), {
   loading: () => <div className="lab-loading"><i /><span>{siteContent.loading.closeup}</span></div>,
 });
 
+type ProjectFileId = "map" | "allocation" | "emg";
+type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references" | "updates";
+type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 type WindowPosition = { x:number; y:number };
 
 const zoneOrder: ZoneId[] = ["computer","drawer","notebook","books","board","fieldcase"];
@@ -53,6 +58,16 @@ type DrawerArtifact = {meta:string;title:string|null;copy:string;images?:{asset:
 type NotebookPage = {meta:string;title:string|null;lead:string;steps:string[];reverseMeta:string;reverseTitle:string|null;reverseCopy:string;note:string};
 type FieldRecord = {meta:string;title:string|null;copy:string;metrics:{value:string;label:string}[];tags:string[]};
 type ContactCardPhase = "table" | "lifting" | "open" | "returning";
+type PublicRelease = {version:string;date:string;title:string;summary:string;highlights:string[];details:Record<string,string[]>};
+
+const publicReleases=releasesContent.releases as PublicRelease[];
+
+function versionStatus(version:string){
+  if(version.includes("-rc."))return releasesContent.statusLabels.releaseCandidate;
+  if(version.includes("-"))return releasesContent.statusLabels.prerelease;
+  if(version.startsWith("0."))return releasesContent.statusLabels.preview;
+  return releasesContent.statusLabels.stable;
+}
 
 function DraggableComputerWindow({id,className,position,zIndex,onMove,onFocus,onClose,onToggleMaximize,isMaximized,ariaLabel,header,children}:{
   id:ComputerWindowId;
@@ -543,6 +558,40 @@ function ContactCardReading({returning,onReturn}:{returning:boolean;onReturn:()=
   return <div className={`contact-reading ${returning?"returning":""}`} onMouseDown={onReturn}><article className="contact-card-detail" onMouseDown={(event)=>event.stopPropagation()}><small>{faxContact.contact.name}</small><h2>{faxContact.contact.headline[0]}<br />{faxContact.contact.headline[1]}</h2><p>{faxContact.contact.role}</p><p className="contact-feedback-copy">{faxContact.contact.feedback}</p><a href={feedbackHref}>{faxContact.contact.feedbackLabel} <span>{siteContent.shared.arrow}</span></a><a className="contact-email" href={`mailto:${faxContact.contact.email}`}>{faxContact.contact.email}</a><button onClick={onReturn}>{faxContact.contact.return}</button></article></div>;
 }
 
+function SystemUpdatesContent(){
+  const [section,setSection]=useState<"general"|"history">("general");
+  const currentRelease=publicReleases.find((release)=>release.version===currentVersion)??publicReleases[0];
+
+  return <div className="os-window-content system-settings-content">
+    <nav className="system-settings-nav" aria-label="System sections">
+      <div className="system-settings-identity"><SystemGearIcon /><span><strong>SYSTEM</strong><small>LAB 17</small></span></div>
+      <button className={section==="general"?"active":""} type="button" aria-current={section==="general"?"page":undefined} onClick={()=>setSection("general")}>{releasesContent.generalLabel}</button>
+      <button className={section==="history"?"active":""} type="button" aria-current={section==="history"?"page":undefined} onClick={()=>setSection("history")}>{releasesContent.historyLabel}</button>
+    </nav>
+    <section className="system-settings-pane">
+      {section==="general"?<div className="system-general-panel">
+        <header><div><small>{releasesContent.eyebrow}</small><h2>{releasesContent.currentStatus}</h2><p>{releasesContent.product}</p></div><button className="system-history-link" type="button" onClick={()=>setSection("history")}>{releasesContent.showHistory}<span aria-hidden="true">→</span></button></header>
+        <div className="system-current-release">
+          <SystemGearIcon />
+          <div><span>{releasesContent.currentLabel}</span><strong>{releasesContent.versionLabel} {currentVersion}</strong>{currentRelease&&<p className="system-current-title">{currentRelease.title}</p>}{currentRelease?.summary&&<p>{currentRelease.summary}</p>}</div>
+          <aside><i>{versionStatus(currentVersion)}</i>{currentRelease&&<time dateTime={currentRelease.date}>{currentRelease.date}</time>}</aside>
+        </div>
+        {currentRelease&&<ul className="system-current-highlights">{currentRelease.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul>}
+      </div>:<div className="system-history-panel" tabIndex={0}>
+        <header><div><small>{releasesContent.historyLabel}</small><h2>Update History</h2></div><span>{publicReleases.length} {releasesContent.releaseCountLabel}</span></header>
+        <div className="system-release-timeline">{publicReleases.map((release)=><article className="system-release-entry" key={release.version}>
+          <header><strong>v{release.version}</strong><time dateTime={release.date}>{release.date}</time></header>
+          <div><h3>{release.title}</h3>{release.summary&&<p>{release.summary}</p>}<ul>{release.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul></div>
+        </article>)}</div>
+      </div>}
+    </section>
+  </div>;
+}
+
+function SystemGearIcon(){
+  return <svg className="system-gear-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M13.2 3.5h5.6l.8 3.1 2.1 1.2 3-.9 2.8 4.8-2.3 2.2v2.4l2.3 2.2-2.8 4.8-3-.9-2.1 1.2-.8 3.1h-5.6l-.8-3.1-2.1-1.2-3 .9-2.8-4.8 2.3-2.2v-2.4l-2.3-2.2 2.8-4.8 3 .9 2.1-1.2.8-3.1Z"/><circle cx="16" cy="15.1" r="4.2"/></svg>;
+}
+
 function ContactScene({onClose,faxPrinted}:{onClose:()=>void;faxPrinted:boolean}) {
   const card=useContactCard(true);
   return <div className="modal-layer tactile-layer contact-layer" onMouseDown={onClose}>
@@ -656,6 +705,7 @@ export default function VersionThree() {
     if(windowId==="projects")return {icon:"▰",label:"PROJECTS"};
     if(windowId==="experience")return {icon:"▰",label:"EXPERIENCE"};
     if(windowId==="profile")return {icon:"●",label:"PROFILE"};
+    if(windowId==="updates")return {icon:"⚙",label:"SYSTEM"};
     if(windowId==="lablog")return {icon:"≡",label:"LAB LOG"};
     if(windowId==="readme")return {icon:"▤",label:"README"};
     if(windowId==="map")return {icon:"▤",label:"MAP"};
@@ -664,7 +714,7 @@ export default function VersionThree() {
     if(windowId==="research")return {icon:"▤",label:"RESEARCH"};
     return {icon:"▤",label:"INTERNSHIP"};
   };
-  const taskbarWindowIds:ComputerWindowId[]=["profile","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"];
+  const taskbarWindowIds:ComputerWindowId[]=["profile","updates","readme","lablog","projects","map","allocation","emg","experience","research","internship","references"];
   const taskbarWindows=taskbarWindowIds.filter(showComputerWindow);
   const solved = discovered.length===zoneOrder.length;
   const status = roomContent.status.messages[discovered.length];
@@ -730,9 +780,9 @@ export default function VersionThree() {
         <>
         <div className="computer-view computer-view-desktop" role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
           <div className="monitor-bezel">
-            <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><small>{siteContent.brand.version}</small></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={leaveComputer}>{computerContent.topBar.leave}</button></header>
+            <header className="os-bar"><div className="os-brand"><span>{computerContent.topBar.title}</span><button className="os-version-button" type="button" aria-label={releasesContent.openAriaLabel} onClick={()=>focusComputerWindow("updates")}>{siteContent.brand.version}</button></div><div><b>{computerContent.topBar.sync}</b><i />{computerContent.topBar.time}</div><button onClick={() => { setComputerWindows([]); setMaximizedWindow(null); setActive(null); }}>{computerContent.topBar.leave}</button></header>
             <div className="os-screen">
-              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><span>{computerContent.sidebar.location}</span></aside>
+              <aside className="os-sidebar"><button className="os-profile-trigger" onClick={() => focusComputerWindow("profile")} aria-label={computerContent.profile.triggerAria}>{siteContent.brand.initials}</button><button onClick={() => openComputerFile("desktop")}>{computerContent.sidebar.desktop}</button><button onClick={() => openComputerFile("projects")}>{computerContent.sidebar.projects}</button><button onClick={() => openComputerFile("experience")}>{computerContent.sidebar.experience}</button><button onClick={() => openComputerFile("references")}>{computerContent.sidebar.references}</button><button onClick={() => openComputerFile("lablog")}>{computerContent.sidebar.labLog}</button><button className="os-system-trigger" aria-label={releasesContent.openAriaLabel} onClick={()=>focusComputerWindow("updates")}>{computerContent.sidebar.system}</button><span>{computerContent.sidebar.location}</span></aside>
               <main className="os-workspace">
                 <div className="desktop-icons">
                   <button className={selectedComputerFile==="readme"?"selected":""} onClick={() => setSelectedComputerFile("readme")} onDoubleClick={() => openComputerFile("readme")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("readme"); }}><i className="file-icon" /><span>{computerContent.desktop.icons.readme}</span></button>
@@ -740,6 +790,7 @@ export default function VersionThree() {
                   <button className={selectedComputerFile==="projects"?"selected":""} onClick={() => setSelectedComputerFile("projects")} onDoubleClick={() => openComputerFile("projects")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("projects"); }}><i className="folder-icon" /><span>{computerContent.desktop.icons.projects}</span></button>
                   <button className={selectedComputerFile==="experience"?"selected":""} onClick={() => setSelectedComputerFile("experience")} onDoubleClick={() => openComputerFile("experience")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("experience"); }}><i className="folder-icon" /><span>{computerContent.desktop.icons.experience}</span></button>
                   <button className={selectedComputerFile==="references"?"selected":""} onClick={() => setSelectedComputerFile("references")} onDoubleClick={() => openComputerFile("references")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("references"); }}><i className="file-icon web-file-icon" /><span>{computerContent.desktop.icons.references}</span></button>
+                  <button className={selectedComputerFile==="updates"?"selected":""} onClick={() => setSelectedComputerFile("updates")} onDoubleClick={() => openComputerFile("updates")} onKeyDown={(event) => { if(event.key==="Enter") openComputerFile("updates"); }}><i className="settings-app-icon" aria-hidden="true"><SystemGearIcon /></i><span>{computerContent.desktop.icons.updates}</span></button>
                   <div className="desktop-welcome"><small>{computerContent.desktop.welcome.eyebrow}</small><h2>{computerContent.desktop.welcome.title}</h2><p>{computerContent.desktop.welcome.description}</p></div>
                 </div>
 
@@ -769,6 +820,10 @@ export default function VersionThree() {
 
                 {showComputerWindow("experience")&&<DraggableComputerWindow id="experience" className="experience-window" position={computerWindowPosition("experience")} zIndex={computerWindowZ("experience")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.experience.folderTitle} header={<span>{computerContent.experience.folderTitle}</span>}>
                   <div className="os-window-content"><button className={selectedComputerFile==="research"?"selected":""} onClick={() => setSelectedComputerFile("research")} onDoubleClick={() => openComputerFile("research")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("research");}}><span>{computerContent.experience.research.listMeta}</span><strong>{computerContent.experience.research.organization}</strong><small>{computerContent.experience.research.date}</small></button><button className={selectedComputerFile==="internship"?"selected":""} onClick={() => setSelectedComputerFile("internship")} onDoubleClick={() => openComputerFile("internship")} onKeyDown={(event)=>{if(event.key==="Enter")openComputerFile("internship");}}><span>{computerContent.experience.internship.listMeta}</span><strong>{computerContent.experience.internship.organization}</strong><small>{computerContent.experience.internship.date}</small></button></div>
+                </DraggableComputerWindow>}
+
+                {showComputerWindow("updates")&&<DraggableComputerWindow id="updates" className="system-updates-window" position={computerWindowPosition("updates")} zIndex={computerWindowZ("updates")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={releasesContent.ariaLabel} header={<span>{releasesContent.windowTitle}</span>}>
+                  <SystemUpdatesContent />
                 </DraggableComputerWindow>}
 
                 {showComputerWindow("research")&&<DraggableComputerWindow id="research" className="text-file experience-detail-window" position={computerWindowPosition("research")} zIndex={computerWindowZ("research")} onMove={moveComputerWindow} onFocus={focusComputerWindow} onClose={closeComputerWindow} ariaLabel={computerContent.experience.research.filename} header={<span>{computerContent.experience.research.filename}</span>}>

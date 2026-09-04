@@ -1,7 +1,7 @@
 {
   "ariaLabel": "Alina's computer desktop",
   "topBar": { "title": "ALINA.OS / LAB-17", "sync": "SYNC ACTIVE", "time": "02:17", "leave": "LEAVE COMPUTER ×" },
-  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "labLog": "LAB LOG", "location": "LAB-17 / LOCAL" },
+  "sidebar": { "desktop": "DESKTOP", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES", "labLog": "LAB LOG", "system": "SYSTEM", "location": "LAB-17 / LOCAL" },
   "profile": {
     "triggerAria": "Open Alina Wu's profile",
     "windowTitle": "USER PROFILE / ALINA.WU",
@@ -19,7 +19,7 @@
     "email": "awu78@uw.edu"
   },
   "desktop": {
-    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES.web" },
+    "icons": { "readme": "README.txt", "labLog": "LAB_LOG.md", "projects": "PROJECTS", "experience": "EXPERIENCE", "references": "REFERENCES.web", "updates": "SYSTEM_UPDATES.app" },
     "welcome": { "eyebrow": "WELCOME / GUEST", "title": "Alina", "description": "Computer Science at the University of Washington. Work across software and physical systems, with recurring attention to how people form expectations, make decisions, and interpret feedback." }
   },
   "readme": {

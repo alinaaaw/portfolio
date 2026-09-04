@@ -9,9 +9,13 @@ import board from "./board.json";
 import fieldCase from "./field-case.json";
 import faxContact from "./fax-contact.json";
 import references from "./references.json";
+import releaseInterface from "./releases.json";
+import changelogSource from "../CHANGELOG.md?raw";
+import { parseReleaseHistory } from "./release-history.mjs";
 import packageMetadata from "../package.json";
 
 const version = `v${packageMetadata.version}`;
+const releases = { ...releaseInterface, releases: parseReleaseHistory(changelogSource) };
 const siteWithVersion = {
   ...site,
   brand: { ...site.brand, version: `PORTFOLIO SYSTEM ${version}` },
@@ -20,8 +24,8 @@ const faxContactWithVersion = {
   ...faxContact,
   contact: {
     ...faxContact.contact,
-    feedback: faxContact.contact.feedback.replace(/v\d+\.\d+\.\d+/, version),
-    feedbackLabel: faxContact.contact.feedbackLabel.replace(/\d+\.\d+\.\d+/, packageMetadata.version),
+    feedback: faxContact.contact.feedback.replace("{version}", version),
+    feedbackLabel: faxContact.contact.feedbackLabel.replace("{version}", packageMetadata.version),
   },
 };
 
@@ -37,4 +41,7 @@ export {
   fieldCase,
   faxContactWithVersion as faxContact,
   references,
+  releases,
 };
+
+export const currentVersion = packageMetadata.version;

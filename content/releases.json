@@ -1,0 +1,20 @@
+{
+  "windowTitle": "SYSTEM_UPDATES.app",
+  "ariaLabel": "Lab 17 system updates and version history",
+  "openAriaLabel": "Open Lab 17 version history",
+  "eyebrow": "SOFTWARE UPDATE",
+  "product": "ALINA PORTFOLIO / LAB 17",
+  "generalLabel": "GENERAL",
+  "currentLabel": "CURRENT VERSION",
+  "versionLabel": "Version",
+  "historyLabel": "VERSION HISTORY",
+  "releaseCountLabel": "PUBLIC RELEASES",
+  "currentStatus": "Lab 17 is up to date",
+  "statusLabels": {
+    "stable": "STABLE",
+    "preview": "PREVIEW",
+    "prerelease": "PRERELEASE",
+    "releaseCandidate": "RELEASE CANDIDATE"
+  },
+  "showHistory": "VIEW UPDATE HISTORY"
+}

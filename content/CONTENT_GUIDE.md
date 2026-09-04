@@ -9,6 +9,9 @@ All visitor-facing copy is stored in the JSON files in this directory. Edit the 
 - `room.json`: Room navigation, discovery states, quick index, and the six exploration zones.
 - `computer.json`: User profile, desktop labels, README, Lab Log entries, projects, experience, reference-browser labels, and system bulletin.
 - `references.json`: The project-reference website opened inside the computer, including filters, citations, annotations, provenance, and external links.
+- `releases.json`: Interface labels for `SYSTEM_UPDATES.app`. Release dates, titles, summaries, and change lists are parsed directly from the root `CHANGELOG.md`; the current version number still comes only from `package.json`.
+
+For each published changelog entry, place one bold display title immediately after the `## [version] - YYYY-MM-DD` heading. The website uses that title and shows every categorized change item in order.
 - `books.json`: Personal bookshelf labels, empty state, and future books or films with Alina's own notes.
 - `drawer.json`: Drawer objects, hotspot labels, and expanded document copy.
 - `notebook.json`: Research notebook pages, annotations, and page-turn prompts.
@@ -61,6 +64,7 @@ The scenes intentionally use different data shapes so the website does not reduc
 
 - **Computer projects and experience:** `details` contains labeled case-file sections. Keep each section evidence-specific. Project pages link to the internal reference browser instead of repeating citations in the case file.
 - **References:** `project`, `citation`, `summary`, `annotation`, `provenance`, and `url` separate the source from Alina's project note.
+- **Releases:** Keep newest public releases first. Each record requires `version`, `date`, `title`, `type`, `summary`, `highlights`, and categorized `details`; never add ordinary commits, drafts, or failed deployments.
 - **Books:** `title` supplies the hover label, `author` groups the dedicated author row, and `isReading` controls the bookmark. Detailed notes are not stored until open-book interaction is enabled.
 - **Notebook:** `lead` introduces the problem, `steps` records a process, and the `reverse*` fields hold the later finding or correction. A `title` or `reverseTitle` may be `null` when the page reads better without one.
 - **Drawer:** `facts` stores artifact labels and values. Use it for measurements, versions, evidence status, and physical contents.
