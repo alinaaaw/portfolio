@@ -3241,7 +3241,7 @@
 
   .landscape-phone-rotate-arrow {
     position: absolute;
-    top: 0;
+    top: 10px;
     left: 10px;
     width: 150px;
     height: 66px;
