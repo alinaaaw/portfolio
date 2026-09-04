@@ -11,9 +11,9 @@ const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
 const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
 const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
-const PORTRAIT_BOOKS_ZONE_FRONT_OFFSET = .82;
-const PORTRAIT_BOOKS_ZONE_RING_SCALE = 1.3;
-const PORTRAIT_BOOKS_ZONE_HIT_SCALE = 1.35;
+const TOUCH_BOOKS_ZONE_FRONT_OFFSET = .82;
+const TOUCH_BOOKS_ZONE_RING_SCALE = 1.3;
+const TOUCH_BOOKS_ZONE_HIT_SCALE = 1.35;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
 export type RoomPanView = "left" | "center" | "right";
@@ -818,6 +818,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
     let isPortrait = false;
     let portraitDistanceScale = 1;
     let landscapeTouchDistanceScale = 1;
+    let booksZoneRingScale = 1;
     let frame = 0;
 
     const resize = () => {
@@ -826,11 +827,13 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       const nextAspect=rect.width/rect.height;
       isPortrait=rect.height>=rect.width;
       const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches;
+      const usesTouchBooksIndicator=isPortrait||isCoarseLandscape;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
       landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1;
-      booksZoneIndicator.position.z=zonePositions.books[2]+(isPortrait?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0);
-      booksZoneRing.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_RING_SCALE:1);
-      booksZoneHit.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1);
+      booksZoneRingScale=usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_RING_SCALE:1;
+      booksZoneIndicator.position.z=zonePositions.books[2]+(usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_FRONT_OFFSET:0);
+      booksZoneRing.scale.setScalar(booksZoneRingScale);
+      booksZoneHit.scale.setScalar(usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_HIT_SCALE:1);
       renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
       renderer.setSize(rect.width,rect.height,false);
       camera.aspect=nextAspect;
@@ -954,7 +957,8 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
         if (!zone || zone==="printer" || !group) return;
         const ring = group.children[0] as THREE.Mesh;
         ring.rotation.z += .012;
-        ring.scale.setScalar(1+Math.sin(now*.002+group.position.x)*.09);
+        const baseScale=zone==="books"?booksZoneRingScale:1;
+        ring.scale.setScalar(baseScale*(1+Math.sin(now*.002+group.position.x)*.09));
         const found = discoveredRef.current.includes(zone);
         const ringMaterial = ring.material as THREE.MeshStandardMaterial;
         ringMaterial.color.setHex(found?palette.cyan:palette.signal);
