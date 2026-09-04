@@ -11,7 +11,7 @@ const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
 const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
 const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
-const TOUCH_BOOKS_ZONE_FRONT_OFFSET = .61;
+const BOOKS_ZONE_FRONT_OFFSET = .61;
 const TOUCH_BOOKS_ZONE_HIT_SCALE = 1.35;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
@@ -827,7 +827,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       const usesTouchBooksIndicator=isPortrait||isCoarseLandscape;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
       landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1;
-      booksZoneIndicator.position.z=zonePositions.books[2]+(usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_FRONT_OFFSET:0);
+      booksZoneIndicator.position.z=zonePositions.books[2]+BOOKS_ZONE_FRONT_OFFSET;
       booksZoneHit.scale.setScalar(usesTouchBooksIndicator?TOUCH_BOOKS_ZONE_HIT_SCALE:1);
       renderer.toneMappingExposure=isPortrait?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE;
       renderer.setSize(rect.width,rect.height,false);

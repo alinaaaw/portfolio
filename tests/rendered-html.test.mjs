@@ -181,7 +181,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /viewportDistanceScale=isPortrait\?portraitDistanceScale:landscapeTouchDistanceScale[\s\S]*multiplyScalar\(viewportDistanceScale\)/);
   assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
   assert.match(game, /roomPanViewChangeRef\.current\(roomPanOrder\[nextIndex\]\)/, "portrait room swipes must snap between complete lateral views");
-  assert.match(game, /usesTouchBooksIndicator=isPortrait\|\|isCoarseLandscape[\s\S]*booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+\(usesTouchBooksIndicator\?TOUCH_BOOKS_ZONE_FRONT_OFFSET:0\)/, "touch rooms must bring the bookshelf indicator in front of the shelf in both orientations");
+  assert.match(game, /booksZoneIndicator\.position\.z=zonePositions\.books\[2\]\+BOOKS_ZONE_FRONT_OFFSET/, "all room layouts must keep the bookshelf indicator visibly inset at the front of the shelf");
   assert.doesNotMatch(game, /booksZoneRing\.rotation\.x=/, "portrait bookshelf indicator must retain its original orientation");
   assert.match(game, /booksZoneHit\.scale\.setScalar\(usesTouchBooksIndicator\?TOUCH_BOOKS_ZONE_HIT_SCALE:1\)/, "touch bookshelf must have a larger target in both orientations");
   assert.doesNotMatch(game, /BOOKS_ZONE_RING_SCALE|booksZoneRingScale/, "bookshelf indicator must use the same visible scale as the other room markers");
