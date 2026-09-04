@@ -126,7 +126,6 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
   return <section className={`portrait-computer-view ${notesOpen?"is-notes-active":""} ${settingsOpen?"is-settings-active":""}`} role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
     <header className="portrait-phone-statusbar">
       <button type="button" className="portrait-room-return" onClick={onLeave} aria-label={computerContent.topBar.leave}><i aria-hidden="true" /> LAB 17</button>
-      <span className="portrait-phone-island" aria-hidden="true"><i /></span>
       <div className="portrait-phone-status" aria-label={`${computerContent.topBar.sync}, ${computerContent.topBar.time}`}><span>{computerContent.topBar.time}</span><i className="portrait-cellular" /><i className="portrait-wifi" /><i className="portrait-battery" /></div>
     </header>
 
