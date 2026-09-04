@@ -335,7 +335,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
     assert.match(contract, /font-size: clamp\(/, "every portrait fax text tier must scale continuously with the viewport");
   }
   assert.match(portraitCss, /@media \(min-width: 520px\) and \(min-height: 700px\) \{[\s\S]*\.room-shell \.fax-reading-scroll \{[\s\S]*overflow-y: hidden[\s\S]*touch-action: manipulation/, "roomy portrait fax reports, including a 540 by 720 viewport, must show their fitted content without an inner scroller");
-  assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(portraitCss, /\.portrait-home-apps \{[\s\S]*grid-template-columns: repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(portraitCss, /\.portrait-app-icon \{[\s\S]*border-radius: 22%/);
   assert.match(portraitCss, /\.portrait-phone-dock \{[\s\S]*backdrop-filter: blur\(20px\)/);
   assert.match(portraitCss, /\.portrait-phone-systembar button \{[\s\S]*height: 44px/);
@@ -344,10 +344,15 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(portraitComputer, /const canGoBack=[\s\S]*computerWindows\.length>1/);
   assert.match(portraitComputer, /className="portrait-phone-statusbar"[\s\S]*className="portrait-room-return"[\s\S]*onClick=\{onLeave\}/);
   assert.match(portraitComputer, /className="portrait-home-apps"[\s\S]*PhoneAppIcon kind="profile"[\s\S]*PhoneAppIcon kind="notes"[\s\S]*PhoneAppIcon kind="experience"/);
+  assert.match(portraitComputer, /onOpenRoot\("updates"\)[\s\S]*PhoneAppIcon kind="settings"[\s\S]*releasesContent\.mobile\.appLabel/, "portrait Computer must expose version history through a phone-native Settings app");
   assert.match(portraitComputer, /className="portrait-phone-dock"[\s\S]*PhoneAppIcon kind="projects"[\s\S]*PhoneAppIcon kind="references"[\s\S]*PhoneAppIcon kind="lablog"/);
   assert.match(portraitComputer, /className="portrait-phone-navbar"[\s\S]*onClick=\{canGoBack\?onBack:\(\)=>onOpenRoot\("desktop"\)\}/);
   assert.match(portraitComputer, /className="portrait-phone-systembar"[\s\S]*aria-label="Go to Home Screen"/);
   assert.match(portraitComputer, /notesOpen=activeWindow==="readme"[\s\S]*is-notes-active/);
+  assert.match(portraitComputer, /settingsOpen=activeWindow==="updates"[\s\S]*is-settings-active[\s\S]*activeWindow==="updates"&&<PortraitSystemSettings/, "portrait settings must stay isolated from the desktop System window");
+  assert.match(portraitComputer, /className="portrait-settings-group"[\s\S]*currentVersion[\s\S]*versionStatus\(currentVersion\)[\s\S]*currentRelease\.date/, "portrait About must use the shared package and release data");
+  assert.match(portraitComputer, /<details className="portrait-settings-history">[\s\S]*publicReleases\.map/, "portrait Settings must expose the shared update history without desktop window behavior");
+  assert.match(portraitCss, /\.portrait-computer-view\.is-settings-active[\s\S]*\.portrait-ios-settings \{[\s\S]*background: #f2f2f7[\s\S]*\.portrait-settings-group,[\s\S]*\.portrait-settings-history \{[\s\S]*border-radius: 13px/, "portrait System must use a grouped mobile Settings surface");
   assert.match(portraitComputer, /className="portrait-document portrait-apple-note"[\s\S]*computerContent\.readme\.mobileMeta[\s\S]*computerContent\.readme\.mobileTitle[\s\S]*className="portrait-notes-toolbar"/, "portrait Notes must use a dedicated phone-native note surface");
   assert.match(portraitComputer, /className=\{notesOpen\?"portrait-notes-access":""\}[\s\S]*computerContent\.readme\.mobileAccess/, "portrait Notes must identify the shared note as view only");
   assert.match(portraitComputer, /className="portrait-notes-readonly"[\s\S]*NotesToolIcon kind="lock"[\s\S]*computerContent\.readme\.mobileReadOnly/);

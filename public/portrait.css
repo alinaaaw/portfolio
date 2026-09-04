@@ -1585,7 +1585,7 @@
 
   .portrait-home-apps {
     display: grid;
-    grid-template-columns: repeat(3,minmax(0,1fr));
+    grid-template-columns: repeat(4,minmax(0,1fr));
     gap: 10px;
   }
 
@@ -1801,6 +1801,21 @@
     width: 34px;
     height: 27px;
     background: repeating-linear-gradient(180deg,var(--red) 0 1.5px,transparent 1.5px 7px);
+  }
+
+  .portrait-app-icon-settings {
+    background: linear-gradient(145deg,#a8aaae,#74767b);
+  }
+
+  .portrait-settings-gear {
+    width: 41px;
+    height: 41px;
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.25));
   }
 
   .portrait-phone-notification .portrait-app-icon {
@@ -2072,6 +2087,215 @@
 
   .portrait-computer-view.is-notes-active .portrait-phone-systembar i {
     background: #1c1c1e;
+  }
+
+  .portrait-computer-view.is-settings-active,
+  .portrait-computer-view.is-settings-active .portrait-phone-statusbar,
+  .portrait-phone-app.is-settings,
+  .portrait-phone-app.is-settings .portrait-phone-navbar,
+  .portrait-computer-view.is-settings-active .portrait-phone-systembar {
+    background: #f2f2f7;
+    color: #1c1c1e;
+  }
+
+  .portrait-computer-view.is-settings-active .portrait-room-return,
+  .portrait-phone-app.is-settings .portrait-phone-navbar > button {
+    color: #276f62;
+  }
+
+  .portrait-phone-app.is-settings .portrait-phone-navbar {
+    border-bottom-color: #d4d4d8;
+    box-shadow: none;
+  }
+
+  .portrait-computer-view.is-settings-active .portrait-phone-systembar i {
+    background: #1c1c1e;
+  }
+
+  .portrait-ios-settings {
+    min-height: 100%;
+    padding: 22px max(18px,env(safe-area-inset-right)) 32px max(18px,env(safe-area-inset-left));
+    background: #f2f2f7;
+    color: #1c1c1e;
+    font-family: system-ui,sans-serif;
+  }
+
+  .portrait-settings-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 8px 26px;
+    text-align: center;
+  }
+
+  .portrait-settings-hero > .portrait-app-icon {
+    margin-bottom: 15px;
+  }
+
+  .portrait-settings-hero small {
+    color: #8e8e93;
+    font: 600 var(--portrait-type-meta)/1.3 system-ui,sans-serif;
+    letter-spacing: .04em;
+  }
+
+  .portrait-settings-hero h2 {
+    margin: 5px 0 4px;
+    font-size: clamp(28px,6vw,42px);
+    line-height: 1.08;
+    letter-spacing: -.035em;
+  }
+
+  .portrait-settings-hero p {
+    margin: 0;
+    color: #6e6e73;
+    font-size: var(--portrait-type-copy);
+  }
+
+  .portrait-settings-section > h3 {
+    margin: 0 15px 7px;
+    color: #6e6e73;
+    font-size: var(--portrait-type-meta);
+    font-weight: 500;
+    letter-spacing: .03em;
+  }
+
+  .portrait-settings-group,
+  .portrait-settings-history {
+    overflow: hidden;
+    border: 1px solid rgba(60,60,67,.13);
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.035);
+  }
+
+  .portrait-settings-group {
+    margin: 0;
+  }
+
+  .portrait-settings-group > div {
+    display: grid;
+    grid-template-columns: minmax(118px,.8fr) minmax(0,1.2fr);
+    align-items: center;
+    min-height: 52px;
+    margin-left: 16px;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid #dedee3;
+    gap: 15px;
+  }
+
+  .portrait-settings-group > div:last-child {
+    border-bottom: 0;
+  }
+
+  .portrait-settings-group dt,
+  .portrait-settings-group dd {
+    margin: 0;
+    font-size: clamp(13px,2vw,17px);
+    line-height: 1.3;
+  }
+
+  .portrait-settings-group dd {
+    min-width: 0;
+    color: #6e6e73;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .portrait-settings-history {
+    margin-top: 28px;
+  }
+
+  .portrait-settings-history > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    padding: 10px 16px;
+    cursor: pointer;
+    list-style: none;
+    touch-action: manipulation;
+  }
+
+  .portrait-settings-history > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .portrait-settings-history > summary > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .portrait-settings-history > summary strong {
+    color: #276f62;
+    font-size: clamp(14px,2.1vw,18px);
+    font-weight: 500;
+  }
+
+  .portrait-settings-history > summary small {
+    color: #8e8e93;
+    font-size: var(--portrait-type-meta);
+  }
+
+  .portrait-settings-history > summary > i {
+    color: #a1a1a6;
+    font-size: 28px;
+    font-style: normal;
+    line-height: 1;
+    transition: transform .2s ease;
+  }
+
+  .portrait-settings-history[open] > summary > i {
+    transform: rotate(90deg);
+  }
+
+  .portrait-settings-releases {
+    padding: 0 16px 18px;
+    border-top: 1px solid #dedee3;
+  }
+
+  .portrait-settings-releases article {
+    padding: 18px 0;
+    border-bottom: 1px solid #dedee3;
+  }
+
+  .portrait-settings-releases article:last-child {
+    border-bottom: 0;
+  }
+
+  .portrait-settings-releases article > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .portrait-settings-releases article > header strong {
+    font-size: clamp(15px,2.3vw,19px);
+  }
+
+  .portrait-settings-releases time,
+  .portrait-settings-releases p,
+  .portrait-settings-releases li {
+    color: #6e6e73;
+    font-size: clamp(12px,1.85vw,16px);
+    line-height: 1.5;
+  }
+
+  .portrait-settings-releases h3 {
+    margin: 8px 0 5px;
+    font-size: clamp(17px,2.8vw,23px);
+    line-height: 1.2;
+  }
+
+  .portrait-settings-releases p {
+    margin: 0 0 9px;
+  }
+
+  .portrait-settings-releases ul {
+    margin: 0;
+    padding-left: 19px;
   }
 
   .portrait-phone-app-content {

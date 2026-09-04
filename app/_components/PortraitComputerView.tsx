@@ -4,18 +4,21 @@ import { useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   computer as computerContent,
+  currentVersion,
   references as referencesContent,
+  releases as releasesContent,
   site as siteContent,
 } from "@/content";
 
 export type ProjectFileId = "map" | "allocation" | "emg";
-export type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references";
+export type ComputerFile = "desktop" | "readme" | "lablog" | "projects" | ProjectFileId | "experience" | "research" | "internship" | "references" | "updates";
 export type ComputerWindowId = Exclude<ComputerFile,"desktop"> | "profile";
 export type ReferenceFilter = "all" | ProjectFileId;
-export type PortraitComputerRoot = "desktop" | "projects" | "experience" | "references" | "lablog";
+export type PortraitComputerRoot = "desktop" | "projects" | "experience" | "references" | "lablog" | "updates";
 
 type ProjectReference = {id:string;project:ProjectFileId;title:string;meta:string;citation:string;summary:string;annotation:string;provenance:string;url:string};
-type PhoneAppIconKind = "profile" | "notes" | "projects" | "experience" | "references" | "lablog";
+type PublicRelease = {version:string;date:string;title:string;summary:string;highlights:string[];details:Record<string,string[]>};
+type PhoneAppIconKind = "profile" | "notes" | "projects" | "experience" | "references" | "lablog" | "settings";
 type LabLogFilter = "all" | "program" | "role";
 type NotesToolIconKind = "lock" | "checklist" | "format" | "camera" | "draw";
 
@@ -35,14 +38,15 @@ type Props = {
 
 const projectFiles = (["map","allocation","emg"] as const).map((id)=>({id,...computerContent.projects[id]}));
 const projectReferences=referencesContent.references as ProjectReference[];
+const publicReleases=releasesContent.releases as PublicRelease[];
 const referenceGroups=referencesContent.groups as {id:ReferenceFilter;label:string}[];
-const rootWindows:ComputerWindowId[]=["projects","experience","references","lablog"];
+const rootWindows:ComputerWindowId[]=["projects","experience","references","lablog","updates"];
 const labLogFilters:{id:LabLogFilter;label:string}[]=[{id:"all",label:"ALL"},{id:"program",label:"PROGRAM"},{id:"role",label:"ROLE"}];
 const NOTIFICATION_DISMISS_DISTANCE=52;
 const notesTools=(["checklist","format","camera","draw"] as const).map((kind)=>({kind,label:computerContent.readme.mobileToolLabels[kind]}));
 
 function PhoneAppIcon({kind,badge=false}:{kind:PhoneAppIconKind;badge?:boolean}) {
-  return <span className={`portrait-app-icon portrait-app-icon-${kind}`} aria-hidden="true"><i />{badge&&<b>1</b>}</span>;
+  return <span className={`portrait-app-icon portrait-app-icon-${kind}`} aria-hidden="true">{kind==="settings"?<svg className="portrait-settings-gear" viewBox="0 0 32 32"><path d="M13.2 3.5h5.6l.8 3.1 2.1 1.2 3-.9 2.8 4.8-2.3 2.2v2.4l2.3 2.2-2.8 4.8-3-.9-2.1 1.2-.8 3.1h-5.6l-.8-3.1-2.1-1.2-3 .9-2.8-4.8 2.3-2.2v-2.4l-2.3-2.2 2.8-4.8 3 .9 2.1-1.2.8-3.1Z"/><circle cx="16" cy="15.1" r="4.2"/></svg>:<i />}{badge&&<b>1</b>}</span>;
 }
 
 function NotesToolIcon({kind}:{kind:NotesToolIconKind}) {
@@ -51,6 +55,30 @@ function NotesToolIcon({kind}:{kind:NotesToolIconKind}) {
   if(kind==="format")return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18 9.3 6h1.9L16 18M6.6 13.2h7.3M17 11v7m-2.5-3.5h5"/></svg>;
   if(kind==="camera")return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 8.5h3L9.2 6h5.6l1.7 2.5h3v10h-15z"/><circle cx="12" cy="13.5" r="3.2"/></svg>;
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 18 1.1-4.2 8.8-8.8 3.1 3.1-8.8 8.8zM14.5 6.5l3 3M5.5 19h13"/></svg>;
+}
+
+function versionStatus(version:string){
+  if(version.includes("-rc."))return releasesContent.statusLabels.releaseCandidate;
+  if(version.includes("-"))return releasesContent.statusLabels.prerelease;
+  if(version.startsWith("0."))return releasesContent.statusLabels.preview;
+  return releasesContent.statusLabels.stable;
+}
+
+function PortraitSystemSettings(){
+  const currentRelease=publicReleases.find((release)=>release.version===currentVersion)??publicReleases[0];
+  return <section className="portrait-ios-settings">
+    <header className="portrait-settings-hero"><PhoneAppIcon kind="settings" /><small>{releasesContent.product}</small><h2>{releasesContent.mobile.aboutTitle}</h2><p>{releasesContent.currentStatus}</p></header>
+    <section className="portrait-settings-section"><h3>{releasesContent.generalLabel}</h3><dl className="portrait-settings-group">
+      <div><dt>{releasesContent.mobile.nameLabel}</dt><dd>{releasesContent.product}</dd></div>
+      <div><dt>{releasesContent.mobile.softwareVersionLabel}</dt><dd>{currentVersion}</dd></div>
+      <div><dt>{releasesContent.mobile.statusLabel}</dt><dd>{versionStatus(currentVersion)}</dd></div>
+      {currentRelease&&<div><dt>{releasesContent.mobile.releaseDateLabel}</dt><dd><time dateTime={currentRelease.date}>{currentRelease.date}</time></dd></div>}
+    </dl></section>
+    <details className="portrait-settings-history">
+      <summary><span><strong>{releasesContent.mobile.historyTitle}</strong><small>{publicReleases.length} {releasesContent.releaseCountLabel}</small></span><i aria-hidden="true">›</i></summary>
+      <div className="portrait-settings-releases">{publicReleases.map((release)=><article key={release.version}><header><strong>v{release.version}</strong><time dateTime={release.date}>{release.date}</time></header><h3>{release.title}</h3>{release.summary&&<p>{release.summary}</p>}<ul>{release.highlights.map((highlight)=><li key={highlight}>{highlight}</li>)}</ul></article>)}</div>
+    </details>
+  </section>;
 }
 
 export default function PortraitComputerView({computerWindows,referenceFilter,bulletin,onOpenFile,onOpenRoot,onFocusWindow,onBack,onOpenReferences,onSetReferenceFilter,onDismissBulletin,onLeave}:Props) {
@@ -65,8 +93,10 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
   const visibleLabLogEntries=labLogFilter==="all"?computerContent.labLog.entries:computerContent.labLog.entries.filter((entry)=>entry.type.toLowerCase().includes(labLogFilter));
   const canGoBack=Boolean(activeWindow)&&(!rootWindows.includes(activeWindow as ComputerWindowId)||computerWindows.length>1);
   const notesOpen=activeWindow==="readme";
+  const settingsOpen=activeWindow==="updates";
   const screenTitle=activeWindow==="profile"?"Profile"
     :activeWindow==="readme"?"Notes"
+    :activeWindow==="updates"?releasesContent.mobile.screenTitle
     :activeWindow==="lablog"?"Lab Log"
     :activeWindow==="projects"?"Projects"
     :activeWindow==="experience"?"Experience"
@@ -93,7 +123,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
     setNotificationOffset(0);
     if(shouldDismiss)onDismissBulletin();
   };
-  return <section className={`portrait-computer-view ${notesOpen?"is-notes-active":""}`} role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
+  return <section className={`portrait-computer-view ${notesOpen?"is-notes-active":""} ${settingsOpen?"is-settings-active":""}`} role="dialog" aria-modal="true" aria-label={computerContent.ariaLabel}>
     <header className="portrait-phone-statusbar">
       <button type="button" className="portrait-room-return" onClick={onLeave} aria-label={computerContent.topBar.leave}><i aria-hidden="true" /> LAB 17</button>
       <span className="portrait-phone-island" aria-hidden="true"><i /></span>
@@ -120,6 +150,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
           <button type="button" onClick={()=>onFocusWindow("profile")}><PhoneAppIcon kind="profile" /><span>Profile</span></button>
           <button type="button" onClick={()=>onOpenFile("readme")}><PhoneAppIcon kind="notes" /><span>Notes</span></button>
           <button type="button" onClick={()=>onOpenRoot("experience")}><PhoneAppIcon kind="experience" /><span>Experience</span></button>
+          <button type="button" onClick={()=>onOpenRoot("updates")} aria-label={releasesContent.openAriaLabel}><PhoneAppIcon kind="settings" /><span>{releasesContent.mobile.appLabel}</span></button>
         </div>
 
         <nav className="portrait-phone-dock" aria-label="Favorite applications">
@@ -129,7 +160,7 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
         </nav>
       </main>}
 
-      {activeWindow&&<div className={`portrait-phone-app ${notesOpen?"is-notes":""}`}>
+      {activeWindow&&<div className={`portrait-phone-app ${notesOpen?"is-notes":""} ${settingsOpen?"is-settings":""}`}>
         <header className="portrait-phone-navbar">
           <button type="button" onClick={canGoBack?onBack:()=>onOpenRoot("desktop")} aria-label={canGoBack?"Back":"Home"}><i aria-hidden="true" /><span>{notesOpen?"Notes":canGoBack?"Back":"Home"}</span></button>
           <strong>{screenTitle}</strong>
@@ -145,6 +176,8 @@ export default function PortraitComputerView({computerWindows,referenceFilter,bu
               <div className="portrait-notes-tools">{notesTools.map((tool)=><button type="button" key={tool.kind} disabled aria-label={tool.label} title={computerContent.readme.mobileReadOnly}><NotesToolIcon kind={tool.kind} /></button>)}</div>
             </footer>
           </section>}
+
+          {activeWindow==="updates"&&<PortraitSystemSettings />}
 
           {activeWindow==="lablog"&&<section className="portrait-lab-log">
             <header className="portrait-log-overview"><small>{computerContent.labLog.meta}</small><span><i />{computerContent.topBar.sync}</span></header>
