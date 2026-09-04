@@ -2407,8 +2407,8 @@
   }
 
   .room-shell .fax-reading-paper {
-    width: min(88vw,650px,calc((100svh - 96px)*.72));
-    width: min(88vw,650px,calc((100dvh - 96px)*.72));
+    width: min(88vw,520px,calc((100svh - 96px)*.72));
+    width: min(88vw,520px,calc((100dvh - 96px)*.72));
     height: auto;
     max-height: none;
     aspect-ratio: .72;
