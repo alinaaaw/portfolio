@@ -725,6 +725,52 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 }
 
 @media (orientation: landscape) and (pointer: coarse) {
+  .room-viewport .room-intro {
+    display: flex;
+    align-items: stretch;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: calc(68px + env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
+  }
+
+  .room-intro .intro-copy {
+    align-self: auto;
+    width: min(760px,100%);
+    margin-block: auto;
+  }
+
+  .room-intro .intro-copy > p:first-child {
+    font-size: clamp(7px,1.2vh,9px);
+  }
+
+  .room-intro .intro-copy h1 {
+    margin: clamp(7px,2vh,14px) 0;
+    font-size: clamp(28px,11vh,72px);
+    line-height: .86;
+  }
+
+  .room-intro .intro-text {
+    max-width: 610px;
+    font-size: clamp(10px,2.4vh,13px);
+    line-height: 1.45;
+  }
+
+  .room-intro .intro-copy > button {
+    min-height: 44px;
+    margin: clamp(7px,2.2vh,16px) 0 clamp(7px,2vh,14px);
+    padding: clamp(9px,2vh,13px) 16px;
+    font-size: clamp(8px,1.8vh,10px);
+  }
+
+  .room-intro .intro-identity {
+    gap: 3px;
+    font-size: clamp(7px,1.7vh,9px);
+  }
+
+  .room-intro .intro-guide {
+    display: none;
+  }
+
   .room-shell .model-scene-readout.is-touch-reveal {
     border-color: var(--signal);
     background: rgba(7,16,15,.94);
