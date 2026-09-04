@@ -202,11 +202,15 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.doesNotMatch(`${portraitComputer}\n${portraitCss}`, /--computer-(?:scale|layout)|transform:\s*scale\(|\bzoom\s*:/, "portrait Computer must not return to whole-interface scaling");
   assert.doesNotMatch(page, /PortraitRoom|MobileRoom|navigator\.userAgent|matchMedia\([^\n]+orientation/);
   assert.match(page, /zoneOrder\.map\(\(zone\) => <button[^>]+onClick=\{\(\) => inspect\(zone\)\}/);
+  assert.match(page, /portraitExploreOpen[\s\S]*className="portrait-explore-launcher"[\s\S]*aria-expanded=\{portraitExploreOpen\}[\s\S]*className="portrait-explore-backdrop"[\s\S]*is-portrait-open/, "portrait room navigation must open as a dismissible bottom sheet");
   assert.match(page, /showRoomPanHint&&<div className="room-pan-hint"[\s\S]*portraitPanHint/, "portrait room must explain the horizontal swipe gesture without permanent view controls");
   assert.match(page, /setRoomPanView\(view\);\s*setShowRoomPanHint\(false\)/, "the swipe hint must dismiss after the visitor changes the room view");
   assert.doesNotMatch(page, /room-pan-nav|Show \$\{view\} side of the room/);
   assert.match(siteCss, /\.room-pan-hint \{ display: none; \}/, "room pan hint must remain hidden from desktop layouts");
   assert.match(portraitCss, /\.room-entered \.room-pan-hint \{[\s\S]*display: flex;[\s\S]*animation: roomPanHintIn/);
+  assert.match(siteCss, /\.portrait-explore-launcher[^}]*display: none/, "portrait explorer controls must remain absent from desktop layout");
+  assert.match(portraitCss, /\.room-entered \.explore-dock \{[\s\S]*display: grid[\s\S]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)[\s\S]*overflow: hidden[\s\S]*visibility: hidden/);
+  assert.doesNotMatch(portraitCss, /\.room-entered \.explore-dock \{[^}]*overflow-x: auto/, "portrait room navigation must not compete with room panning through horizontal scrolling");
   assert.match(page, /PORTRAIT_MAP_INITIAL_ZOOM[\s\S]*portraitMapInitializedRef[\s\S]*sheet\.clientHeight>=sheet\.clientWidth[\s\S]*camera\.zoom<PORTRAIT_MAP_INITIAL_ZOOM/, "portrait travel map must open closer without changing its desktop camera");
   assert.match(page, /setShowMapPanHint\(false\)[\s\S]*className="field-map-pan-hint"[\s\S]*fieldCaseContent\.mapPortraitPanHint/, "portrait travel map must explain horizontal dragging until the visitor uses it");
   assert.match(siteCss, /\.field-map-pan-hint \{ display: none; \}/, "map pan hint must stay hidden from desktop layouts");

@@ -75,6 +75,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--signal); outlin
 
 .room-status, .hover-readout, .explore-dock, .fax-alert { position: absolute; z-index: 9; }
 .room-pan-hint { display: none; }
+.portrait-explore-launcher, .portrait-explore-backdrop, .portrait-explore-sheet-header { display: none; }
 .room-status { top: 82px; left: 26px; width: 270px; padding: 13px 15px; border-left: 2px solid var(--cyan); background: rgba(6,14,13,.76); backdrop-filter: blur(8px); }
 .room-status span, .room-status p, .hover-readout span, .hover-readout p { font: 7px var(--font-mono), monospace; letter-spacing: .08em; }
 .room-status span, .hover-readout span { color: var(--cyan); }

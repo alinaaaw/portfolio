@@ -558,6 +558,7 @@ export default function VersionThree() {
   const [entered,setEntered] = useState(false);
   const [roomPanView,setRoomPanView] = useState<RoomPanView>("center");
   const [showRoomPanHint,setShowRoomPanHint] = useState(true);
+  const [portraitExploreOpen,setPortraitExploreOpen] = useState(false);
   const [hovered,setHovered] = useState<ZoneId|null>(null);
   const [active,setActive] = useState<ZoneId|null>(null);
   const [discovered,setDiscovered] = useState<ZoneId[]>([]);
@@ -573,6 +574,7 @@ export default function VersionThree() {
   const [contactOpen,setContactOpen] = useState(false);
 
   const inspect = useCallback((zone: ZoneId) => {
+    setPortraitExploreOpen(false);
     setActive(zone);
     setDiscovered((current) => current.includes(zone)?current:[...current,zone]);
   },[]);
@@ -591,12 +593,13 @@ export default function VersionThree() {
   useEffect(() => {
     const close = (event:KeyboardEvent) => {
       if (event.key!=="Escape") return;
+      if(portraitExploreOpen){setPortraitExploreOpen(false);return;}
       if(active==="computer"&&computerWindows.length){const closing=computerWindows.at(-1); setComputerWindows((current)=>current.slice(0,-1)); setMaximizedWindow((current)=>current===closing?null:current); return;}
       setActive(null); setIndexOpen(false); setFaxOpen(false); setContactOpen(false);
     };
     window.addEventListener("keydown",close);
     return () => window.removeEventListener("keydown",close);
-  },[active,computerWindows]);
+  },[active,computerWindows,portraitExploreOpen]);
 
   const focusComputerWindow = useCallback((windowId:ComputerWindowId) => {
     setComputerWindows((current)=>current.at(-1)===windowId?current:[...current.filter((item)=>item!==windowId),windowId]);
@@ -668,7 +671,7 @@ export default function VersionThree() {
   const visibleReferences = referenceFilter==="all"?projectReferences:projectReferences.filter((reference)=>reference.project===referenceFilter);
 
   return (
-    <main className={`room-shell ${entered?"room-entered":""}`}>
+    <main className={`room-shell ${entered?"room-entered":""} ${portraitExploreOpen?"portrait-explore-open":""}`}>
       <header className="room-nav">
         <button className="room-brand" onClick={() => setIndexOpen(true)}>{siteContent.brand.name} <span>{siteContent.brand.lab}</span></button>
         <nav><button onClick={() => setIndexOpen(true)}>{roomContent.navigation.index}</button><button onClick={() => setContactOpen(true)}>{roomContent.navigation.contact}</button></nav>
@@ -702,7 +705,10 @@ export default function VersionThree() {
             <div className="room-status"><span>{roomContent.status.label}</span><strong>{status}</strong><p>{roomContent.status.instruction}</p></div>
             <div className="hover-readout" aria-live="polite"><span>{hovered?`${roomContent.hover.signalPrefix} ${zoneInfo[hovered].index}`:roomContent.hover.defaultMeta}</span><strong>{hovered?zoneInfo[hovered].label:roomContent.hover.defaultTitle}</strong><p>{hovered?zoneInfo[hovered].hint:roomContent.hover.defaultHint}</p></div>
             {showRoomPanHint&&<div className="room-pan-hint" role="status"><i aria-hidden="true">←</i><span>{roomContent.navigation.portraitPanHint}</span><i aria-hidden="true">→</i></div>}
-            <div className="explore-dock">
+            <button type="button" className="portrait-explore-launcher" aria-expanded={portraitExploreOpen} aria-controls="portrait-explore-sheet" onClick={()=>setPortraitExploreOpen(true)}><span><i aria-hidden="true" />{roomContent.navigation.portraitExplore}</span><strong>{roomContent.navigation.portraitExploreCount}</strong></button>
+            {portraitExploreOpen&&<button type="button" className="portrait-explore-backdrop" aria-label={roomContent.navigation.portraitExploreClose} onClick={()=>setPortraitExploreOpen(false)} />}
+            <div id="portrait-explore-sheet" className={`explore-dock ${portraitExploreOpen?"is-portrait-open":""}`} role="group" aria-label={roomContent.navigation.portraitExplore}>
+              <div className="portrait-explore-sheet-header"><div><span>{roomContent.navigation.portraitExplore}</span><strong>{roomContent.navigation.portraitExploreCount}</strong></div><button type="button" aria-label={roomContent.navigation.portraitExploreClose} onClick={()=>setPortraitExploreOpen(false)}><i aria-hidden="true" /></button></div>
               {zoneOrder.map((zone) => <button className={discovered.includes(zone)?"found":""} key={zone} onClick={() => inspect(zone)}><span>{zoneInfo[zone].index}</span><i>{zoneInfo[zone].label}</i></button>)}
             </div>
             {solved&&!faxOpen&&<button className="fax-alert" onClick={() => setFaxOpen(true)}><i /> {roomContent.faxAlert.title} <strong>{roomContent.faxAlert.action}</strong></button>}

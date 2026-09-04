@@ -143,37 +143,178 @@
     50% { opacity: 1; transform: translateX(3px); }
   }
 
+  .room-entered .portrait-explore-launcher {
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(360px,calc(100% - 24px));
+    min-height: 54px;
+    padding: 10px 15px;
+    translate: -50% 0;
+    border: 1px solid rgba(229,220,198,.3);
+    border-radius: 18px;
+    background: rgba(5,12,11,.9);
+    color: var(--paper);
+    box-shadow: 0 12px 32px rgba(0,0,0,.38);
+    backdrop-filter: blur(14px);
+    cursor: pointer;
+    transition: opacity .2s ease,translate .2s ease;
+  }
+
+  .room-entered .portrait-explore-launcher > span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: 8px/1 var(--font-mono),monospace;
+    letter-spacing: .1em;
+  }
+
+  .room-entered .portrait-explore-launcher > span > i {
+    display: block;
+    width: 13px;
+    height: 13px;
+    background: radial-gradient(circle,var(--signal) 0 2px,transparent 2.5px) 0 0/6px 6px;
+  }
+
+  .room-entered .portrait-explore-launcher > strong {
+    color: var(--cyan);
+    font: 7px/1 var(--font-mono),monospace;
+    letter-spacing: .08em;
+  }
+
+  .room-entered .portrait-explore-backdrop {
+    position: absolute;
+    z-index: 10;
+    inset: 58px 0 0;
+    display: block;
+    width: 100%;
+    border: 0;
+    background: rgba(2,6,5,.46);
+    backdrop-filter: blur(2px);
+    animation: portraitExploreBackdropIn .2s ease both;
+  }
+
   .room-entered .explore-dock {
+    z-index: 11;
     left: max(12px,env(safe-area-inset-left));
     right: max(12px,env(safe-area-inset-right));
     bottom: calc(10px + env(safe-area-inset-bottom));
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 8px;
     width: auto;
     max-width: none;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-padding-inline: 8px;
-    scroll-snap-type: x proximity;
+    overflow: hidden;
+    padding: 0 8px 10px;
+    translate: 0 calc(100% + 34px);
+    border-color: rgba(229,220,198,.28);
+    border-radius: 20px;
+    background: rgba(5,12,11,.96);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .24s ease,translate .3s cubic-bezier(.2,.8,.2,1),visibility 0s linear .3s;
+  }
+
+  .room-entered .explore-dock.is-portrait-open {
     translate: 0 0;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
   }
 
-  .room-entered .explore-dock button {
-    flex: 0 0 clamp(108px,31vw,150px);
-    justify-content: flex-start;
-    min-height: 64px;
-    padding: 12px 13px;
-    border-right: 1px solid var(--line);
-    border-bottom: 0;
-    scroll-snap-align: start;
+  .room-entered .portrait-explore-sheet-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 54px;
+    padding: 5px 4px 0 7px;
+    border-bottom: 1px solid rgba(229,220,198,.16);
   }
 
-  .room-entered .explore-dock button:last-child {
-    border-right: 0;
+  .room-entered .portrait-explore-sheet-header > div {
+    display: grid;
+    gap: 5px;
   }
 
-  .room-entered .explore-dock i {
-    display: block;
+  .room-entered .portrait-explore-sheet-header span,
+  .room-entered .portrait-explore-sheet-header strong {
+    font: 7px/1 var(--font-mono),monospace;
+    letter-spacing: .09em;
+  }
+
+  .room-entered .portrait-explore-sheet-header span {
+    color: var(--paper);
+  }
+
+  .room-entered .portrait-explore-sheet-header strong {
+    color: var(--cyan);
+  }
+
+  .room-entered .portrait-explore-sheet-header > button {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .room-entered .portrait-explore-sheet-header > button > i {
+    width: 9px;
+    height: 9px;
+    border-right: 1px solid var(--paper);
+    border-bottom: 1px solid var(--paper);
+    transform: translateY(-2px) rotate(45deg);
+  }
+
+  .room-entered .explore-dock > button {
+    display: grid;
+    grid-template-rows: auto minmax(18px,auto);
+    place-items: center;
+    gap: 7px;
+    min-height: 70px;
+    padding: 10px 6px;
+    border: 1px solid rgba(111,130,121,.48);
+    border-radius: 12px;
+    background: rgba(19,31,28,.72);
+    text-align: center;
+  }
+
+  .room-entered .explore-dock > button:last-child {
+    border-right: 1px solid rgba(111,130,121,.48);
+  }
+
+  .room-entered .explore-dock > button > span {
     font-size: 8px;
+  }
+
+  .room-entered .explore-dock > button > i {
+    display: block;
+    overflow: visible;
+    font-size: 8px;
+    line-height: 1.25;
+    white-space: normal;
+    text-overflow: clip;
+  }
+
+  .room-shell.portrait-explore-open .portrait-explore-launcher,
+  .room-shell.portrait-explore-open .room-pan-hint,
+  .room-shell.portrait-explore-open .fax-alert {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @keyframes portraitExploreBackdropIn {
+    from { opacity: 0; }
   }
 
   .room-entered .fax-alert {
