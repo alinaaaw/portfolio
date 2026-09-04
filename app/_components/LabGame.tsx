@@ -11,7 +11,7 @@ const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
 const MAX_PORTRAIT_ROOM_DISTANCE_SCALE = 1.85;
 const PORTRAIT_ROOM_VIEW_OFFSET = 5.25;
-const TOUCH_BOOKS_ZONE_FRONT_OFFSET = .82;
+const TOUCH_BOOKS_ZONE_FRONT_OFFSET = .61;
 const TOUCH_BOOKS_ZONE_HIT_SCALE = 1.35;
 
 export type ZoneId = "computer" | "drawer" | "notebook" | "books" | "board" | "fieldcase";
