@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { room } from "@/content";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
-import { aspectOverflowDistanceScale, shortSideFitDistanceScale } from "./cameraFraming";
+import { aspectOverflowDistanceScale, touchViewportFitDistanceScale } from "./cameraFraming";
 
 const DEFAULT_ROOM_EXPOSURE = .92;
 const PORTRAIT_ROOM_EXPOSURE = 1.08;
@@ -827,7 +827,7 @@ export default function LabGame({ active, viewing, discovered, faxReady, faxPrin
       isPortrait=rect.height>=rect.width;
       const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches;
       portraitDistanceScale=isPortrait?Math.min(aspectOverflowDistanceScale(nextAspect),MAX_PORTRAIT_ROOM_DISTANCE_SCALE):1;
-      landscapeTouchDistanceScale=isCoarseLandscape?shortSideFitDistanceScale(rect.width,rect.height):1;
+      landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1;
       booksZoneIndicator.position.z=zonePositions.books[2]+(isPortrait?PORTRAIT_BOOKS_ZONE_FRONT_OFFSET:0);
       booksZoneRing.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_RING_SCALE:1);
       booksZoneHit.scale.setScalar(isPortrait?PORTRAIT_BOOKS_ZONE_HIT_SCALE:1);

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createFieldCaseWorldMapCanvas, FIELD_CASE_TRAVEL_PINS, pinPosition } from "./fieldCaseMap";
-import { aspectOverflowDistanceScale, shortSideFitDistanceScale } from "./cameraFraming";
+import { aspectOverflowDistanceScale, touchViewportFitDistanceScale } from "./cameraFraming";
 import {
   board as boardContent,
   books as booksContent,
@@ -642,7 +642,7 @@ export default function ZoneCloseup3D({zone,onSelect,faxPrinted=false,onFaxPrint
         labelRef.current.classList.toggle("is-touch-reveal",touchReveal&&Boolean(hovered?.userData.hoverOnly));
       }
     };
-    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches; usesTouchHotspots=isPortrait||isCoarseLandscape; hotspotLayer.hidden=!usesTouchHotspots; touchCoach.hidden=!usesTouchHotspots||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; landscapeTouchDistanceScale=isCoarseLandscape?shortSideFitDistanceScale(rect.width,rect.height):1; const viewportDistanceScale=isPortrait?portraitDistanceScale:landscapeTouchDistanceScale; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/viewportDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
+    const resize=()=>{ const rect=stage.getBoundingClientRect(); if(rect.width<2||rect.height<2)return; const nextAspect=rect.width/rect.height; isPortrait=rect.height>=rect.width; const isCoarseLandscape=!isPortrait&&window.matchMedia("(pointer: coarse)").matches; usesTouchHotspots=isPortrait||isCoarseLandscape; hotspotLayer.hidden=!usesTouchHotspots; touchCoach.hidden=!usesTouchHotspots||touchGuideDismissed; portraitDistanceScale=isPortrait?portraitCloseupFitScale(rect.width,rect.height,nextAspect):1; landscapeTouchDistanceScale=isCoarseLandscape?touchViewportFitDistanceScale(rect.width,rect.height,nextAspect):1; const viewportDistanceScale=isPortrait?portraitDistanceScale:landscapeTouchDistanceScale; closeupFog.density=DEFAULT_CLOSEUP_FOG_DENSITY/viewportDistanceScale; renderer.toneMappingExposure=isPortrait?PORTRAIT_CLOSEUP_EXPOSURE:DEFAULT_CLOSEUP_EXPOSURE; renderer.setSize(rect.width,rect.height,false); camera.aspect=nextAspect; camera.fov=42; camera.updateProjectionMatrix(); if(!hovered&&labelRef.current)labelRef.current.textContent=idleHint(); startTouchGuide(); };
     const observer=new ResizeObserver(resize); observer.observe(stage); resize();
     const layoutFrame=requestAnimationFrame(resize);
     const isHitAvailable=(hit:HitMesh)=>(!hit.userData.requiresOpen||(drawerTarget>.5&&drawerProgress>.72))&&(!hit.userData.requiresPrinted||printProgress>.96);

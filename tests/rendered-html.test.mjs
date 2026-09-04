@@ -176,7 +176,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(game, /camera\.aspect=nextAspect/);
   assert.match(game, /camera\.fov=43/);
   assert.match(game, /portraitDistanceScale=isPortrait\?Math\.min\(aspectOverflowDistanceScale\(nextAspect\),MAX_PORTRAIT_ROOM_DISTANCE_SCALE\):1/);
-  assert.match(game, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*landscapeTouchDistanceScale=isCoarseLandscape\?shortSideFitDistanceScale\(rect\.width,rect\.height\):1/, "coarse-pointer landscape rooms must fit their camera to the available short side");
+  assert.match(game, /isCoarseLandscape=!isPortrait&&window\.matchMedia\("\(pointer: coarse\)"\)\.matches[\s\S]*landscapeTouchDistanceScale=isCoarseLandscape\?touchViewportFitDistanceScale\(rect\.width,rect\.height,nextAspect\):1/, "coarse-pointer landscape rooms must fit their camera to both viewport dimensions");
   assert.match(game, /renderer\.toneMappingExposure=isPortrait\?PORTRAIT_ROOM_EXPOSURE:DEFAULT_ROOM_EXPOSURE/);
   assert.match(game, /viewportDistanceScale=isPortrait\?portraitDistanceScale:landscapeTouchDistanceScale[\s\S]*multiplyScalar\(viewportDistanceScale\)/);
   assert.match(game, /const portraitPan=roomPanOffsets\[roomPanViewRef\.current\]\+portraitDragOffset/);
@@ -192,6 +192,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(framing, /IDEAL_LANDSCAPE_ASPECT/);
   assert.match(framing, /Math\.max\(1, IDEAL_LANDSCAPE_ASPECT \/ safeAspect\)/);
   assert.match(framing, /shortSideFitDistanceScale[\s\S]*Math\.min\(width,height\)[\s\S]*referenceShortSide\/shortSide[\s\S]*maxScale/, "touch landscape fitting must scale continuously with the viewport short side and remain capped");
+  assert.match(framing, /touchViewportFitDistanceScale[\s\S]*Math\.max\(aspectOverflowDistanceScale\(aspect\),shortSideFitDistanceScale\(width,height\)\)/, "touch landscape fitting must choose the larger horizontal or short-side distance requirement");
   assert.match(page, /<div className="computer-view computer-view-desktop"/);
   assert.match(page, /<PortraitComputerView computerWindows=\{computerWindows\} referenceFilter=\{referenceFilter\} bulletin=\{bulletin\}/);
   assert.match(page, /onOpenFile=\{openComputerFile\}[\s\S]*onOpenRoot=\{openPortraitComputerRoot\}[\s\S]*onFocusWindow=\{focusComputerWindow\}[\s\S]*onBack=\{backPortraitComputer\}[\s\S]*onOpenReferences=\{openReferences\}/);
@@ -358,7 +359,7 @@ test("portrait room, computer, and closeup sizing stay isolated from desktop arc
   assert.match(siteCss, /@media \(orientation: landscape\) and \(pointer: coarse\) \{[\s\S]*\.mobile-scene-hotspots[\s\S]*\.mobile-scene-hotspot-coach/, "landscape hotspot styling must be isolated to coarse pointers");
   assert.match(closeups, /const shortestSide=Math\.min\(width,height\)/, "portrait closeup sizing must respond to the viewport's shorter side");
   assert.match(closeups, /portraitDistanceScale=isPortrait\?portraitCloseupFitScale\(rect\.width,rect\.height,nextAspect\):1/);
-  assert.match(closeups, /landscapeTouchDistanceScale=isCoarseLandscape\?shortSideFitDistanceScale\(rect\.width,rect\.height\):1[\s\S]*closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "coarse-pointer landscape closeups must fit their camera and compensate fog together");
+  assert.match(closeups, /landscapeTouchDistanceScale=isCoarseLandscape\?touchViewportFitDistanceScale\(rect\.width,rect\.height,nextAspect\):1[\s\S]*closeupFog\.density=DEFAULT_CLOSEUP_FOG_DENSITY\/viewportDistanceScale/, "coarse-pointer landscape closeups must fit both viewport dimensions and compensate fog together");
   assert.match(closeups, /isHitAvailable=\(hit:HitMesh\)=>\(!hit\.userData\.requiresOpen\|\|\(drawerTarget>\.5&&drawerProgress>\.72\)\)/, "drawer contents must stop accepting taps as soon as the drawer starts closing");
   assert.match(closeups, /renderer\.setSize\(rect\.width,rect\.height,false\)/);
   assert.match(closeups, /camera\.aspect=nextAspect/);

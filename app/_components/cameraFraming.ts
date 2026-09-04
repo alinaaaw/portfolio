@@ -9,3 +9,7 @@ export function shortSideFitDistanceScale(width: number, height: number, referen
   const shortSide = Math.max(Math.min(width,height),Number.EPSILON);
   return Math.min(Math.max(1,referenceShortSide/shortSide),maxScale);
 }
+
+export function touchViewportFitDistanceScale(width: number, height: number, aspect: number) {
+  return Math.max(aspectOverflowDistanceScale(aspect),shortSideFitDistanceScale(width,height));
+}
