@@ -9,6 +9,7 @@ import board from "./board.json";
 import fieldCase from "./field-case.json";
 import faxContact from "./fax-contact.json";
 import references from "./references.json";
+import releases from "./releases.json";
 import packageMetadata from "../package.json";
 
 const version = `v${packageMetadata.version}`;
@@ -37,4 +38,7 @@ export {
   fieldCase,
   faxContactWithVersion as faxContact,
   references,
+  releases,
 };
+
+export const currentVersion = packageMetadata.version;

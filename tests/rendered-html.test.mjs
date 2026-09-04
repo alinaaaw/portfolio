@@ -59,7 +59,8 @@ test("website version displays and release tag match package version", async () 
 test("source contains six room objects, real work, and a progressive reveal", async () => {
   const { readFile } = await import("node:fs/promises");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const contentFiles = ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"];
+  const siteCss = await readFile(new URL("../public/site.css", import.meta.url), "utf8");
+  const contentFiles = ["site","intro","room","computer","references","releases","books","drawer","notebook","board","field-case","fax-contact"];
   const content = (await Promise.all(contentFiles.map((name) => readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8")))).join("\n");
   for (const zone of ["computer", "drawer", "notebook", "books", "board", "fieldcase"]) {
     assert.match(page, new RegExp(`active===\\"${zone}\\"|active!==\\"${zone}\\"|\\"${zone}\\"`));
@@ -75,6 +76,23 @@ test("source contains six room objects, real work, and a progressive reveal", as
   assert.match(page, /lab-log-line/);
   assert.match(content, /USER PROFILE \/ ALINA\.WU/);
   assert.match(page, /os-profile-trigger/);
+  assert.match(content, /SYSTEM_UPDATES\.app/);
+  assert.match(page, /selectedComputerFile==="updates"/);
+  assert.match(page, /focusComputerWindow\("updates"\)/);
+  assert.match(page, /className="os-version-button"/);
+  assert.match(page, /className="os-system-trigger"/);
+  assert.match(page, /className="settings-app-icon"/);
+  assert.doesNotMatch(page, /desktopBadge|updates-app-icon/);
+  assert.doesNotMatch(page, /profile-version-history/);
+  assert.match(page, /showComputerWindow\("updates"\)/);
+  assert.match(page, /section===\"history\"/);
+  assert.match(page, /className="system-release-timeline"/);
+  assert.doesNotMatch(page, /selectedVersion|selectedRelease/);
+  assert.doesNotMatch(page, /className="system-release-list"/);
+  assert.match(siteCss, /\.system-updates-window > \.system-settings-content \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-settings-pane \{[^}]*overflow: hidden/);
+  assert.match(siteCss, /\.system-history-panel \{[^}]*overflow: hidden/);
+  assert.match(page, /tabIndex=\{0\}/);
   assert.match(page, /onToggleMaximize=\{toggleMaximizedWindow\}/);
   assert.match(page, /maximizedWindow===\"references\"/);
   assert.match(page, /window-maximize/);
@@ -163,12 +181,31 @@ test("source contains six room objects, real work, and a progressive reveal", as
 
 test("editable copy is organized into valid category files", async () => {
   const { readFile } = await import("node:fs/promises");
-  for (const name of ["site","intro","room","computer","references","books","drawer","notebook","board","field-case","fax-contact"]) {
+  for (const name of ["site","intro","room","computer","references","releases","books","drawer","notebook","board","field-case","fax-contact"]) {
     const source = await readFile(new URL(`../content/${name}.json`, import.meta.url), "utf8");
     assert.doesNotThrow(() => JSON.parse(source), `${name}.json must remain valid JSON`);
   }
   const guide = await readFile(new URL("../content/CONTENT_GUIDE.md", import.meta.url), "utf8");
   assert.match(guide, /Website Copy Editing Guide/);
+});
+
+test("public release history is ordered and matches the package version", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const releaseContent = JSON.parse(await readFile(new URL("../content/releases.json", import.meta.url), "utf8"));
+  const releases = releaseContent.releases;
+
+  assert.ok(releases.length > 0);
+  assert.equal(releases[0].version, packageJson.version, "latest public release must match the current package version");
+  assert.deepEqual([...releases].sort((a,b) => b.date.localeCompare(a.date)), releases, "public releases must remain newest first");
+  for (const release of releases) {
+    assert.match(release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+    assert.match(release.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(release.title && release.summary);
+    assert.ok(["major","minor","patch"].includes(release.type));
+    assert.ok(Array.isArray(release.highlights) && release.highlights.length >= 1 && release.highlights.length <= 3);
+    assert.ok(Object.values(release.details).every((items) => Array.isArray(items) && items.length > 0));
+    if (release.releaseUrl) assert.equal(new URL(release.releaseUrl).protocol, "https:");
+  }
 });
 
 test("critical local assets and visitor links remain valid", async () => {

@@ -190,32 +190,33 @@
 
 ### 4.3 网站电脑中的 Version History 应用
 
-在 Lab 17 的电脑里增加一个符合系统氛围的版本历史应用。建议使用同一个窗口提供两个入口：
+在 Lab 17 的电脑里增加一个符合系统氛围的版本历史应用。使用同一个窗口提供三个入口：
 
 - Computer 桌面上的 `SYSTEM_UPDATES.app` 或 `VERSION_HISTORY.md`
-- Profile / System Information 窗口里的 **Version History…** 按钮
+- Computer 顶栏的当前版本号
+- Computer 左侧栏的 **System**
 
-这样访客既可以主动发现它，也可以从查看当前系统版本的位置进入，不需要在首页额外增加版本入口。
+这样访客既可以从桌面主动发现它，也可以从当前版本号或系统设置进入，不需要在首页额外增加版本入口。
 
 #### 当前版本界面
 
-- [ ] 在窗口顶部显示产品名称，例如 `ALINA PORTFOLIO / LAB 17`。
-- [ ] 自动显示 `package.json` 中的当前版本，例如 `Version 1.2.0`。
-- [ ] 显示发布日期和状态，例如 `Stable`、`Release Candidate` 或 `Preview`。
-- [ ] 用一句简短文字概括当前版本，例如 “Introduced the AI Lab Guide and dossier Q&A.”
-- [ ] 提供 **View Version History**，展开过往正式版本。
-- [ ] 保持 macOS About / Software Update 的清楚层级，但继续使用网站现有的 Lab 17 视觉语言，不直接复制 Apple 界面。
+- [x] 在窗口顶部显示产品名称，例如 `ALINA PORTFOLIO / LAB 17`。
+- [x] 自动显示 `package.json` 中的当前版本，例如 `Version 1.2.0`。
+- [x] 显示发布日期和状态，例如 `Stable`、`Release Candidate` 或 `Preview`。
+- [x] 用一句简短文字概括当前版本，例如 “Introduced the AI Lab Guide and dossier Q&A.”
+- [x] 提供 **View Version History**，展开过往正式版本。
+- [x] 保持 macOS About / Software Update 的清楚层级，但继续使用网站现有的 Lab 17 视觉语言，不直接复制 Apple 界面。
 
 #### 版本历史列表
 
-- [ ] 按时间倒序显示，最新版本在最上方。
-- [ ] 每个版本显示版本号、发布日期、版本标题和 1–3 条简短概要。
-- [ ] 使用容易识别但不过度抢眼的标签区分 `MAJOR`、`MINOR`、`PATCH`。
-- [ ] 重大版本可以使用更完整的卡片，普通修复版本默认保持紧凑。
-- [ ] 允许展开某个版本查看 Added、Changed 和 Fixed 的详细内容。
-- [ ] 可选：提供该版本的 GitHub Release 链接，但不要求普通访客理解 commit 或内部部署信息。
+- [x] 按时间倒序显示，最新版本在最上方。
+- [x] 每个版本显示版本号、发布日期、版本标题和 1–3 条简短概要。
+- [x] 使用容易识别但不过度抢眼的标签区分 `MAJOR`、`MINOR`、`PATCH`。
+- [x] 所有版本使用统一、紧凑的条目排版，类型标签用于区分 `MAJOR`、`MINOR` 和 `PATCH`。
+- [x] 当前少量版本直接完整列出概要，不要求逐项选择或展开。
+- [x] 可选：提供该版本的 GitHub Release 链接，但不要求普通访客理解 commit 或内部部署信息。
 - [ ] 可选：为与场景有关的变化提供 **Explore this update**，带访客前往对应项目、物体或 AI Guide。
-- [ ] 旧版本较多时采用滚动、折叠或按 major version 分组，避免窗口无限变长。
+- [ ] 版本数量增加后采用 major version 分组或分页，继续避免页面滚动和窗口无限变长。
 
 建议显示效果：
 
@@ -238,14 +239,14 @@ Improved mobile hotspots and camera transitions.
 
 #### 版本历史数据
 
-- [ ] 新建 `content/releases.json`，只存放已经发布或明确标记为 prerelease 的公开版本概要。
-- [ ] 每条记录包含 `version`、`date`、`title`、`type`、`summary`、`highlights` 和可选的 `releaseUrl`、`relatedScene`。
-- [ ] 当前版本号仍然只从 `package.json` 读取；`releases.json` 负责历史内容，不成为第二个当前版本来源。
-- [ ] CI 检查 `releases.json` 最新稳定记录、Git tag 和 `package.json` version 是否一致。
-- [ ] 正式网站默认不显示普通 commit、内部 build、未发布草稿或失败部署。
-- [ ] Release Candidate 只能在 preview 中显示 `Prerelease` 状态；正式站点只显示已经发布的稳定版本。
-- [ ] 初期继续使用 JSON，不需要为了 Version History 增加数据库或 CMS。
-- [ ] 未来 CMS 可以辅助撰写 release summary，但版本记录仍随正式 release 一起进入 Git 历史。
+- [x] 新建 `content/releases.json`，只存放已经发布或明确标记为 prerelease 的公开版本概要。
+- [x] 每条记录包含 `version`、`date`、`title`、`type`、`summary`、`highlights` 和可选的 `releaseUrl`、`relatedScene`。
+- [x] 当前版本号仍然只从 `package.json` 读取；`releases.json` 负责历史内容，不成为第二个当前版本来源。
+- [x] CI 检查 `releases.json` 最新公开记录、Git tag 和 `package.json` version 是否一致。
+- [x] 正式网站默认不显示普通 commit、内部 build、未发布草稿或失败部署。
+- [x] Prerelease 和 Release Candidate 使用相应状态；历史中只显示已经公开发布的记录。
+- [x] 初期继续使用 JSON，不需要为了 Version History 增加数据库或 CMS。
+- [x] 未来 CMS 可以辅助撰写 release summary，但版本记录仍随正式 release 一起进入 Git 历史。
 
 数据结构示例：
 
@@ -270,11 +271,11 @@ Improved mobile hotspots and camera transitions.
 
 #### 交互和无障碍要求
 
-- [ ] Version History 窗口沿用现有 computer 的打开、聚焦、拖动、最小化和关闭行为。
-- [ ] 桌面图标支持单击选中、双击打开、Enter 打开和清楚的 focus 状态。
-- [ ] 版本列表支持键盘滚动，展开按钮具有正确的 `aria-expanded` 状态。
+- [x] Version History 窗口沿用现有 computer 的打开、聚焦、拖动、任务栏恢复和关闭行为。
+- [x] 桌面图标支持单击选中、双击打开、Enter 打开和清楚的 focus 状态。
+- [x] General 与 Version History 可通过键盘切换，当前少量版本不依赖滚动、选择或展开操作。
 - [ ] 在窄屏和手机 close-up 中保证版本号、日期和概要不会被截断。
-- [ ] 即使 JavaScript 动画被减少，版本信息仍可完整访问。
+- [x] 即使 JavaScript 动画被减少，版本信息仍可完整访问。
 
 完成标准：访客可以在网站电脑中查看当前版本与全部正式发布历史；显示内容与 GitHub Release 一致，并且不会暴露未发布开发记录。
 

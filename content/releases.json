@@ -1,0 +1,66 @@
+{
+  "windowTitle": "SYSTEM_UPDATES.app",
+  "ariaLabel": "Lab 17 system updates and version history",
+  "openAriaLabel": "Open Lab 17 version history",
+  "eyebrow": "SOFTWARE UPDATE",
+  "product": "ALINA PORTFOLIO / LAB 17",
+  "generalLabel": "GENERAL",
+  "currentLabel": "CURRENT VERSION",
+  "versionLabel": "Version",
+  "historyLabel": "VERSION HISTORY",
+  "releaseCountLabel": "PUBLIC RELEASES",
+  "currentStatus": "Lab 17 is up to date",
+  "statusLabels": {
+    "stable": "STABLE",
+    "preview": "PREVIEW",
+    "prerelease": "PRERELEASE",
+    "releaseCandidate": "RELEASE CANDIDATE"
+  },
+  "showHistory": "VIEW UPDATE HISTORY",
+  "releaseLink": "VIEW GITHUB RELEASE ↗",
+  "releases": [
+    {
+      "version": "0.8.1",
+      "date": "2026-08-28",
+      "title": "Interaction Alignment",
+      "type": "patch",
+      "summary": "Refined shared 3D scenes and improved interaction consistency across Lab 17.",
+      "highlights": [
+        "Aligned printer, drawer, and room closeup staging",
+        "Refined return controls and project labels"
+      ],
+      "details": {
+        "Fixed": [
+          "Corrected printer, drawer, and room closeup staging and alignment",
+          "Improved scene test resilience when 3D layouts change",
+          "Refined return controls and corrected related project copy and labels",
+          "Updated the release workflow runtime"
+        ]
+      },
+      "releaseUrl": "https://github.com/alinaaaw/portfolio/releases/tag/v0.8.1"
+    },
+    {
+      "version": "0.8.0",
+      "date": "2026-08-27",
+      "title": "Initial Public Preview",
+      "type": "minor",
+      "summary": "Introduced the first public preview of the Lab 17 interactive portfolio.",
+      "highlights": [
+        "Opened the six-station laboratory exploration",
+        "Added project records, System Bulletin, and feedback paths"
+      ],
+      "details": {
+        "Added": [
+          "Introduced the Lab 17 portfolio experience at alinawu.com",
+          "Added interactive room exploration with progressive content reveal",
+          "Added System Bulletin and feedback entry points"
+        ],
+        "Changed": [
+          "Established alinawu.com as the canonical public address",
+          "Redirected www.alinawu.com to the canonical root domain"
+        ]
+      },
+      "releaseUrl": "https://github.com/alinaaaw/portfolio/releases/tag/v0.8.0"
+    }
+  ]
+}
